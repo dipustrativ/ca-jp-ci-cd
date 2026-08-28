@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Developify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="CarpetAvenue_Developify::core" title="Developify" module="CarpetAvenue_Developify" sortOrder="400" parent="Magento_Backend::system" resource="CarpetAvenue_Developify::core"/>
+        <add id="CarpetAvenue_Developify::cron" title="Cron Manager" module="CarpetAvenue_Developify" sortOrder="200" parent="CarpetAvenue_Developify::core" action="developify/cron/index" resource="CarpetAvenue_Developify::cron"/>
+        <add id="CarpetAvenue_Developify::cron_jobs" title="Cron Jobs" module="CarpetAvenue_Developify" sortOrder="210" parent="CarpetAvenue_Developify::core" action="developify/cron/jobs" resource="CarpetAvenue_Developify::cron_jobs"/>
+        <add id="CarpetAvenue_Developify::log_viewer" title="Log Viewer" module="CarpetAvenue_Developify" sortOrder="300" parent="CarpetAvenue_Developify::core" action="developify/logviewer/index" resource="CarpetAvenue_Developify::log_viewer"/>
+        <add id="CarpetAvenue_Developify::support" title="Support" module="CarpetAvenue_Developify" sortOrder="400" parent="CarpetAvenue_Developify::core" action="developify/support/index" resource="CarpetAvenue_Developify::support"/>
+    </menu>
+</config>

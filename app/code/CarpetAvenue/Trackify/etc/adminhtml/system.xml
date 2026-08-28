@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="carpetavenue_analytics" translate="label" type="text" sortOrder="340" showInDefault="1">
+            <label>Trackify</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_Trackify::analytics</resource>
+            <group id="tagmanager" translate="label" type="text" sortOrder="10" showInDefault="1">
+                <label>Google Tag Manager (GTM)</label>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="container" translate="label" type="textarea" sortOrder="20" showInDefault="1">
+                    <label>Container</label>
+                    <depends>
+                        <field id="*/*/active">1</field>
+                    </depends>
+                </field>
+                <field id="noscript_container" translate="label" type="textarea" sortOrder="20" showInDefault="1">
+                    <label>Noscript Container</label>
+                    <depends>
+                        <field id="*/*/active">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

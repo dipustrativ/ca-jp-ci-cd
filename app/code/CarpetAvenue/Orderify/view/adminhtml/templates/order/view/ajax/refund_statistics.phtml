@@ -1,0 +1,244 @@
+<?php
+/** @var CarpetAvenue\Orderify\Block\Adminhtml\Order\Ajax\RefundStatistic $block */
+$order = $block->getOrder();
+$refundOrderByEmail = $block->getRefundStatisticByEmail($order->getCustomerEmail());
+$streetAddress = $order?->getShippingAddress()?->getData('street');
+if (is_array($streetAddress)) {
+    $streetAddress = implode(' ', $streetAddress);
+}
+$refundOrderByStreetAddress = $block->getRefundStatisticByStreetAddress($streetAddress);
+if ($order->getData('x_forwarded_for')) {
+    $remoteIP = explode(',', $order->getData('x_forwarded_for'))[0];
+} else {
+    $remoteIP = null;
+}
+$refundOrderByIP = $block->getRefundStatisticByIP($remoteIP);
+$blackDetails = $block->getBlackList();
+
+?>
+
+<div class="admin__page-section-title">
+    <span class="title"><?= __('Refund Statistics') ?></span>
+</div>
+
+<div class="admin__page-section-content overview-wrapper">
+
+    <!-- 1) Shipping Address -->
+    <div class="overview-box" style="background: <?= isset($refundOrderByStreetAddress['total_refund']) && $refundOrderByStreetAddress['total_refund'] > 1 ? '#f8f8f8' : '#fff'?>;">
+        <div class="overview-title"><?= __('Same Address')?></div>
+        <div class="overview-text">
+            <strong>Address: <?= $streetAddress?></strong> <br>
+            <strong>Total Refund: <?= $refundOrderByStreetAddress['total_refund'] ?? 0?></strong> <br>
+            <?php if (isset($refundOrderByStreetAddress['total_refund'])): ?>
+                <button
+                        data-refund_statistic_details="<?= htmlspecialchars(json_encode($refundOrderByStreetAddress), ENT_QUOTES, 'UTF-8'); ?>"
+                        data-refund_statistic_title="<?= __('Orders with Same Street Address Refund Details')?>"
+                        type="button"
+                        style="margin-top: 15px"
+                        id="open-modal"
+                        class="refund_statistic_orders_button"
+                >
+                    Show Orders
+                </button>
+            <?php endif; ?>
+        </div>
+    </div>
+
+
+    <!-- 2) Email + Total Refund -->
+    <div class="overview-box" style="margin-left:15px; margin-right: 15px; background: <?= isset($refundOrderByEmail['total_refund']) && $refundOrderByEmail['total_refund'] > 1 ? '#f8f8f8' : '#fff'?>;">
+        <div class="overview-title"><?= __('Same Email')?></div>
+        <div class="overview-text">
+            <strong>Email: <?= $order->getCustomerEmail()?></strong> <br/>
+            <strong>Total Refund: <?= $refundOrderByEmail['total_refund'] ?? 0?></strong> <br/>
+            <?php if (isset($refundOrderByEmail['total_refund'])): ?>
+                <button
+                        data-refund_statistic_details="<?= htmlspecialchars(json_encode($refundOrderByEmail), ENT_QUOTES, 'UTF-8'); ?>"
+                        data-refund_statistic_title="<?= __('Orders with Same Email Refund Details')?>"
+                        type="button"
+                        style="margin-top: 15px"
+                        id="open-modal"
+                        class="refund_statistic_orders_button"
+                >
+                    Show Orders
+                </button>
+            <?php endif; ?>
+        </div>
+    </div>
+
+
+    <!-- 3) IP Address -->
+    <div class="overview-box" style="margin-left:15px; margin-right: 15px; background: <?= isset($refundOrderByIP['total_refund']) && $refundOrderByIP['total_refund'] > 1 ? '#f8f8f8' : '#fff'?>;">
+        <div class="overview-title"><?= __('Same IP Address')?></div>
+        <div class="overview-text">
+            <strong>IP: <?= $refundOrderByIP['ip'] ?? $remoteIP?></strong> <br>
+            <strong>Total Refund: <?= $refundOrderByIP['total_refund'] ?? 0?></strong> <br>
+            <?php if (isset($refundOrderByIP['total_refund'])): ?>
+                <button
+                        data-refund_statistic_details="<?= htmlspecialchars(json_encode($refundOrderByIP), ENT_QUOTES, 'UTF-8'); ?>"
+                        data-refund_statistic_title="<?= __('Orders with Same IP Address Refund Details')?>"
+                        type="button"
+                        style="margin-top: 15px"
+                        id="open-modal"
+                        class="refund_statistic_orders_button"
+                >
+                    Show Orders
+                </button>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- 4) Black -->
+    <div class="overview-box" style="<?= !empty($blackDetails) && count($blackDetails)  ? 'background: #eb5204; color: #fff' : 'background: #fff'?>;">
+        <div class="overview-title"><?= __('Black List (Address / Email / IP)')?></div>
+        <div class="overview-text">
+
+            <?php if(is_array($blackDetails) && count($blackDetails) == 0): ?>
+                <button
+                        type="button"
+                        style="margin-top: 15px"
+                        class="add_in_black_list_button"
+                >
+                    Add to Black List
+                </button>
+
+            <?php else: ?>
+                <?php foreach ($blackDetails as $detail): ?>
+                    <button
+                            type="button"
+                            class="remove_in_black_list_button"
+                            style="margin-top: 5px"
+                            data-blacklist_id="<?= $detail['entity_id'] ?>"
+                    >
+                        <?= __("%1 remove from blacklist", ucfirst($detail['blacklist_type'])) ?>
+                    </button>
+                <?php endforeach; ?>
+            <?php endif;?>
+
+        </div>
+    </div>
+
+    <div id="modal-content" style="display:none; margin-bottom: 35px;">
+        <div id="modal_popup_content">
+
+        </div>
+    </div>
+
+</div>
+
+<?php if (is_array($blackDetails) && count($blackDetails)):?>
+<div class="admin__page-section-content">
+    <?php foreach ($blackDetails as $detail): ?>
+        <?php if(!empty($detail['note'])):?>
+            <p style="color: red"><?= $detail['note'] ?></p>
+        <?php endif;?>
+    <?php endforeach;?>
+</div>
+<?php endif;?>
+
+<style>
+    .small-modal .modal-inner-wrap {
+        width: 400px !important;
+        max-width: 90%;
+    }
+</style>
+
+<script type="text/javascript">
+    require([
+        'jquery',
+        'Magento_Ui/js/modal/modal'
+    ], function ($, modal) {
+
+        const options = {
+            type: 'popup',
+            modalClass: 'small-modal',
+            buttons: [
+                /*{
+                    text: 'Close',
+                    click: function () {
+                        this.closeModal();
+                    }
+                }*/
+            ]
+        };
+
+        modal(options, $('#modal-content'));
+
+        $('.refund_statistic_orders_button').click(function () {
+            $('#modal-content').modal('openModal');
+            const title = $(this).data('refund_statistic_title');
+            const details = $(this).data('refund_statistic_details');
+            let contentHtml = '<h2>' + title + '</h2>';
+            contentHtml += '<ul>';
+            if (details.all_refund_orders) {
+                let orders = details.all_refund_orders.split(",");
+                if (orders.length > 0) {
+                    orders.forEach(function(orderId) {
+                        const order = orderId.split("--");
+                        if (order.length === 2) {
+                            contentHtml += '<li style="padding: 5px 5px">' +
+                                '<a href="<?= $block->getOrderUrl('ORDER_ID_PLACEHOLDER') ?>'.replace('ORDER_ID_PLACEHOLDER', order[1]) + '" target="_blank">' +
+                                order[0] +
+                                '</a></li>';
+                        }
+                    });
+                }
+            } else {
+                contentHtml += '<li>No orders found.</li>';
+            }
+            contentHtml += '</ul>';
+            $('#modal_popup_content').html(contentHtml);
+        });
+
+        $('.add_in_black_list_button').click(function () {
+            $('#modal-content').modal('openModal');
+            let contentHtml = `
+                <h2 style="margin-bottom:15px;"><?= __('Add to Black List') ?></h2>
+
+                <form id="blacklist_form" style="font-size:14px;margin-top: 25px" action="<?= $block->getAddToBlackListUrl(); ?>" method="POST">
+                    <input name="form_key" type="hidden" value="<?= $block->getFormKey() ?>" />
+                    <input name="order_id" type="hidden" value="<?= $order->getEntityId() ?>" />
+
+                    <label for="blacklist_type" style="font-weight:600; display:block; margin-bottom:5px;">
+                        <?= __('Type:') ?> <span style="color:red;">*</span>
+                    </label>
+
+                    <select id="blacklist_type" name="blacklist_type" required="true" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                        <option value="">-- Select --</option>
+                        <option value="email">Email</option>
+                        <option value="address">Address</option>
+                        <option value="ip">IP</option>
+                    </select>
+
+                    <br><br>
+
+                    <label for="blacklist_reason" style="font-weight:600; display:block; margin-bottom:5px;">
+                        <?= __('Reason:') ?>
+                    </label>
+
+                    <textarea id="blacklist_reason" name="blacklist_reason" rows="5" cols="45"
+                        style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></textarea>
+
+                    <br><br>
+
+                    <button type="submit" id="submit_blacklist"
+                        style="background:#1979c3; color:#fff; border:none; padding:10px 18px; border-radius:4px; cursor:pointer;">
+                        <?= __('Submit') ?>
+                    </button>
+
+                </form>
+            `;
+
+
+            $('#modal_popup_content').html(contentHtml);
+        })
+
+        $('.remove_in_black_list_button').click(function () {
+            let blacklistId = $(this).data('blacklist_id');
+            if (confirm('Are you sure you want to remove this item from the blacklist?')) {
+                window.location.href = "<?= $block->getBlackListRemoveUrl('ID_PLACEHOLDER') ?>".replace('ID_PLACEHOLDER', Number(blacklistId));
+            }
+        });
+
+    });
+</script>

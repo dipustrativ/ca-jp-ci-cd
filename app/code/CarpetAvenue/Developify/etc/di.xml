@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Developify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Cron Manager — data source for the read-only cron_schedule grid.
+         Magento's own resource model already declares the table and its
+         schedule_id primary key, so no Model/ResourceModel/Collection of our
+         own is needed — the stock SearchResult is enough.
+
+         Global, NOT etc/adminhtml/di.xml: an area-scoped `collections`
+         argument REPLACES the global array instead of merging into it, which
+         drops all 48 core data sources and breaks every admin grid built on
+         the generic UI DataProvider ("Not registered handle
+         cms_block_listing_data_source"). Core declares its entries globally too.
+         ═══════════════════════════════════════════════════════════════════ -->
+    <virtualType name="CarpetAvenue\Developify\Model\ResourceModel\CronSchedule\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cron_schedule</argument>
+            <argument name="resourceModel" xsi:type="string">Magento\Cron\Model\ResourceModel\Schedule</argument>
+            <argument name="identifierName" xsi:type="string">schedule_id</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="developify_cron_listing_data_source" xsi:type="string">CarpetAvenue\Developify\Model\ResourceModel\CronSchedule\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>

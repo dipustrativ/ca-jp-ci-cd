@@ -1,0 +1,414 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="ixpfng" translate="label" sortOrder="100" class="ixpfng-extensions">
+            <label>IXPF NG</label>
+        </tab>
+
+        <section id="ixpfng" translate="label" type="text" sortOrder="101" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <label>Webhook</label>
+            <tab>ixpfng</tab>
+            <resource>Magento_Backend::admin</resource>
+
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>General Configuration</label>
+                <field id="shop_object_id" translate="label" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Shop ID</label>
+                    <comment>Enter the shop object ID for integration.</comment>
+                </field>
+            </group>
+
+            <group id="product" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Product Sync Configuration</label>
+                <field id="enable_webhook" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable Webhook</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Select Yes to enable the webhook.</comment>
+                </field>
+                <field id="webhook_url" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Webhook Url</label>
+                    <comment>Enter the product webhook url.</comment>
+                </field>
+                <field id="secret_code" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Webhook Secret Code</label>
+                    <comment>Enter the product webhook url secret code for secure communication.</comment>
+                </field>
+            </group>
+
+            <group id="cronjob" translate="label" sortOrder="30" showInDefault="1">
+                <label>Cron Job</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable IXPF Cron Job</label>
+                    <comment>Enable/disable the automated product indexer cron job</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+
+            <group id="webhook_dispatch" translate="label" type="text" sortOrder="40" showInDefault="1"
+                   showInWebsite="0" showInStore="0">
+                <label>Webhook Dispatch</label>
+
+                <field id="dispatch_limit" translate="label comment" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Dispatch Limit</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment><![CDATA[Maximum number of <code>ready_for_webhook</code> jobs to fetch and dispatch per cron run. Default: <strong>50</strong>.]]></comment>
+                </field>
+
+                <field id="parallel_processing" translate="label comment" type="select" sortOrder="20"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Parallel Processing</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Enable parallel processing for webhook dispatch using multiple worker processes.<br/><strong>Yes</strong> — forks multiple child processes (faster, requires <code>pcntl</code> PHP extension).<br/><strong>No</strong> — processes jobs sequentially one at a time (safe default).]]></comment>
+                </field>
+
+                <field id="parallel_workers" translate="label comment" type="text" sortOrder="30" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Parallel Workers</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <depends>
+                        <field id="parallel_processing">1</field>
+                    </depends>
+                    <comment><![CDATA[Number of parallel worker processes for webhook dispatch. Recommended: <strong>3–5</strong>. Maximum allowed: <strong>10</strong>.<br/>Only visible when <strong>Parallel Processing</strong> is set to Yes.]]></comment>
+                </field>
+
+            </group>
+        </section>
+
+        <section id="ixpfng_product" translate="label" type="text" sortOrder="102" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <label>Product</label>
+            <tab>ixpfng</tab>
+            <resource>Magento_Backend::admin</resource>
+
+            <group id="product_update_config" translate="label" type="text" sortOrder="10" showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
+                <label>Product Update Configuration</label>
+
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Select Yes to enable the product updated feature from ixpf.</comment>
+                </field>
+
+                <field id="allow_attributes" translate="label" type="multiselect" sortOrder="20" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Allow Attributes</label>
+                    <source_model>IXPF\Syncer\Model\Config\Source\AllowAttributes</source_model>
+                    <comment>Select attributes to allow product update.</comment>
+                </field>
+
+            </group>
+
+            <group id="category_position" translate="label" type="text" sortOrder="20" showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
+                <label>Category Position Update</label>
+
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Select Yes to enable the product category position updated feature from ixpf.</comment>
+                </field>
+
+            </group>
+
+            <group id="product_bulk_update_config" translate="label" type="text" sortOrder="30" showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
+                <label>Product Bulk Update Configuration</label>
+
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Select Yes to enable the product bulk updated feature from ixpf.</comment>
+                </field>
+
+                <field id="category_assign_enable" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Category Assign Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Select Yes to enable the product bulk category assign feature from ixpf.</comment>
+                </field>
+
+                <field id="allow_attributes" translate="label" type="multiselect" sortOrder="30" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Allow Attributes</label>
+                    <source_model>IXPF\Syncer\Model\Config\Source\AllowAttributes</source_model>
+                    <comment>Select attributes to allow product bulk update.</comment>
+                </field>
+
+            </group>
+
+            <group id="google_bucket_config" translate="label" type="text" sortOrder="40" showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
+                <label>Product Image Google Bucket Configuration</label>
+
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Select Yes to enable the bucket configuration.</comment>
+                </field>
+
+                <field id="enable_cron" translate="label comment" type="select" sortOrder="15" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable Cron</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Select Yes to run the PhotoStudio cron, which downloads new Google Bucket images and processes the image queue into product galleries. Ignored when <strong>Enable Previous Functionality</strong> is set to Yes.]]></comment>
+                </field>
+
+                <field id="enable_previous_functionality" translate="label comment" type="select" sortOrder="20" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable Previous Functionality</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Enable the PhotoStudio Previous Functionality. <strong>If set to Yes, please communicate with the developer before enabling on production.</strong>]]></comment>
+                </field>
+
+                <field id="product_save_method" translate="label comment" type="select" sortOrder="30" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Product Save Method</label>
+                    <source_model>IXPF\Syncer\Model\Config\Source\PhotoStudioSaveMethod</source_model>
+                    <comment><![CDATA[Choose how products are persisted after image processing.<br/><strong>ORM</strong> — uses Magento's standard <code>product->save()</code> (safe, fires all observers/events).<br/><strong>Raw DB</strong> — uses direct SQL queries; faster and bypasses ORM events, but skips Magento observers. <strong>Use with caution on production.</strong>]]></comment>
+                </field>
+
+                <field id="bucket_name" translate="label" type="text" sortOrder="40" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Bucket Name</label>
+                    <comment>Enter the google bucket name.</comment>
+                </field>
+
+                <field id="json_file" translate="label" type="file" sortOrder="50" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Upload JSON File</label>
+                    <backend_model>IXPF\Syncer\Model\Config\Source\GoogleBucketJsonFile</backend_model>
+                    <comment>Upload google bucket configuration JSON file.</comment>
+                </field>
+
+
+                <field id="webhook_dispatch_limit" translate="label comment" type="text" sortOrder="60" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Webhook Dispatch Limit</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment><![CDATA[Maximum number of <code>ready_for_webhook</code> jobs to fetch and dispatch per cron run. Default: <strong>25</strong>.]]></comment>
+                </field>
+
+                <field id="webhook_parallel_processing" translate="label comment" type="select" sortOrder="70" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Webhook Parallel Processing</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Enable parallel processing for webhook dispatch using multiple worker processes.<br/><strong>Yes</strong> — forks multiple child processes (faster, requires <code>pcntl</code> PHP extension).<br/><strong>No</strong> — processes jobs sequentially one at a time (safe default).]]></comment>
+                </field>
+
+                <field id="webhook_parallel_workers" translate="label comment" type="text" sortOrder="80" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Webhook Parallel Workers</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <depends>
+                        <field id="webhook_parallel_processing">1</field>
+                    </depends>
+                    <comment><![CDATA[Number of parallel worker processes for webhook dispatch. Recommended: <strong>3–5</strong>. Maximum allowed: <strong>10</strong>.<br/>Only visible when Parallel Processing is set to <strong>Yes</strong>.]]></comment>
+                </field>
+
+            </group>
+
+        </section>
+
+        <section id="ixpfng_purchase" translate="label" type="text" sortOrder="102" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <label>Purchase</label>
+            <tab>ixpfng</tab>
+            <resource>Magento_Backend::admin</resource>
+
+            <group id="purchase" translate="label" type="text" sortOrder="10" showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
+                <label>Product Purchase Configuration</label>
+
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Select Yes to enable the purchase configuration.</comment>
+                </field>
+
+                <field id="required_attributes" translate="label" type="multiselect" sortOrder="20" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Required Attributes</label>
+                    <source_model>IXPF\Syncer\Model\Config\Source\AllowAttributes</source_model>
+                    <comment>Select attributes that are requires to purchase product create.</comment>
+                </field>
+
+                <field id="root_category_id" translate="label comment" type="text" sortOrder="30" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Root Category ID</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment><![CDATA[Root catalog category id used as parent when resolving/creating category paths on purchase product create. Default: <strong>1</strong> (root catalog).]]></comment>
+                </field>
+            </group>
+
+            <group id="webhook" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Purchase Webhook Configuration</label>
+                <field id="enable_webhook" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable Webhook</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Select Yes to enable the webhook.</comment>
+                </field>
+                <field id="webhook_url" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Webhook Url</label>
+                    <comment>Enter the purchase webhook url.</comment>
+                </field>
+                <field id="secret_code" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Webhook Secret Code</label>
+                    <comment>Enter the purchase webhook url secret code for secure communication.</comment>
+                </field>
+            </group>
+
+            <group id="cronjob" translate="label" sortOrder="30" showInDefault="1">
+                <label>Cron Job</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable IXPF Purchase Cron Job</label>
+                    <comment>Enable/disable the automated purchase cron job</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+
+        </section>
+
+        <section id="ixpfng_order" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <label>Order</label>
+            <tab>ixpfng</tab>
+            <resource>Magento_Backend::admin</resource>
+
+            <group id="order_create" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Order Create Configuration</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <comment>Select Yes to enable the quote/order create API (admin manual order style) from ixpf.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="payment_methods" translate="label comment" type="multiselect" sortOrder="20"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Allowed Payment Methods</label>
+                    <comment>Only the selected methods are returned by the PaymentMethods endpoint. Leave empty to return all active methods.</comment>
+                    <source_model>Magento\Payment\Model\Config\Source\Allmethods</source_model>
+                </field>
+                <field id="allow_oversell" translate="label comment" type="select" sortOrder="30" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Allow Over-sell (admin parity)</label>
+                    <comment>Select Yes to skip the requested-qty stock check so any salable product can be added regardless of available qty, exactly like the admin Create New Order screen. The product must still exist, be enabled and salable. Default No.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="order_update" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Order Configuration</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <comment>Select Yes to enable the order updated feature from ixpf.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="invoice_update" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Invoice Configuration</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <comment>Select Yes to enable the order updated feature from ixpf.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="creditmemo_update" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>CreditMemo Configuration</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <comment>Select Yes to enable the order updated feature from ixpf.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="shipment_update" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Shipment Configuration</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <comment>Select Yes to enable the order updated feature from ixpf.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+
+
+        </section>
+
+        <section id="ixpfng_customer" translate="label" type="text" sortOrder="104" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <label>Customer</label>
+            <tab>ixpfng</tab>
+            <resource>Magento_Backend::admin</resource>
+
+            <group id="customer_create" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Customer Create Configuration</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <comment>Select Yes to enable the customer create API (with optional address book) from ixpf.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+
+        <section id="ixpfng_notification" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <label>Notifications</label>
+            <tab>ixpfng</tab>
+            <resource>Magento_Backend::admin</resource>
+
+            <group id="slack" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Slack Notification</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable Slack Notification</label>
+                    <comment>Send Slack notifications when webhook jobs fail.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="webhook_url" translate="label comment" type="text" sortOrder="20" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Slack Incoming Webhook URL</label>
+                    <comment>Enter your Slack Incoming Webhook URL (e.g. https://hooks.slack.com/services/XXX/YYY/ZZZ).</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+
+    </system>
+</config>
+

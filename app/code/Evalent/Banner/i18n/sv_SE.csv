@@ -1,0 +1,70 @@
+YES,JA
+Yes,Ja
+NO,NEJ
+No,Nej
+Big,Stor
+Medium,Medium
+Small,Liten
+Save and Continue Edit,Spara och fortsätt editera
+Default,Default
+Zoom,Zoom
+Delete Banner,Radera Banner
+Are you sure you want to do this?,Är du säker på att du vill slutföra åtgärden?
+Default: 100% Width,Default: 100% Bredd
+%1/%2: %3% Width,%1/%2: %3% Bredd
+Something went wrong while saving the file(s)., Något gick galet när vi försökte spara filen/filerna.
+File can not be saved to the destination folder.,Filen kunde sparas i utvalde mappen.
+Edit,Editera
+Action,Åtgärd
+Delete,Radera
+Add,Lägg till
+Add after,Lägg till efter
+You deleted the Banner.,Du har raderat Bannern.
+We can't find a Banner to delete.,Vi kan inte gitta en Banner att radera.
+This Banner no longer exists.,Den här Bannern finns inte längre.
+Banner,Banner
+You saved the Banner.,Du har sparat Bannern
+Something went wrong while saving the Banner.,Något gick galet när vi försökte spara Bannern
+Column,Kolumn
+Animation,Animation
+New Banner,Ny Banner
+Add Banner,Lägg till Banner
+Banners,Banners
+Edit Banner %1,Editera Banner %1
+Please correct the data sent.,Vänligen rätta till datan som skickades
+Save Banner,Spara Banner
+Back,Tillbaka
+"Banner with id ""%1"" does not exist.","Bannern med id ""%1"" fin inte."
+Could not delete the Banner: %1,Kunde inte radera Bannern: %1
+Enabled,Aktiverad
+Disabled,Inaktiverad
+Delete ${ $.$data.name },Radera ${ $.$data.name }
+Are you sure you wan't to delete a ${ $.$data.name } record?,Är du säker på att du vill radera ${ $.$data.name }?
+Delete items,Radera objekt
+Are you sure you want to delete selected items?,Är du säker på att du vill radera de valda objekten?
+Enable items,Aktivera objekt
+Are you sure you want to enable selected items?,Är du säker på att du vill aktivera valda objekt?
+Disable items,Inaktivera object
+Are you sure you want to disable selected items?,Är du säker på att du vill inaktivera valda objekt?
+A total of %1 record(s) have been deleted.,Totalt %1 objekt har blivit raderade.
+An error occurred while deleting record(s).,Ett fel uppstod när objeckten skulle raderas.
+A total of %1 record(s) have been enabled.,Totalt %1 objekt har blivit aktiverade.
+An error occurred while enabling record(s).,Ett fel uppstod när objeckten skulle aktiveras.
+A total of %1 record(s) have been disabled.,Totalt %1 objekt har blivit inaktiverade.
+An error occurred while disabling record(s).,Ett fel uppstod när objeckten skulle inaktiveras.
+Dark,Mörk
+Light,Ljus
+Outlined,Outlined
+Fullscreen (To the edges of the screen),Helskärm (Till kanterna på sidan)
+Left,Vänster
+Right,Höger
+Center,Mitten
+Top Left,Övre Vänster
+Top Center,Övre Mitten
+Top Right,Övre Höger
+Center Left,Mitten Vänster
+Center,Mitten
+Center Right,Mitten Höger
+Bottom Left,Nedre Vänster
+Bottom Center,Nedre Mitten
+Bottom Right,Nedre Höger

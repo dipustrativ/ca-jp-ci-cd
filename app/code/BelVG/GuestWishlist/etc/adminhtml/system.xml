@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!--
+ * BelVG LLC.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://store.belvg.com/BelVG-LICENSE-COMMUNITY.txt
+ *
+ ********************************************************************
+ * @category   BelVG
+ * @package    BelVG_GuestWishlist
+ * @copyright  Copyright (c) BelVG LLC. (http://www.belvg.com)
+ * @license    http://store.belvg.com/BelVG-LICENSE-COMMUNITY.txt
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="guestwishlist" translate="label" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Guest Wishlist</label>
+            <tab>customer</tab>
+            <resource>Magento_Customer::config_customer</resource>
+            <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Settings</label>
+                <hide_in_single_store_mode>0</hide_in_single_store_mode>
+                <comment>
+                    <![CDATA[
+                    <div style="padding:10px;background-color:#fff;border:1px solid #ddd;margin-bottom:7px;">
+                    <div style="float:left;margin-right:10px;background:url('data:image/png;base64,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') no-repeat; width: 54px; height: 54px;"></div>
+                    This module was developed by <a href="http://www.belvg.com" target="_blank">www.BelVG.com</a>.<br>
+                    For docs & examples refer to the BelVG <a href="http://www.belvg.com" target="_blank">web site</a>.
+                    <br/>We have the largest selections of  <a href="http://store.belvg.com/extensions.html" target="_blank">extensions</a> and <a href="http://store.belvg.com/themes.html" target="_blank">themes</a> on Magento.
+                    </div>
+                    ]]>
+                </comment>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled For Frontend</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="cookie_lifetime" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Cookie Lifetime</label>
+                    <backend_model>\Magento\Framework\App\Config\Value</backend_model>
+                </field>
+                <field id="merge" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merge Wishlist</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Merged "Guest Wishlist" with customer "Wishlist" after authorization</comment>
+                </field>
+                <field id="sharing" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sharing</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Enabled sharing for guests</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

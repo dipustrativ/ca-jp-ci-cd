@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Core
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="CarpetAvenue_Core">
+        <sequence>
+            <module name="Magento_Backend"/>
+            <module name="Magento_Catalog"/>
+            <!-- Ensures the InitializeColumns preference target class is loadable -->
+            <module name="Mageplaza_Osc"/>
+        </sequence>
+    </module>
+</config>

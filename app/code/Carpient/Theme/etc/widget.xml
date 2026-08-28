@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © Carpient. All rights reserved.
+ * Adds the "Two Worlds Gallery" template option to the Banner group widget.
+ */
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    <widget class="Evalent\Banner\Block\Widget\MultipleBanner" id="evalent_banner_multiplebanner">
+        <parameters>
+            <parameter name="template" xsi:type="select" required="true" visible="true">
+                <label>Template</label>
+                <options>
+                    <option name="two_worlds_gallery" value="widget/multiple_banner-two-worlds.phtml">
+                        <label>Carpient Worlds Gallery</label>
+                    </option>
+                    <option name="collections_gallery" value="widget/multiple_banner-collections.phtml">
+                        <label>Carpient Collections (4 per row)</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+    <widget class="Evalent\Banner\Block\Widget\CtaWidget" id="evalent_banner_cta">
+        <parameters>
+            <parameter name="template" xsi:type="select" required="true" visible="true">
+                <label>Template</label>
+                <options>
+                    <option name="product_details_promotional" value="Carpient_Theme::widget/cta_banner_product_details_promotional.phtml">
+                        <label>Product Details Promotional</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <evalent_banner>
+            <evalent_banner_main>
+                <quality>90</quality>
+                <desktop_width>2000</desktop_width>
+                <desktop_height>698</desktop_height>
+                <mobile_width>1024</mobile_width>
+                <mobile_height>682</mobile_height>
+            </evalent_banner_main>
+        </evalent_banner>
+    </default>
+</config>

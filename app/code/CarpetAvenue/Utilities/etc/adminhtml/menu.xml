@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="CarpetAvenue_Utilities::utilities"
+             title="Utilities"
+             module="CarpetAvenue_Utilities"
+             sortOrder="400"
+             parent="CarpetAvenue_Core::carpetavenue"
+             resource="CarpetAvenue_Utilities::utilities"/>
+
+        <add id="CarpetAvenue_Utilities::region_manager"
+             title="Region Manager"
+             module="CarpetAvenue_Utilities"
+             sortOrder="10"
+             parent="CarpetAvenue_Utilities::utilities"
+             action="utilities/region/index"
+             resource="CarpetAvenue_Utilities::region_manager"/>
+
+
+        <!-- Attribute Override pages accessible via buttons in Stores > Config > Utilities > Attribute Override -->
+
+    </menu>
+</config>
+

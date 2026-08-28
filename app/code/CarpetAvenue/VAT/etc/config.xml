@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_VAT
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carpetavenue_vat>
+            <vies>
+                <enabled>0</enabled>
+                <provider>eu_soap</provider>
+                <test_mode>1</test_mode>
+            </vies>
+            <shipping_vat>
+                <shipping_not_taxfree>0</shipping_not_taxfree>
+            </shipping_vat>
+            <tax_calc>
+                <store_country_origin>0</store_country_origin>
+            </tax_calc>
+            <eur_pricing>
+                <null_pricing_in_eur_stores>0</null_pricing_in_eur_stores>
+            </eur_pricing>
+        </carpetavenue_vat>
+    </default>
+</config>

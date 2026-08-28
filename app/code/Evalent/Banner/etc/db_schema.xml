@@ -1,0 +1,119 @@
+<?xml version="1.0" ?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+	<table comment="evalent_banner_banner_entity Table" engine="innodb" name="evalent_banner_banner_entity" resource="default">
+		<column comment="Entity Id" identity="true" name="entity_id" nullable="false" padding="6" unsigned="false" xsi:type="smallint"/>
+		<constraint referenceId="PRIMARY" xsi:type="primary">
+			<column name="entity_id"/>
+		</constraint>
+		<column length="255" name="name" nullable="false" xsi:type="varchar"/>
+		<column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+		<column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Update Time"/>
+	</table>
+
+<!--	All attribute tables with constraints and indexes-->
+	<table comment="evalent_banner_banner_entity_int Table" engine="innodb" name="evalent_banner_banner_entity_int" resource="default">
+		<column comment="value_id" identity="true" name="value_id" nullable="false" padding="6" unsigned="false" xsi:type="int"/>
+		<column name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute ID" xsi:type="smallint"/>
+		<column name="store_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Store ID" xsi:type="smallint"/>
+		<column comment="Entity Id" name="entity_id" nullable="false" default="0" padding="6" unsigned="false" xsi:type="smallint"/>
+		<column comment="Value" name="value" nullable="true" xsi:type="int"/>
+		<constraint referenceId="PRIMARY" xsi:type="primary">
+			<column name="value_id"/>
+		</constraint>
+		<index referenceId="EVALENT_BANNER_BANNER_ENTITY_INT" indexType="btree">
+			<column name="entity_id"/>
+			<column name="store_id"/>
+			<column name="attribute_id"/>
+		</index>
+		<index referenceId="EVALENT_BANNER_BANNER_ENTITY_INT_STORE_ID" indexType="btree">
+			<column name="store_id"/>
+		</index>
+		<index referenceId="EVALENT_BANNER_BANNER_ENTITY_INT_ATTRIBUTE_ID" indexType="btree">
+			<column name="attribute_id"/>
+		</index>
+		<constraint xsi:type="foreign" referenceId="EVA_BAN_BAN_ENTT_INT_ATTR_ID_EAV_ATTR_ATTR_ID"
+					table="evalent_banner_banner_entity_int" column="attribute_id" referenceTable="eav_attribute"
+					referenceColumn="attribute_id" onDelete="CASCADE"/>
+		<constraint xsi:type="foreign" referenceId="EVA_BAN_BAN_ENTT_INT_BANNER_ID_CAT_PRD_ENTT_ENTT_ID"
+					table="evalent_banner_banner_entity_int" column="entity_id" referenceTable="evalent_banner_banner_entity"
+					referenceColumn="entity_id" onDelete="CASCADE"/>
+		<constraint xsi:type="foreign" referenceId="EVA_BAN_BAN_ENTITY_INT_STORE_ID_STORE_STORE_ID"
+					table="evalent_banner_banner_entity_int" column="store_id" referenceTable="store"
+					referenceColumn="store_id" onDelete="CASCADE"/>
+		<constraint xsi:type="unique" referenceId="EVA_BAN_ENTITY_INT_BANNER_ID_ATTRIBUTE_ID_STORE_ID">
+			<column name="entity_id"/>
+			<column name="attribute_id"/>
+			<column name="store_id"/>
+		</constraint>
+	</table>
+	<table comment="evalent_banner_banner_entity_varchar Table" engine="innodb" name="evalent_banner_banner_entity_varchar" resource="default">
+		<column comment="value_id" identity="true" name="value_id" nullable="false" padding="6" unsigned="false" xsi:type="int"/>
+		<column name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute ID" xsi:type="smallint"/>
+		<column name="store_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Store ID" xsi:type="smallint"/>
+		<column comment="Entity Id" name="entity_id" nullable="false" default="0" padding="6" unsigned="false" xsi:type="smallint"/>
+		<column comment="Value" name="value" nullable="true" default="NULL"  xsi:type="varchar"/>
+		<constraint referenceId="PRIMARY" xsi:type="primary">
+			<column name="value_id"/>
+		</constraint>
+		<index referenceId="EVALENT_BANNER_BANNER_ENTITY_VARCHAR" indexType="btree">
+			<column name="entity_id"/>
+			<column name="store_id"/>
+			<column name="attribute_id"/>
+		</index>
+		<index referenceId="EVALENT_BANNER_BANNER_ENTITY_VARCHAR_STORE_ID" indexType="btree">
+			<column name="store_id"/>
+		</index>
+		<index referenceId="EVALENT_BANNER_BANNER_ENTITY_VARCHAR_ATTRIBUTE_ID" indexType="btree">
+			<column name="attribute_id"/>
+		</index>
+		<constraint xsi:type="foreign" referenceId="EVA_BAN_BAN_ENTT_VAR_ATTR_ID_EAV_ATTR_ATTR_ID"
+					table="evalent_banner_banner_entity_varchar" column="attribute_id" referenceTable="eav_attribute"
+					referenceColumn="attribute_id" onDelete="CASCADE"/>
+		<constraint xsi:type="foreign" referenceId="EVA_BAN_BAN_ENTT_VAR_BANNER_ID_CAT_PRD_ENTT_ENTT_ID"
+					table="evalent_banner_banner_entity_varchar" column="entity_id" referenceTable="evalent_banner_banner_entity"
+					referenceColumn="entity_id" onDelete="CASCADE"/>
+		<constraint xsi:type="foreign" referenceId="EVA_BAN_BAN_ENTITY_VARCHAR_STORE_ID_STORE_STORE_ID"
+					table="evalent_banner_banner_entity_varchar" column="store_id" referenceTable="store"
+					referenceColumn="store_id" onDelete="CASCADE"/>
+		<constraint xsi:type="unique" referenceId="EVA_BAN__ENTITY_VARCHAR_BANNER_ID_ATTRIBUTE_ID_STORE_ID">
+			<column name="entity_id"/>
+			<column name="attribute_id"/>
+			<column name="store_id"/>
+		</constraint>
+	</table>
+	<table comment="evalent_banner_banner_entity_text Table" engine="innodb" name="evalent_banner_banner_entity_text" resource="default">
+		<column comment="value_id" identity="true" name="value_id" nullable="false" padding="6" unsigned="false" xsi:type="int"/>
+		<column name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute ID" xsi:type="smallint"/>
+		<column name="store_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Store ID" xsi:type="smallint"/>
+		<column comment="Entity Id" name="entity_id" nullable="false" default="0" padding="6" unsigned="false" xsi:type="smallint"/>
+		<column comment="Value" name="value" nullable="true"  xsi:type="text"/>
+		<constraint referenceId="PRIMARY" xsi:type="primary">
+			<column name="value_id"/>
+		</constraint>
+		<index referenceId="EVALENT_BANNER_BANNER_ENTITY_TEXT" indexType="btree">
+			<column name="entity_id"/>
+			<column name="store_id"/>
+			<column name="attribute_id"/>
+		</index>
+		<index referenceId="EVALENT_BANNER_BANNER_ENTITY_TEXT_STORE_ID" indexType="btree">
+			<column name="store_id"/>
+		</index>
+		<index referenceId="EVALENT_BANNER_BANNER_ENTITY_TEXT_ATTRIBUTE_ID" indexType="btree">
+			<column name="attribute_id"/>
+		</index>
+		<constraint xsi:type="foreign" referenceId="EVA_BAN_BAN_ENTT_TEXT_ATTR_ID_EAV_ATTR_ATTR_ID"
+					table="evalent_banner_banner_entity_text" column="attribute_id" referenceTable="eav_attribute"
+					referenceColumn="attribute_id" onDelete="CASCADE"/>
+		<constraint xsi:type="foreign" referenceId="EVA_BAN_BAN_ENTT_TEXT_BANNER_ID_CAT_PRD_ENTT_ENTT_ID"
+					table="evalent_banner_banner_entity_text" column="entity_id" referenceTable="evalent_banner_banner_entity"
+					referenceColumn="entity_id" onDelete="CASCADE"/>
+		<constraint xsi:type="foreign" referenceId="EVA_BAN_BAN_ENTITY_TEXT_STORE_ID_STORE_STORE_ID"
+					table="evalent_banner_banner_entity_text" column="store_id" referenceTable="store"
+					referenceColumn="store_id" onDelete="CASCADE"/>
+		<constraint xsi:type="unique" referenceId="EVA_BAN_ENTITY_TEXT_BANNER_ID_ATTRIBUTE_ID_STORE_ID">
+			<column name="entity_id"/>
+			<column name="attribute_id"/>
+			<column name="store_id"/>
+		</constraint>
+	</table>
+</schema>

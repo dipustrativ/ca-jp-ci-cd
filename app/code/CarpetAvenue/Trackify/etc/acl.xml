@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+<acl>
+    <resources>
+        <resource id="Magento_Backend::admin">
+            <resource id="CarpetAvenue_Core::carpetavenue" title="Core" translate="title">
+                <resource id="CarpetAvenue_Trackify::trackify" title="CarpetAvenue Trackify" translate="title" sortOrder="400">
+                    <resource id="CarpetAvenue_Trackify::trackify_google_tag" title="Google Tag Manager" translate="title" sortOrder="400"/>
+                </resource>
+            </resource>
+        </resource>
+    </resources>
+</acl>
+</config>

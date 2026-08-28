@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Product
+ * @package   CarpetAvenue_Productify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="carpetavenue_productify_varient_build" xsi:type="object">CarpetAvenue\Productify\Console\BuildVariantCommand</item>
+                <item name="carpetavenue_productify_product_sync"  xsi:type="object">CarpetAvenue\Productify\Console\ProductSyncCommand</item>
+                <item name="carpetavenue_productify_queue_run"  xsi:type="object">CarpetAvenue\Productify\Console\ProductifyQueueRun</item>
+                <item name="carpetavenue_productify_campaign_import" xsi:type="object">CarpetAvenue\Productify\Console\CampaignImportCommand</item>
+                <item name="carpetavenue_productify_assign_color_shape_category" xsi:type="object">CarpetAvenue\Productify\Console\AssignColorShapeCategoriesCommand</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="CarpetAvenue\Productify\Api\LowestPriceInterface" type="CarpetAvenue\Productify\Model\Api\LowestPrice"/>
+    <!-- Adds rug size to the /V1/products-render-info payload, used by client-side
+         widgets like the native "Recently Viewed" widget -->
+    <type name="Magento\Catalog\Ui\DataProvider\Product\ProductRenderCollectorComposite">
+        <arguments>
+            <argument name="productProviders" xsi:type="array">
+                <item name="size" xsi:type="object">CarpetAvenue\Productify\Ui\DataProvider\Product\Listing\Collector\Size</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="CarpetAvenue\Productify\Model\Indexer\Product">
+        <arguments>
+            <argument name="batchRowsCount" xsi:type="number">50</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="CarpetAvenue\Productify\Model\ResourceModel\ProductifyProductChangelog\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">carpetavenue_productify_product_change_log</argument>
+            <argument name="resourceModel" xsi:type="string">CarpetAvenue\Productify\Model\ResourceModel\ProductifyProductChangelog</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="CarpetAvenue\Productify\Model\ResourceModel\CaJpBlacklist\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ca_jp_blacklist</argument>
+            <argument name="resourceModel" xsi:type="string">CarpetAvenue\Productify\Model\ResourceModel\CaJpBlacklist</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="productify_namechangelog_listing_data_source"
+                      xsi:type="string">CarpetAvenue\Productify\Model\ResourceModel\ProductifyProductChangelog\Grid\Collection</item>
+                <item name="productify_japan_blacklist_listing_data_source"
+                      xsi:type="string">CarpetAvenue\Productify\Model\ResourceModel\CaJpBlacklist\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="\Magento\Directory\Model\Currency">
+        <plugin name="carpetavenue_productify_jpy_currency_convert" type="CarpetAvenue\Productify\Plugin\Currency\JPCurrencyConvert"/>
+    </type>
+    <type name="Magento\Checkout\CustomerData\DefaultItem">
+        <plugin name="add_production_type_unique_minicart" type="CarpetAvenue\Productify\Plugin\CustomerData\DefaultItem" />
+        <plugin name="add_size_minicart" type="CarpetAvenue\Productify\Plugin\CustomerData\DefaultItemSize" />
+    </type>
+
+    <type name="Magento\CatalogImportExport\Model\Import\Product\Validator">
+        <plugin name="autocreate_attribute_options" type="CarpetAvenue\Productify\Plugin\Import\CreateAttributeOptions"/>
+    </type>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Merged CarpetAvenue_EnhanceCategory
+         ═══════════════════════════════════════════════════════════════════ -->
+    <preference for="Magento\Catalog\Model\Category\DataProvider"
+                type="CarpetAvenue\Productify\EnhanceCategory\Model\Category\DataProvider"/>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Merged CarpetAvenue_ProductStatus
+         ═══════════════════════════════════════════════════════════════════ -->
+    <preference for="CarpetAvenue\Productify\ProductStatus\Api\ConfigInterface"
+                type="CarpetAvenue\Productify\ProductStatus\Model\Config"/>
+    <preference for="CarpetAvenue\Productify\ProductStatus\Api\StatusManagerInterface"
+                type="CarpetAvenue\Productify\ProductStatus\Model\StatusManager"/>
+    <preference for="Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider"
+                type="CarpetAvenue\Productify\ProductStatus\Model\CatalogSearch\Indexer\Fulltext\DataProvider"/>
+    <preference for="Magento\Sitemap\Model\ResourceModel\Catalog\Product"
+                type="CarpetAvenue\Productify\ProductStatus\Model\Sitemap\ResourceModel\Catalog\Product"/>
+    <type name="CarpetAvenue\Productify\ProductStatus\Console\Reindex">
+        <arguments>
+            <argument name="name" xsi:type="string">productstatus:reindex</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="ProductStatusReindex" xsi:type="object">CarpetAvenue\Productify\ProductStatus\Console\Reindex</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

@@ -1,0 +1,21 @@
+{
+  "name": "ixpf/module-syncer",
+  "version": "1.0.0",
+  "description": "IXPF Syncer module for product, order, and purchase synchronization",
+  "type": "magento2-module",
+  "require": {
+    "magento/framework": "*",
+    "magento/module-webapi": "*",
+    "magento/module-catalog": "*",
+    "magento/module-store": "*",
+    "google/cloud-storage": "^1.48"
+  },
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "IXPF\\Syncer\\": ""
+    }
+  }
+}

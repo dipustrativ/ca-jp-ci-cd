@@ -1,0 +1,124 @@
+<?php
+/**
+ * @var \CarpetAvenue\Utilities\Block\Adminhtml\Media\Retrieve $block
+ */
+$bucket      = $block->getDefaultBucket();
+$credentials = $block->getDefaultCredentials();
+?>
+<div class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Retrieve Original Images from GCS')) ?></span>
+    </div>
+
+    <div class="admin__page-section-content">
+        <p class="note">
+            <?= $block->escapeHtml(__('Downloads GCS-backed originals for the given SKUs and packages them into a ZIP file. Only images with a recorded GCS backup (from carpetavenue:media:resize:disabled --live --bucket) can be retrieved. Maximum 20 SKUs per request.')) ?>
+        </p>
+
+        <?php if ($bucket === ''): ?>
+        <div class="message message-warning warning">
+            <div>
+                <?= $block->escapeHtml(__('No GCS Bucket configured. Set it in')) ?>
+                <strong><?= $block->escapeHtml(__('Stores → Configuration → CarpetAvenue → Utilities → Media Cleanup & Backup.')) ?></strong>
+            </div>
+        </div>
+        <?php else: ?>
+        <div class="message message-notice notice">
+            <div>
+                <?= $block->escapeHtml(__('Using bucket:')) ?>
+                <strong><?= $block->escapeHtml($bucket) ?></strong>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <form id="ca-retrieve-form"
+              method="post"
+              action="<?= $block->escapeUrl($block->getDownloadUrl()) ?>"
+              enctype="application/x-www-form-urlencoded">
+
+            <input type="hidden" name="form_key"    value="<?= $block->escapeHtmlAttr($block->getFormKey()) ?>"/>
+            <input type="hidden" name="bucket"      value="<?= $block->escapeHtmlAttr($bucket) ?>"/>
+            <input type="hidden" name="credentials" value="<?= $block->escapeHtmlAttr($credentials) ?>"/>
+
+            <fieldset class="admin__fieldset" style="max-width:860px;">
+
+                <div class="admin__field _required">
+                    <label class="admin__field-label" for="ca-retrieve-skus">
+                        <span><?= $block->escapeHtml(__('SKU(s)')) ?></span>
+                    </label>
+                    <div class="admin__field-control">
+                        <textarea id="ca-retrieve-skus"
+                                  name="skus"
+                                  rows="4"
+                                  class="admin__control-textarea"
+                                  placeholder="SKU001, SKU002, SKU003"
+                                  style="width:100%;font-family:monospace;"></textarea>
+                        <p class="admin__field-note">
+                            <?= $block->escapeHtml(__('Comma-separated. Max 20 SKUs. Allowed characters: letters, digits, hyphens (-), underscores (_), dots (.).')) ?>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin__field no-label" style="margin-top:24px;">
+                    <div class="admin__field-control">
+                        <button id="ca-retrieve-submit"
+                                type="submit"
+                                class="action-default scalable save primary"
+                                <?= $bucket === '' ? 'disabled="disabled"' : '' ?>
+                                style="min-width:200px;">
+                            <span><?= $block->escapeHtml(__('Download ZIP')) ?></span>
+                        </button>
+                        <span id="ca-retrieve-spinner"
+                              style="display:none;margin-left:16px;vertical-align:middle;color:#666;">
+                            <?= $block->escapeHtml(__('Downloading from GCS, please wait…')) ?>
+                        </span>
+                    </div>
+                </div>
+
+            </fieldset>
+        </form>
+
+        <div class="admin__page-section" style="margin-top:32px;max-width:860px;">
+            <div class="admin__page-section-title">
+                <span class="title" style="font-size:14px;"><?= $block->escapeHtml(__('How it works')) ?></span>
+            </div>
+            <div class="admin__page-section-content">
+                <ol style="margin-left:20px;line-height:1.8;">
+                    <li><?= $block->escapeHtml(__('Enter up to 20 SKUs whose originals were previously backed up via carpetavenue:media:resize:disabled --live --bucket=...')) ?></li>
+                    <li><?= $block->escapeHtml(__('The system looks up the GCS path for each image from the carpetavenue_image_resize_log table.')) ?></li>
+                    <li><?= $block->escapeHtml(__('Files are downloaded from GCS and packaged into a ZIP.')) ?></li>
+                    <li><?= $block->escapeHtml(__('Your browser downloads the ZIP automatically.')) ?></li>
+                </ol>
+                <p style="margin-top:12px;">
+                    <strong><?= $block->escapeHtml(__('Note:')) ?></strong>
+                    <?= $block->escapeHtml(__('This downloads originals for inspection only. To restore files to disk use: bin/magento carpetavenue:media:restore:originals')) ?>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+require(['jquery'], function ($) {
+    'use strict';
+    $('#ca-retrieve-form').on('submit', function () {
+        var skus = $('#ca-retrieve-skus').val().trim();
+        if (!skus) {
+            alert('<?= $block->escapeJs(__('Please enter at least one SKU.')) ?>');
+            return false;
+        }
+        var list = skus.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+        if (list.length > 20) {
+            alert('<?= $block->escapeJs(__('Maximum 20 SKUs allowed. You entered ')) ?>' + list.length + '.');
+            return false;
+        }
+        var invalid = list.filter(function (s) { return !/^[a-zA-Z0-9_\-.]+$/.test(s) || s.length > 255; });
+        if (invalid.length) {
+            alert('<?= $block->escapeJs(__('Invalid SKU(s): ')) ?>' + invalid.join(', ') + '\n<?= $block->escapeJs(__('Only letters, digits, hyphens (-), underscores (_), and dots (.) are allowed.')) ?>');
+            return false;
+        }
+        $('#ca-retrieve-submit').prop('disabled', true);
+        $('#ca-retrieve-spinner').show();
+    });
+});
+</script>

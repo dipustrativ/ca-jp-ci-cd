@@ -1,0 +1,187 @@
+<?xml version="1.0" ?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">evalent_banner_banner_listing.evalent_banner_banner_listing_data_source</item>
+		</item>
+	</argument>
+	<settings>
+		<spinner>evalent_banner_banner_columns</spinner>
+		<deps>
+			<dep>evalent_banner_banner_listing.evalent_banner_banner_listing_data_source</dep>
+		</deps>
+		<buttons>
+			<button name="add">
+				<url path="*/*/new"/>
+				<class>primary</class>
+				<label translate="true">Add new Banner</label>
+			</button>
+		</buttons>
+	</settings>
+	<dataSource name="evalent_banner_banner_listing_data_source">
+		<argument name="dataProvider" xsi:type="configurableObject">
+			<argument name="class" xsi:type="string">Evalent\Banner\Model\Banner\DataProvider</argument>
+			<argument name="name" xsi:type="string">evalent_banner_banner_listing_data_source</argument>
+			<argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+			<argument name="requestFieldName" xsi:type="string">id</argument>
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+					<item name="update_url" path="mui/index/render" xsi:type="url"/>
+					<item name="storageConfig" xsi:type="array">
+						<item name="indexField" xsi:type="string">entity_id</item>
+					</item>
+					<item name="paging" xsi:type="array">
+						<item name="defaults" xsi:type="array">
+							<item name="pageSize" xsi:type="number">200</item>
+						</item>
+					</item>
+				</item>
+			</argument>
+		</argument>
+	</dataSource>
+	<listingToolbar name="listing_top">
+		<settings>
+			<sticky>true</sticky>
+		</settings>
+		<bookmark name="bookmarks"/>
+		<columnsControls name="columns_controls"/>
+		<filters name="listing_filters"/>
+		<paging name="listing_paging"/>
+		<massaction name="listing_massaction">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="selectProvider" xsi:type="string">evalent_banner_banner_listing.evalent_banner_banner_listing.evalent_banner_banner_columns.ids</item>
+					<item name="indexField" xsi:type="string">entity_id</item>
+				</item>
+			</argument>
+			<action name="delete">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="type" xsi:type="string">delete</item>
+						<item name="label" xsi:type="string" translate="true">Delete</item>
+						<item name="url" xsi:type="url" path="evalent_banner/banner/massDelete"/>
+						<item name="confirm" xsi:type="array">
+							<item name="title" xsi:type="string" translate="true">Delete items</item>
+							<item name="message" xsi:type="string" translate="true">Are you sure you want to delete selected items?</item>
+						</item>
+					</item>
+				</argument>
+			</action>
+			<action name="enable">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="type" xsi:type="string">enable</item>
+						<item name="label" xsi:type="string" translate="true">Enable</item>
+						<item name="url" xsi:type="url" path="evalent_banner/banner/massEnable"/>
+					</item>
+					<item name="confirm" xsi:type="array">
+						<item name="title" xsi:type="string" translate="true">Enable items</item>
+						<item name="message" xsi:type="string" translate="true">Are you sure you want to enable selected items?</item>
+					</item>
+				</argument>
+			</action>
+			<action name="disable">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="type" xsi:type="string">disable</item>
+						<item name="label" xsi:type="string" translate="true">Disable</item>
+						<item name="url" xsi:type="url" path="evalent_banner/banner/massDisable"/>
+					</item>
+					<item name="confirm" xsi:type="array">
+						<item name="title" xsi:type="string" translate="true">Disable items</item>
+						<item name="message" xsi:type="string" translate="true">Are you sure you want to disable selected items?</item>
+					</item>
+				</argument>
+			</action>
+		</massaction>
+	</listingToolbar>
+	<columns name="evalent_banner_banner_columns">
+		<settings>
+			<editorConfig>
+				<param name="selectProvider" xsi:type="string">evalent_banner_banner_listing.evalent_banner_banner_listing.evalent_banner_banner_columns.ids</param>
+				<param name="enabled" xsi:type="boolean">true</param>
+				<param name="indexField" xsi:type="string">entity_id</param>
+				<param name="clientConfig" xsi:type="array">
+					<item name="saveUrl" path="evalent_banner/banner/inlineEdit" xsi:type="url"/>
+					<item name="validateBeforeSave" xsi:type="boolean">false</item>
+				</param>
+			</editorConfig>
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">evalent_banner_banner_listing.evalent_banner_banner_listing.evalent_banner_banner_columns.actions</item>
+                    <item name="target" xsi:type="string">applyAction</item>
+                    <item name="params" xsi:type="array">
+                        <item name="0" xsi:type="string">edit</item>
+                        <item name="1" xsi:type="string">${ $.$data.rowIndex }</item>
+                    </item>
+                </param>
+            </childDefaults>
+		</settings>
+		<selectionsColumn name="ids">
+			<settings>
+				<indexField>entity_id</indexField>
+			</settings>
+		</selectionsColumn>
+		<column name="entity_id">
+			<settings>
+				<filter>text</filter>
+				<sorting>asc</sorting>
+				<label translate="true">ID</label>
+			</settings>
+		</column>
+		<column name="name">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Name</label>
+				<editor>
+					<editorType>text</editorType>
+					<validation>
+						<rule name="required-entry" xsi:type="boolean">true</rule>
+					</validation>
+				</editor>
+			</settings>
+		</column>
+		<column name="enabled" component="Magento_Ui/js/grid/columns/select">
+			<settings>
+				<filter>select</filter>
+				<label translate="true">Enabled</label>
+				<editor>
+					<editorType>select</editorType>
+				</editor>
+				<options class="Magento\Catalog\Model\Product\Attribute\Source\Status"/>
+				<dataType>select</dataType>
+			</settings>
+		</column>
+		<column name="desktop_image" component="Magento_Ui/js/grid/columns/thumbnail" class="Evalent\Banner\Ui\Component\Listing\Column\DesktopImage">
+			<settings>
+				<label translate="true">Desktop Image</label>
+			</settings>
+		</column>
+		<column name="mobile_image" component="Magento_Ui/js/grid/columns/thumbnail" class="Evalent\Banner\Ui\Component\Listing\Column\MobileImage">
+			<settings>
+				<label translate="true">Mobile Image</label>
+			</settings>
+		</column>
+		<column name="heading">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Heading</label>
+				<editor>
+					<editorType>text</editorType>
+					<validation>
+						<rule name="required-entry" xsi:type="boolean">false</rule>
+					</validation>
+				</editor>
+			</settings>
+		</column>
+		<actionsColumn class="Evalent\Banner\Ui\Component\Listing\Column\BannerActions" name="actions" sortOrder="999">
+			<settings>
+				<indexField>entity_id</indexField>
+				<resizeEnabled>false</resizeEnabled>
+				<resizeDefaultWidth>107</resizeDefaultWidth>
+				<draggable>false</draggable>
+			</settings>
+		</actionsColumn>
+	</columns>
+</listing>

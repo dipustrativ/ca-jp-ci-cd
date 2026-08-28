@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- MSI indexer -->
+    <type name="Magento\InventoryIndexer\Indexer\InventoryIndexer">
+        <plugin name="ixpf_syncermsi_inventory_indexer_plugin" type="IXPF\SyncerMsi\Plugins\Indexer\InventoryIndexerPlugin" sortOrder="10"/>
+    </type>
+
+</config>

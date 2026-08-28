@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+		<section id="catalog">
+			<group id="navigation">
+				<field id="top_menu_root_category_enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+					<label>Change Top Menu Root Category</label>
+					<comment/>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+				<field id="show_hide_additional_data" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+					<label>Show or Hide Additional Data</label>
+					<comment/>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+				<field id="show_hide_usp" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+					<label>Show or Hide USP</label>
+					<comment/>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+				<field id="top_menu_root_category_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+					<label>Top Menu Root Category</label>
+					<comment>Choose a root category if it differs from the stores root category</comment>
+					<source_model>Evalent\MegaMenu\Model\Config\Source\CategoryList</source_model>
+					<depends>
+						<field id="top_menu_root_category_enabled">1</field>
+					</depends>
+				</field>
+			</group>
+		</section>
+	</system>
+</config>

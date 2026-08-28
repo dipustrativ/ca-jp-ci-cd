@@ -1,0 +1,27 @@
+<?php
+/**
+ * Copyright © Carpient. All rights reserved.
+ *
+ * Plain header anchor. Label / route path / css class come from layout arguments,
+ * so a new header link needs no new template.
+ *
+ * Framework's Html\Link block is not used: it wraps its output in an <li>, which
+ * is invalid inside the header's plain <div> wrappers.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ */
+
+$label = trim((string) $block->getData('label'));
+$path = (string) $block->getData('path');
+
+if ($label === '' || $path === '') {
+    return;
+}
+?>
+<?php
+// `_direct` keeps the path verbatim. Plain getUrl() treats it as a route and
+// appends a trailing slash, which every URL-rewrite target then 301s away.
+$url = $block->getUrl('', ['_direct' => ltrim($path, '/')]);
+?>
+<a class="<?= $block->escapeHtmlAttr((string) $block->getData('css_class')) ?>"
+   href="<?= $block->escapeUrl($url) ?>"><?= $block->escapeHtml($label) ?></a>

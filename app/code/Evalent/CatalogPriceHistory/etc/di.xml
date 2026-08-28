@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Evalent\CatalogPriceHistory\Model\ResourceModel\Product\Indexer\Price\HistoryInterface"
+                type="Evalent\CatalogPriceHistory\Model\ResourceModel\Product\Indexer\Price\History"/>
+    <preference for="\Evalent\CatalogPriceHistory\Api\ConfigInterface"
+                type="\Evalent\CatalogPriceHistory\Model\Config"/>
+    <preference for="\Evalent\CatalogPriceHistory\Api\HistoryRepositoryInterface"
+                type="\Evalent\CatalogPriceHistory\Model\HistoryRepository"/>
+</config>

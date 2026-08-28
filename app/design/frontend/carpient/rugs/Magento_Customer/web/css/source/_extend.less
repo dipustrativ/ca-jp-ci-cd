@@ -1,0 +1,34 @@
+//  Account page titles.
+//  clamp() must be escaped — LESS does unit arithmetic on the middle term and
+//  collapses `0.83vw + 1.69rem` to a bare `2.52vw`, killing the rem floor.
+.customer-account-login,
+.customer-account-create {
+    .page-title-wrapper .page-title {
+        margin: 0 0 16px;
+        font-family: @font-family__base;
+        font-size: 25px !important;
+        font-weight: 600;
+        font-size: ~"clamp(2rem, 0.83vw + 1.69rem, 2.96rem)";
+        line-height: 1.3;
+        color: #0c0c0c;
+        text-transform: none;
+        letter-spacing: normal;
+    }
+    .login-container .fieldset:after{
+        display: none;
+    }
+}
+
+.account{
+    .page-title-wrapper .page-title {
+        margin: 0 0 16px;
+        font-family: @font-family__base;
+        font-size: 25px !important;
+        font-weight: 600;
+        font-size: ~"clamp(2rem, 0.83vw + 1.69rem, 2.96rem)";
+        line-height: 1.3;
+        color: #0c0c0c;
+        text-transform: none;
+        letter-spacing: normal;
+    }
+}

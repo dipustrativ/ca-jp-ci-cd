@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+
+        <section id="orderify" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Orderify</label>
+            <tab>carpetavenue</tab>
+            <resource>Magento_Backend::admin</resource>
+
+            <group id="fake_customer_statistic" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Refund Statistic In Order View</label>
+                <field id="enable" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Enable to display fake customer statistics on the order details page.</comment>
+                </field>
+            </group>
+
+            <group id="region_settings" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Region/State Settings</label>
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Custom Region Settings</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Enable to show optional state/region field for selected countries.</comment>
+                </field>
+                <field id="optional_countries" translate="label" type="multiselect" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Countries to Show Optional State/Region</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                    <comment>Select countries where state/region field should be visible and optional. All other countries will use Magento default behavior.</comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="jp_region_id_sort_enabled" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable JP region_id Position</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If Yes, forces sort order country_id → region_id → region → city for Japan in checkout. If No, skips this reordering.</comment>
+                </field>
+            </group>
+
+            <group id="cancel_inventory_reindex" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Order Cancel Inventory Reindex</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If enabled, inventory index is recalculated immediately after an order is canceled.</comment>
+                </field>
+            </group>
+
+            <group id="failed_payment_email" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Failed Payment Reminder Email</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+                <field id="template" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <comment>Select "Failed Payment Reminder" or use a custom template configured in Marketing > Email Templates.</comment>
+                </field>
+            </group>
+
+            <group id="adyen_auto_invoice" translate="label" type="text" sortOrder="35" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Adyen Automatic Invoice Processing</label>
+                <comment><![CDATA[Cron verifies Adyen payments using locally synchronized webhook data and automatically invoices paid orders that have no invoice. Bank transfer orders are excluded.]]></comment>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="min_order_age_minutes" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Minimum Order Age (Minutes)</label>
+                    <validate>validate-digits</validate>
+                    <comment>Orders younger than this are skipped to give Adyen webhooks time to arrive. Default: 10.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="batch_size" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Batch Size</label>
+                    <validate>validate-digits</validate>
+                    <comment>Maximum orders processed per cron run. Default: 50.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+
+            <group id="payment_icons" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Payment Icons (Checkout + Footer)</label>
+                <comment><![CDATA[Renders a payment-icon strip under the checkout button on the cart. Configure per store view.]]></comment>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="heading" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Heading</label>
+                    <comment>e.g. "Nous acceptons". Leave blank to hide the heading.</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="icons" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Icons</label>
+                    <comment>Add a row per logo. Drag to reorder. Use "Choose / Upload" to pick an existing icon or upload a new SVG/PNG.</comment>
+                    <frontend_model>CarpetAvenue\Orderify\Block\Adminhtml\System\Config\Form\Field\Icons</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="sheet_id" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Google Sheet ID</label>
+                    <comment><![CDATA[The document id from the sheet URL: docs.google.com/spreadsheets/d/<strong>&lt;ID&gt;</strong>/edit. Sharing must be "Anyone with the link".]]></comment>
+                </field>
+                <field id="gid" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Google Sheet Grid ID</label>
+                    <comment><![CDATA[The tab's <strong>gid</strong> from the sheet URL (…/edit#gid=<strong>0</strong>). Defaults to 0.]]></comment>
+                </field>
+                <field id="update_button" translate="label comment" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Update from Sheet</label>
+                    <comment>Rebuilds every listed store view's icon strip from the sheet. Overwrites existing icons for those store views.</comment>
+                    <frontend_model>CarpetAvenue\Orderify\Block\Adminhtml\System\Config\Form\Field\UpdateButton</frontend_model>
+                </field>
+            </group>
+
+        </section>
+
+    </system>
+</config>

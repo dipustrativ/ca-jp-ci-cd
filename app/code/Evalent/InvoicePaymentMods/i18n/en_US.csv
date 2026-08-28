@@ -1,0 +1,23 @@
+"Invoice: ","Invoice: "
+"Order: ","Order: "
+"Customer Number: ","Customer number: "
+"Invoice Date: ","Invoice Date: "
+"Sold to:","Sold to:"
+"CA - Sold to:","Sold to:"
+"Ship to:","Ship to:"
+"Payment Method:","Payment Method:"
+"Shipping Method:","Shipping Method:"
+"Order Summary","Order Summary"
+Products,Products
+"SKU",SKU
+"CA - SKU",SKU
+Price,Price
+Quantity,Quantity
+Subtotal,Subtotal
+"Subtotal:","Subtotal:"
+Tax,VAT
+CA - Tax,VAT
+"CA - Grand Total (Excl. Tax)","Grand Total Excl. VAT"
+"CA - Grand Total (Incl. Tax)","Grand Total Incl. VAT"
+"CA - Qty","Qty"
+"CA - Ship to:","Ship to:"

@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © Carpet Avenue GmbH. All rights reserved.
+*
+*
+* This source file is subject to the Carpet Avenue GmbH license
+*
+* @category  Product
+* @package   CarpetAvenue_Productify
+* @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+* @author    Strativ Magento Team
+*/
+-->
+
+<!--
+    layout="2columns-left" came from the merged Lof_AjaxScroll module and is the
+    ONLY source of that attribute on this handle — the live category page renders
+    page-layout-2columns-left because of it. Do not drop it.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      layout="2columns-left"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <!-- Infinite scroll (merged Lof_AjaxScroll) -->
+    <update handle="ajaxscroll"/>
+    <body>
+        <referenceContainer name="page.top">
+            <block class="CarpetAvenue\Productify\Block\Category\Banner"
+                   name="category.top.banner"
+                   before="breadcrumbs"
+                   template="CarpetAvenue_Productify::category/banner/top.phtml" />
+        </referenceContainer>
+
+        <!-- This will show Category Listing Top of the Category Page -->
+        <referenceContainer name="columns.top">
+            <block class="CarpetAvenue\Productify\Block\Product\Category\CategoryList"
+                   name="top.category.heading"
+                   after="category.top.banner"
+                   template="CarpetAvenue_Productify::category/heading.phtml" />
+            <block class="CarpetAvenue\Productify\Block\Product\Category\CategoryList"
+                   name="top.category.content"
+                   after="top.category.heading"
+                   template="CarpetAvenue_Productify::category/category.phtml" />
+        </referenceContainer>
+
+        <!-- Bottom Banner and Custom Block -->
+        <referenceContainer name="content">
+            <block class="CarpetAvenue\Productify\Block\Category\BottomBlock"
+                   name="category.bottom.block"
+                   after="-"
+                   template="CarpetAvenue_Productify::category/bottom_block.phtml">
+            </block>
+        </referenceContainer>
+
+        <referenceContainer name="after.body.start">
+            <block class="CarpetAvenue\Productify\Block\BfCache\Init" name="productify.bfcache.init.category" template="CarpetAvenue_Productify::bfcache/init.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,20 @@
+<?php
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Boots the AJAX filter widget on filterable pages.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \CarpetAvenue\Productify\LayeredNavigation\ViewModel\FilterConfig $viewModel
+ */
+$viewModel = $block->getData('filter_config');
+?>
+<?php if ($viewModel && $viewModel->isAjaxEnabled()): ?>
+<script type="text/x-magento-init">
+{
+    "body": {
+        "carpetavenueFilterAjax": <?= /* @noEscape */ $viewModel->getJsonConfig() ?>
+    }
+}
+</script>
+<?php endif; ?>

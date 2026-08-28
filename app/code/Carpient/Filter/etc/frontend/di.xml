@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Disable Magento_Swatches' layered-navigation renderer hijack. Swatch
+ * attributes (e.g. Shape) otherwise render as plain full-navigation swatch
+ * links, bypassing the custom am-filter-link renderer — so they reload the
+ * whole page and miss the batch-AJAX staging that Color/Size use. With the
+ * plugin off they flow through CarpetAvenue_Productify's filter renderer
+ * (label + count + data-req-var), gaining AJAX + the Carpient_Filter option
+ * image design.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\LayeredNavigation\Block\Navigation\FilterRenderer">
+        <plugin name="swatches_layered_renderer" disabled="true"/>
+    </type>
+</config>

@@ -1,0 +1,49 @@
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="sales_proforma" resource="default" engine="innodb" comment="Sales Proforma">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="increment_id" nullable="false" length="50" comment="Increment ID"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="false" comment="Order ID"/>
+        <column xsi:type="varchar" name="order_increment_id" nullable="false" length="50" comment="Order Increment ID"/>
+        <column xsi:type="varchar" name="currency_code" nullable="false" length="3" comment="Currency Code"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false" comment="Customer ID"/>
+        <column xsi:type="varchar" name="customer_name" nullable="false" length="50" comment="Customer Name"/>
+        <column xsi:type="varchar" name="customer_street" nullable="false" length="64" comment="Customer Street"/>
+        <column xsi:type="varchar" name="customer_postcode" nullable="false" length="10" comment="Customer Postcode"/>
+        <column xsi:type="varchar" name="customer_city" nullable="false" length="10" comment="Customer City"/>
+        <column xsi:type="varchar" name="customer_country_id" nullable="false" length="10" comment="Customer Country Id"/>
+        <column xsi:type="varchar" name="customer_vat_id" nullable="true" length="20" comment="Customer Vat Id"/>
+        <column xsi:type="varchar" name="contact" nullable="false" length="50" comment="Contact"/>
+        <column xsi:type="int" name="tax_free" unsigned="true" nullable="false" comment="Tax free"/>
+        <column xsi:type="decimal" name="tax_percent" nullable="false" scale="2" precision="10" comment="Tax %"/>
+        <column xsi:type="decimal" name="tax_amount" nullable="false" scale="4" precision="12" comment="Tax Amount"/>
+        <column xsi:type="decimal" name="grand_total_excl_tax" nullable="false" scale="4" precision="12" comment="Grand Total Excl"/>
+        <column xsi:type="decimal" name="grand_total_incl_tax" nullable="false" scale="4" precision="12" comment="Grand Total Incl"/>
+        <column xsi:type="decimal" name="shipping_tax_percent" nullable="false" scale="2" precision="10" comment="Shipping Tax %"/>
+        <column xsi:type="decimal" name="shipping_tax_amount" nullable="false" scale="4" precision="12" comment="Shipping Tax Amount"/>
+        <column xsi:type="decimal" name="shipping_excl_tax" nullable="false" scale="4" precision="12" comment="Shipping Amount Excl"/>
+        <column xsi:type="decimal" name="shipping_incl_tax" nullable="false" scale="4" precision="12" comment="Shipping Amount Incl"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+    <table name="sales_proforma_item" resource="default" engine="innodb" comment="Sales Proforma Item">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="proforma_id" unsigned="true" nullable="false" comment="Proforma ID"/>
+        <column xsi:type="varchar" name="sku" nullable="false" length="50" comment="SKU"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Name"/>
+        <column xsi:type="varchar" name="description" nullable="false" length="255" comment="Description"/>
+        <column xsi:type="decimal" name="qty" nullable="false" scale="2" precision="10" comment="Quantity"/>
+        <column xsi:type="decimal" name="tax_percent" nullable="false" scale="2" precision="10" comment="Vat %"/>
+        <column xsi:type="decimal" name="price_tax_amount" nullable="false" scale="4" precision="12" comment="Unit Tax"/>
+        <column xsi:type="decimal" name="price_excl_tax" nullable="false" scale="4" precision="12" comment="Unit Price Excl"/>
+        <column xsi:type="decimal" name="price_incl_tax" nullable="false" scale="4" precision="12" comment="Unit Price Incl"/>
+        <column xsi:type="decimal" name="row_total_tax_amount" nullable="false" scale="4" precision="12" comment="Row Total Tax"/>
+        <column xsi:type="decimal" name="row_total_excl_tax" nullable="false" scale="4" precision="12" comment="Row Total Excl"/>
+        <column xsi:type="decimal" name="row_total_incl_tax" nullable="false" scale="4" precision="12" comment="Row Total Incl"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+</schema>

@@ -1,0 +1,368 @@
+<?php
+/**
+ * @var \CarpetAvenue\Utilities\Block\Adminhtml\AttributeOverride\ManualFix $block
+ */
+$dryRunUrl = $block->getDryRunUrl();
+$runFixUrl  = $block->getRunFixUrl();
+$formKey    = $block->getFormKey();
+$stores     = $block->getStoreOptions();
+$priceAttrs = $block->getPriceAttributeOptions();
+$customAttrs = $block->getCustomAttributeOptions();
+?>
+
+<div class="ca-attr-override-wrap" style="max-width:900px;padding:20px;">
+
+    <div class="admin__page-section">
+        <div class="admin__page-section-content">
+            <p style="color:#666;">
+                <?= $block->escapeHtml(__('Step 1: configure the fix. Step 2: run dry-run to preview changes. Step 3: apply fix (Run Fix button unlocks after dry-run).')) ?>
+            </p>
+        </div>
+    </div>
+
+    <!-- ── Form ─────────────────────────────────────────────────────── -->
+    <form id="ca-override-form" novalidate>
+        <input type="hidden" name="form_key" value="<?= $block->escapeHtmlAttr($formKey) ?>"/>
+
+        <fieldset class="admin__fieldset" style="margin-bottom:20px;">
+
+            <!-- Type -->
+            <div class="admin__field" style="margin-bottom:12px;">
+                <label class="admin__field-label" for="ca_type"><strong><?= $block->escapeHtml(__('Type')) ?></strong></label>
+                <div class="admin__field-control">
+                    <select id="ca_type" name="type" class="admin__control-select" style="width:220px;" required>
+                        <option value=""><?= $block->escapeHtml(__('-- Select type --')) ?></option>
+                        <option value="price"><?= $block->escapeHtml(__('Price')) ?></option>
+                        <option value="image"><?= $block->escapeHtml(__('Image')) ?></option>
+                        <option value="custom"><?= $block->escapeHtml(__('Custom Attribute')) ?></option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Attribute (price) -->
+            <div class="admin__field ca-field-price" style="margin-bottom:12px;display:none;">
+                <label class="admin__field-label" for="ca_attr_price"><strong><?= $block->escapeHtml(__('Price Attribute')) ?></strong></label>
+                <div class="admin__field-control">
+                    <select id="ca_attr_price" name="attribute_price" class="admin__control-select" style="width:280px;">
+                        <option value=""><?= $block->escapeHtml(__('-- Select attribute --')) ?></option>
+                        <?php foreach ($priceAttrs as $opt): ?>
+                            <option value="<?= $block->escapeHtmlAttr($opt['value']) ?>"><?= $block->escapeHtml($opt['label']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Image type -->
+            <div class="admin__field ca-field-image" style="margin-bottom:12px;display:none;">
+                <label class="admin__field-label" for="ca_image_type"><strong><?= $block->escapeHtml(__('Image Fix Type')) ?></strong></label>
+                <div class="admin__field-control">
+                    <select id="ca_image_type" name="image_type" class="admin__control-select" style="width:220px;">
+                        <option value="all"><?= $block->escapeHtml(__('All (roles + positions)')) ?></option>
+                        <option value="roles"><?= $block->escapeHtml(__('Roles only')) ?></option>
+                        <option value="position"><?= $block->escapeHtml(__('Positions only')) ?></option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Attribute (custom) -->
+            <div class="admin__field ca-field-custom" style="margin-bottom:12px;display:none;">
+                <label class="admin__field-label" for="ca_attr_custom"><strong><?= $block->escapeHtml(__('Custom Attribute')) ?></strong></label>
+                <div class="admin__field-control">
+                    <select id="ca_attr_custom" name="attribute_custom" class="admin__control-select" style="width:280px;">
+                        <option value=""><?= $block->escapeHtml(__('-- Select attribute --')) ?></option>
+                        <?php foreach ($customAttrs as $opt): ?>
+                            <option value="<?= $block->escapeHtmlAttr($opt['value']) ?>"><?= $block->escapeHtml($opt['label']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Scope -->
+            <div class="admin__field" style="margin-bottom:12px;">
+                <label class="admin__field-label"><strong><?= $block->escapeHtml(__('Apply To')) ?></strong></label>
+                <div class="admin__field-control">
+                    <label style="margin-right:16px;"><input type="radio" name="scope" value="all" checked/> <?= $block->escapeHtml(__('All Products')) ?></label>
+                    <label style="margin-right:16px;"><input type="radio" name="scope" value="sku"/> <?= $block->escapeHtml(__('Specific SKUs')) ?></label>
+                    <label><input type="radio" name="scope" value="id"/> <?= $block->escapeHtml(__('Specific IDs')) ?></label>
+                </div>
+            </div>
+
+            <!-- Scope values -->
+            <div class="admin__field ca-scope-values" style="margin-bottom:12px;display:none;">
+                <label class="admin__field-label" for="ca_scope_values"><strong><?= $block->escapeHtml(__('SKUs / IDs')) ?></strong></label>
+                <div class="admin__field-control">
+                    <textarea id="ca_scope_values" name="scope_values" class="admin__control-textarea"
+                              rows="3" style="width:400px;"
+                              placeholder="<?= $block->escapeHtmlAttr(__('Comma or newline separated')) ?>"></textarea>
+                </div>
+            </div>
+
+            <!-- Store view -->
+            <div class="admin__field" style="margin-bottom:12px;">
+                <label class="admin__field-label" for="ca_store_id"><strong><?= $block->escapeHtml(__('Store View')) ?></strong></label>
+                <div class="admin__field-control">
+                    <select id="ca_store_id" name="store_id" class="admin__control-select" style="width:280px;" required>
+                        <option value=""><?= $block->escapeHtml(__('-- Select store view --')) ?></option>
+                        <?php foreach ($stores as $store): ?>
+                            <option value="<?= $block->escapeHtmlAttr($store['value']) ?>"><?= $block->escapeHtml($store['label']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+        </fieldset>
+
+        <!-- ── Actions ──────────────────────────────────────────────── -->
+        <div style="margin-top:8px;display:flex;gap:12px;align-items:center;">
+            <button type="button" id="ca-btn-dryrun" class="action-default scalable primary">
+                <?= $block->escapeHtml(__('Run Dry-Run / Preview')) ?>
+            </button>
+            <button type="button" id="ca-btn-runfix" class="action-default scalable" disabled title="<?= $block->escapeHtmlAttr(__('Run dry-run first to unlock')) ?>">
+                <?= $block->escapeHtml(__('Run Fix')) ?>
+            </button>
+            <span id="ca-spinner" style="display:none;">⏳ <?= $block->escapeHtml(__('Working...')) ?></span>
+        </div>
+    </form>
+
+    <!-- ── Messages ─────────────────────────────────────────────────── -->
+    <div id="ca-message" style="margin-top:16px;display:none;"></div>
+
+    <!-- ── Dry-run preview table ────────────────────────────────────── -->
+    <div id="ca-preview-wrap" style="margin-top:20px;display:none;">
+        <h4 style="margin-bottom:8px;"><?= $block->escapeHtml(__('Dry-Run Preview')) ?></h4>
+        <table id="ca-preview-table" class="data-grid" style="width:100%;">
+            <thead>
+                <tr>
+                    <th><?= $block->escapeHtml(__('Entity ID')) ?></th>
+                    <th><?= $block->escapeHtml(__('SKU')) ?></th>
+                    <th><?= $block->escapeHtml(__('Store')) ?></th>
+                    <th><?= $block->escapeHtml(__('Attribute')) ?></th>
+                    <th><?= $block->escapeHtml(__('Current Value')) ?></th>
+                    <th><?= $block->escapeHtml(__('Intended Value')) ?></th>
+                </tr>
+            </thead>
+            <tbody id="ca-preview-body"></tbody>
+        </table>
+        <p id="ca-preview-empty" style="display:none;color:#2e7d32;"><?= $block->escapeHtml(__('✓ No changes needed — all values match intended.')) ?></p>
+    </div>
+
+    <!-- ── Fix result ───────────────────────────────────────────────── -->
+    <div id="ca-fix-result" style="margin-top:20px;display:none;"></div>
+
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    const form       = document.getElementById('ca-override-form');
+    const btnDryRun  = document.getElementById('ca-btn-dryrun');
+    const btnRunFix  = document.getElementById('ca-btn-runfix');
+    const spinner    = document.getElementById('ca-spinner');
+    const msgBox     = document.getElementById('ca-message');
+    const previewWrap  = document.getElementById('ca-preview-wrap');
+    const previewBody  = document.getElementById('ca-preview-body');
+    const previewEmpty = document.getElementById('ca-preview-empty');
+    const fixResult  = document.getElementById('ca-fix-result');
+
+    // Track current form signature to reset Run Fix button when form changes
+    let dryRunSignature = null;
+
+    // ── Type → show/hide fields ──────────────────────────────────────
+    document.getElementById('ca_type').addEventListener('change', function () {
+        document.querySelectorAll('.ca-field-price, .ca-field-image, .ca-field-custom')
+            .forEach(el => el.style.display = 'none');
+        if (this.value === 'price')  document.querySelector('.ca-field-price').style.display  = '';
+        if (this.value === 'image')  document.querySelector('.ca-field-image').style.display  = '';
+        if (this.value === 'custom') document.querySelector('.ca-field-custom').style.display = '';
+        resetDryRun();
+    });
+
+    // ── Scope → show/hide textarea ───────────────────────────────────
+    document.querySelectorAll('input[name="scope"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            document.querySelector('.ca-scope-values').style.display = this.value !== 'all' ? '' : 'none';
+            resetDryRun();
+        });
+    });
+
+    // Any form change → reset dry-run unlock
+    form.addEventListener('change', resetDryRun);
+
+    function resetDryRun() {
+        btnRunFix.disabled = true;
+        btnRunFix.title    = '<?= $block->escapeJs(__('Run dry-run first to unlock')) ?>';
+        dryRunSignature    = null;
+        previewWrap.style.display = 'none';
+        fixResult.style.display   = 'none';
+        clearMessage();
+    }
+
+    // ── Dry-run ──────────────────────────────────────────────────────
+    btnDryRun.addEventListener('click', function () {
+        const params = collectParams();
+        if (!params) return;
+
+        setWorking(true);
+        clearMessage();
+        previewWrap.style.display = 'none';
+        fixResult.style.display   = 'none';
+
+        fetch('<?= $block->escapeJs($dryRunUrl) ?>', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(params),
+        })
+        .then(r => r.json())
+        .then(function (data) {
+            if (!data.success) {
+                showMessage(data.message, 'error');
+                return;
+            }
+
+            renderPreview(data.preview || []);
+            showMessage(data.message, data.total > 0 ? 'warning' : 'success');
+
+            // Unlock Run Fix only if there are rows to fix
+            if (data.total > 0) {
+                dryRunSignature    = JSON.stringify(params);
+                btnRunFix.disabled = false;
+                btnRunFix.title    = '';
+            }
+        })
+        .catch(function (err) { showMessage('Request failed: ' + err, 'error'); })
+        .finally(function ()  { setWorking(false); });
+    });
+
+    // ── Run Fix ──────────────────────────────────────────────────────
+    btnRunFix.addEventListener('click', function () {
+        if (!confirm('<?= $block->escapeJs(__('This will write to the database and backup current values to CSV. Proceed?')) ?>')) {
+            return;
+        }
+
+        const params = collectParams();
+        if (!params) return;
+
+        // Safety: re-check signature hasn't changed
+        if (dryRunSignature !== JSON.stringify(params)) {
+            showMessage('<?= $block->escapeJs(__('Form changed since last dry-run. Please run dry-run again.')) ?>', 'error');
+            resetDryRun();
+            return;
+        }
+
+        setWorking(true);
+        clearMessage();
+        fixResult.style.display = 'none';
+
+        fetch('<?= $block->escapeJs($runFixUrl) ?>', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(params),
+        })
+        .then(r => r.json())
+        .then(function (data) {
+            if (!data.success) {
+                showMessage(data.message, 'error');
+                return;
+            }
+            renderFixResult(data);
+            showMessage(data.message, data.errors > 0 ? 'warning' : 'success');
+            btnRunFix.disabled = true;
+            dryRunSignature    = null;
+        })
+        .catch(function (err) { showMessage('Request failed: ' + err, 'error'); })
+        .finally(function ()  { setWorking(false); });
+    });
+
+    // ── Helpers ──────────────────────────────────────────────────────
+
+    function collectParams() {
+        const type    = document.getElementById('ca_type').value;
+        const storeId = document.getElementById('ca_store_id').value;
+
+        if (!type) { showMessage('<?= $block->escapeJs(__('Please select a type.')) ?>', 'error'); return null; }
+        if (!storeId) { showMessage('<?= $block->escapeJs(__('Please select a store view.')) ?>', 'error'); return null; }
+
+        let attribute = '';
+        if (type === 'price')  attribute = document.getElementById('ca_attr_price').value;
+        if (type === 'custom') attribute = document.getElementById('ca_attr_custom').value;
+
+        if (type !== 'image' && !attribute) {
+            showMessage('<?= $block->escapeJs(__('Please select an attribute.')) ?>', 'error');
+            return null;
+        }
+
+        const scope       = document.querySelector('input[name="scope"]:checked').value;
+        const scopeValues = document.getElementById('ca_scope_values').value;
+        const imageType   = document.getElementById('ca_image_type').value;
+
+        if (scope !== 'all' && !scopeValues.trim()) {
+            showMessage('<?= $block->escapeJs(__('Please enter SKUs or IDs.')) ?>', 'error');
+            return null;
+        }
+
+        return {
+            form_key:     '<?= $block->escapeJs($formKey) ?>',
+            type:         type,
+            attribute:    attribute,
+            image_type:   imageType,
+            scope:        scope,
+            scope_values: scopeValues,
+            store_id:     storeId,
+        };
+    }
+
+    function renderPreview(rows) {
+        previewBody.innerHTML = '';
+        if (rows.length === 0) {
+            previewEmpty.style.display = '';
+            previewWrap.style.display  = '';
+            return;
+        }
+        previewEmpty.style.display = 'none';
+        rows.forEach(function (r) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = [r.entity_id, esc(r.sku), r.store_id, esc(r.attribute_code), esc(r.current_value), esc(r.intended_value)]
+                .map(v => '<td>' + v + '</td>').join('');
+            previewBody.appendChild(tr);
+        });
+        previewWrap.style.display = '';
+    }
+
+    function renderFixResult(data) {
+        fixResult.innerHTML =
+            '<div style="background:#e8f5e9;border:1px solid #a5d6a7;padding:12px 16px;border-radius:4px;">' +
+            '<strong><?= $block->escapeJs(__('Fix applied.')) ?></strong><br/>' +
+            '<?= $block->escapeJs(__('Processed')) ?>: ' + data.processed + ' &nbsp;|&nbsp; ' +
+            '<?= $block->escapeJs(__('Fixed')) ?>: ' + data.fixed + ' &nbsp;|&nbsp; ' +
+            '<?= $block->escapeJs(__('Errors')) ?>: ' + data.errors +
+            (data.csv_filename ? '<br/><?= $block->escapeJs(__('Backup CSV')) ?>: <code>' + esc(data.csv_filename) + '</code>' : '') +
+            '</div>';
+        fixResult.style.display = '';
+    }
+
+    function setWorking(on) {
+        spinner.style.display   = on ? '' : 'none';
+        btnDryRun.disabled      = on;
+        if (!on && dryRunSignature) btnRunFix.disabled = false;
+    }
+
+    function showMessage(msg, type) {
+        const colors = { success: '#d4edda', error: '#f8d7da', warning: '#fff3cd' };
+        const borders = { success: '#c3e6cb', error: '#f5c6cb', warning: '#ffeeba' };
+        msgBox.innerHTML = '<div style="background:' + (colors[type]||colors.warning) + ';border:1px solid ' + (borders[type]||borders.warning) + ';padding:10px 14px;border-radius:4px;">' + msg + '</div>';
+        msgBox.style.display = '';
+    }
+
+    function clearMessage() {
+        msgBox.innerHTML     = '';
+        msgBox.style.display = 'none';
+    }
+
+    function esc(str) {
+        if (str === null || str === undefined) return '<em style="color:#999">null</em>';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+}());
+</script>

@@ -1,0 +1,91 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- store api -->
+    <preference for="IXPF\Syncer\Api\Store\StoreApi" type="IXPF\Syncer\Model\Api\Store\Store"/>
+    <preference for="IXPF\Syncer\Api\Store\StoreInformationResponseApi" type="IXPF\Syncer\Model\Api\Store\StoreInformationResponse"/>
+
+    <!-- products api -->
+    <preference for="IXPF\Syncer\Api\Product\ProductApi" type="IXPF\Syncer\Model\Api\Product\Product"/>
+    <preference for="IXPF\Syncer\Api\Product\ProductListResponseApi" type="IXPF\Syncer\Model\Api\Product\ProductListResponse"/>
+    <preference for="IXPF\Syncer\Api\Product\ProductResponseApi" type="IXPF\Syncer\Model\Api\Product\ProductResponse"/>
+
+
+    <type name="Magento\Sales\Api\OrderRepositoryInterface">
+        <plugin name="carpetavenue_currency_order_extension" type="IXPF\Syncer\Plugin\OrderExtension" />
+    </type>
+
+    <type name="Magento\Sales\Api\Data\OrderInterface">
+        <plugin name="add_default_name_to_order_items"
+                type="IXPF\Syncer\Plugin\OrderItemDefaultName" />
+    </type>
+
+
+    <!-- console commands -->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="ixpf_syncer_purchase_command" xsi:type="object">IXPF\Syncer\Console\Commands\PurchaseCommand</item>
+                <item name="ixpf_syncer_photostudio_command" xsi:type="object">IXPF\Syncer\Console\Commands\ProductGallerySync</item> <!-- legacy -->
+                <item name="ixpf_syncer_photostudio_queue_command" xsi:type="object">IXPF\Syncer\Console\Commands\PhotoStudioQueueRun</item>
+                <item name="ixpf_syncer_photostudio_image_download_command" xsi:type="object">IXPF\Syncer\Console\Commands\DownloadGoogleBucketImages</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="IXPF\Syncer\Model\ResourceModel\IxpfWebhookJobs\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ixpf_webhook_jobs</argument>
+            <argument name="resourceModel" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfWebhookJobs</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="IXPF\Syncer\Model\ResourceModel\IxpfPhotoStudioQueue\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ixpf_photo_studio_queue</argument>
+            <argument name="resourceModel" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfPhotoStudioQueue</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="IXPF\Syncer\Model\ResourceModel\IxpfPurchaseOrder\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ixpf_purchase_orders</argument>
+            <argument name="resourceModel" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfPurchaseOrder</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="IXPF\Syncer\Model\ResourceModel\IxpfPurchaseOrderProduct\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ixpf_purchase_order_items</argument>
+            <argument name="resourceModel" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfPurchaseOrderProduct</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="IXPF\Syncer\Model\ResourceModel\IxpfProductBulkUpdateQueue\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ixpf_product_bulk_update_queue</argument>
+            <argument name="resourceModel" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfProductBulkUpdateQueue</argument>
+        </arguments>
+    </virtualType>
+
+
+    <virtualType name="IXPF\Syncer\Model\ResourceModel\IxpfOrderApiActivity\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ixpf_order_api_activity</argument>
+            <argument name="resourceModel" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfOrderApiActivity</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="ixpfsyncer_webhook_listing_data_source" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfWebhookJobs\Grid\Collection</item>
+                <item name="ixpfsyncer_productgallery_listing_data_source" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfPhotoStudioQueue\Grid\Collection</item>
+                <item name="ixpfsyncer_purchaseorder_listing_data_source" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfPurchaseOrder\Grid\Collection</item>
+                <item name="ixpfsyncer_purchaseorder_product_listing_data_source" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfPurchaseOrderProduct\Grid\Collection</item>
+                <item name="ixpf_product_bulk_update_queue_listing_data_source" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfProductBulkUpdateQueue\Grid\Collection</item>
+                <item name="ixpfsyncer_orderapiactivity_listing_data_source" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfOrderApiActivity\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+
+</config>

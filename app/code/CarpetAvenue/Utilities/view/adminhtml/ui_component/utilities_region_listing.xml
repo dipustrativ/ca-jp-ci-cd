@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">utilities_region_listing.utilities_region_listing_data_source</item>
+        </item>
+        <item name="buttons" xsi:type="array">
+            <item name="add" xsi:type="array">
+                <item name="name" xsi:type="string">add</item>
+                <item name="label" xsi:type="string" translate="true">Add New Region</item>
+                <item name="url" xsi:type="string">utilities/region/new</item>
+                <item name="class" xsi:type="string">primary</item>
+            </item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>utilities_region_listing.utilities_region_listing_data_source</dep>
+        </deps>
+        <spinner>utilities_region_columns</spinner>
+    </settings>
+
+    <dataSource name="utilities_region_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">region_id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>CarpetAvenue_Utilities::region_manager</aclResource>
+        <dataProvider name="utilities_region_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>region_id</requestFieldName>
+                <primaryFieldName>region_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="utilities_region_columns">
+
+        <column name="region_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">ID</label>
+                <sorting>asc</sorting>
+            </settings>
+        </column>
+
+        <column name="country_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Country Code</label>
+            </settings>
+        </column>
+
+        <column name="code">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Region Code</label>
+            </settings>
+        </column>
+
+        <column name="default_name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Default Name</label>
+            </settings>
+        </column>
+
+        <actionsColumn name="actions"
+                       class="CarpetAvenue\Utilities\Ui\Component\Listing\Column\RegionActions">
+            <settings>
+                <label translate="true">Actions</label>
+                <indexField>region_id</indexField>
+            </settings>
+        </actionsColumn>
+
+    </columns>
+</listing>
+

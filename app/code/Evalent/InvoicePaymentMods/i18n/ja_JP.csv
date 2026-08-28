@@ -1,0 +1,26 @@
+"Invoice: ","請求書: "
+"Order: ","ご注文: "
+"Customer Number: ","お客様番号: "
+"Invoice Date: ","請求日: "
+"Sold to:","販売先:"
+"CA - Sold to:","販売先:"
+"Ship to:","配送先:"
+"Payment Method:","支払方法:"
+"Shipping Method:","配送方法:"
+"Order Summary","ご注文内容"
+Products,商品
+"SKU",商品番号
+"CA - SKU",商品番号
+Price,価格
+Quantity,個数
+Tax,消費税
+Subtotal,小計
+"Subtotal:","小計:"
+"Grand Total Excl. Tax","合計（税別）"
+"Grand Total Incl. Tax","合計（税込）"
+"CA - Tax","消費税"
+"CA - Grand Total (Excl. Tax)","合計（税別）"
+"CA - Grand Total (Incl. Tax)","合計（税込）"
+"Japanese Additional Invoice Message","価格には、消費税、税関手続き(該当する場合のみ)を含むすべての料金が含まれています。"
+"CA - Qty","個数"
+"CA - Ship to:","配送先:"

@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">productify_namechangelog_listing.productify_namechangelog_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>productify_namechangelog_listing.productify_namechangelog_listing_data_source</dep>
+        </deps>
+        <spinner>productify_namechangelog_columns</spinner>
+    </settings>
+
+    <dataSource name="productify_namechangelog_listing_data_source" component="Magento_Ui/js/grid/provider">
+
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">entity_id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>Magento_Backend::system</aclResource>
+        <dataProvider name="productify_namechangelog_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>entity_id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <paging name="listing_paging"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+    </listingToolbar>
+
+    <columns name="productify_namechangelog_columns">
+
+        <column name="sku">
+            <settings>
+                <label translate="true">SKU</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="store_id">
+            <settings>
+                <label translate="true">Store ID</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="previous_name">
+            <settings>
+                <label translate="true">Old Name</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="name">
+            <settings>
+                <label translate="true">Current Name</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="created_at">
+            <settings>
+                <label translate="true">Created At</label>
+                <filter>dateRange</filter>
+            </settings>
+        </column>
+    </columns>
+</listing>

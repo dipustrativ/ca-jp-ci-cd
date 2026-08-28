@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @package CarpetAvenue_Utilities
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <!--
+        carpetavenue_image_resize_log
+        ─────────────────────────────
+        Tracks every image considered for resize.
+
+        status values:
+          pending    – queued but not yet processed
+          converted  – successfully resized (restore available)
+          skipped    – criteria not met (see skip_reason)
+          error      – resize attempt failed (see skip_reason)
+          restored   – original restored from bucket backup
+    -->
+    <table name="carpetavenue_image_resize_log" resource="default" engine="innodb"
+           comment="CarpetAvenue — Image Resize &amp; Restore Log">
+
+        <!-- ── Identity ───────────────────────────────────────────── -->
+        <column xsi:type="int"       name="id"                  unsigned="true" nullable="false" identity="true" comment="Primary Key"/>
+        <column xsi:type="int"       name="product_id"          unsigned="true" nullable="false"                 comment="Catalog Product Entity ID"/>
+        <column xsi:type="varchar"   name="sku"                 length="255"    nullable="false"                 comment="Product SKU"/>
+
+        <!-- ── Image classification ──────────────────────────────── -->
+        <!--  image_type: 'main' | 'gallery'  -->
+        <column xsi:type="varchar"   name="image_type"          length="16"     nullable="false"                 comment="Image type: main or gallery"/>
+        <column xsi:type="varchar"   name="local_path"          length="768"    nullable="false"                 comment="Absolute local path to image file (max 768 chars — utf8mb4 unique key limit)"/>
+        <column xsi:type="varchar"   name="db_path"             length="1024"   nullable="false" default=""      comment="DB gallery value path (relative)"/>
+
+        <!-- ── Bucket / restore ───────────────────────────────────── -->
+        <column xsi:type="varchar"   name="bucket_remote_path"  length="1024"   nullable="true"                  comment="GCS bucket path of the original backup (null if not uploaded)"/>
+
+        <!-- ── Before metrics ────────────────────────────────────── -->
+        <column xsi:type="bigint"    name="before_size"         unsigned="true" nullable="true"                  comment="File size in bytes before resize"/>
+        <column xsi:type="int"       name="before_width"        unsigned="true" nullable="true"                  comment="Image width in pixels before resize"/>
+        <column xsi:type="int"       name="before_height"       unsigned="true" nullable="true"                  comment="Image height in pixels before resize"/>
+
+        <!-- ── After metrics ─────────────────────────────────────── -->
+        <column xsi:type="bigint"    name="after_size"          unsigned="true" nullable="true"                  comment="File size in bytes after resize"/>
+        <column xsi:type="int"       name="after_width"         unsigned="true" nullable="true"                  comment="Image width in pixels after resize"/>
+        <column xsi:type="int"       name="after_height"        unsigned="true" nullable="true"                  comment="Image height in pixels after resize"/>
+
+        <!-- ── Status ────────────────────────────────────────────── -->
+        <column xsi:type="varchar"   name="status"              length="16"     nullable="false" default="pending" comment="Status: pending | converted | skipped | error | restored"/>
+        <column xsi:type="text"      name="skip_reason"                         nullable="true"                  comment="Human-readable reason when status is skipped or error"/>
+
+        <!-- ── Timestamps ────────────────────────────────────────── -->
+        <column xsi:type="timestamp" name="created_at"                          nullable="false" default="CURRENT_TIMESTAMP"                       comment="Row creation timestamp"/>
+        <column xsi:type="timestamp" name="updated_at"                          nullable="false" default="CURRENT_TIMESTAMP" on_update="true"      comment="Last update timestamp"/>
+        <column xsi:type="timestamp" name="restored_at"                         nullable="true"                  comment="Timestamp when the original was restored"/>
+
+        <!-- ── Constraints ───────────────────────────────────────── -->
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+
+        <!-- Unique: one row per local file path per run (no duplicate entries) -->
+        <constraint xsi:type="unique" referenceId="CA_IMG_RESIZE_LOG_LOCAL_PATH_UNIQ">
+            <column name="local_path"/>
+        </constraint>
+
+        <!-- ── Indexes ───────────────────────────────────────────── -->
+        <index referenceId="CA_IMG_RESIZE_LOG_PRODUCT_ID"  indexType="btree">
+            <column name="product_id"/>
+        </index>
+        <index referenceId="CA_IMG_RESIZE_LOG_SKU"         indexType="btree">
+            <column name="sku"/>
+        </index>
+        <index referenceId="CA_IMG_RESIZE_LOG_STATUS"      indexType="btree">
+            <column name="status"/>
+        </index>
+    </table>
+
+
+    <!--
+        carpetavenue_attribute_override_value
+        ──────────────────────────────────────
+        Stores intended per-store-view attribute values.
+        Unique key: (entity_id, store_id, attribute_type, attribute_code)
+    -->
+    <table name="carpetavenue_attribute_override_value" resource="default" engine="innodb"
+           comment="CarpetAvenue — Intended Per-Store-View Attribute Values">
+
+        <column xsi:type="int"       name="id"             unsigned="true" nullable="false" identity="true" comment="Primary Key"/>
+        <column xsi:type="int"       name="entity_id"      unsigned="true" nullable="false"                 comment="Catalog Product Entity ID"/>
+        <column xsi:type="smallint"  name="store_id"       unsigned="true" nullable="false"                 comment="Store View ID"/>
+        <column xsi:type="varchar"   name="attribute_type" length="20"     nullable="false"                 comment="price | image_role | image_position | custom"/>
+        <column xsi:type="varchar"   name="attribute_code" length="255"    nullable="false"                 comment="EAV attribute code; for image_position: gallery file path"/>
+        <column xsi:type="text"      name="value"                          nullable="true"                  comment="Serialized intended value"/>
+        <column xsi:type="timestamp" name="created_at"                     nullable="false" default="CURRENT_TIMESTAMP"              comment="Row creation timestamp"/>
+        <column xsi:type="timestamp" name="updated_at"                     nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Last update timestamp"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="CA_ATTR_OVERRIDE_VALUE_UNIQ">
+            <column name="entity_id"/>
+            <column name="store_id"/>
+            <column name="attribute_type"/>
+            <column name="attribute_code"/>
+        </constraint>
+        <index referenceId="CA_ATTR_OVERRIDE_VALUE_ENTITY_STORE" indexType="btree">
+            <column name="entity_id"/>
+            <column name="store_id"/>
+        </index>
+    </table>
+
+    <!--
+        carpetavenue_override_event_log
+        ────────────────────────────────
+        Detect CLI run log — one row per violation found.
+        run_id (UUID) groups all rows from one CLI run.
+    -->
+    <table name="carpetavenue_override_event_log" resource="default" engine="innodb"
+           comment="CarpetAvenue — Override Detect Run Violation Log">
+
+        <column xsi:type="int"       name="id"             unsigned="true" nullable="false" identity="true" comment="Primary Key"/>
+        <column xsi:type="int"       name="entity_id"      unsigned="true" nullable="false"                 comment="Catalog Product Entity ID"/>
+        <column xsi:type="smallint"  name="store_id"       unsigned="true" nullable="false"                 comment="Store View ID"/>
+        <column xsi:type="varchar"   name="attribute_type" length="20"     nullable="false"                 comment="price | image_role | image_position | custom"/>
+        <column xsi:type="varchar"   name="attribute_code" length="255"    nullable="false"                 comment="EAV attribute code"/>
+        <column xsi:type="text"      name="old_value"                      nullable="true"                  comment="Value before the overwrite"/>
+        <column xsi:type="text"      name="new_value"                      nullable="true"                  comment="Value after the overwrite (current live value)"/>
+        <column xsi:type="tinyint"   name="auto_fixed"     unsigned="true" nullable="false" default="0"     comment="1 = fix applied in same detect run"/>
+        <column xsi:type="varchar"   name="run_id"         length="40"     nullable="false"                 comment="UUID grouping all rows from one CLI run"/>
+        <column xsi:type="tinyint"   name="dry_run"        unsigned="true" nullable="false" default="0"     comment="1 = detect ran with --dry-run (no writes)"/>
+        <column xsi:type="timestamp" name="created_at"                     nullable="false" default="CURRENT_TIMESTAMP" comment="Row creation timestamp"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="CA_OVERRIDE_EVENT_LOG_RUN_ID" indexType="btree">
+            <column name="run_id"/>
+        </index>
+        <index referenceId="CA_OVERRIDE_EVENT_LOG_ENTITY_STORE" indexType="btree">
+            <column name="entity_id"/>
+            <column name="store_id"/>
+        </index>
+    </table>
+
+    <!--
+        carpetavenue_override_backup_log
+        ─────────────────────────────────
+        Tracks CSV backup files created before each fix run.
+        status values:
+          pending  – backup queued
+          done     – backup CSV written successfully
+          failed   – write failed
+    -->
+    <table name="carpetavenue_override_backup_log" resource="default" engine="innodb"
+           comment="CarpetAvenue — Override Fix Backup CSV Log">
+
+        <column xsi:type="int"       name="id"             unsigned="true" nullable="false" identity="true" comment="Primary Key"/>
+        <column xsi:type="varchar"   name="attribute_type" length="20"     nullable="false"                 comment="price | image | custom"/>
+        <column xsi:type="varchar"   name="attribute_code" length="255"    nullable="false"                 comment="EAV attribute code"/>
+        <column xsi:type="smallint"  name="store_id"       unsigned="true" nullable="false"                 comment="Store View ID"/>
+        <column xsi:type="varchar"   name="scope"          length="10"     nullable="false" default="all"   comment="all | sku | id"/>
+        <column xsi:type="text"      name="scope_values"                   nullable="true"                  comment="Comma-separated SKUs or entity IDs (null when scope=all)"/>
+        <column xsi:type="varchar"   name="csv_path"       length="512"    nullable="false"                 comment="Path under var/carpetavenue/override_backup/"/>
+        <column xsi:type="int"       name="row_count"      unsigned="true" nullable="false" default="0"     comment="Number of rows in the backup CSV"/>
+        <column xsi:type="varchar"   name="status"         length="20"     nullable="false" default="pending" comment="pending | done | failed"/>
+        <column xsi:type="timestamp" name="created_at"                     nullable="false" default="CURRENT_TIMESTAMP" comment="Row creation timestamp"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="CA_OVERRIDE_BACKUP_LOG_TYPE_STORE" indexType="btree">
+            <column name="attribute_type"/>
+            <column name="store_id"/>
+        </index>
+        <index referenceId="CA_OVERRIDE_BACKUP_LOG_STATUS" indexType="btree">
+            <column name="status"/>
+        </index>
+    </table>
+
+
+    <!--
+        salesrule (extend)
+        ──────────────────
+        Add pos_enabled flag so admins can control which cart price rules
+        appear in the POS checkout coupon picker.
+        Default 0 = hidden from POS.
+    -->
+    <table name="salesrule" resource="default">
+        <column xsi:type="smallint" name="pos_enabled" unsigned="true" nullable="false" default="0"
+                comment="Show coupon in POS checkout (0=No 1=Yes)"/>
+    </table>
+
+</schema>
+

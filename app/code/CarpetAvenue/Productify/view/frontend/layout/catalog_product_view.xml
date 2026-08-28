@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Product
+ * @package   CarpetAvenue_Productify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <block class="Magento\Catalog\Block\Product\View" name="productify.variants" template="CarpetAvenue_Productify::variants.phtml">
+            <arguments>
+                <argument name="view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\VariantCacheView</argument>
+            </arguments>
+        </block>
+        <move element="productify.variants" destination="product.info.form.content" before="product.info.addtocart"/>
+
+        <!-- similar product load by the ajax -->
+        <block name="catalog.product.similar.ajax" after="catalog.product.related"
+               class="CarpetAvenue\Productify\Block\Product\List\SimilarProductBlock"
+               template="CarpetAvenue_Productify::product/list/ajax_similar.phtml"/>
+        <move element="catalog.product.similar.ajax" destination="main.full" before="-" />
+
+        <!-- Recently viewed products - native Magento_Catalog widget, no custom backend needed -->
+        <block name="catalog.product.recently.viewed"
+               class="Magento\Catalog\Block\Widget\RecentlyViewed"
+               template="Magento_Catalog::product/widget/viewed/grid.phtml">
+            <arguments>
+                <argument name="uiComponent" xsi:type="string">widget_recently_viewed</argument>
+                <argument name="page_size" xsi:type="string">10</argument>
+                <argument name="show_attributes" xsi:type="string">name,image,price</argument>
+                <argument name="show_buttons" xsi:type="string">add_to_wishlist</argument>
+            </arguments>
+        </block>
+        <move element="catalog.product.recently.viewed" destination="main.full" after="catalog.product.similar.ajax" />
+
+        <!-- Related products carousel — merged from Evalent_RelatedCarouselProducts -->
+        <referenceContainer name="main.content">
+
+        </referenceContainer>
+
+        <referenceBlock name="product.info.collector">
+            <arguments>
+                <argument name="collector_view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\CollectorTagData</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * Injects the B2B catalog-mode view model onto the Add to Cart block so the
+ * PDP can hide Add to Cart and show a "Become a Reseller" button when the
+ * store runs in B2B mode.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_B2B
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="product.info.addtocart">
+            <arguments>
+                <argument name="b2b_catalog_mode" xsi:type="object">CarpetAvenue\B2B\ViewModel\CatalogMode</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

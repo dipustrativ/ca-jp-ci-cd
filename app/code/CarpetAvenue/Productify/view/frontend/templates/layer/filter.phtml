@@ -1,0 +1,114 @@
+<?php
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Multiselect filter option list — checkbox-styled links so filtering works
+ * without JS; the AJAX widget (phase 2) intercepts the same anchors.
+ *
+ * @var \Magento\LayeredNavigation\Block\Navigation\FilterRenderer $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$viewModel = $block->getData('product_layer_view_model');
+// Optional (Carpient_Filter): per-option image swatch renderer.
+$optionImages = $block->getData('option_image_view_model');
+
+$sliderFilter = null;
+foreach ($filterItems as $item) {
+    if ($item->getLabel() === \CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\SliderFilterInterface::SLIDER_ITEM_LABEL
+        && $item->getFilter() instanceof \CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\SliderFilterInterface
+    ) {
+        $sliderFilter = $item->getFilter();
+        break;
+    }
+}
+?>
+<?php if ($sliderFilter !== null): ?>
+    <?php
+    $sliderConfig = $sliderFilter->getSliderConfig();
+    $units = (string)($sliderConfig['units'] ?? '');
+    ?>
+    <div class="am-price-slider"
+         data-mage-init='{"carpetavenuePriceSlider": <?= $escaper->escapeHtmlAttr(json_encode($sliderConfig)) ?>}'>
+        <div class="am-price-slider-inputs">
+            <div class="am-price-field">
+                <?php if ($units !== ''): ?><span class="am-price-units"><?= $escaper->escapeHtml($units) ?></span><?php endif; ?>
+                <input type="number" data-role="from" class="input-text am-price-from"
+                       min="<?= $escaper->escapeHtmlAttr((string)$sliderConfig['min']) ?>"
+                       max="<?= $escaper->escapeHtmlAttr((string)$sliderConfig['max']) ?>"
+                       aria-label="<?= $escaper->escapeHtmlAttr(__('From')) ?>"/>
+            </div>
+            <span class="am-price-sep">&ndash;</span>
+            <div class="am-price-field">
+                <?php if ($units !== ''): ?><span class="am-price-units"><?= $escaper->escapeHtml($units) ?></span><?php endif; ?>
+                <input type="number" data-role="to" class="input-text am-price-to"
+                       min="<?= $escaper->escapeHtmlAttr((string)$sliderConfig['min']) ?>"
+                       max="<?= $escaper->escapeHtmlAttr((string)$sliderConfig['max']) ?>"
+                       aria-label="<?= $escaper->escapeHtmlAttr(__('To')) ?>"/>
+            </div>
+        </div>
+        <div data-role="slider" class="am-price-slider-track"></div>
+        <div data-role="ticks" class="am-price-ticks"></div>
+    </div>
+    <?php return; ?>
+<?php endif; ?>
+<?php
+// Attribute code drives per-attribute layout (e.g. Color = swatch grid,
+// Shape = icon rows). Taken from the first item's filter request var.
+$attrCode = '';
+$firstItem = $filterItems[0] ?? null;
+if ($firstItem && method_exists($firstItem, 'getFilter')
+    && method_exists($firstItem->getFilter(), 'getRequestVar')) {
+    $attrCode = (string) $firstItem->getFilter()->getRequestVar();
+}
+// Option swatches are keyed by eav_attribute_option.option_id. The category
+// filter's item values are category entity IDs, which share the same numeric
+// space and collide (e.g. category "Patina" #29 hitting shape "Round" #29's
+// swatch). Only look up images for real attribute-option filters, not "cat".
+$supportsOptionImages = $optionImages !== null && $attrCode !== '' && $attrCode !== 'cat';
+?>
+<ol class="items am-filter-items<?= $attrCode !== '' ? ' am-filter--' . $escaper->escapeHtmlAttr($attrCode) : '' ?>">
+    <?php foreach ($filterItems as $filterItem): ?>
+        <?php
+        $isSelected = method_exists($filterItem, 'isSelected') && $filterItem->isSelected();
+        $isDisabled = !$isSelected && $filterItem->getCount() === 0;
+        $optionImageUrl = $supportsOptionImages ? $optionImages->getUrl((int) $filterItem->getValue()) : null;
+        ?>
+        <li class="item am-filter-item<?= $isSelected ? ' -selected' : '' ?><?= $isDisabled ? ' -disabled' : '' ?><?= $optionImageUrl ? ' -has-image' : '' ?>">
+            <?php if ($isDisabled): ?>
+                <span class="am-filter-link">
+                    <?php if ($optionImageUrl): ?>
+                        <span class="am-filter-swatch" style="background-image:url('<?= $escaper->escapeUrl($optionImageUrl) ?>')" aria-hidden="true"></span>
+                    <?php else: ?>
+                        <span class="am-filter-checkbox" aria-hidden="true"></span>
+                    <?php endif; ?>
+                    <span class="am-filter-label"><?= /* @noEscape */ $filterItem->getLabel() ?></span>
+                    <?php if ($viewModel && $viewModel->shouldDisplayProductCountOnLayer()): ?>
+                        <span class="count"><?= (int)$filterItem->getCount() ?></span>
+                    <?php endif; ?>
+                </span>
+            <?php else: ?>
+                <a class="am-filter-link"
+                   href="<?= $escaper->escapeUrl($filterItem->getUrl()) ?>"
+                   rel="nofollow"
+                   role="checkbox"
+                   aria-checked="<?= $isSelected ? 'true' : 'false' ?>"
+                   <?php if (method_exists($filterItem, 'getRequestVar')): ?>
+                   data-req-var="<?= $escaper->escapeHtmlAttr($filterItem->getRequestVar()) ?>"
+                   data-value="<?= $escaper->escapeHtmlAttr($filterItem->getValueString()) ?>"
+                   data-multi="<?= $filterItem->isMultiselect() ? '1' : '0' ?>"
+                   data-selected="<?= $isSelected ? '1' : '0' ?>"
+                   <?php endif; ?>>
+                    <?php if ($optionImageUrl): ?>
+                        <span class="am-filter-swatch" style="background-image:url('<?= $escaper->escapeUrl($optionImageUrl) ?>')" aria-hidden="true"></span>
+                    <?php else: ?>
+                        <span class="am-filter-checkbox" aria-hidden="true"></span>
+                    <?php endif; ?>
+                    <span class="am-filter-label"><?= /* @noEscape */ $filterItem->getLabel() ?></span>
+                    <?php if ($viewModel && $viewModel->shouldDisplayProductCountOnLayer()): ?>
+                        <span class="count"><?= (int)$filterItem->getCount() ?></span>
+                    <?php endif; ?>
+                </a>
+            <?php endif; ?>
+        </li>
+    <?php endforeach; ?>
+</ol>

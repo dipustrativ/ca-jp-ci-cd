@@ -1,0 +1,2253 @@
+<?php
+
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Developify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/**
+ * @var Template $block
+ * @var $treeHelper CarpetAvenue\Developify\Helper\FileScanner
+ */
+
+use Magento\Framework\View\Element\Template;
+
+$treeHelper = $this->helper('CarpetAvenue\Developify\Helper\FileScanner');
+try {
+    $logTree = $treeHelper->getLogFilesTree();
+} catch (Exception $e) {
+    echo '<div class="message message-error">' . __('Error: %1', $e->getMessage()) . '</div>';
+    return;
+}
+?>
+
+<style>
+    body.dark-mode{
+        background-color: #1e1e2f;
+        color: #ddd;
+    }
+    body.dark-mode .page-wrapper{
+        background: #2a2a3b;
+    }
+
+    .notices-wrapper {
+        display: none;
+    }
+
+    .page-columns {
+        padding-top: 20px;
+    }
+
+    .page-footer {
+        display: none;
+    }
+
+    .page-header, #messages {
+        display: none;
+    }
+
+    .logviewer-wrapper {
+        display: flex;
+        gap: 20px;
+        height: 95vh;
+    }
+
+    .logviewer-sidebar {
+        width: 300px;
+        background: #fff;
+        padding: 0;
+        overflow-y: auto;
+        border-right: 1px solid #ddd;
+    }
+
+    body.dark-mode .logviewer-sidebar {
+        background: #1a1a2e;
+        border-right-color: #333;
+    }
+
+    /* Sidebar Header */
+    .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 15px;
+        background: #f6f8fa;
+        border-bottom: 1px solid #d0d7de;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    body.dark-mode .sidebar-header {
+        background: #0d1117;
+        border-bottom-color: #30363d;
+    }
+
+    .sidebar-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #24292f;
+    }
+
+    body.dark-mode .sidebar-title {
+        color: #c9d1d9;
+    }
+
+    /* Theme Toggle Button */
+    .theme-toggle {
+        width: 0;
+        height: 17px;
+        border-radius: 100%;
+        border: 1px solid #d0d7de;
+        background: #fff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        font-size: 16px;
+    }
+
+    .theme-toggle:hover {
+        background: #f6f8fa;
+        border-color: #1979c3;
+        transform: rotate(180deg);
+    }
+
+    body.dark-mode .theme-toggle {
+        background: #161b22;
+        border-color: #30363d;
+    }
+
+    body.dark-mode .theme-toggle:hover {
+        background: #21262d;
+        border-color: #58a6ff;
+    }
+
+    .theme-icon {
+        transition: transform 0.3s ease;
+    }
+
+    .logviewer-content {
+        background: #fff;
+        padding: 10px;
+        overflow: auto;
+        width: calc(100% - 350px);
+        position: relative;
+    }
+
+    body.dark-mode .logviewer-content {
+        background: #1a1a2e;
+    }
+
+    body.dark-mode .logviewer-wrapper {
+        background: #1a1a2e;
+    }
+
+    .folder, .file {
+        cursor: pointer;
+        padding: 4px 6px;
+        font-size: 12px;
+        border-radius: 3px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+    }
+
+    .file {
+        margin-left: 0 !important;
+    }
+
+    .folder:hover, .file:hover {
+        background: #e3f2fd;
+        transform: translateX(2px);
+    }
+
+    body.dark-mode .folder:hover, body.dark-mode .file:hover {
+        background: rgba(33, 150, 243, 0.15);
+    }
+
+    .file-name-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .file-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 12px;
+        position: relative;
+    }
+
+    /* Tooltip for full filename */
+    .file-name-wrapper {
+        position: relative;
+    }
+
+    .file-name-wrapper:hover::after {
+        content: attr(data-fullname);
+        position: absolute;
+        left: 0;
+        background: #2c3e50;
+        color: #fff;
+        padding: 6px 8px;
+        border-radius: 2px;
+        font-size: 10px;
+        z-index: 10000;
+        margin-top: 15px;
+        font-weight: 500;
+        min-width: 150px;
+        max-width: 400px;
+        word-break: break-all;
+    }
+
+    body.dark-mode .file-name-wrapper:hover::after {
+        background: #1a1a1a;
+        color: #fff;
+        border: 1px solid #e85d23;
+    }
+
+    .file-size {
+        font-size: 9px;
+        color: #8c8c8c;
+        margin-left: 6px;
+        font-weight: normal;
+        white-space: nowrap;
+    }
+
+    body.dark-mode .file-size {
+        color: #a0aec0;
+    }
+
+    /* Last Modified Date */
+    .file-date, .folder-date {
+        font-size: 9px;
+        color: #8c8c8c;
+        margin-left: 4px;
+        white-space: nowrap;
+    }
+
+    body.dark-mode .file-date, body.dark-mode .folder-date {
+        color: #999;
+    }
+
+    .file-icon {
+        margin-right: 4px;
+        font-size: 14px;
+    }
+
+    .folder-icon {
+        margin-right: 4px;
+        font-size: 14px;
+        transition: transform 0.2s;
+    }
+
+    .folder.open > .folder-icon {
+        transform: rotate(90deg);
+    }
+
+    .file-large {
+        color: #dc3545;
+        font-weight: 600;
+    }
+
+    body.dark-mode .file-large {
+        color: #fc8181;
+    }
+
+    .file.active, .file.selected {
+        background: linear-gradient(135deg, rgba(0, 123, 255, 0.2), rgba(102, 126, 234, 0.2));
+        border-left: 3px solid #007bff;
+        font-weight: bold;
+        transform: translateX(5px);
+    }
+
+    body.dark-mode .file.active, body.dark-mode .file.selected {
+        background: linear-gradient(135deg, rgba(66, 153, 225, 0.3), rgba(102, 126, 234, 0.3));
+        border-left-color: #4299e1;
+    }
+
+    /* Permission Denied Files */
+    .file-permission-denied {
+        opacity: 0.6;
+        cursor: not-allowed !important;
+        background: rgba(220, 53, 69, 0.05);
+    }
+
+    .file-permission-denied:hover {
+        background: rgba(220, 53, 69, 0.1) !important;
+        transform: none !important;
+    }
+
+    body.dark-mode .file-permission-denied {
+        background: rgba(220, 53, 69, 0.1);
+    }
+
+    body.dark-mode .file-permission-denied:hover {
+        background: rgba(220, 53, 69, 0.15) !important;
+    }
+
+    .permission-warning-badge {
+        display: inline-block;
+        margin-left: 4px;
+        font-size: 12px;
+        animation: warningPulse 2s infinite;
+    }
+
+    @keyframes warningPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.1); }
+    }
+
+    .file-name-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .permission-error-message {
+        background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border-left: 4px solid #c53030;
+        box-shadow: 0 4px 12px rgba(252, 129, 129, 0.3);
+    }
+
+    body.dark-mode .permission-error-message {
+        background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+        border-left-color: #fc8181;
+    }
+
+    .permission-error-message strong {
+        display: block;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .permission-error-message p {
+        margin: 8px 0;
+        line-height: 1.6;
+    }
+
+    .permission-error-message ul {
+        margin: 10px 0 10px 20px;
+        line-height: 1.8;
+    }
+
+    .log-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    .log-table th, .log-table td {
+        padding: 8px;
+        border: 1px solid #ccc;
+        font-size: 11px;
+    }
+
+    body.dark-mode .log-table th, body.dark-mode .log-table td {
+        border-color: #444;
+    }
+
+    .toggle-dark {
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        background: #e85d23;
+        color: white;
+        cursor: pointer;
+    }
+
+    .file.active {
+        font-weight: bold;
+        color: #28a745;
+        background: rgba(40, 167, 69, 0.1);
+    }
+
+    #log-content {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 15px;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        line-height: 1.4;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-height: 70vh;
+        overflow-y: auto;
+        color: #333;
+    }
+
+    body.dark-mode #log-content {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+    /* Log level highlighting */
+    .log-line {
+        margin: 2px 0;
+        padding: 2px 4px;
+        border-radius: 2px;
+    }
+
+    .log-error {
+        background-color: #fee;
+        color: #c53030;
+        border-left: 3px solid #e53e3e;
+    }
+
+    body.dark-mode .log-error {
+        background-color: rgba(254, 178, 178, 0.1);
+        color: #feb2b2;
+    }
+
+    .log-warning {
+        background-color: #fffbeb;
+        color: #d69e2e;
+        border-left: 3px solid #ed8936;
+    }
+
+    body.dark-mode .log-warning {
+        background-color: rgba(251, 211, 141, 0.1);
+        color: #fbd38d;
+    }
+
+    #log-tree {
+        font-size: 11px;
+        padding: 10px;
+        overflow-y: auto;
+        max-height: calc(100vh - 200px);
+    }
+
+    /* Root Directory Styling - Magento 2 Style */
+    .root-directory {
+        margin-bottom: 10px;
+    }
+
+    .root-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 8px;
+        background: #514943;
+        color: #fff;
+        border-radius: 3px;
+        font-weight: 600;
+        font-size: 12px;
+        margin-bottom: 5px;
+        border-left: 3px solid #eb5202;
+    }
+
+    body.dark-mode .root-header {
+        background: #3d3d3d;
+        border-left-color: #f57c00;
+    }
+
+    .root-name {
+        font-size: 12px;
+        letter-spacing: 0.3px;
+    }
+
+    /* Folder Container */
+    .folder-container {
+        margin-bottom: 1px;
+    }
+
+    .folder {
+        cursor: pointer;
+        padding: 4px 6px;
+        border-radius: 3px;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+    .folder:hover {
+        background: #e3f2fd;
+    }
+
+    body.dark-mode .folder:hover {
+        background: rgba(33, 150, 243, 0.15);
+    }
+
+    .folder-header {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 600;
+    }
+
+    .folder-toggle {
+        display: inline-block;
+        font-size: 9px;
+        transition: transform 0.2s ease;
+        color: #6c757d;
+        min-width: 10px;
+    }
+
+    body.dark-mode .folder-toggle {
+        color: #a0aec0;
+    }
+
+    .folder.open .folder-toggle {
+        transform: rotate(90deg);
+    }
+
+    .folder-name {
+        font-size: 12px;
+        color: #495057;
+    }
+
+    body.dark-mode .folder-name {
+        color: #e2e8f0;
+    }
+
+    .folder-children {
+        margin-top: 1px;
+        border-left: 1px solid rgba(0, 123, 255, 0.2);
+        margin-left: 6px;
+        padding-left: 4px;
+    }
+
+    body.dark-mode .folder-children {
+        border-left-color: rgba(66, 153, 225, 0.3);
+    }
+
+    /* File Container */
+    .file-container {
+        margin-bottom: 1px;
+    }
+
+    .log-info {
+        background-color: #ebf8ff;
+        color: #3182ce;
+        border-left: 3px solid #4299e1;
+    }
+
+    body.dark-mode .log-info {
+        background-color: rgba(190, 227, 248, 0.1);
+        color: #bee3f8;
+    }
+
+    .log-debug {
+        background-color: #f0fff4;
+        color: #38a169;
+        border-left: 3px solid #48bb78;
+    }
+
+    body.dark-mode .log-debug {
+        background-color: rgba(154, 230, 180, 0.1);
+        color: #9ae6b4;
+    }
+
+    .log-critical {
+        background-color: #4a0e0e;
+        color: #fed7d7;
+        border-left: 3px solid #f56565;
+        font-weight: bold;
+    }
+
+    .log-timestamp {
+        color: #718096;
+        font-weight: normal;
+    }
+
+    body.dark-mode .log-timestamp {
+        color: #a0aec0;
+    }
+
+    #log-actions {
+        margin-bottom: 10px;
+        background: #f4f4f4;
+        padding: 8px;
+        border-radius: 3px;
+        border: 1px solid #ddd;
+    }
+
+    body.dark-mode #log-actions {
+        background: #2d2d2d;
+        border-color: #444;
+    }
+
+    .actions-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .search-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .action-buttons button {
+        min-width: 36px;
+        height: 28px;
+        padding: 4px 10px;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #log-actions button {
+        margin-right: 5px;
+        padding: 1px 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 12px;
+        transition: all 0.2s ease;
+        background: #fff;
+        color: #333;
+    }
+
+    #log-actions button:hover {
+        background: #f4f4f4;
+        border-color: #999;
+    }
+
+    #log-actions button:active {
+        transform: none;
+        background: #e9e9e9;
+    }
+
+    body.dark-mode #log-actions button {
+        background: #3a3a3a;
+        color: #ddd;
+        border-color: #555;
+        font-size: 20px;
+    }
+
+    body.dark-mode #log-actions button:hover {
+        background: #4a4a4a;
+        border-color: #777;
+    }
+
+    #download-log {
+        background: #1979c3;
+        color: #fff;
+        border-color: #1979c3;
+    }
+
+    #download-log:hover {
+        background: #006bb4;
+        border-color: #006bb4;
+    }
+
+    #delete-log {
+        background: #d32f2f;
+        color: #fff;
+        border-color: #d32f2f;
+    }
+
+    #delete-log:hover {
+        background: #b71c1c;
+        border-color: #b71c1c;
+    }
+
+    #clear-search, #expand-all, #collapse-all {
+        background: #fff;
+        color: #333;
+        border-color: #ccc;
+    }
+
+    body.dark-mode #clear-search,
+    body.dark-mode #expand-all,
+    body.dark-mode #collapse-all {
+        background: #3a3a3a;
+        color: #ddd;
+    }
+
+    .log-search {
+        flex: 1;
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        font-size: 12px;
+        transition: all 0.2s ease;
+        height: 28px;
+    }
+
+    .log-search:focus {
+        outline: none;
+        border-color: #1979c3;
+        box-shadow: 0 0 0 1px #1979c3;
+    }
+
+    body.dark-mode .log-search {
+        background: #3a3a3a;
+        color: #fff;
+        border-color: #555;
+    }
+
+    body.dark-mode .log-search:focus {
+        border-color: #2196f3;
+        box-shadow: 0 0 0 1px #2196f3;
+    }
+
+    .log-level-filter {
+        padding: 5px 28px 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        cursor: pointer;
+        background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%23333" d="M6 9L1 4h10z"/></svg>') no-repeat right 8px center;
+        background-size: 12px 12px;
+        font-size: 12px;
+        font-weight: 500;
+        height: 28px;
+        min-width: 120px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
+
+    .log-level-filter:focus {
+        outline: none;
+        border-color: #1979c3;
+        box-shadow: 0 0 0 1px #1979c3;
+    }
+
+    body.dark-mode .log-level-filter {
+        background: #3a3a3a url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%23ddd" d="M6 9L1 4h10z"/></svg>') no-repeat right 8px center;
+        background-size: 12px 12px;
+        color: #fff;
+        border-color: #555;
+    }
+
+    body.dark-mode .log-level-filter:focus {
+        border-color: #2196f3;
+        box-shadow: 0 0 0 1px #2196f3;
+    }
+
+    .highlight {
+        background-color: yellow;
+        color: black;
+    }
+
+    body.dark-mode .highlight {
+        background-color: #ffd700;
+        color: #000;
+    }
+
+    /* Loading and Progress Bar */
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.95);
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    body.dark-mode .loading-overlay {
+        background: rgba(26, 26, 46, 0.95);
+    }
+
+    .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #007bff;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .progress-bar-container {
+        width: 80%;
+        max-width: 500px;
+        height: 30px;
+        background: #e9ecef;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    body.dark-mode .progress-bar-container {
+        background: #2d3748;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #007bff, #0056b3);
+        width: 0%;
+        transition: width 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    .loading-text {
+        margin-top: 15px;
+        font-size: 14px;
+        color: #495057;
+    }
+
+    body.dark-mode .loading-text {
+        color: #cbd5e0;
+    }
+
+    /* Collapsible Log Lines */
+    .log-line {
+        margin: 2px 0;
+        padding: 6px 8px;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .log-line:hover {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transform: translateX(2px);
+    }
+
+    .log-line.collapsed .log-details {
+        display: none;
+    }
+
+    .log-line .log-summary {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .log-line .log-details {
+        margin-top: 8px;
+        padding: 8px;
+        border-top: 1px solid rgba(0,0,0,0.1);
+        font-size: 11px;
+        white-space: pre;
+        overflow-x: auto;
+        line-height: 1.6;
+        background: #f8f9fa;
+        border-radius: 3px;
+        position: relative;
+        font-family: 'Monaco', 'Courier New', monospace;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    body.dark-mode .log-line .log-details {
+        border-top-color: rgba(255,255,255,0.1);
+        background: #1a1a1a;
+    }
+
+    .log-copy-btn {
+        position: relative;
+        background: #1979c3;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        padding: 4px 8px;
+        font-size: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 600;
+        z-index: 10;
+        margin-bottom: 4px;
+    }
+
+    .log-copy-btn:hover {
+        background: #006bb4;
+        transform: translateY(-1px);
+    }
+
+    .log-copy-btn:active {
+        transform: translateY(0);
+    }
+
+    .log-copy-btn.copied {
+        background: #388e3c;
+    }
+
+    body.dark-mode .log-copy-btn {
+        background: #2196f3;
+    }
+
+    body.dark-mode .log-copy-btn:hover {
+        background: #1976d2;
+    }
+
+    body.dark-mode .log-copy-btn.copied {
+        background: #43a047;
+    }
+
+    .collapse-icon {
+        font-size: 10px;
+        transition: transform 0.2s;
+        display: inline-block;
+        min-width: 12px;
+    }
+
+    .log-line.collapsed .collapse-icon {
+        transform: rotate(-90deg);
+    }
+
+    /* Enhanced Timestamp Styling */
+    .log-timestamp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'Monaco', 'Courier New', monospace;
+    }
+
+    body.dark-mode .log-timestamp {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .log-level-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        flex-shrink: 0;
+    }
+
+    /* Compact Timestamp - Exact Format */
+    .log-timestamp-compact {
+        background: #e85d23;
+        color: #fff;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 9px;
+        font-weight: 600;
+        font-family: 'Monaco', 'Courier New', monospace;
+        white-space: nowrap;
+        min-width: 130px;
+        text-align: center;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    body.dark-mode .log-timestamp-compact {
+        background: #f57c00;
+    }
+
+    /* Message Preview - Single Line */
+    .log-message-preview {
+        flex: 1;
+        font-size: 12px;
+        color: #333;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+    }
+
+    body.dark-mode .log-message-preview {
+        color: #ddd;
+    }
+
+    .badge-error {
+        background: #dc3545;
+        color: white;
+    }
+
+    .badge-warning {
+        background: #ffc107;
+        color: #000;
+    }
+
+    .badge-info {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .badge-debug {
+        background: #28a745;
+        color: white;
+    }
+
+    .badge-critical {
+        background: #6f1616;
+        color: #fed7d7;
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    /* Load More Button */
+    #load-more-btn {
+        width: 100%;
+        padding: 8px 12px;
+        margin-top: 10px;
+        background: #1979c3;
+        color: white;
+        border: 1px solid #1979c3;
+        border-radius: 3px;
+        font-weight: 500;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: none;
+    }
+
+    #load-more-btn:hover {
+        background: #006bb4;
+        border-color: #006bb4;
+    }
+
+    #load-more-btn:disabled {
+        background: #ccc;
+        border-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    body.dark-mode #load-more-btn {
+        background: #2196f3;
+        border-color: #2196f3;
+    }
+
+    body.dark-mode #load-more-btn:hover {
+        background: #1976d2;
+        border-color: #1976d2;
+    }
+
+    /* Download Large File Button */
+    .download-large-file {
+        background: #1979c3;
+        color: white;
+        padding: 6px 12px;
+        border: 1px solid #1979c3;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .download-large-file:hover {
+        background: #006bb4;
+        border-color: #006bb4;
+    }
+
+    /* Combined File Info & Stats - Single Line */
+    .file-stats-combined {
+        display: flex;
+        gap: 6px;
+        margin: 8px 0;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 6px 10px;
+        background: #f8f9fa;
+        border-radius: 4px;
+        border: 1px solid #e0e0e0;
+    }
+
+    body.dark-mode .file-stats-combined {
+        background: #2a2a2a;
+        border-color: #3a3a3a;
+    }
+
+    /* Unified tag style - Softer colors */
+    .file-stats-combined .info-tag,
+    .file-stats-combined .stat-card {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 3px 8px;
+        border-radius: 3px;
+        border: 1px solid #bbdefb;
+        min-width: auto;
+        text-align: center;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-weight: 500;
+        font-size: 11px;
+    }
+
+    .file-stats-combined .info-tag:hover,
+    .file-stats-combined .stat-card:hover {
+        border-color: #90caf9;
+        background: #d1e7fd;
+    }
+
+    body.dark-mode .file-stats-combined .info-tag,
+    body.dark-mode .file-stats-combined .stat-card {
+        background: #1e3a5f;
+        color: #90caf9;
+        border-color: #2c5282;
+    }
+
+    body.dark-mode .file-stats-combined .info-tag:hover,
+    body.dark-mode .file-stats-combined .stat-card:hover {
+        background: #2c4f7c;
+        border-color: #3b6db5;
+    }
+
+    /* Stat numbers */
+    .file-stats-combined .stat-number {
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .file-stats-combined .stat-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0;
+        opacity: 0.85;
+    }
+
+    /* Softer stat color variations */
+    .file-stats-combined .stat-error {
+        background: #ffebee;
+        color: #c62828;
+        border-color: #ffcdd2;
+    }
+
+    .file-stats-combined .stat-warning {
+        background: #fff3e0;
+        color: #ef6c00;
+        border-color: #ffe0b2;
+    }
+
+    .file-stats-combined .stat-info {
+        background: #e3f2fd;
+        color: #1976d2;
+        border-color: #bbdefb;
+    }
+
+    .file-stats-combined .stat-debug {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-color: #c8e6c9;
+    }
+
+    .file-stats-combined .stat-critical {
+        background: #fce4ec;
+        color: #c2185b;
+        border-color: #f8bbd0;
+    }
+
+    /* Dark mode softer colors */
+    body.dark-mode .file-stats-combined .stat-error {
+        background: #3d1f1f;
+        color: #ef5350;
+        border-color: #5d2f2f;
+    }
+
+    body.dark-mode .file-stats-combined .stat-warning {
+        background: #3d2f1f;
+        color: #ffa726;
+        border-color: #5d4729;
+    }
+
+    body.dark-mode .file-stats-combined .stat-info {
+        background: #1e3a5f;
+        color: #64b5f6;
+        border-color: #2c5282;
+    }
+
+    body.dark-mode .file-stats-combined .stat-debug {
+        background: #1f3d20;
+        color: #66bb6a;
+        border-color: #2f5d31;
+    }
+
+    body.dark-mode .file-stats-combined .stat-critical {
+        background: #3d1f2f;
+        color: #ec407a;
+        border-color: #5d2f47;
+    }
+
+    /* Separator for visual grouping */
+    .file-stats-combined .separator {
+        width: 1px;
+        height: 20px;
+        background: #ddd;
+        margin: 0 4px;
+    }
+
+    body.dark-mode .file-stats-combined .separator {
+        background: #444;
+    }
+
+    /* File Info & Stats - Legacy (kept for compatibility) */
+    #file-info {
+        display: flex;
+        gap: 6px;
+        margin: 8px 0;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    #file-info .info-tag {
+        background: #e85d23;
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 3px;
+        border: 1px solid #d04d13;
+        min-width: auto;
+        text-align: center;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 18px;
+    }
+
+    #file-info .info-tag:hover {
+        border-color: #c03d03;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark-mode #file-info .info-tag {
+        background: #f57c00;
+        border-color: #e85d23;
+    }
+
+    body.dark-mode #file-info .info-tag:hover {
+        border-color: #ff8c00;
+    }
+
+    /* Statistics Panel - Compact */
+    .log-stats {
+        display: flex;
+        gap: 6px;
+        margin: 8px 0;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .stat-card {
+        background: #e85d23;
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 3px;
+        border: 1px solid #d04d13;
+        min-width: auto;
+        text-align: center;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 600;
+    }
+
+    .stat-card:hover {
+        border-color: #c03d03;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark-mode .stat-card {
+        background: #f57c00;
+        color: #fff;
+        border-color: #e85d23;
+    }
+
+    body.dark-mode .stat-card:hover {
+        border-color: #ff8c00;
+    }
+
+    .stat-number {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+        color: #fff;
+    }
+
+    .stat-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #fff;
+        margin: 0;
+        opacity: 0.95;
+    }
+
+    body.dark-mode .stat-label {
+        color: #fff;
+    }
+
+    /* Specific stat colors - darker orange variations */
+    .stat-error { background: #d32f2f; border-color: #b71c1c; }
+    .stat-warning { background: #f57c00; border-color: #e65100; }
+    .stat-info { background: #1979c3; border-color: #0d47a1; }
+    .stat-debug { background: #388e3c; border-color: #1b5e20; }
+    .stat-critical { background: #b71c1c; border-color: #7f0000; }
+
+    body.dark-mode .stat-error { background: #e53935; border-color: #c62828; }
+    body.dark-mode .stat-warning { background: #fb8c00; border-color: #f57c00; }
+    body.dark-mode .stat-info { background: #1e88e5; border-color: #1565c0; }
+    body.dark-mode .stat-debug { background: #43a047; border-color: #2e7d32; }
+    body.dark-mode .stat-critical { background: #c62828; border-color: #8e0000; }
+
+    /* Scroll to Top Button - Compact */
+    #scroll-to-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 0;
+        height: 20px;
+        background: #e85d23;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+        z-index: 999;
+    }
+
+    #scroll-to-top:hover {
+        background: #fa4900;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-mode #scroll-to-top {
+        background: #e85d23;
+    }
+
+    body.dark-mode #scroll-to-top:hover {
+        background: #fa4900;
+    }
+
+    #scroll-to-top.show {
+        display: flex;
+    }
+</style>
+
+<div class="logviewer-wrapper">
+    <div class="logviewer-sidebar">
+        <div class="sidebar-header">
+            <h3 class="sidebar-title">Log Viewer</h3>
+            <button class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+        <div id="log-tree">
+            <?php
+            function renderTree($tree, $level = 0): void
+            {
+                foreach ($tree as $node) {
+                    if ($node['type'] === 'directory') {
+                        $indent = $level * 12;
+                        $modified = $node['modified'] ?? 0;
+                        $modifiedStr = $modified > 0 ? date('M d, H:i', $modified) : '';
+
+                        echo '<div class="folder-container" style="margin-left: ' . $indent . 'px;">';
+                        echo '<div class="folder" onclick="toggleFolder(this)">';
+                        echo '<span class="folder-header">';
+                        echo '<span class="folder-toggle">▶</span>';
+                        echo '<span class="folder-icon">📁</span>';
+                        echo '<span class="folder-name">' . htmlspecialchars($node['name']) . '</span>';
+                        if ($modifiedStr) {
+                            echo '<span class="folder-date">' . htmlspecialchars($modifiedStr) . '</span>';
+                        }
+                        echo '</span>';
+                        echo '</div>';
+                        echo '<div class="folder-children" style="display:none;">';
+                        renderTree($node['children'], $level + 1);
+                        echo '</div>';
+                        echo '</div>';
+                    } elseif ($node['type'] === 'file') {
+                        $path = base64_encode($node['path']);
+                        $size = $node['size'] ?? 0;
+                        $sizeFormatted = $node['size_formatted'] ?? '0 B';
+                        $sizeClass = $size > 20 * 1024 * 1024 ? 'file-large' : '';
+                        $isReadable = $node['readable'] ?? true;
+                        $error = $node['error'] ?? null;
+                        $modified = $node['modified'] ?? 0;
+                        $modifiedStr = $modified > 0 ? date('M d, H:i', $modified) : '';
+
+                        // Get file icon based on extension
+                        $extension = pathinfo($node['name'], PATHINFO_EXTENSION);
+                        $icon = match($extension) {
+                            'log' => '📋',
+                            'txt' => '📄',
+                            'xml' => '📰',
+                            'json' => '🗂️',
+                            'csv' => '📊',
+                            default => '📄'
+                        };
+
+                        // Add warning class if not readable
+                        $fileClass = $isReadable ? 'file' : 'file file-permission-denied';
+                        $onClickHandler = $isReadable
+                            ? "event.stopPropagation();loadLog('$path', $size, this)"
+                            : "event.stopPropagation();showPermissionError(this, '" . htmlspecialchars($node['name']) . "')";
+
+                        $indent = $level * 12;
+                        echo '<div class="file-container" style="margin-left: ' . $indent . 'px;">';
+                        echo '<div class="' . $fileClass . '" onclick="' . $onClickHandler . '">';
+                        echo '<span class="file-name-wrapper" data-fullname="' . htmlspecialchars($node['name']) . '">';
+                        echo '<span class="file-icon">' . $icon . '</span>';
+                        echo '<span class="file-name">' . htmlspecialchars($node['name']) . '</span>';
+                        if (!$isReadable) {
+                            echo '<span class="permission-warning-badge" title="Permission Denied">🔒</span>';
+                        }
+                        echo '</span>';
+                        echo '<span class="file-size ' . $sizeClass . '">' . htmlspecialchars($sizeFormatted) . '</span>';
+                        if ($modifiedStr) {
+                            echo '<span class="file-date">' . htmlspecialchars($modifiedStr) . '</span>';
+                        }
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                }
+            }
+
+            foreach ($logTree as $dir => $tree) {
+                echo '<div class="root-directory">';
+                echo '<div class="root-header">';
+                echo '<span class="folder-icon">📂</span>';
+                echo '<span class="root-name">' . htmlspecialchars($dir) . '</span>';
+                echo '</div>';
+                renderTree($tree, 0);
+                echo '</div>';
+            }
+            ?>
+        </div>
+    </div>
+    <div class="logviewer-content">
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="loading-spinner"></div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar">0%</div>
+            </div>
+            <div class="loading-text" id="loading-text">Loading file...</div>
+        </div>
+        <div id="log-actions" style="display: none;">
+            <div class="actions-row">
+                <div class="search-group">
+                    <input type="text" id="search-input" class="log-search" placeholder="🔍 Search logs...">
+                    <select id="log-level-filter" class="log-level-filter">
+                        <option value="all">All Levels</option>
+                        <option value="critical">Critical</option>
+                        <option value="error">Errors</option>
+                        <option value="warning">Warnings</option>
+                        <option value="info">Info</option>
+                        <option value="debug">Debug</option>
+                    </select>
+                </div>
+                <div class="action-buttons">
+                    <button id="expand-all" title="Expand All">📖</button>
+                    <button id="collapse-all" title="Collapse All">📕</button>
+                    <button id="clear-search" title="Clear Search">✕</button>
+                    <button id="download-log" title="Download">⬇</button>
+                    <button id="delete-log" title="Delete">🗑</button>
+                </div>
+            </div>
+        </div>
+        <div id="file-stats-combined" class="file-stats-combined" style="display:none;"></div>
+        <pre id="log-content">Select a file to view its contents.</pre>
+        <button id="load-more-btn">⬇ Load More Lines (1000)</button>
+    </div>
+</div>
+
+<button id="scroll-to-top" title="Scroll to top">↑</button>
+
+<script>
+    require(['jquery'], function ($) {
+        let originalLogContent = '';
+
+        $('body').addClass('dark-mode');
+
+        window.toggleFolder = function (el) {
+            $(el).children('.children').slideToggle();
+            event.stopPropagation();
+        };
+
+        function highlightLogContent(content) {
+            const lines = content.split('\n');
+            const highlightedLines = lines.map(line => {
+                let className = '';
+                const lowerLine = line.toLowerCase();
+
+                if (lowerLine.includes('[error]') || lowerLine.includes('error:') || lowerLine.includes('fatal')) {
+                    className = 'log-error';
+                } else if (lowerLine.includes('[warning]') || lowerLine.includes('warning:') || lowerLine.includes('warn:')) {
+                    className = 'log-warning';
+                } else if (lowerLine.includes('[info]') || lowerLine.includes('info:')) {
+                    className = 'log-info';
+                } else if (lowerLine.includes('[debug]') || lowerLine.includes('debug:')) {
+                    className = 'log-debug';
+                } else if (lowerLine.includes('[critical]') || lowerLine.includes('critical:') || lowerLine.includes('emergency')) {
+                    className = 'log-critical';
+                }
+
+                // Highlight timestamps
+                const timestampRegex = /(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2})/g;
+                let processedLine = line.replace(timestampRegex, '<span class="log-timestamp">$1</span>');
+
+                return className ? `<div class="log-line ${className}">${processedLine}</div>` : `<div class="log-line">${processedLine}</div>`;
+            });
+
+            return highlightedLines.join('');
+        }
+
+        let currentFilePath = null;
+        let currentFileSize = 0;
+        let currentOffset = 0;
+        let hasMoreLines = false;
+        let isLoading = false;
+
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Group multi-line log entries (stack traces, arrays, etc.)
+        function groupLogLines(content) {
+            const lines = content.split('\n');
+            const groupedEntries = [];
+            let currentEntry = '';
+            let isMultiLine = false;
+
+            // Regex to detect log entry start (timestamp patterns)
+            const logStartPattern = /^\[(\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}:\d{2})/;
+
+            lines.forEach((line, index) => {
+                const trimmedLine = line.trim();
+
+                // Skip empty lines
+                if (!trimmedLine && !isMultiLine) {
+                    if (currentEntry) {
+                        groupedEntries.push(currentEntry);
+                        currentEntry = '';
+                    }
+                    return;
+                }
+
+                // Check if this is a new log entry
+                const isNewEntry = logStartPattern.test(line);
+
+                if (isNewEntry) {
+                    // Save previous entry if exists
+                    if (currentEntry) {
+                        groupedEntries.push(currentEntry);
+                    }
+                    // Start new entry
+                    currentEntry = line;
+
+                    // Check if this might be a multi-line entry (contains stack trace keywords)
+                    isMultiLine = line.includes('Stack trace:') ||
+                                 line.includes('exception') ||
+                                 line.includes('Exception') ||
+                                 line.includes('array (') ||
+                                 line.includes('stdClass');
+                } else if (currentEntry) {
+                    // This is a continuation line
+                    // Detect stack trace lines
+                    const isStackTrace = /^#\d+\s/.test(trimmedLine) || // #0, #1, etc.
+                                       /^\s+at\s/.test(line) ||        // at ...
+                                       /^\s+in\s/.test(line) ||        // in ...
+                                       /^Caused by:/.test(trimmedLine) ||
+                                       /^\s+\[/.test(line) ||          // array elements
+                                       /^\s+=>/.test(line) ||          // array arrows
+                                       /^\s+\)/.test(line) ||          // closing parens
+                                       /^\s+\(/.test(line) ||          // opening parens
+                                       /^{/.test(trimmedLine) ||       // JSON start
+                                       /^}/.test(trimmedLine) ||       // JSON end
+                                       trimmedLine.startsWith("'") ||  // array values
+                                       trimmedLine.startsWith('"');    // array values
+
+                    // Append to current entry
+                    currentEntry += '\n' + line;
+
+                    // Update multi-line status
+                    if (isStackTrace) {
+                        isMultiLine = true;
+                    }
+
+                    // Check if multi-line entry might be ending
+                    if (isMultiLine && !isStackTrace && trimmedLine && !trimmedLine.endsWith(',')) {
+                        isMultiLine = false;
+                    }
+                } else {
+                    // No current entry, start a new one with this line
+                    currentEntry = line;
+                }
+            });
+
+            // Don't forget the last entry
+            if (currentEntry) {
+                groupedEntries.push(currentEntry);
+            }
+
+            return groupedEntries;
+        }
+
+        // Toggle folder open/close with smooth animation
+        window.toggleFolder = function(element) {
+            const $folder = $(element);
+            const $children = $folder.siblings('.folder-children');
+
+            if ($children.length) {
+                // Toggle folder state
+                $folder.toggleClass('open');
+
+                // Smooth slide animation
+                $children.slideToggle(200);
+            }
+        };
+
+        window.loadLog = function (path, fileSize, el) {
+            if (isLoading) return;
+
+            currentFilePath = path;
+            currentFileSize = fileSize || 0;
+            currentOffset = 0;
+            hasMoreLines = false;
+
+            $('.file').removeClass('active');
+            $(el).addClass('active');
+            $('#log-actions').show();
+
+            const fileName = $(el).find('.file-name').text().trim();
+            const sizeFormatted = $(el).find('.file-size').text().trim();
+            const dateFormatted = $(el).find('.file-date').text().trim();
+
+            // Build combined file info HTML
+            window.currentFileInfo = {
+                fileName: fileName,
+                sizeFormatted: sizeFormatted,
+                dateFormatted: dateFormatted
+            };
+
+            // Show combined view with just file info initially
+            let combinedHtml = '';
+            combinedHtml += '<span class="info-tag">📄 ' + escapeHtml(fileName) + '</span>';
+            if (sizeFormatted) {
+                combinedHtml += '<span class="info-tag">💾 ' + escapeHtml(sizeFormatted) + '</span>';
+            }
+            if (dateFormatted) {
+                combinedHtml += '<span class="info-tag">🕒 ' + escapeHtml(dateFormatted) + '</span>';
+            }
+            $('#file-stats-combined').show().html(combinedHtml);
+
+            // Check if file is larger than 20MB
+            if (currentFileSize > 20 * 1024 * 1024) {
+                let largeFileHtml = '<span class="info-tag">⚠️ ' + escapeHtml(fileName) + '</span>';
+                largeFileHtml += '<span class="info-tag">💾 ' + escapeHtml(sizeFormatted) + '</span>';
+                largeFileHtml += '<a href="<?= $block->getUrl("developify/logviewer/download") ?>?path=' + path + '" class="download-large-file" download>⬇ Download</a>';
+                $('#file-stats-combined').html(largeFileHtml);
+                $('#log-content').text('This file is too large to view directly. Please download it.');
+                $('#log-actions').hide();
+                $('#load-more-btn').hide();
+                return;
+            }
+
+            $('#log-content').empty();
+            $('#load-more-btn').hide();
+
+            fetchLogContent(path, 0, 1000);
+        };
+
+        function fetchLogContent(path, offset, lines) {
+            if (isLoading) return;
+
+            isLoading = true;
+            const $loadingOverlay = $('#loading-overlay');
+            const $progressBar = $('#progress-bar');
+            const $loadingText = $('#loading-text');
+            const $logContent = $('#log-content');
+            const $loadMoreBtn = $('#load-more-btn');
+
+            // Show loading
+            $loadingOverlay.show();
+            $progressBar.css('width', '10%').text('10%');
+            $loadingText.text('Fetching log content...');
+
+            $.ajax({
+                url: '<?= $block->getUrl("developify/logviewer/fetch") ?>',
+                method: 'POST',
+                data: {
+                    path: path,
+                    offset: offset,
+                    lines: lines,
+                    form_key: window.FORM_KEY
+                },
+                xhr: function() {
+                    const xhr = new window.XMLHttpRequest();
+                    xhr.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            const percentComplete = Math.min((evt.loaded / evt.total) * 100, 90);
+                            $progressBar.css('width', percentComplete + '%').text(Math.round(percentComplete) + '%');
+                        }
+                    }, false);
+                    return xhr;
+                },
+                success: function (response) {
+                    try {
+                        let data;
+                        if (typeof response === 'string') {
+                            data = JSON.parse(response);
+                        } else {
+                            data = response;
+                        }
+
+                        if (data.error) {
+                            // Check if it's a permission error
+                            if (data.error.includes('Permission denied') ||
+                                data.error.includes('permission') ||
+                                data.error.includes('not be opened')) {
+                                $logContent.html(`
+                                    <div class="permission-error-message">
+                                        <strong>🔒 Permission Denied</strong>
+                                        <p><strong>File:</strong> ${escapeHtml(fileName)}</p>
+                                        <p>${escapeHtml(data.error)}</p>
+                                        <p><strong>Possible solutions:</strong></p>
+                                        <ul>
+                                            <li>Check file permissions: <code>ls -la /var/log/</code></li>
+                                            <li>Ensure web server user has read access</li>
+                                            <li>Run: <code>chmod 644 ${escapeHtml(fileName)}</code></li>
+                                            <li>Or: <code>chown www-data:www-data ${escapeHtml(fileName)}</code></li>
+                                            <li>Contact your system administrator for assistance</li>
+                                        </ul>
+                                    </div>
+                                `);
+                            } else {
+                                $logContent.html(`<div class="permission-error-message"><strong>Error:</strong> ${escapeHtml(data.error)}</div>`);
+                            }
+                            $loadingOverlay.hide();
+                            isLoading = false;
+                            return;
+                        }
+
+                        // Update progress
+                        $progressBar.css('width', '100%').text('100%');
+                        $loadingText.text('Processing content...');
+
+                        setTimeout(() => {
+                            originalLogContent = data.content;
+                            hasMoreLines = data.hasMore || false;
+                            currentOffset = data.offset || 0;
+
+                            if (offset === 0) {
+                                $logContent.empty();
+                            }
+
+                            // Process and display log entries (grouped for multi-line logs)
+                            const logEntries = groupLogLines(data.content);
+                            logEntries.forEach(entry => {
+                                if (entry.trim()) {
+                                    const $logLine = createLogLineElement(entry);
+                                    $logContent.append($logLine);
+                                }
+                            });
+
+                            // Show/hide load more button
+                            if (hasMoreLines) {
+                                $loadMoreBtn.show().prop('disabled', false);
+                            } else {
+                                $loadMoreBtn.hide();
+                            }
+
+                            $('#download-log').data('path', path);
+                            $('#delete-log').data('path', path);
+                            $('#search-input').val('');
+
+                            // Update statistics
+                            updateLogStats();
+
+                            $loadingOverlay.hide();
+                            isLoading = false;
+                        }, 300);
+
+                    } catch (e) {
+                        // Fallback for non-JSON response (old format)
+                        originalLogContent = response;
+                        const highlightedContent = highlightLogContent(response);
+                        $logContent.html(highlightedContent);
+                        $('#download-log').data('path', path);
+                        $('#delete-log').data('path', path);
+                        $('#search-input').val('');
+                        $loadingOverlay.hide();
+                        isLoading = false;
+                    }
+                },
+                error: function () {
+                    alert('Failed to load file.');
+                    $loadingOverlay.hide();
+                    isLoading = false;
+                }
+            });
+        }
+
+        function createLogLineElement(entry) {
+            const $div = $('<div>').addClass('log-line collapsed');
+
+            // Split entry into first line and rest (for multi-line entries)
+            const lines = entry.split('\n');
+            const firstLine = lines[0];
+            const hasMultipleLines = lines.length > 1;
+
+            // Parse log level and timestamp from first line
+            const logLevelMatch = firstLine.match(/\[(.*?)\]\s*(\w+)\.(ERROR|WARNING|INFO|DEBUG|CRITICAL)/i);
+            let timestamp = '';
+            let level = '';
+            let message = firstLine;
+
+            if (logLevelMatch) {
+                timestamp = logLevelMatch[1];
+                level = logLevelMatch[3].toUpperCase();
+                message = firstLine.substring(logLevelMatch[0].length).trim();
+            }
+
+
+            // Determine border and background color
+            let borderColor = 'transparent';
+            let bgColor = 'transparent';
+
+            if (level === 'ERROR') {
+                borderColor = '#dc3545';
+                bgColor = 'rgba(220, 53, 69, 0.05)';
+            } else if (level === 'WARNING') {
+                borderColor = '#ffc107';
+                bgColor = 'rgba(255, 193, 7, 0.05)';
+            } else if (level === 'INFO') {
+                borderColor = '#17a2b8';
+                bgColor = 'rgba(23, 162, 184, 0.05)';
+            } else if (level === 'DEBUG') {
+                borderColor = '#28a745';
+                bgColor = 'rgba(40, 167, 69, 0.05)';
+            } else if (level === 'CRITICAL') {
+                borderColor = '#6f1616';
+                bgColor = 'rgba(111, 22, 22, 0.1)';
+            }
+
+            $div.css({
+                'border-left-color': borderColor,
+                'background-color': bgColor
+            });
+
+            // Create compact summary - single line
+            const $summary = $('<div>').addClass('log-summary');
+            let summaryHtml = '<span class="collapse-icon">▶</span>';
+
+            // Timestamp first
+            if (timestamp) {
+                summaryHtml += '<span class="log-timestamp-compact" title="' + $('<div>').text(timestamp).html() + '">' +
+                              $('<div>').text(timestamp).html() + '</span>';
+            }
+
+            // Then log level badge
+            if (level) {
+                summaryHtml += '<span class="log-level-badge badge-' + level.toLowerCase() + '">' + level + '</span>';
+            }
+
+            // Show preview of first line message + indicator if multi-line
+            let displayMessage = message.substring(0, 120);
+            if (hasMultipleLines) {
+                displayMessage += ' [+' + (lines.length - 1) + ' more lines]';
+            } else if (message.length > 120) {
+                displayMessage += '...';
+            }
+            summaryHtml += '<span class="log-message-preview">' + $('<div>').text(displayMessage).html() + '</span>';
+
+            $summary.html(summaryHtml);
+
+            // Create full details view with entire entry (including stack trace) and copy button
+            const $details = $('<div>').addClass('log-details');
+            const $copyBtn = $('<button>').addClass('log-copy-btn').text('📋 Copy');
+
+            $details.text(entry);
+            $details.append($copyBtn);
+
+            // Copy button click handler
+            $copyBtn.on('click', function(e) {
+                e.stopPropagation(); // Prevent collapse toggle
+                const textToCopy = entry;
+
+                // Copy to clipboard
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        $copyBtn.text('✓ Copied!').addClass('copied');
+                        setTimeout(() => {
+                            $copyBtn.text('📋 Copy').removeClass('copied');
+                        }, 2000);
+                    }).catch(() => {
+                        // Fallback for older browsers
+                        fallbackCopy(textToCopy, $copyBtn);
+                    });
+                } else {
+                    // Fallback for older browsers
+                    fallbackCopy(textToCopy, $copyBtn);
+                }
+            });
+
+            $div.append($summary).append($details);
+
+            // Toggle collapse on click
+            $div.on('click', function(e) {
+                // Don't toggle if clicking the copy button
+                if (!$(e.target).hasClass('log-copy-btn')) {
+                    $(this).toggleClass('collapsed');
+                }
+            });
+
+            return $div;
+        }
+
+        // Fallback copy function for older browsers
+        function fallbackCopy(text, $btn) {
+            const $temp = $('<textarea>').val(text).css({
+                position: 'absolute',
+                left: '-9999px'
+            });
+            $('body').append($temp);
+            $temp.select();
+            try {
+                document.execCommand('copy');
+                $btn.text('✓ Copied!').addClass('copied');
+                setTimeout(() => {
+                    $btn.text('📋 Copy').removeClass('copied');
+                }, 2000);
+            } catch (err) {
+                $btn.text('✗ Failed');
+                setTimeout(() => {
+                    $btn.text('📋 Copy');
+                }, 2000);
+            }
+            $temp.remove();
+        }
+
+        function updateLogStats() {
+            const $logLines = $('#log-content .log-line');
+            const stats = {
+                total: $logLines.length,
+                error: 0,
+                warning: 0,
+                info: 0,
+                debug: 0,
+                critical: 0
+            };
+
+            $logLines.each(function() {
+                const text = $(this).text().toUpperCase();
+                if (text.includes('CRITICAL')) stats.critical++;
+                else if (text.includes('ERROR')) stats.error++;
+                else if (text.includes('WARNING')) stats.warning++;
+                else if (text.includes('INFO')) stats.info++;
+                else if (text.includes('DEBUG')) stats.debug++;
+            });
+
+            // Build file info part
+            let combinedHtml = '';
+            if (window.currentFileInfo) {
+                combinedHtml += '<span class="info-tag">📄 ' + escapeHtml(window.currentFileInfo.fileName) + '</span>';
+                if (window.currentFileInfo.sizeFormatted) {
+                    combinedHtml += '<span class="info-tag">💾 ' + escapeHtml(window.currentFileInfo.sizeFormatted) + '</span>';
+                }
+                if (window.currentFileInfo.dateFormatted) {
+                    combinedHtml += '<span class="info-tag">🕒 ' + escapeHtml(window.currentFileInfo.dateFormatted) + '</span>';
+                }
+                combinedHtml += '<span class="separator"></span>';
+            }
+
+            // Append stats
+            combinedHtml += `
+                <span class="stat-card">
+                    <span class="stat-number">${stats.total}</span>
+                    <span class="stat-label">Lines</span>
+                </span>
+            `;
+
+            if (stats.critical > 0) {
+                combinedHtml += `
+                    <span class="stat-card stat-critical">
+                        <span class="stat-number">${stats.critical}</span>
+                        <span class="stat-label">Critical</span>
+                    </span>
+                `;
+            }
+
+            if (stats.error > 0) {
+                combinedHtml += `
+                    <span class="stat-card stat-error">
+                        <span class="stat-number">${stats.error}</span>
+                        <span class="stat-label">Errors</span>
+                    </span>
+                `;
+            }
+
+            if (stats.warning > 0) {
+                combinedHtml += `
+                    <span class="stat-card stat-warning">
+                        <span class="stat-number">${stats.warning}</span>
+                        <span class="stat-label">Warnings</span>
+                    </span>
+                `;
+            }
+
+            if (stats.info > 0) {
+                combinedHtml += `
+                    <span class="stat-card stat-info">
+                        <span class="stat-number">${stats.info}</span>
+                        <span class="stat-label">Info</span>
+                    </span>
+                `;
+            }
+
+            if (stats.debug > 0) {
+                combinedHtml += `
+                    <span class="stat-card stat-debug">
+                        <span class="stat-number">${stats.debug}</span>
+                        <span class="stat-label">Debug</span>
+                    </span>
+                `;
+            }
+
+            $('#file-stats-combined').html(combinedHtml).show();
+        }
+
+
+        window.showPermissionError = function(element, fileName) {
+            // Highlight the denied file
+            $('.file').removeClass('active');
+            $(element).addClass('active');
+
+            // Show permission error message
+            $('#log-content').html(`
+                <div class="permission-error-message">
+                    <strong>🔒 Permission Denied</strong>
+                    <p><strong>File:</strong> ${$('<div>').text(fileName).html()}</p>
+                    <p>This file cannot be accessed due to permission restrictions.</p>
+                    <p><strong>Possible solutions:</strong></p>
+                    <ul>
+                        <li>Check file permissions: <code>ls -la /var/log/</code></li>
+                        <li>Ensure web server user has read access</li>
+                        <li>Run: <code>chmod 644 /var/log/${$('<div>').text(fileName).html()}</code></li>
+                        <li>Or: <code>chown www-data:www-data /var/log/${$('<div>').text(fileName).html()}</code></li>
+                        <li>Contact your system administrator for assistance</li>
+                    </ul>
+                </div>
+            `);
+
+            $('#log-actions').hide();
+            $('#file-info').hide();
+            $('#log-stats').hide();
+            $('#load-more-btn').hide();
+        };
+
+        // Load more button handler
+        $('#load-more-btn').on('click', function() {
+            if (!isLoading && hasMoreLines && currentFilePath) {
+                fetchLogContent(currentFilePath, currentOffset, 1000);
+            }
+        });
+
+
+        function searchLogs() {
+            const searchTerm = $('#search-input').val().toLowerCase();
+            const levelFilter = $('#log-level-filter').val();
+            const $logLines = $('#log-content .log-line');
+
+            if (!searchTerm && levelFilter === 'all') {
+                $logLines.show();
+                $logLines.find('.highlight').contents().unwrap();
+                return;
+            }
+
+            $logLines.each(function() {
+                const $line = $(this);
+                const text = $line.text().toLowerCase();
+                let showLine = true;
+
+                // Apply search filter
+                if (searchTerm && !text.includes(searchTerm)) {
+                    showLine = false;
+                }
+
+                // Apply level filter
+                if (levelFilter !== 'all' && showLine) {
+                    const hasLevel = text.includes(levelFilter);
+                    if (!hasLevel) {
+                        showLine = false;
+                    }
+                }
+
+                if (showLine) {
+                    $line.show();
+                    // Highlight the search term
+                    if (searchTerm) {
+                        const html = $line.html();
+                        const regex = new RegExp(`(${searchTerm})`, 'gi');
+                        const highlighted = html.replace(regex, '<span class="highlight">$1</span>');
+                        $line.html(highlighted);
+                    }
+                    // Auto-expand matching lines
+                    $line.removeClass('collapsed');
+                } else {
+                    $line.hide();
+                }
+            });
+        }
+
+        $('#search-input').on('input', searchLogs);
+        $('#log-level-filter').on('change', searchLogs);
+
+        $('#clear-search').on('click', function() {
+            $('#search-input').val('');
+            $('#log-level-filter').val('all');
+            const $logLines = $('#log-content .log-line');
+            $logLines.show();
+            $logLines.find('.highlight').contents().unwrap();
+        });
+
+        $('#expand-all').on('click', function() {
+            $('#log-content .log-line').removeClass('collapsed');
+        });
+
+        $('#collapse-all').on('click', function() {
+            $('#log-content .log-line').addClass('collapsed');
+        });
+
+        // Scroll to top button
+        const $scrollBtn = $('#scroll-to-top');
+        const $logContent = $('#log-content');
+
+        $logContent.on('scroll', function() {
+            if ($(this).scrollTop() > 300) {
+                $scrollBtn.addClass('show');
+            } else {
+                $scrollBtn.removeClass('show');
+            }
+        });
+
+        $scrollBtn.on('click', function() {
+            $logContent.animate({ scrollTop: 0 }, 600);
+        });
+
+        // Smooth scroll for better UX
+        $('#log-content').css('scroll-behavior', 'smooth');
+
+        // Keyboard shortcuts
+        $(document).on('keydown', function(e) {
+            // Ctrl/Cmd + F for search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                $('#search-input').focus();
+            }
+
+            // Ctrl/Cmd + E for expand all
+            if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+                e.preventDefault();
+                $('#expand-all').click();
+            }
+
+            // Ctrl/Cmd + C for collapse all (when not selecting text)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !window.getSelection().toString()) {
+                e.preventDefault();
+                $('#collapse-all').click();
+            }
+
+            // Escape to clear search
+            if (e.key === 'Escape') {
+                $('#search-input').val('').trigger('input');
+            }
+        });
+
+        // Theme Toggle
+        $('#theme-toggle').on('click', function () {
+            $('body').toggleClass('dark-mode');
+
+            // Update icon based on mode
+            const $icon = $(this).find('.theme-icon');
+            if ($('body').hasClass('dark-mode')) {
+                $icon.text('☀️'); // Sun icon for light mode switch
+            } else {
+                $icon.text('🌙'); // Moon icon for dark mode switch
+            }
+        });
+
+        $('#download-log').on('click', function () {
+            const path = $(this).data('path');
+            window.location.href = '<?= $block->getUrl("developify/logviewer/download") ?>?path=' + path;
+        });
+
+        $('#delete-log').on('click', function () {
+            if (!confirm('Delete this log file?')) return;
+            const path = $(this).data('path');
+            $.post('<?= $block->getUrl("developify/logviewer/delete") ?>', {
+                path: path,
+                form_key: window.FORM_KEY
+            }, function () {
+                alert('File deleted.');
+                location.reload();
+            });
+        });
+    });
+</script>
+
+<style>
+    .page-layout-admin-2columns-left .page-columns .main-col {
+        width: calc((100%) * 1 - 30px);
+    }
+</style>

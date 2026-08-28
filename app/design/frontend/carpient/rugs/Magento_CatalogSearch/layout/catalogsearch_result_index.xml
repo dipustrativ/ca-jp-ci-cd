@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Search results page — same treatment as category view: no breadcrumb, no
+ * left sidebar, full-width grid, and the reference-style horizontal filter bar
+ * (Carpient_Filter) reusing CarpetAvenue_Productify for the data/AJAX.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <attribute name="class" value="page-layout-fullwidth-filter"/>
+
+        <!-- No breadcrumb on search -->
+        <referenceBlock name="breadcrumbs" remove="true"/>
+
+        <!-- Grey search header band (reference boost-sd__search-form-wrapper):
+             title + search field. Replaces the default page title. -->
+        <referenceBlock name="page.main.title" remove="true"/>
+        <referenceContainer name="columns.top">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="carpient.search.form.band"
+                   template="Magento_CatalogSearch::search/form-band.phtml"
+                   before="-">
+                <arguments>
+                    <argument name="suggest_options" xsi:type="object">CarpetAvenue\Productify\ViewModel\SuggestOptions</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!-- Drop the "Related search terms" recommendations block -->
+        <referenceBlock name="search_recommendations" remove="true"/>
+
+        <!-- Keep sidebar.main in the tree but empty, so main goes full width -->
+        <referenceContainer name="sidebar.main">
+            <block class="Magento\Framework\View\Element\Text" name="sidebar.dummy.block">
+                <arguments>
+                    <argument name="text" xsi:type="string"><![CDATA[<!-- keep -->]]></argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!-- Filters above the product grid, rendered as the inline-dropdown bar -->
+        <move element="catalogsearch.leftnav" destination="content" before="-"/>
+        <referenceBlock name="catalogsearch.leftnav" template="Carpient_Filter::layer/view.phtml"/>
+
+        <!-- No add-to-wishlist action on grid items -->
+        <referenceBlock name="catalogsearch.product.addto.wishlist" remove="true"/>
+    </body>
+</page>

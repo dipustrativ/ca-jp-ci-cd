@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <table name="ixpf_webhook_jobs" engine="innodb" comment="Ixpf webhook jobs">
+        <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="type" nullable="false" />
+        <column xsi:type="bigint" name="object_id" unsigned="true" nullable="false" comment="type id, example if type product then product_id"/>
+        <column xsi:type="text" name="payload" nullable="true" />
+        <column xsi:type="text" name="last_response" nullable="true" />
+        <column xsi:type="varchar" name="trigger_status" nullable="false" />
+        <column xsi:type="int" name="total_trigger" unsigned="true" default="0" />
+        <column xsi:type="datetime" name="created_at" default="CURRENT_TIMESTAMP" on_update= "false"/>
+        <column xsi:type="datetime" name="updated_at" default="CURRENT_TIMESTAMP" on_update="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="IXPF_WEBHOOK_TYPE_OBJECT_UNIQUE">
+            <column name="type"/>
+            <column name="object_id"/>
+        </constraint>
+    </table>
+
+    <table name="ixpf_purchases_batch" engine="innodb" comment="Ixpf purchases batch">
+        <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="purchase_id" nullable="false" />
+        <column xsi:type="varchar" name="batch_id" nullable="false" />
+        <column xsi:type="longtext" name="products" nullable="true" comment="JSON product payload"/>
+        <column xsi:type="varchar" name="status" nullable="false" />
+        <column xsi:type="text" name="ixpf_response" nullable="true" />
+        <column xsi:type="text" name="magento_response" nullable="true" />
+        <column xsi:type="text" name="exception" nullable="true" />
+        <column xsi:type="datetime" name="created_at" default="CURRENT_TIMESTAMP" on_update= "false"/>
+        <column xsi:type="datetime" name="updated_at" default="CURRENT_TIMESTAMP" on_update="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="ixpf_photo_studio_queue" engine="innodb" comment="IXPF Photo Studio Jobs">
+        <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="type" nullable="false" />
+        <column xsi:type="bigint" name="object_id" unsigned="true" nullable="false" comment="type id, example if type product then product_id"/>
+        <column xsi:type="text" name="payload" nullable="true" />
+        <column xsi:type="text" name="response_result" nullable="true" />
+        <column xsi:type="text" name="ixpf_response" nullable="true" />
+        <column xsi:type="varchar" name="status" nullable="false" />
+        <column xsi:type="int" name="retry_count" default="0" />
+        <column xsi:type="datetime" name="created_at" default="CURRENT_TIMESTAMP" on_update= "false"/>
+        <column xsi:type="datetime" name="updated_at" default="CURRENT_TIMESTAMP" on_update="true"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="ixpf_photo_studio_bucket_images" engine="innodb" comment="IXPF photo studio bucket images">
+        <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="bigint" name="photo_studio_queue_id" unsigned="true" nullable="false"/>
+        <column xsi:type="text" name="bucket_image_path" nullable="false" />
+        <column xsi:type="varchar" name="status" nullable="false" />
+        <column xsi:type="text" name="error_message" nullable="true" />
+        <column xsi:type="datetime" name="created_at" default="CURRENT_TIMESTAMP" on_update= "false"/>
+        <column xsi:type="datetime" name="updated_at" default="CURRENT_TIMESTAMP" on_update="true"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="ixpf_purchase_orders" engine="innodb" comment="IXPF Purchase Orders">
+        <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="purchase_name" nullable="false" />
+        <column xsi:type="varchar" name="ixpf_purchase_id" nullable="false" />
+        <column xsi:type="text" name="ixpf_payload" nullable="true" />
+        <column xsi:type="varchar" name="process_status" nullable="true" />
+        <column xsi:type="int" name="product_count" nullable="true" default="0" />
+        <column xsi:type="int" name="process_success_count" nullable="true" default="0" />
+        <column xsi:type="int" name="process_failed_count" nullable="true" default="0" />
+        <column xsi:type="text" name="process_response" nullable="true" />
+        <column xsi:type="datetime" name="created_at" default="CURRENT_TIMESTAMP" on_update= "false"/>
+        <column xsi:type="datetime" name="updated_at" default="CURRENT_TIMESTAMP" on_update="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+    <table name="ixpf_purchase_order_items" engine="innodb" comment="IXPF Purchase Order Items">
+        <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="bigint" name="purchase_order_id" unsigned="true" nullable="false" />
+        <column xsi:type="varchar" name="ixpf_purchase_id" nullable="false" />
+        <column xsi:type="varchar" name="behavior" nullable="false" comment="insert/update"/>
+        <column xsi:type="varchar" name="sku" nullable="false" />
+        <column xsi:type="varchar" name="name" nullable="false" />
+        <column xsi:type="int" name="qty" default="0" />
+        <column xsi:type="float" name="price" default="0" />
+        <column xsi:type="float" name="cost" default="0" />
+        <column xsi:type="varchar" name="process_status" nullable="false" />
+        <column xsi:type="text" name="attribute_data" nullable="false" />
+        <column xsi:type="smallint" name="ongoing_create" default="0" />
+        <column xsi:type="text" name="error_message" nullable="true" />
+        <column xsi:type="datetime" name="created_at" default="CURRENT_TIMESTAMP" on_update= "false"/>
+        <column xsi:type="datetime" name="updated_at" default="CURRENT_TIMESTAMP" on_update="true"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="ixpf_order_api_activity" engine="innodb" comment="IXPF Order API Activity Log">
+        <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="activity_type" nullable="false" comment="Action performed, example: comment, send_tracking, invoice_print"/>
+        <column xsi:type="varchar" name="resource" nullable="false" comment="Resource acted on, example: order, shipment, invoice, creditmemo"/>
+        <column xsi:type="varchar" name="reference_id" nullable="true" comment="Resource ID or increment ID, example: order ID"/>
+        <column xsi:type="varchar" name="status" nullable="false" default="success" comment="success / error"/>
+        <column xsi:type="text" name="message" nullable="true" comment="Detail message or payload summary"/>
+        <column xsi:type="datetime" name="created_at" default="CURRENT_TIMESTAMP" on_update="false"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="IXPF_ORDER_API_ACTIVITY_TYPE" indexType="btree">
+            <column name="activity_type"/>
+        </index>
+        <index referenceId="IXPF_ORDER_API_ACTIVITY_RESOURCE" indexType="btree">
+            <column name="resource"/>
+        </index>
+        <index referenceId="IXPF_ORDER_API_ACTIVITY_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
+    </table>
+
+    <table name="ixpf_product_bulk_update_queue" engine="innodb" comment="IXPF Product Bulk Update Queue">
+        <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="int" name="store_id" nullable="false" />
+        <column xsi:type="varchar" name="ixpf_batch_id" nullable="false" />
+        <column xsi:type="longtext" name="payload" nullable="true" />
+        <column xsi:type="text" name="response_result" nullable="true" />
+        <column xsi:type="text" name="ixpf_response" nullable="true" />
+        <column xsi:type="varchar" name="status" nullable="false" />
+        <column xsi:type="longtext" name="error_message" nullable="true" />
+        <column xsi:type="int" name="attempts" default="0" />
+        <column xsi:type="text" name="meta_data" nullable="true" />
+        <column xsi:type="datetime" name="created_at" default="CURRENT_TIMESTAMP" on_update= "false"/>
+        <column xsi:type="datetime" name="updated_at" default="CURRENT_TIMESTAMP" on_update="true"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+</schema>

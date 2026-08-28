@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_VAT
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="CarpetAvenue_VAT::vat"
+             title="VAT / Tax"
+             module="CarpetAvenue_VAT"
+             sortOrder="30"
+             parent="CarpetAvenue_Core::carpetavenue"
+             action="adminhtml/system_config/edit/section/carpetavenue_vat"
+             resource="CarpetAvenue_VAT::vat"/>
+    </menu>
+</config>

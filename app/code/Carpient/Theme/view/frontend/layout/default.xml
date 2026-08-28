@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpient. All rights reserved.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- Store-scoped CSS vars for the translatable "Rec. price" labels. -->
+        <referenceContainer name="head.additional">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="carpient_rec_price_vars"
+                   template="Carpient_Theme::html/rec_price_vars.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

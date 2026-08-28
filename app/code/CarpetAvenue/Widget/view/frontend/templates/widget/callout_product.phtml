@@ -1,0 +1,134 @@
+<?php
+// @codingStandardsIgnoreFile
+date_default_timezone_set("Europe/Stockholm");
+$_product = $block->getProduct();
+
+// No current product
+if($_product === null)
+    return;
+
+// Already sold or not for sale
+if(!$_product->isSaleable())
+    return;
+?>
+
+
+<?php $_discountPercentage = floatval($block->getDiscount()); ?>
+<?php $_fontsize = $block->getFontSize(); ?>
+<?php $_fontsizetimer = $block->getFontSizeTimer(); ?>
+<?php $_textcolor = $block->getTextColor(); ?>
+<?php $_fontweight = $block->getFontWeight(); ?>
+<?php $_bgcolor = $block->getBgColor(); ?>
+<?php $_showBtn = $block->getData("closebtn"); ?>
+<?php $_countdown = date_format(date_create($block->getCountdown()),"Y/m/d H:i"); ?>
+<?php $_showDaysBefore = $block->getShowDaysBefore(); ?>
+<?php $date = date("Y/m/d H:i"); ?>
+<?php $bannerId = rand(); ?>
+<?php $_daysLeft = strtotime($date) - strtotime($_countdown); ?>
+<?php $_diff = ceil(abs($_daysLeft / 86400)); ?>
+<?php $_hiddenCountdown = ($_showDaysBefore > 0 && $_diff > $_showDaysBefore); ?>
+<?php if($_countdown < $date && !empty($_countdown)) : else: ?>
+<?php
+$_regularPrice = $_product->getPriceInfo()->getPrice('regular_price')->getValue();
+$_currentPrice = $_product->getPriceInfo()->getPrice('final_price')->getValue();
+
+$_savings = 0;
+$_finalPrice = 0;
+if ($_discountPercentage > 0) {
+    $_savings    = round($_currentPrice * ($_discountPercentage / 100));
+    $_finalPrice = round($_currentPrice - $_savings);
+}
+
+$timerShow = $_showDaysBefore == 0 || ($_showDaysBefore > 0 && $_diff <= $_showDaysBefore);
+?>
+
+<div class="callout-product-widget callout-widget--<?= $bannerId ?> <?= $_hiddenCountdown ? 'hide-countdown' : '' ?>" style="background: <?php if($_bgcolor): echo $_bgcolor; endif; ?>;">
+
+    <div class="callout-widget__content">
+        <?php if($_message = trim($block->getMessage())): ?>
+            <div style="text-align: center;font-size: <?= $_fontsize ?>; color: <?= $_textcolor ?>; font-weight: <?= $_fontweight ?>" class="callout-product-widget__msg">
+                <?= $_message ?>
+            </div>
+        <?php endif; ?>
+        <?php if($_showBtn): ?>
+            <a href="#" title="<?= __("Close") ?>" class="close-btn" style="font-size: <?= $_fontsize ?>; color: <?= $_textcolor ?>;">
+                <span><?= __("X") ?></span>
+            </a>
+        <?php endif; ?>
+    </div>
+
+    <?php
+    if ($_savings > 0):
+        ?>
+        <div style="width:100%;text-align:center; padding-bottom: 5px; font-size: <?= $_fontsize ?>; color: <?= $_textcolor ?>; font-weight: <?= $_fontweight ?>">
+            <?php
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $localeResolver = $objectManager->get(\Magento\Framework\Locale\ResolverInterface::class);
+            $storeManager = $objectManager->get(\Magento\Store\Model\StoreManagerInterface::class);
+
+            $locale = $localeResolver->getLocale();
+            $currencyCode = $storeManager->getStore()->getCurrentCurrencyCode();
+
+            $formatter = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
+            $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 0);
+            ?>
+            <?= $formatter->formatCurrency($_finalPrice, $currencyCode) ?> - <?= __('you save') ?> <?= $formatter->formatCurrency($_savings, $currencyCode) ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if($_countdown): ?>
+        <?php if($timerShow): ?>
+            <div style="display: flex; justify-content: center" class="widget_timer">
+                <div style="width: 100px; padding-bottom: 10px; font-size: <?= $_fontsize ?>; color: <?= $_textcolor ?>; font-weight: <?= $_fontweight ?>" class="callout-product-widget__timer"></div>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>
+
+<script>
+    require(
+        [
+            'jquery',
+            'countdown',
+            "mage/translate"
+        ],
+        function($) {
+
+            if(!$('body').hasClass('callout-product-widget-active')) {
+                $('body').addClass('callout-product-widget-active');
+            }
+
+            <?php if($_showBtn): ?>
+            if($('.callout-product-widget.callout-widget--<?= $bannerId ?> .close-btn').length) {
+                $('.callout-product-widget.callout-widget--<?= $bannerId ?> .close-btn').on('click', function (e) {
+                    $(this).closest('.callout-product-widget.callout-widget--<?= $bannerId ?>').hide();
+                    $('body').removeClass('callout-product-widget-active');
+                    e.preventDefault()
+                });
+            }
+            <?php endif; ?>
+
+            <?php if($_countdown): ?>
+                <?php if($_showDaysBefore == 0 || ($_showDaysBefore > 0 && $_diff <= $_showDaysBefore)): ?>
+
+                $('.callout-product-widget.callout-widget--<?= $bannerId ?> .callout-product-widget__timer')
+                    .countdown("<?= date("Y/m/d H:i",strtotime($_countdown." +1 minutes"))?>", function (event) {
+
+                        $(this).html(
+                            event.strftime(
+                                '<div class="time"><div class="head" style="font-size: <?= $_fontsize ?>">%D</div><p style="font-size:<?= $_fontsizetimer ?>"><?= __('days') ?></p></div> <div class="semi">:</div> ' +
+                                '<div class="time"><div class="head" style="font-size: <?= $_fontsize ?>">%H</div><p style="font-size:<?= $_fontsizetimer ?>"><?= __('hours') ?></p></div> <div class="semi">:</div> ' +
+                                '<div class="time"><div class="head" style="font-size: <?= $_fontsize ?>">%M</div><p style="font-size:<?= $_fontsizetimer ?>"><?= __('minutes') ?></p></div>'
+                            )
+                        );
+
+                    }).on('finish.countdown', function() {
+                        $(".callout-product-widget.callout-widget--<?= $bannerId ?>").hide();
+                        $('body').removeClass('callout-product-widget-active');
+                    });
+                <?php endif; ?>
+            <?php endif; ?>
+        }
+    );
+</script>
+<?php endif; ?>

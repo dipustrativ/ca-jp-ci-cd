@@ -1,0 +1,20 @@
+<!--@subject Your account has been approved @-->
+<!--@vars {
+"var customer_name":"Customer Name",
+"var store_url":"Store URL",
+"var store.frontend_name":"Store Name"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<table>
+    <tr>
+        <td>
+            <h1>{{trans "Welcome, %name!" name=$customer_name}}</h1>
+            <p>{{trans "Good news — your account has been approved."}}</p>
+            <p>{{trans "You can now sign in and place orders."}}</p>
+            <p><a href="{{var store_url}}">{{trans "Visit the store"}}</a></p>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

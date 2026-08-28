@@ -1,0 +1,75 @@
+<?php
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @var \CarpetAvenue\B2B\Block\Adminhtml\Reseller\View $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$application = $block->getApplication();
+?>
+<?php if ($application === null): ?>
+    <div class="message message-error"><?= $escaper->escapeHtml(__('Application not found.')) ?></div>
+<?php else: ?>
+    <div class="admin__page-section">
+        <div class="admin__page-section-title">
+            <span class="title"><?= $escaper->escapeHtml(__('Reseller Application #%1', $application->getId())) ?></span>
+        </div>
+        <table class="admin__table-secondary">
+            <tbody>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Status')) ?></th>
+                    <td><?= $escaper->escapeHtml($block->getStatusLabel((string)$application->getData('status'))) ?></td>
+                </tr>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Submitted')) ?></th>
+                    <td><?= $escaper->escapeHtml($block->formatDate($application->getData('created_at'), \IntlDateFormatter::MEDIUM, true)) ?></td>
+                </tr>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Name')) ?></th>
+                    <td><?= $escaper->escapeHtml((string)$application->getData('name')) ?></td>
+                </tr>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Email')) ?></th>
+                    <td>
+                        <a href="mailto:<?= $escaper->escapeHtmlAttr((string)$application->getData('email')) ?>">
+                            <?= $escaper->escapeHtml((string)$application->getData('email')) ?>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Company Name')) ?></th>
+                    <td><?= $escaper->escapeHtml((string)$application->getData('company_name')) ?></td>
+                </tr>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Homepage')) ?></th>
+                    <td>
+                        <?php $homepage = (string)$application->getData('homepage'); ?>
+                        <?php if ($homepage !== ''): ?>
+                            <?= $escaper->escapeHtml($homepage) ?>
+                        <?php else: ?>
+                            &mdash;
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Type of Business')) ?></th>
+                    <td><?= $escaper->escapeHtml($block->getBusinessTypeLabel((string)$application->getData('business_type'))) ?></td>
+                </tr>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Sales Channels')) ?></th>
+                    <td><?= $escaper->escapeHtml($block->getSalesChannelLabel((string)$application->getData('sales_channels'))) ?></td>
+                </tr>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Message')) ?></th>
+                    <td><?= nl2br($escaper->escapeHtml((string)$application->getData('message'))) ?></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="admin__field">
+        <a href="<?= $escaper->escapeUrl($block->getBackUrl()) ?>" class="action-default">
+            <span><?= $escaper->escapeHtml(__('Back to Applications')) ?></span>
+        </a>
+    </div>
+<?php endif; ?>

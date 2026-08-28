@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!--Order Emails-->
+    <event name="fooman_emailattachments_before_send_order">
+        <observer name="evalent_productcertificate_before_send_order_observer"
+                  instance="Evalent\ProductCertificate\Observer\BeforeSendOrderObserver"/>
+    </event>
+    <event name="fooman_emailattachments_before_send_order_comment">
+        <observer name="evalent_productcertificate_before_send_order_comment_observer"
+                  instance="Evalent\ProductCertificate\Observer\BeforeSendOrderCommentObserver"/>
+    </event>
+
+    <!--Shipment Emails-->
+    <event name="fooman_emailattachments_before_send_shipment">
+        <observer name="evalent_productcertificate_before_send_shipment_observer"
+                  instance="Evalent\ProductCertificate\Observer\BeforeSendShipmentObserver"/>
+    </event>
+    <event name="fooman_emailattachments_before_send_shipment_comment">
+        <observer name="evalent_productcertificate_before_send_shipment_comment_observer"
+                  instance="Evalent\ProductCertificate\Observer\BeforeSendShipmentCommentObserver"/>
+    </event>
+
+</config>

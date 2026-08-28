@@ -1,0 +1,11 @@
+<div class="image-link__wrapper">
+    <a href="<?php echo $block->getLink(); ?>" class="image-link__link" target="_blank" rel="nofollow">
+        <div class="image-link__content">
+            <?php if ($block->getData('image')) : ?>
+            <div class="image-link__image--wrapper">
+                <img class="image-link__image" src="<?= $this->getUrl('pub/media') . $block->getData('image') ?>">
+            </div>
+            <?php endif; ?>
+        </div>
+    </a>
+</div>

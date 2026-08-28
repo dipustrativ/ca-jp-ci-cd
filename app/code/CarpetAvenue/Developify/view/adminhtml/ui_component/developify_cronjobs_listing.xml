@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Developify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<!--
+    Every registered cron job. Config-backed — CronJobDataProvider reads
+    Magento\Cron\Model\ConfigInterface, so this grid issues no query at all and
+    does its filtering, sorting and paging in PHP over ~100 rows.
+
+    job_code is the primary field because registered jobs have no id of their
+    own. There are no massactions and no export, so nothing depends on that key
+    being unique across groups.
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">developify_cronjobs_listing.developify_cronjobs_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>developify_cronjobs_listing.developify_cronjobs_listing_data_source</dep>
+        </deps>
+        <spinner>developify_cronjobs_columns</spinner>
+    </settings>
+
+    <dataSource name="developify_cronjobs_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">job_code</param>
+            </storageConfig>
+        </settings>
+        <aclResource>CarpetAvenue_Developify::cron_jobs</aclResource>
+        <dataProvider name="developify_cronjobs_listing_data_source"
+                      class="CarpetAvenue\Developify\Ui\DataProvider\CronJobDataProvider">
+            <settings>
+                <requestFieldName>job_code</requestFieldName>
+                <primaryFieldName>job_code</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="developify_cronjobs_columns">
+        <column name="job_code" sortOrder="10">
+            <settings>
+                <label translate="true">Job Code</label>
+                <filter>text</filter>
+                <dataScope>job_code</dataScope>
+                <sorting>asc</sorting>
+            </settings>
+        </column>
+
+        <column name="group" sortOrder="20">
+            <settings>
+                <options class="CarpetAvenue\Developify\Model\Config\Source\CronGroup"/>
+                <label translate="true">Group</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <dataScope>group</dataScope>
+            </settings>
+        </column>
+
+        <column name="schedule" sortOrder="30">
+            <settings>
+                <label translate="true">Schedule</label>
+                <filter>text</filter>
+                <dataScope>schedule</dataScope>
+            </settings>
+        </column>
+
+        <column name="instance" sortOrder="40">
+            <settings>
+                <label translate="true">Class</label>
+                <filter>text</filter>
+                <dataScope>instance</dataScope>
+            </settings>
+        </column>
+
+        <column name="method" sortOrder="50">
+            <settings>
+                <label translate="true">Method</label>
+                <filter>text</filter>
+                <dataScope>method</dataScope>
+            </settings>
+        </column>
+    </columns>
+</listing>

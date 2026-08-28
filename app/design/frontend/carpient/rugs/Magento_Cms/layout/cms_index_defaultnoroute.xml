@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpient. All rights reserved.
+ *
+ * Safety net: Magento forwards to cms/index/defaultNoRoute when the configured
+ * no-route CMS page is missing, disabled or not assigned to the current store
+ * view — without this the visitor gets the bare "There was no 404 CMS page
+ * configured or found." message. Reuses the real 404 handle, so the markup is
+ * defined in one place; only the browser-tab title is missing here, since that
+ * comes from the CMS page.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="cms_noroute_index"/>
+</page>

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="catalog_product_index_price_history" resource="default" engine="innodb" comment="">
+        <column xsi:type="int" name="row_id" unsigned="true" nullable="false" identity="true"  />
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="false"/>
+        <column xsi:type="int" name="customer_group_id" unsigned="true" nullable="false" identity="false"/>
+        <column xsi:type="smallint" name="website_id" unsigned="true" nullable="false" identity="false"/>
+        <column xsi:type="smallint" name="tax_class_id" unsigned="true" nullable="true" identity="false"/>
+        <column xsi:type="decimal" name="price" unsigned="false" nullable="true" precision="20" scale="6"/>
+        <column xsi:type="decimal" name="final_price" unsigned="false" nullable="true" precision="20" scale="6"/>
+        <column xsi:type="decimal" name="min_price" unsigned="false" nullable="true" precision="20" scale="6"/>
+        <column xsi:type="decimal" name="max_price" unsigned="false" nullable="true" precision="20" scale="6"/>
+        <column xsi:type="decimal" name="tier_price" unsigned="false" nullable="true" precision="20" scale="6"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Creation Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="row_id"/>
+            <column name="entity_id"/>
+            <column name="customer_group_id"/>
+            <column name="website_id"/>
+        </constraint>
+        <index referenceId="CATALOG_PRODUCT_INDEX_PRICE_HISTORY_CUSTOMER_GROUP_ID" indexType="btree">
+            <column name="customer_group_id"/>
+        </index>
+        <index referenceId="CATALOG_PRODUCT_INDEX_PRICE_HISTORY_MIN_PRICE" indexType="btree">
+            <column name="min_price"/>
+        </index>
+        <index referenceId="CAT_PRD_IDX_PRICE_HISTORY_WS_ID_CSTR_GROUP_ID_MIN_PRICE" indexType="btree">
+            <column name="website_id"/>
+            <column name="customer_group_id"/>
+            <column name="min_price"/>
+        </index>
+        <!-- Cron\PurgeHistory deletes by created_at; without this it is a full scan. -->
+        <index referenceId="CATALOG_PRODUCT_INDEX_PRICE_HISTORY_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
+    </table>
+</schema>

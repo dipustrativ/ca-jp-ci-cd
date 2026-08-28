@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Evalent_MagicGallery
+ * @author Hampus Ershagen <hampus.ershagen@evalent.com>
+ */
+-->
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- Remove Fotorama Shit -->
+        <referenceBlock name="product.info.media.image" remove="true"/>
+        <referenceBlock name="product.info.media.video" remove="true"/>
+
+
+        <referenceContainer name="product.info.media">
+            <block class="Magento\Catalog\Block\Product\View\Gallery" name="magicgallery.product" template="Evalent_MagicGallery::product/view/gallery.phtml">
+                <container name="magicgallery.product.inner" as="magicgallery_inner" after="-" />
+            </block>
+        </referenceContainer>
+    </body>
+</page>

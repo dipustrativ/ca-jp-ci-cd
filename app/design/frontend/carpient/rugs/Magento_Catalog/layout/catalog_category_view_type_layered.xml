@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Full-width product grid with the layered-navigation filters moved to a
+ * horizontal bar above the grid (no left sidebar). Ported from carpetavenue/rugs.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <attribute name="class" value="page-layout-fullwidth-filter"/>
+
+        <!-- Keep sidebar.main in the tree but empty, so main goes full width -->
+        <referenceContainer name="sidebar.main">
+            <block class="Magento\Framework\View\Element\Text" name="sidebar.dummy.block">
+                <arguments>
+                    <argument name="text" xsi:type="string"><![CDATA[<!-- keep -->]]></argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!-- Filters above the product grid -->
+        <move element="catalog.leftnav" destination="content" before="-"/>
+
+        <!-- Reference-style horizontal filter bar + inline dropdowns (Carpient_Filter).
+             Reuses CarpetAvenue_Productify renderer/AJAX/price-slider. -->
+        <referenceBlock name="catalog.leftnav" template="Carpient_Filter::layer/view.phtml"/>
+
+        <!-- No add-to-wishlist action on grid items -->
+        <referenceBlock name="category.product.addto.wishlist" remove="true"/>
+    </body>
+</page>

@@ -1,0 +1,22 @@
+<?php
+/**
+ * Copyright © Carpient. All rights reserved.
+ *
+ * Injects the "Rec. price" label as CSS custom properties so the theme's
+ * pseudo-element labels (content: var(--rec-price-label ...)) translate per
+ * store view. CSS `content:` cannot use __(), so the translated text is passed
+ * in here through a store-scoped inline <style>.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ */
+
+// addslashes escapes " and \ for a valid CSS string token; UTF-8 passes through.
+$label  = addslashes((string) __('Rec. price'));
+$labelC = addslashes((string) __('Rec. price:'));
+?>
+<style>
+    :root {
+        --rec-price-label: "<?= /* @noEscape */ $label ?>";
+        --rec-price-label-c: "<?= /* @noEscape */ $labelC ?>";
+    }
+</style>

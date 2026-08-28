@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Product
+ * @package   CarpetAvenue_Productify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <columns name="widget_columns">
+        <!-- Between name (sortOrder 1) and price (sortOrder 3) - matches
+             "You might also like" (name, size, price) -->
+        <column name="size" component="CarpetAvenue_Productify/js/product/list/columns/size" sortOrder="2" displayArea="details-area">
+            <settings>
+                <label translate="true">Size</label>
+                <bodyTmpl>CarpetAvenue_Productify/product/list/columns/size</bodyTmpl>
+            </settings>
+        </column>
+    </columns>
+</listing>

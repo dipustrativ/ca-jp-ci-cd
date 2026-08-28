@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- Menu content = category tree + megamenu category attributes + the linked CMS block. -->
+    <event name="catalog_category_save_after">
+        <observer name="evalent_megamenu_clean_topmenu" instance="Evalent\MegaMenu\Observer\CleanTopMenuCache"/>
+    </event>
+    <event name="catalog_category_delete_after">
+        <observer name="evalent_megamenu_clean_topmenu" instance="Evalent\MegaMenu\Observer\CleanTopMenuCache"/>
+    </event>
+    <event name="cms_block_save_after">
+        <observer name="evalent_megamenu_clean_topmenu" instance="Evalent\MegaMenu\Observer\CleanTopMenuCache"/>
+    </event>
+    <!-- catalog/navigation/top_menu_root_category_{enabled,id} — Helper\Data reads these to
+         pick the menu root, so changing them rebuilds a different tree.
+         ponytail: changing a store group's root category is not covered; that leaves the
+         menu stale for up to LIFETIME. Add store_group_save_after if it bites. -->
+    <event name="admin_system_config_changed_section_catalog">
+        <observer name="evalent_megamenu_clean_topmenu" instance="Evalent\MegaMenu\Observer\CleanTopMenuCache"/>
+    </event>
+</config>

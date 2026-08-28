@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="IXPF_Syncer::ixpf_syncer" title="IXPF Syncer" translate="title">
+                    <resource id="IXPF_Syncer::webhook_list" title="Webhook Trigger List" translate="title"/>
+                    <resource id="IXPF_Syncer::purchase_order" title="Purchase Order" translate="title"/>
+                    <resource id="IXPF_Syncer::bulk_update_revert" title="Bulk Update Revert" translate="title"/>
+                    <resource id="IXPF_Syncer::product_gallery_webhook_list" title="PhotoStudio Webhooks" translate="title"/>
+                    <resource id="IXPF_Syncer::order_api_activity" title="Order API Activity" translate="title"/>
+                    <resource id="IXPF_Syncer::docs" title="API Docs" translate="title"/>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

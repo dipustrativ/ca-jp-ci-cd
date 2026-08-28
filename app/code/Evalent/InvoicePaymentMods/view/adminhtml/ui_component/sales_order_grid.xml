@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <listingToolbar name="listing_top">
+        <massaction name="listing_massaction" component="Magento_Ui/js/grid/tree-massactions">
+            <action name="pdfinvoices_legacy_order">
+                <settings>
+                    <url path="sales/order/pdfinvoices/legacy/1"/>
+                    <type>pdfinvoices_order_legacy</type>
+                    <label translate="true">Print Legacy Invoices (Pre 2021)</label>
+                </settings>
+            </action>
+            <action name="creditmemo_legacy_order">
+                <settings>
+                    <url path="sales/order/pdfcreditmemos/legacy/1"/>
+                    <type>pdfcreditmemos_order_legacy</type>
+                    <label translate="true">Print Legacy Credit Memo (Pre 2021)</label>
+                </settings>
+            </action>
+        </massaction>
+    </listingToolbar>
+</listing>

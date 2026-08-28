@@ -1,0 +1,198 @@
+@import "owl/_owl.carousel.less";
+@import "owl/_owl.theme.default.less";
+
+//  Merged modules — kept as separate files so each feature's styles stay
+//  reviewable in isolation. See README → Merged Modules.
+@import "_layerednav.less";   // was CarpetAvenue_LayeredNavigation/_module.less
+@import "_ajaxscroll.less";   // was Lof_AjaxScroll/_module.less
+
+& when (@media-common = true) {
+
+    //  Collectors badge — was an inline <style> inside tag/collector.phtml,
+    //  which repeated it once per product tile.
+    .collector_tags {
+        background: #ffd900 !important;
+
+        .collector-text {
+            color: @color-black !important;
+            font-weight: 600;
+        }
+    }
+
+    .catalog-product-view {
+        .products-related_carousel {
+            margin: 0;
+
+            .ev-product-items {
+                margin-top: 0;
+
+                .owl-stage-outer {
+                    padding-top: 10px;
+                }
+            }
+
+            .owl-item {
+                padding-bottom: 10px;
+                background-size: 0 2px;
+                background-position: left bottom;
+                background-repeat: no-repeat;
+                -webkit-transition: background-size .75s cubic-bezier(.2, .75, .5, 1), color .7s ease;
+                transition: background-size .75s cubic-bezier(.2, .75, .5, 1), color .7s ease;
+                //width: 107px !important;
+
+                .ev-product-item-info {
+                    max-width: 100px;
+                    border-radius: 10px;
+                    border: 1px solid @color-white;
+                    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+                    margin-bottom: 10px;
+                    height: 188px;
+                    transition: box-shadow 0.4s ease-in-out;
+                    margin-left: 5px;
+
+                    .product-image-container {
+                        overflow: hidden;
+
+                        .product-image-wrapper {
+                            padding-bottom: 100%!important;
+                        }
+                    }
+
+                    .product-item-name {
+                        margin: 0 3px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+
+                        .product-item-link {
+                            overflow: hidden;
+                            max-height: 43px;
+                            color: @color-black;
+                            font-weight: 700;
+                            .lib-font-size(16);
+                        }
+                    }
+
+                    .hover-details {
+                        padding-top: 10px;
+                    }
+
+                    .product-item-details {
+                        text-align: center;
+
+                        .size {
+                            white-space: nowrap;
+                            font-size: 12px;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                    }
+                }
+
+                .product-item-summary {
+                    margin: 5px;
+                    font-weight: 700;
+                    overflow: hidden;
+
+                    .price-container {
+                        .price-label{
+                            display: none;
+                        }
+                        .price {
+                            .lib-font-size(16);
+                        }
+                    }
+                    .old-price {
+                        display: none;
+                        .price {
+                            .lib-font-size(10);
+                            text-decoration: line-through;
+                            font-weight: 400;
+                            bottom: 2px;
+                            left: 4px;
+                            position: relative;
+                        }
+                    }
+                }
+                &.chose-related,
+                &:first-child {
+                    background-size: 100% 3px;
+                    opacity: 1;
+                }
+
+                &.first-related {
+                    margin-left: 2px;
+
+                    .ev-product-item-info {
+                        box-shadow: rgba(14, 30, 37, 0.12) 0 2px 4px 0, rgba(14, 30, 37, 0.32) 0 2px 5px 0;
+                        transition: box-shadow 0.4s ease-in-out;
+                    }
+                }
+            }
+
+                .owl-nav {
+                    .owl-next,
+                    .owl-prev {
+                        background-color: @color-white;
+                        .lib-font-size(35);
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        border: 1px solid #F1F1F1;
+                        box-sizing: border-box;
+                        box-shadow: 0 7px 10px 1px rgba(0, 0, 0, 0.25);
+                        color: @color-black;
+                        top: ~'calc(50% - 20px/2)';
+
+                        &.disabled {
+                            display: none;
+                        }
+
+                        span {
+                            display: none;
+                        }
+
+                        &:after {
+                            border: solid @color-black;
+                            padding: 3px;
+                            content: '';
+                            position: absolute;
+                            width: 3px;
+                            height: 3px;
+                            top: 14px;
+                            transform: rotate(-45deg);
+                            -webkit-transform: rotate(-45deg);
+                        }
+                    }
+
+                    .owl-next {
+                        right: -25px;
+
+                        &:after {
+                            border-width: 0 1.5px 1.5px 0;
+                            left: 11px;
+                        }
+                    }
+
+                    .owl-prev {
+                        left: -25px;
+
+                        &:after {
+                            border-width: 1.5px 0 0 1.5px;
+                            left: 15px;
+                        }
+                    }
+
+                    &:hover {
+                        background-color: @color-white;
+                        color: @color-black;
+                        box-shadow: rgba(14, 30, 37, 0.12) 0 2px 4px 0, rgba(14, 30, 37, 0.32) 0 2px 16px 0;
+                    }
+                }
+
+                .owl-dots {
+                    display: none;
+                }
+        }
+    }
+}

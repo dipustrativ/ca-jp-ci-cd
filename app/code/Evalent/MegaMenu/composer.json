@@ -1,0 +1,26 @@
+{
+    "name": "evalent/module-megamenu",
+    "description": "",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "email": "info@mage2gen.com",
+            "name": "Mage2Gen"
+        },
+        {
+            "email": "tobias.nilsson@evalent.com",
+            "name": "Tobias Nilsson"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Evalent\\MegaMenu\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}

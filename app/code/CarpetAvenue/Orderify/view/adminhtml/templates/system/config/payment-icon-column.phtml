@@ -1,0 +1,17 @@
+<?php
+/** @var \CarpetAvenue\Orderify\Block\Adminhtml\System\Config\Form\Field\IconColumn $block */
+?>
+<div class="payment-icon-field">
+    <input type="text" readonly="readonly"
+           id="<?= /* @noEscape */ $block->getInputId() ?>"
+           name="<?= /* @noEscape */ $block->getInputName() ?>"
+           value="<%- <?= /* @noEscape */ $block->getColumnName() ?> %>"
+           class="input-text admin__control-text payment-icon-input"
+           data-media-base="<?= $block->escapeHtmlAttr($block->getMediaBaseUrl()) ?>"
+           placeholder="<?= $block->escapeHtmlAttr(__('No icon selected')) ?>"
+           style="width:240px"/>
+    <img class="payment-icon-preview" src="" alt=""/>
+    <button type="button" class="action-default scalable payment-icon-choose">
+        <span><?= $block->escapeHtml(__('Browse')) ?></span>
+    </button>
+</div>

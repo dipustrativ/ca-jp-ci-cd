@@ -1,0 +1,46 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \IXPF\Syncer\ViewModel\Docs\DocsList $viewModel */
+$viewModel = $block->getData('view_model');
+$docs = $viewModel->getDocs();
+
+// group by module
+$grouped = [];
+foreach ($docs as $doc) {
+    $grouped[$doc['module']][] = $doc;
+}
+?>
+<div class="ixpf-docs-wrap">
+    <?php if (empty($docs)): ?>
+        <div class="message message-notice"><?= $block->escapeHtml(__('No documentation files found under app/code/IXPF/*/docs/.')) ?></div>
+    <?php else: ?>
+        <?php foreach ($grouped as $module => $items): ?>
+            <div class="ixpf-docs-group">
+                <h2 class="ixpf-docs-module"><?= $block->escapeHtml($module) ?></h2>
+                <table class="data-grid ixpf-docs-grid">
+                    <thead>
+                        <tr>
+                            <th><?= $block->escapeHtml(__('Document')) ?></th>
+                            <th><?= $block->escapeHtml(__('File')) ?></th>
+                            <th><?= $block->escapeHtml(__('Action')) ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($items as $doc): ?>
+                            <tr>
+                                <td><?= $block->escapeHtml($doc['title']) ?></td>
+                                <td><code><?= $block->escapeHtml($doc['file']) ?></code></td>
+                                <td>
+                                    <a class="action-default"
+                                       href="<?= $block->escapeUrl($viewModel->getViewUrl($doc['key'])) ?>">
+                                        <?= $block->escapeHtml(__('View')) ?>
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>

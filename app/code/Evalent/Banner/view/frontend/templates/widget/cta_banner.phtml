@@ -1,0 +1,158 @@
+<?php
+// @codingStandardsIgnoreFile
+date_default_timezone_set("Europe/Stockholm");
+
+use \Evalent\Banner\Api\Data\BannerInterface;
+
+/** @var \Evalent\Banner\Block\Widget\CtaBanner $block   */
+
+/** @var \Evalent\Banner\Api\Data\BannerInterface $banner */
+
+$banner = $block->getBanner();
+$timeZone = new \DateTimeZone("Europe/Stockholm");
+
+$dateStart = $banner->getDateStart();
+$dateEnd = $banner->getDateEnd();
+
+$_dateStart = !empty($dateStart) ? date_format(date_create($dateStart . '+ 1 hour', $timeZone),"Y/m/d H:i") : "";
+$_dateEnd = !empty($dateEnd) ? date_format(date_create($dateEnd . '+ 1 hour', $timeZone),"Y/m/d H:i") : "";
+
+$dateNow = date("Y/m/d H:i");
+$_daysLeft = 0;
+
+//echo $dateStart . "<br>" . $dateEnd;
+//echo "Start: ".$_dateStart . "<br>End: " . $_dateEnd . "<br>Now: " . $dateNow;
+
+if(!empty($_dateStart) && !empty($_dateEnd) && ($_dateEnd < $dateNow || $_dateStart > $dateNow)):
+
+    return;
+
+endif;
+
+if(empty($_dateStart) && !empty($_dateEnd) && $_dateEnd < $dateNow):
+
+    return;
+
+endif;
+
+if(!empty($_dateStart) && empty($_dateEnd) && $_dateStart > $dateNow):
+
+    return;
+
+endif;
+
+?>
+
+<?php $_title = $banner->getHeading(); ?>
+<?php $_description = $banner->getDescription(); ?>
+<?php $_buttonText = $banner->getButtonText(); ?>
+<?php $_buttonLink = $banner->getBannerLinkUrl(); ?>
+<?php $_bannerButtonStyle = $banner->getButtonStyle(); ?>
+<?php $_bannerHeadingTag = $banner->getHeadingTag(); ?>
+<?php $_bgcolor = $block->getData('bgcolor'); ?>
+<?php $_textcolor = $block->getTextColor(); ?>
+<?php $_buttonColor = $block->getButtonColor(); ?>
+<?php $_descColor = $block->getDescColor() ?? $_textcolor; ?>
+<?php $_buttonTextColor = $block->getButtonTextColor(); ?>
+<?php $_headlineSize = $banner->getHeadingSizeDesktop(); ?>
+<?php $_descSize = $banner->getDescriptionSizeDesktop() ?>
+<?php $_buttonSize = $banner->getButtonSizeDesktop(); ?>
+<?php $_image = $banner->getImageUrl(BannerInterface::DESKTOP_IMAGE); ?>
+<?php $_imageLayout = $block->getData('image_layout') == "left" ? "first-md" : "last-md" ?>
+<?php $_imageLayoutMob = $block->getData('image_layout_mobile') == "left" ? "first-xs" : "last-xs" ?>
+<?php $_fullwidth = $block->getData('is_fullwidth'); ?>
+<?php $_alignContent = $banner->getContentAlignDesktop() ?? "left"; ?>
+<?php $_margin = $block->getData('margin'); ?>
+<?php $_marginMobile = $block->getData('margin_mobile'); ?>
+<?php $_padding = $block->getData('padding'); ?>
+<?php $_paddingMobile = $block->getData('padding_mobile'); ?>
+<?php $_descriptionPosition = $banner->getDescriptionPosition() ?? "after-heading"; ?>
+<?php $_sku = $block->getProductSku(); ?>
+<?php $_product = null; ?>
+<?php if($_sku): $_product = $block->getProductBySku($_sku); endif; ?>
+<?php $_dotX = $block->getDotX() ?? "50"; ?>
+<?php $_dotY = $block->getDotY() ?? "70"; ?>
+<?php $sizeValue = ""; ?>
+<?php $_buttonCtaHover = $banner->getButtonCtaHover() ?? null;?>
+
+<?php
+// Set default heading tag if empty
+if(!isset($_bannerHeadingTag) || empty($_bannerHeadingTag)): $_bannerHeadingTag = "h2"; endif;
+
+?>
+
+<?php
+    // generate random 10 digit number for unique class
+    $randomNum = rand(1000000000, 9999999999);
+    $elementClass = "cta-banner-".$randomNum;
+?>
+
+<div class="<?= $elementClass?> ev-banners cta-banner cta-banner-wrapper <?= $_fullwidth ? '' : 'page-main ' ?>
+<?= 'mt'.$_marginMobile . '--xs ' . 'mt'.$_margin.'--md' ?> <?= 'mb'.$_marginMobile . '--xs ' . 'mb'.$_margin.'--md ' .
+'pl'.$_padding.'--md '  . 'pr'.$_padding.'--md '  . 'pl'.$_paddingMobile.'--xs ' . 'pr'.$_paddingMobile.'--xs ' ?>">
+
+    <a href="<?= $_buttonLink ?>" class="cta-banner__link"></a>
+
+    <div class="cta-banner__container row">
+        <div class="cta-banner__container__content <?= $_alignContent ?> col-xs-12 col-md-6"
+             style="background-color: <?= $_bgcolor ?>; --ctabanner-content-color: <?= $_textcolor ?>; --ctabanner-button-color: <?= $_buttonColor ?>;">
+            <<?= $_bannerHeadingTag ?> class="cta-banner__content__heading <?= $_headlineSize ?>"><?= $_title ?></<?= $_bannerHeadingTag ?>>
+
+            <?php if($_descriptionPosition == "after-heading"): ?>
+                <div class="cta-banner__content__description <?= $_descSize ?>" style="color: <?= $_descColor ?>;">
+                    <?= $_description ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if($_buttonText): ?>
+                <span class="cta-banner__content__button <?= $_buttonSize . ' button-style--' . $_bannerButtonStyle ?>"
+                      style="color: <?= $_buttonTextColor ?>;"><?= $_buttonText ?></span>
+            <?php endif; ?>
+
+            <?php if($_descriptionPosition == "after-button"): ?>
+                <div class="cta-banner__content__description <?= $_descSize ?>" style="color: <?= $_descColor ?>;">
+                    <?= $_description ?>
+                </div>
+            <?php endif; ?>
+
+        </div>
+        <div class="cta-banner__container__image col-xs-12 col-md-6 <?= $_imageLayoutMob . ' ' . $_imageLayout ?>">
+            <img src="<?= $_image ?>" alt="<?= $_title ?>" />
+
+            <?php if($_product !== null): ?>
+
+                <?php if ($_product->getData('width') && $_product->getData('length')) {
+                        if ($_product->getData('shape') != 20) {
+                            $sizeValue = $_product->getData('width') . ' x ' . $_product->getData('length') . ' cm';
+                        } else {
+                            $sizeValue = "∅ " . $_product->getData('width') . ' cm';
+                        }
+                    } ?>
+
+                <?php if($_sku): ?>
+                    <ul class="product-highlighter">
+                        <li style="left: <?= $_dotX ?>%; top: <?= $_dotY ?>%;">
+                            <a class="product-highlighter__dot" href="<?= $block->escapeUrl($_product->getProductUrl()) ?>"></a>
+                            <div class="product-highlighter__sign">
+                                <a href="<?= $block->escapeUrl($_product->getProductUrl()) ?>">
+                                </a>
+                                <div class="product-highlighter__sign__name"><?= $_product->getName(); ?></div>
+                                <div class="product-highlighter__sign__size"><?= $sizeValue ?></div>
+                                <div class="product-highlighter__sign__price"><?= $block->getProductPrice($_product); ?></div>
+                            </div>
+                        </li>
+                    </ul>
+                <?php endif; ?>
+
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<style>
+    .<?= $elementClass ?>:hover .cta-banner__content__button {
+    <?php if($_buttonCtaHover): ?>
+        background-color: <?= $_buttonCtaHover ?> !important;
+    <?php endif; ?>
+    }
+</style>

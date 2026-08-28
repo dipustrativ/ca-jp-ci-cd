@@ -1,0 +1,40 @@
+//
+//  CarpetAvenue Rugs — theme variables (override Magento/blank + UI lib)
+//  _____________________________________________
+
+//  Palette
+@ca-black:            #050505;
+@ca-footer-bg:        #292D33;
+@ca-footer-text:      #c1c1c1;
+@ca-price:            #7c232e;
+
+//  Base
+@primary__color:                    @ca-black;
+@page__background-color:            #ffffff;
+@layout__max-width:                 1440px;
+@layout-indent__width:              20px;
+
+//  Typography (Figtree, <link>-loaded in Magento_Theme/layout/default_head_blocks.xml)
+@font-family-name__base:            'Figtree';
+@font-family__base:                 @font-family-name__base, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+//  Buttons — match carpient.com .btn.btn--primary (black, r5, hover #2e2e2e).
+//  Size matches the tocart/checkout primaries, which already render at
+//  @button__padding__l; without this the login/contact/account primaries stay
+//  at the blank-theme 7px 15px and read as a different button.
+@button__border-radius:             5px;
+@button-primary__background:        #000000;
+@button-primary__color:             #ffffff;
+@button-primary__border:            1px solid #000000;
+@button-primary__hover__background: #2e2e2e;
+@button-primary__hover__border:     1px solid #2e2e2e;
+@button-primary__hover__color:      #ffffff;
+@button-primary__padding:           14px 17px;
+@button-primary__font-size:         1.8rem;
+
+//  Form inputs
+@form-element-input__border-radius: 5px;
+@form-element-input__height:        48px;
+
+//  Price
+@price-color:                       @ca-price;

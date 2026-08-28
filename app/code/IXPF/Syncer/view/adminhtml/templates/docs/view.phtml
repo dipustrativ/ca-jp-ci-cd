@@ -1,0 +1,25 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \IXPF\Syncer\ViewModel\Docs\DocView $viewModel */
+$viewModel = $block->getData('view_model');
+$doc  = $viewModel->getDoc();
+$html = $viewModel->getHtml();
+?>
+<div class="ixpf-docs-wrap">
+    <p>
+        <a class="action-secondary" href="<?= $block->escapeUrl($viewModel->getBackUrl()) ?>">
+            &larr; <?= $block->escapeHtml(__('Back to list')) ?>
+        </a>
+    </p>
+    <?php if ($doc): ?>
+        <div class="ixpf-doc-meta">
+            <span class="ixpf-doc-module"><?= $block->escapeHtml($doc['module']) ?></span>
+            <code><?= $block->escapeHtml($doc['file']) ?></code>
+        </div>
+    <?php endif; ?>
+    <div class="ixpf-md-body">
+        <?php // $html is produced by MarkdownRenderer which HTML-escapes all source
+              // content and only emits its own whitelist of tags. Safe to output. ?>
+        <?= /* @noEscape */ $html ?>
+    </div>
+</div>

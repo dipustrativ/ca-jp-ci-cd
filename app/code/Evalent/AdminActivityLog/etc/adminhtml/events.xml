@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="model_save_after">
+        <observer instance="Evalent\AdminActivityLog\Observer\Model\SaveAfter" name="evalent_adminactivitylog_observer_model_saveafter_model_save_after"/>
+    </event>
+    <event name="model_delete_after">
+        <observer instance="Evalent\AdminActivityLog\Observer\Model\DeleteAfter" name="evalent_adminactivitylog_observer_model_saveafter_model_delete_after"/>
+    </event>
+    <event name="backend_auth_user_login_success">
+        <observer instance="Evalent\AdminActivityLog\Observer\User\AuthAfter" name="evalent_adminactivitylog_observer_user_auth_after_login_success"/>
+    </event>
+    <event name="backend_auth_user_login_failed">
+        <observer instance="Evalent\AdminActivityLog\Observer\User\AuthAfter" name="evalent_adminactivitylog_observer_user_auth_after_login_failed"/>
+    </event>
+
+    <!--Events for cache clearing-->
+    <event name="clean_catalog_images_cache_after">
+        <observer instance="Evalent\AdminActivityLog\Observer\Cache\CacheCleanAfter" name="evalent_adminactivitylog_observer_clean_catalog_images_cache_after"/>
+    </event>
+    <event name="clean_media_cache_after">
+        <observer instance="Evalent\AdminActivityLog\Observer\Cache\CacheCleanAfter" name="evalent_adminactivitylog_observer_clean_media_cache_after"/>
+    </event>
+    <event name="clean_static_files_cache_after">
+        <observer instance="Evalent\AdminActivityLog\Observer\Cache\CacheCleanAfter" name="evalent_adminactivitylog_observer_clean_static_files_cache_after"/>
+    </event>
+    <event name="adminhtml_cache_flush_all">
+        <observer instance="Evalent\AdminActivityLog\Observer\Cache\CacheCleanAfter" name="evalent_adminactivitylog_observer_adminhtml_cache_flush_all"/>
+    </event>
+    <event name="adminhtml_cache_flush_system">
+        <observer instance="Evalent\AdminActivityLog\Observer\Cache\CacheCleanAfter" name="evalent_adminactivitylog_observer_adminhtml_cache_flush_system"/>
+    </event>
+    <!--events for cache clearing-->
+</config>

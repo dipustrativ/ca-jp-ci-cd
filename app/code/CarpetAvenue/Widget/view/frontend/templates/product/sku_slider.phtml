@@ -1,0 +1,155 @@
+<?php
+/**
+ * Product SKU Slider widget.
+ *
+ * @var \CarpetAvenue\Widget\Block\Widget\ProductSkuSlider $block
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+
+$items = $block->getOrderedItems();
+if (empty($items)) {
+    return;
+}
+
+$slidesToShow = $block->getSlidesToShow();
+$sliderId = 'carpet-sku-slider-' . $block->getData('name') . '-' . count($items);
+$sliderId = preg_replace('/[^a-zA-Z0-9_-]/', '', $sliderId);
+
+$urlHelper = $this->helper(CarpetAvenue\Core\Helper\URL::class);
+$baseUrl = $urlHelper->getBaseUrl();
+
+$hoverImage = $this->helper(CarpetAvenue\Core\Helper\Product::class);
+$productIds = [];
+foreach ($items as $_item) {
+    $productIds[] = $_item->getId();
+}
+$hoverImageMapper = [];
+if ($hoverImage->isEnableHoverImage()) {
+    $hoverImageMapper = $hoverImage->getProductSecondImage($productIds, false);
+}
+
+$image = 'category_page_grid'; // 560x750, matches category grid
+$templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+?>
+
+<?php
+$heading = __($block->getHeading());
+$viewAllUrl = $block->getViewAllUrl();
+?>
+<div class="block widget block-products-list grid carpet-sku-slider">
+    <?php if ($heading !== '' || $viewAllUrl !== '') : ?>
+        <div class="block-title title carpet-sku-slider__header">
+            <?php if ($heading !== '') : ?>
+                <strong class="carpet-sku-slider__title" role="heading" aria-level="2"><?= $block->escapeHtml($heading) ?></strong>
+            <?php endif; ?>
+            <?php if ($viewAllUrl !== '') : ?>
+                <a class="carpet-sku-slider__viewall" href="<?= $block->escapeUrl($viewAllUrl) ?>"><?= $block->escapeHtml(__('View all')) ?></a>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+    <div class="block-content content">
+        <div id="<?= $block->escapeHtmlAttr($sliderId) ?>"
+             class="products wrapper grid products-grid carpet-sku-slider__track"
+             data-slides-to-show="<?= (int) $slidesToShow ?>">
+            <?php foreach ($items as $_item) : ?>
+                <div class="item product product-item ev-product-item carpet-sku-slider__slide">
+                    <div class="product-item-info">
+                        <?php
+                        $regularPrice = $_item->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\RegularPrice::PRICE_CODE)->getAmount()->getValue();
+                        $finalPrice = $_item->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)->getAmount()->getValue();
+                        if ($regularPrice !== $finalPrice) :
+                            $discountPercentage = round(100 * (1 - ($finalPrice / $regularPrice)), 0, PHP_ROUND_HALF_UP); ?>
+                            <div class="product-item__flag--discount"><?= '-' . $block->escapeHtml($discountPercentage) . '%' ?></div>
+                        <?php endif; ?>
+
+                        <?php $hoverSrc = $hoverImageMapper[$_item->getId()] ?? ''; ?>
+                        <a href="<?= $block->escapeUrl($block->getProductUrl($_item)) ?>"
+                           class="product photo product-item-photo<?= $hoverSrc ? ' has-hover-image' : '' ?>">
+                            <?= $block->getImage($_item, $image)->toHtml() ?>
+                            <?php if ($hoverSrc) : ?>
+                                <img class="product-image-photo--hover"
+                                     src="<?= $block->escapeUrl($hoverSrc) ?>"
+                                     loading="lazy" decoding="async" alt="" aria-hidden="true">
+                            <?php endif; ?>
+                        </a>
+
+                        <div class="product details product-item-details">
+                            <strong class="product name product-item-name">
+                                <a class="product-item-link" title="<?= $block->escapeHtml($_item->getName()) ?>" href="<?= $block->escapeUrl($block->getProductUrl($_item)) ?>">
+                                    <?= $block->escapeHtml($_item->getName()) ?></a>
+                            </strong>
+
+                            <div class="size">
+                                <?php
+                                echo $block->escapeHtml($this->helper(\CarpetAvenue\Productify\Helper\Data::class)->formatSize(
+                                    $_item->getData('width'),
+                                    $_item->getData('length'),
+                                    $_item->getData('shape')
+                                ));
+                                ?>
+                            </div>
+
+                            <?php if ($_item->isSaleable()) : ?>
+                                <?= /* @noEscape */ $block->getProductPrice($_item) ?>
+                            <?php endif; ?>
+
+                            <?php if ($templateType) : ?>
+                                <?= $block->getReviewsSummaryHtml($_item, $templateType) ?>
+                            <?php endif; ?>
+
+                            <?= $block->getLayout()->createBlock('Magento\Catalog\Block\Product\ProductList\Item\Block')->setProduct($_item)->setTemplate('Magento_Catalog::product/view/collector-tag.phtml')->toHtml(); ?>
+
+                            <div class="product actions product-item-inner">
+                                <div class="product-item-actions">
+                                    <div class="secondary-addto-links actions-secondary" data-role="add-to-links">
+                                        <?php if ($addToBlock = $block->getChildBlock('addto')) : ?>
+                                            <?= $addToBlock->setProduct($_item)->getChildHtml() ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <?php if (!$_item->isSaleable()) : ?>
+                                    <?php $similarToUrl = $baseUrl . 'productify/similarto?sku=' . $_item->getSku() ?>
+                                    <span class="sold-caption"><?= __('Sold') ?></span>
+                                    <div class="product-item-similar">
+                                        <a href="<?= $block->escapeUrl($similarToUrl) ?>"><span><?= __('Similar Products') ?></span></a>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+
+<script>
+    require(['jquery', 'slick'], function ($) {
+        'use strict';
+        var $track = $('#<?= /* @noEscape */ $sliderId ?>');
+        if (!$track.length || $track.hasClass('slick-initialized')) {
+            return;
+        }
+        var show = parseInt($track.data('slides-to-show'), 10) || 5;
+        var count = $track.children('.carpet-sku-slider__slide').length;
+        // Never show more columns than there are products, else slick leaves a
+        // big empty gap on the right and the row hugs the left edge.
+        show = Math.min(show, count);
+        $track.slick({
+            slidesToShow: show,
+            slidesToScroll: 1,
+            infinite: count > show,
+            arrows: count > show,
+            dots: false,
+            responsive: [
+                { breakpoint: 1200, settings: { slidesToShow: Math.min(show, 4) } },
+                { breakpoint: 992, settings: { slidesToShow: Math.min(show, 3) } },
+                { breakpoint: 768, settings: { slidesToShow: 2 } },
+                { breakpoint: 480, settings: { slidesToShow: 1 } }
+            ]
+        });
+    });
+</script>
+
+

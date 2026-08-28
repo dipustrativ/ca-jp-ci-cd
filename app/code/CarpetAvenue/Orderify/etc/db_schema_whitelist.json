@@ -1,0 +1,25 @@
+{
+    "carpetavenue_order_black_list": {
+        "column": {
+            "entity_id": true,
+            "blacklist_type": true,
+            "blacklist_value": true,
+            "note": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "sales_order": {
+        "column": {
+            "is_pos_order": true,
+            "store_to_eur_rate": true
+        }
+    },
+    "sales_order_grid": {
+        "column": {
+            "is_pos_order": true
+        }
+    }
+}

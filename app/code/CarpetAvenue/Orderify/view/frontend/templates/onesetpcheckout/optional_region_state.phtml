@@ -1,0 +1,19 @@
+<?php
+/**
+ * Optional Region/State Field for One Step Checkout
+ *
+ * @package CarpetAvenue_Orderify
+ */
+/** @var $block \CarpetAvenue\Orderify\Block\OnestepCheckout\OptionalStateRegion */
+?>
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "CarpetAvenue_Orderify/js/onesetpcheckout/optional_region_state": {
+                "optionalRegionCountries": <?= /* @noEscape */ json_encode($block->getOptionalSateCountries()) ?>,
+                "requiredRegionCountries": <?= /* @noEscape */json_encode($block->getRequiredSateCountries()) ?>
+            }
+        }
+    }
+</script>

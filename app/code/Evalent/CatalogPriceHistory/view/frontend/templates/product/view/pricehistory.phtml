@@ -1,0 +1,12 @@
+<?php
+/** @var Evalent\CatalogPriceHistory\Block\Product\View $block */
+if (!($price = $block->getLowestPrice())) {
+    return "";
+}
+?>
+
+<div class="price-lowest-price-days">
+    <div class="label"> <?= $block->getLowestPriceLabel() . ":&nbsp;" ?></div>
+        <?= $block->currencyByStore($price) ?>
+    <span><?= " " . __("Incl. VAT") ?></span>
+</div>

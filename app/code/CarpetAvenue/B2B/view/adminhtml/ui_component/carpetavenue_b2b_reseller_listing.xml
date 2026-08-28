@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @package CarpetAvenue_B2B
+ * @author  Strativ Magento Team
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">carpetavenue_b2b_reseller_listing.carpetavenue_b2b_reseller_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>carpetavenue_b2b_reseller_listing.carpetavenue_b2b_reseller_listing_data_source</dep>
+        </deps>
+        <spinner>carpetavenue_b2b_reseller_listing_columns</spinner>
+    </settings>
+
+    <dataSource name="carpetavenue_b2b_reseller_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">application_id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>CarpetAvenue_B2B::reseller_applications</aclResource>
+        <dataProvider name="carpetavenue_b2b_reseller_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>application_id</requestFieldName>
+                <primaryFieldName>application_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+        <exportButton name="export_button"/>
+    </listingToolbar>
+
+    <columns name="carpetavenue_b2b_reseller_listing_columns">
+        <column name="application_id">
+            <settings>
+                <label translate="true">ID</label>
+                <filter>textRange</filter>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="name">
+            <settings>
+                <label translate="true">Name</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="email">
+            <settings>
+                <label translate="true">Email</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="company_name">
+            <settings>
+                <label translate="true">Company</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="business_type">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">CarpetAvenue\B2B\Model\Source\BusinessType</item>
+            </argument>
+            <settings>
+                <label translate="true">Business Type</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+            </settings>
+        </column>
+        <column name="sales_channels">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">CarpetAvenue\B2B\Model\Source\SalesChannel</item>
+            </argument>
+            <settings>
+                <label translate="true">Sales Channels</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+            </settings>
+        </column>
+        <column name="status" component="Magento_Ui/js/grid/columns/select">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">CarpetAvenue\B2B\Model\Source\ApplicationStatus</item>
+            </argument>
+            <settings>
+                <label translate="true">Status</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <label translate="true">Submitted</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+            </settings>
+        </column>
+
+        <actionsColumn name="actions" class="CarpetAvenue\B2B\Ui\Component\Listing\Column\ResellerActions">
+            <settings>
+                <label translate="true">Action</label>
+                <indexField>application_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

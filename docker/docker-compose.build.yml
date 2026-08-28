@@ -1,0 +1,191 @@
+# CarpetAvenue — Dokploy BUILDS the image itself from git (no registry, no CI).
+#
+# Use this only if you don't want a build server + registry. Dokploy clones the
+# repo and runs `docker compose build`; `app` builds the image once, the other
+# Magento services reuse it. Traefik still fronts nginx (Domain tab, port 80).
+#
+# ⚠️ Two build secrets are gitignored and are NOT in Dokploy's clone. You must
+#    place them into the build context on the Dokploy host before deploying:
+#      <clone>/auth.json            (Composer keys)
+#      <clone>/docker/env.php.scd   (env.php used only during static-content deploy)
+#    Add them via Dokploy → Advanced → Files, or scp them onto the host clone.
+#    This friction is exactly why the registry-pull path is the default.
+#
+# Dokploy setup: same Environment + Domains + sysctl as docker-compose.dokploy.yml.
+
+services:
+
+  cache:
+    image: valkey/valkey:9-alpine
+    restart: unless-stopped
+    command: >
+      valkey-server
+      --maxmemory 2gb
+      --maxmemory-policy allkeys-lru
+      --save ""
+      ${VALKEY_PASSWORD:+--requirepass ${VALKEY_PASSWORD}}
+    volumes:
+      - valkey_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [magento_net]
+
+  queue:
+    image: rabbitmq:4.2-management-alpine
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-/}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [magento_net]
+
+  search:
+    image: opensearchproject/opensearch:3
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      OPENSEARCH_JAVA_OPTS: "-Xms2g -Xmx2g"
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile:  { soft: 65536, hard: 65536 }
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks: [magento_net]
+
+  # The ONLY service that builds. Tags the image carpient:built; the others reuse it.
+  app:
+    image: carpient:built
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      secrets:
+        - composer_auth
+        - env_php_scd
+    restart: unless-stopped
+    depends_on:
+      upgrade: { condition: service_completed_successfully }
+      queue:   { condition: service_healthy }
+      search:  { condition: service_healthy }
+    environment: &magento_env
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      VALKEY_HOST: ${VALKEY_HOST:-cache}
+      VALKEY_PORT: ${VALKEY_PORT:-6379}
+      VALKEY_PASSWORD: ${VALKEY_PASSWORD:-}
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-queue}
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_VHOST: ${RABBITMQ_VHOST:-/}
+      OPENSEARCH_HOST: ${OPENSEARCH_HOST:-search}
+      OPENSEARCH_PORT: ${OPENSEARCH_PORT:-9200}
+      MAGE_CRYPT_KEY: ${MAGE_CRYPT_KEY}
+      MAGE_GRAPHQL_ID_SALT: ${MAGE_GRAPHQL_ID_SALT}
+      DOMAIN: ${DOMAIN:-carpetavenue.net}
+      DEBUG_ENV: ${DEBUG_ENV:-false}
+    volumes:
+      - magento_media:/var/www/html/pub/media
+      - magento_var:/var/www/html/var
+    networks:
+      magento_net:
+        aliases: [carpient-fpm]
+
+  upgrade:
+    image: carpient:built
+    command: >
+      sh -c "chown -R www-data:www-data /var/www/html/var &&
+      php bin/magento maintenance:enable &&
+      php -d memory_limit=2G bin/magento setup:upgrade --keep-generated &&
+      php bin/magento maintenance:disable"
+    restart: "no"
+    depends_on:
+      cache:  { condition: service_healthy }
+      queue:  { condition: service_healthy }
+      search: { condition: service_healthy }
+    environment: *magento_env
+    volumes:
+      - magento_var:/var/www/html/var
+    networks: [magento_net]
+
+  static:
+    image: carpient:built
+    command: sh -c "rm -rf /mnt/static/* && cp -a /var/www/html/pub/static/. /mnt/static/"
+    restart: "no"
+    depends_on:
+      upgrade: { condition: service_completed_successfully }
+    volumes:
+      - magento_static:/mnt/static
+    networks: [magento_net]
+
+  cron:
+    image: carpient:built
+    command: cron -f
+    restart: unless-stopped
+    depends_on:
+      upgrade: { condition: service_completed_successfully }
+    environment: *magento_env
+    volumes:
+      - magento_media:/var/www/html/pub/media
+      - magento_var:/var/www/html/var
+    networks: [magento_net]
+
+  nginx:
+    image: carpient-nginx:built
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.nginx
+    restart: unless-stopped
+    depends_on:
+      - app
+      - static
+    expose:
+      - "80"
+    volumes:
+      - magento_media:/var/www/html/pub/media:ro
+      - magento_static:/var/www/html/pub/static:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1/health_check.php || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks: [magento_net, dokploy-network]
+
+secrets:
+  composer_auth:
+    file: ../auth.json
+  env_php_scd:
+    file: ./env.php.scd
+
+volumes:
+  magento_media:
+  magento_var:
+  magento_static:
+  valkey_data:
+  rabbitmq_data:
+  opensearch_data:
+
+networks:
+  magento_net:
+    driver: bridge
+  dokploy-network:
+    external: true

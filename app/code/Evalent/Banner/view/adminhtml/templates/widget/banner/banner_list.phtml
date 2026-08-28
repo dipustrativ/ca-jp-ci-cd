@@ -1,0 +1,226 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+
+<?php
+$_htmlId = $block->getHtmlId() ? $block->getHtmlId() : '_' . uniqid();
+$_colspan = 2;
+if (!$block->isAddAfter()) {
+    $_colspan -= 1;
+}
+$_colspan = $_colspan > 1 ? 'colspan="' . $_colspan . '"' : '';
+?>
+<div class="design_theme_ua_regexp" id="grid<?= /* @escapeNotVerified */
+$_htmlId ?>">
+    <div class="custom_grid admin__control-table-wrapper" id="custom_grid<?php echo $_htmlId ?>">
+        <table class="admin__control-table" id="<?= /* @escapeNotVerified */
+        $block->getElement()->getId() ?>">
+            <thead>
+            <tr class="headings" id="headings<?php echo $_htmlId ?>">
+                <?php foreach ($block->getColumns() as $columnName => $column): ?>
+                    <th><?= /* @escapeNotVerified */
+                        $column['label'] ?></th>
+                <?php endforeach; ?>
+                <th class="col-actions" colspan="<?= /* @escapeNotVerified */
+                $_colspan ?>"><?= /* @escapeNotVerified */
+                    __('Action') ?></th>
+            </tr>
+            </thead>
+            <tbody id="addRow<?= /* @escapeNotVerified */
+            $_htmlId ?>"></tbody>
+            <tfoot>
+            <tr>
+                <td colspan="12"></td>
+                <td <?php echo $_colspan ?> class="col-actions-add">
+                    <button id="addToEndBtn<?= /* @escapeNotVerified */
+                    $_htmlId ?>" class="action-add" title="<?= /* @escapeNotVerified */
+                    __('Add') ?>" type="button">
+                        <span><?= /* @escapeNotVerified */
+                            $block->getAddButtonLabel() ?></span>
+                    </button>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+    <input type="hidden" name="<?= /* @escapeNotVerified */
+    $block->getElement()->getName() ?>[__empty]" value=""/>
+    <input type="hidden" name="<?php echo $block->getElement()->getName() ?>" id="items<?php echo $_htmlId ?>"
+           value="<?php echo $block->getElement()->getValue() ?>"/>
+    <div id="empty<?php echo $_htmlId ?>">
+        <button style="" onclick="" class="scalable add" type="button" id="emptyAddBtn<?php echo $_htmlId ?>">
+            <span><span><span><?= /* @escapeNotVerified */
+                        $block->getAddButtonLabel() ?>s</span></span></span>
+        </button>
+    </div>
+    <script>
+        require([
+            'mage/template',
+            'prototype'
+        ], function (mageTemplate) {
+
+            // create row creator
+            window.arrayRow<?= /* @escapeNotVerified */ $_htmlId ?> = {
+
+                // define row prototypeJS template
+                template: mageTemplate(
+                    '<tr id="<%- _id %>" class="item-row">'
+                    <?php
+                    $countcolumns = count($block->getColumns());
+                    $columns = $block->getColumns();
+                    //var_dump($columns);
+                    //exit;
+                    //for ($i = $countcolumns - 1; $i >= 0; $i--):
+                    foreach ($block->getColumns() as $columnName => $column):
+                    //if($columns[$i] != null):
+                    ?>
+                    + '<td>'
+                    + '<?= /* @escapeNotVerified */ $block->renderCellTemplate($columnName) ?>'
+                    + '<\/td>'
+                    <?php //endif; ?>
+                   <?php //endfor; ?>
+                   <?php endforeach; ?>
+
+                    <?php if ($block->isAddAfter()): ?>
+                    + '<td><button class="action-add" type="button" id="addAfterBtn<%- _id %>"><span><?= /* @escapeNotVerified */ __('Add after') ?><\/span><\/button><\/td>'
+                    <?php endif; ?>
+
+                    + '<td class="col-actions"><button id="btn_delete_<%- _id %>" onclick="arrayRow<?= /* @escapeNotVerified */ $_htmlId ?>.del(\'<%- _id %>\')" class="action-delete" type="button"><span><?= /* @escapeNotVerified */ __('Delete') ?><\/span><\/button><\/td>'
+                    + '<\/tr>'
+        ),
+
+            add: function (rowData, insertAfterId) {
+                // generate default template data
+                var templateValues;
+
+                // Prepare template values
+                if (rowData) {
+                    templateValues = rowData;
+                } else {
+                    var d = new Date();
+
+                    templateValues = {
+                    <?php
+                    foreach ($block->getColumns() as $columnName => $column): ?>
+                    <?= $columnName ?>: '', 'option_extra_attrs': {},
+                    <?php endforeach; ?>
+                    _id: '_' + d.getTime() + '_' + d.getMilliseconds()
+                    }
+
+                }
+
+                // Insert new row after specified row or at the bottom
+                if (insertAfterId) {
+                    Element.insert($(insertAfterId), {before: this.template(templateValues)});
+                } else {
+                    Element.insert($('addRow<?= /* @escapeNotVerified */ $_htmlId ?>'), {bottom: this.template(templateValues)});
+                }
+
+                // Fill controls with data
+                if (rowData) {
+                    var rowInputElementNames = Object.keys(rowData.column_values);
+                    for (var i = 0; i < rowInputElementNames.length; i++) {
+                        if ($(rowInputElementNames[i])) {
+                            $(rowInputElementNames[i]).setValue(rowData.column_values[rowInputElementNames[i]]);
+                        }
+                    }
+                }
+
+                $$(".ev-banner-item").invoke('observe', 'change', this.serialize.bind(this));
+                this.serialize();
+            }
+        ,
+
+            del: function (rowId) {
+                $(rowId).remove();
+                this.rowsCount -= 1;
+                if (0 == this.rowsCount) {
+                    this.showButtonOnly();
+                }
+                this.serialize();
+            }
+        ,
+
+            more: function (rowId) {
+                $(rowId + "_extra").toggle();
+                $(rowId).toggleClassName('active');
+            }
+        ,
+
+            serialize : function (e) {
+                var values = {};
+                $$('#custom_grid<?php echo $_htmlId ?> .item-row').each(function (tr, i) {
+                    var a = {};
+                    $(tr).select('.widget-option').each(function (input) {
+                            console.log(input.name);
+                            var k = input.name.match(/\w+/g).pop();
+                            a[k] = input.value;
+                            console.log(k);
+                    });
+                    //console.log(tr);
+                    values[$(tr).identify()] = a;
+                });
+                var b64 = this.encode(JSON.stringify(values));
+                $('items<?php echo $_htmlId ?>').value = b64;
+
+            }
+        ,
+
+            encode: function b64EncodeUnicode(str) {
+                return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function (match, p1) {
+                    return String.fromCharCode('0x' + p1);
+                }));
+            }
+        ,
+
+            showButtonOnly : function () {
+                $('custom_grid<?php echo $_htmlId ?>').hide();
+                $('empty<?php echo $_htmlId ?>').show();
+            }
+        }
+            ;
+
+            // bind add action to "Add" button in last row
+            Event.observe('addToEndBtn<?= /* @escapeNotVerified */ $_htmlId ?>', 'click', arrayRow<?= /* @escapeNotVerified */ $_htmlId ?>.add.bind(arrayRow<?= /* @escapeNotVerified */ $_htmlId ?>, false, false));
+
+            <?php
+            $_addAfterId = "addRow{$_htmlId}";
+            $countit = count($block->getArrayRows());
+            $bannerRows = $block->getArrayRows();
+
+            foreach (array_reverse($block->getArrayRows()) as $_rowId => $_row) {
+            //for ($i = $countit; $i >= 0; $i--):
+            ?>
+            arrayRow<?php echo $_htmlId ?>.add(<?php echo $_row->toJson() ?>, '<?php echo $_addAfterId ?>');
+            <?php
+            $_addAfterId = $_rowId;
+            //endfor;
+            }
+            ?>
+
+            // initialize standalone button
+            $('empty<?php echo $_htmlId ?>').hide();
+            Event.observe('emptyAddBtn<?php echo $_htmlId ?>', 'click', function () {
+                $('custom_grid<?php echo $_htmlId ?>').show();
+                $('empty<?php echo $_htmlId ?>').hide();
+                arrayRow<?php echo $_htmlId ?>.add('', '');
+            });
+
+            // if no rows, hide grid and show button only
+            <?php if (!$block->getArrayRows()):?>
+            arrayRow<?php echo $_htmlId ?>.showButtonOnly();
+            <?php endif;?>
+
+            // Toggle the grid availability, if element is disabled (depending on scope)
+            <?php if ($block->getElement()->getDisabled()):?>
+            toggleValueElements({checked: true}, $('grid<?= /* @escapeNotVerified */ $_htmlId ?>').parentNode);
+            <?php endif;?>
+        });
+    </script>
+</div>

@@ -1,0 +1,247 @@
+//
+//  Carpient CMS content blocks: banners, gallery, about-us rich text
+//  (split out of _carpient_footer.less — none of these are footer rules)
+//  _____________________________________________
+
+//
+//  Banner: center the heading + button at the image middle point
+//  _____________________________________________
+.ev-banners {
+    .inner-wrapper { position: relative; }
+
+    .ev-banners__content {
+        box-sizing: border-box;
+        position: absolute;
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: translate(-50%, -50%) !important;
+        width: 100%;
+        padding: 0 20px;
+        text-align: center !important;    // beat text-align--desktop--left class
+        align-items: center !important;   // flex column is set to top-left; recenter
+        justify-content: center !important;
+    }
+
+    .ev-banners__content__heading {
+        text-align: center !important;
+    }
+
+    // Match carpient.com .btn.btn--primary (black bg, white text, r5, hover #2e2e2e)
+    .ev-banners__content__button {
+        position: static !important;
+        display: inline-block;
+        margin: 20px auto 0 !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        background: #000000 !important;
+        border: 1px solid #000000 !important;
+        border-radius: 5px !important;
+        color: #ffffff !important;
+        padding: 12px 28px !important;
+        font-size: 1.6rem !important;
+        font-weight: 600;
+        line-height: 1.2;
+        text-transform: none;
+        transition: background-color .2s ease, border-color .2s ease;
+
+        span { color: #ffffff !important; }
+
+        &:after { display: none !important; } // drop carpetavenue chevron
+
+        &:hover {
+            background: #2e2e2e !important;
+            border-color: #2e2e2e !important;
+            color: #ffffff !important;
+        }
+    }
+}
+
+//
+//  Collapse empty paragraphs (PageBuilder wraps widgets in <p>, leaving <p></p>)
+//  _____________________________________________
+p:empty {
+    display: none;
+    margin: 0;
+}
+
+// PageBuilder wraps a widget in `<p>\n{{widget}}</p>`; the browser auto-closes
+// the <p> before the widget's block element, leaving a whitespace-only <p>
+// (which :empty can't match) sitting just before the banner/gallery. Kill it.
+[data-content-type="text"] > p:has(+ .ev-banners),
+[data-content-type="text"] > p:has(+ .carpient-gallery) {
+    display: none;
+    margin: 0;
+}
+
+//
+//  About-us rich text block (carpient.com cc-rich-text look)
+//  _____________________________________________
+.carpient-about-us {
+    display: flex;
+    justify-content: center;
+    text-align: left;
+    padding: 20px 0 0px;
+
+    .max-w-text-overlay {
+        width: 100%;
+        max-width: 48em;   // matches carpient --reading-width
+    }
+
+    .section__block--heading {
+        margin: 0 0 22px;
+        font-size: 2.4rem;
+        font-weight: 600;
+        line-height: 1.25;
+    }
+
+    .reading-width--inline {
+        max-width: 48em;
+        margin-right: auto;
+    }
+
+    p {
+        margin: 0 0 16px;
+        font-size: 1.5rem;
+        line-height: 1.75;
+        color: #333333;
+
+        &:last-child { margin-bottom: 0; }
+    }
+
+    strong { font-weight: 700; }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .carpient-about-us {
+        text-align: center;
+        padding: 40px 20px 0px;
+    }
+}
+
+//
+//  "Two Worlds of Rugs" banner gallery (carpient.com cc-gallery look)
+//  _____________________________________________
+.carpient-gallery {
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr;   // mobile: stacked
+    gap: 16px;
+    width: 100%;
+    padding: 0;
+
+    .carpient-gallery__tile {
+        position: relative;
+        display: block;
+        overflow: hidden;
+        min-height: calc(290px + 8vw);
+        border-radius: 4px;
+        color: #ffffff;
+
+        &:hover .carpient-gallery__media img { transform: scale(1.05); }
+        &:hover .carpient-gallery__button { background: #e6e6e6; }
+    }
+
+    .carpient-gallery__media {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .5s ease;
+        }
+    }
+
+    .carpient-gallery__overlay {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, rgb(0 0 0 / 0%) 45%, rgba(0, 0, 0, 0) 80%);
+    }
+
+    .carpient-gallery__content {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 28px;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, .45);
+    }
+
+    .carpient-gallery__title-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .carpient-gallery__heading {
+        color: #ffffff !important;
+        font-size: 2.8rem;
+        line-height: 1.1;
+        margin: 0;
+    }
+
+    .carpient-gallery__desc {
+        color: #ffffff !important;
+        margin: 0 0 14px;
+        font-size: 1.4rem;
+    }
+
+    .carpient-gallery__button {
+        display: inline-block;
+        background: #ffffff;
+        color: #111111;
+        padding: 10px 24px;
+        border-radius: 5px;
+        font-size: 1.4rem;
+        font-weight: 600;
+        transition: background-color .2s ease;
+    }
+
+    .carpient-gallery__arrow {
+        display: inline-flex;
+        align-items: center;
+        margin: 0;
+        color: #ffffff;
+        transition: transform .25s ease;
+
+        svg { width: 28px; height: 28px; }
+    }
+
+    .carpient-gallery__tile:hover .carpient-gallery__arrow {
+        transform: translateX(6px);
+    }
+}
+
+// Collections variant: fixed grid that wraps (2 mobile / 4 desktop => 8 = 4+4)
+.carpient-gallery--collections {
+    grid-template-columns: repeat(2, 1fr);
+
+    .carpient-gallery__tile { min-height: calc(290px + 8vw); }
+
+    .carpient-gallery__heading { font-size: 2rem; }
+}
+
+// Desktop: one column per banner (3 banners => 3 cols, 2 => 2)
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .carpient-gallery {
+        grid-template-columns: repeat(var(--cw-cols, 2), 1fr);
+    }
+
+    .carpient-gallery--collections {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media(max-width: 767px){
+    .carpient-gallery__tile {min-height: 230px !important;}
+}

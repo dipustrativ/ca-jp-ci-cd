@@ -1,0 +1,140 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1000" translate="label">
+            <group id="evinvoicepayment" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+                <label>Evalent Invoice Payment</label>
+                <!-- ===== payment method fields (merged from Evalent_InvoicePaymentMethod) ===== -->
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Title</label>
+                </field>
+                <field id="auto_invoice" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Auto Invoice</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="auto_send_invoice" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Invoice Email, (if Auto Invoice is Allowed).</label>
+                    <depends><field id="auto_invoice">1</field></depends>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="order_status" translate="label" type="select" sortOrder="41" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set order status after invoice creation</label>
+                    <depends><field id="auto_invoice">1</field></depends>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+                </field>
+                <field id="invoice_status_value" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Invoice Status, (if Auto Invoice is Allowed).</label>
+                    <depends><field id="auto_invoice">1</field></depends>
+                    <source_model>Evalent\InvoicePaymentMods\Model\Config\Source\Invoicestatus\InvoiceStatusValues</source_model>
+                </field>
+                <field id="allowspecific_customer" translate="label" type="select" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Applicable Customer Groups</label>
+                    <source_model>Evalent\InvoicePaymentMods\Model\Config\Source\Allcustomer\Allcustomer</source_model>
+                </field>
+                <field id="allowcustomergroup" translate="label" type="multiselect" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Specific Customer Groups Only</label>
+                    <depends><field id="allowspecific_customer">1</field></depends>
+                    <source_model>\Magento\Customer\Model\ResourceModel\Group\Collection</source_model>
+                </field>
+                <field id="allowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="65" translate="label" type="allowspecific">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label" type="multiselect">
+                    <label>Payment from Specific Countries</label>
+                    <depends><field id="allowspecific">1</field></depends>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+                <field id="checkaddress" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Validate Billing Address same as Shipping Address</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="checkaddressinstructions" translate="label" type="textarea" sortOrder="85" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Billing Address same as Shipping Address Instructions</label>
+                    <depends><field id="checkaddress">1</field></depends>
+                </field>
+                <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="85" translate="label" type="text">
+                    <label>Sort Order</label>
+                </field>
+                <field id="instructions" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="textarea">
+                    <label>Instructions</label>
+                </field>
+                <field id="invoice_extra_details" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="textarea">
+                    <label>Invoice Extra Details, will be added to the pdf invoice file.</label>
+                    <depends><field id="auto_send_invoice">1</field></depends>
+                </field>
+                <field id="invoice_referens" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="textarea">
+                    <label>Referens</label>
+                    <depends><field id="auto_send_invoice">1</field></depends>
+                </field>
+                <field id="invoice_villkor" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="textarea">
+                    <label>Villkor</label>
+                    <depends><field id="auto_send_invoice">1</field></depends>
+                </field>
+                <field id="invoice_virtical" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="textarea">
+                    <label>Vertical left line</label>
+                    <depends><field id="auto_send_invoice">1</field></depends>
+                </field>
+
+                <!-- ===== mods fields (email templates, shipping instructions, PDF footer) ===== -->
+                <field id="instructions_payment_information" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="92" translate="label" type="textarea">
+                    <label>Instructions (added to Payment Information)</label>
+                </field>
+                <field id="instructions_payment_information_for_reminder" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="93" translate="label" type="textarea">
+                    <label>Instructions (added to Payment Information) for Reminder</label>
+                </field>
+                <field id="instructions_payment_information_shipment" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="94" translate="label" type="textarea">
+                    <label>Instructions for shipping email</label>
+                    <comment>Added to Payment Information on shipping email only</comment>
+                </field>
+                <field id="email_template_receipt" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="94" translate="label" type="select">
+                    <label>Email template for receipt email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="email_template_receipt_guest" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="94" translate="label" type="select">
+                    <label>Email template for receipt email guest</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="pdf_footer_type" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="200" translate="label" type="select">
+                    <label>PDF Footer Left</label>
+                    <source_model>Evalent\InvoicePaymentMods\Model\Config\Source\PdfFooterTypes</source_model>
+                    <comment>Keep in mind that the first row will be bold. If this is not desired add a new line at the top of the text</comment>
+                </field>
+                <field id="pdf_footer_full" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="202" translate="label" type="textarea">
+                    <label>PDF Footer</label>
+                    <depends>
+                        <field id="*/*/pdf_footer_type">1</field>
+                    </depends>
+                </field>
+                <field id="pdf_footer_left" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="202" translate="label" type="textarea">
+                    <label>PDF Footer Left</label>
+                    <depends>
+                        <field id="*/*/pdf_footer_type">2</field>
+                    </depends>
+                </field>
+                <field id="pdf_footer_middle" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="205" translate="label" type="textarea">
+                    <label>PDF Footer Middle</label>
+                    <depends>
+                        <field id="*/*/pdf_footer_type">2</field>
+                    </depends>
+                </field>
+                <field id="pdf_footer_right" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="209" translate="label" type="textarea">
+                    <label>PDF Footer Left</label>
+                    <depends>
+                        <field id="*/*/pdf_footer_type">2</field>
+                    </depends>
+                </field>
+                <field id="show_grand_total_tax_invoice_pdf" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="220" translate="label" type="select">
+                    <label>Enable/disable display 'Grand Total incl/excl tax' and 'Tax' totals in invoice PDF</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

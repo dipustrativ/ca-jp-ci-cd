@@ -1,0 +1,23 @@
+"Invoice: ","Factuur: "
+"Order: ","Bestellen: "
+"Customer Number: ","Klantnummer: "
+"Invoice Date: ","Factuur datum: "
+"Sold to:","Verkocht aan::"
+"CA - Sold to:","Verkocht aan:"
+"Ship to:","Verzenden naar:"
+"Payment Method:","Betaalmethode:"
+"Shipping Method:","Verzendmethode:"
+"Order Summary","Overzicht van bestelling"
+Products,Producten
+"SKU","Art.nr."
+"CA - SKU","Art.nr."
+Price,prijs
+Quantity,Aantal
+Subtotal,Subtotaal
+"Subtotal:","Subtotaal:"
+"Tax","BTW"
+"CA - Tax","BTW"
+"CA - Grand Total (Excl. Tax)","Totaal (excl. BTW)"
+"CA - Grand Total (Incl. Tax)","Totaal (incl. BTW)"
+"CA - Qty","Aantal"
+"CA - Ship to:","Verzenden naar:"

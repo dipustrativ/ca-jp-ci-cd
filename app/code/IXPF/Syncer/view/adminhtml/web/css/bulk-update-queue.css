@@ -1,0 +1,27 @@
+/* Bulk Update Queue Status Colors */
+.grid-severity-pending {
+    color: #ff9800 !important;
+}
+
+.grid-severity-processing {
+    color: #2196F3 !important;
+}
+
+.grid-severity-completed {
+    color: #4CAF50 !important;
+}
+
+.grid-severity-failed {
+    color: #f44336 !important;
+}
+
+/* Action Link Styling */
+.action-view {
+    color: #1979c3;
+    text-decoration: none;
+}
+
+.action-view:hover {
+    color: #006bb4;
+    text-decoration: underline;
+}

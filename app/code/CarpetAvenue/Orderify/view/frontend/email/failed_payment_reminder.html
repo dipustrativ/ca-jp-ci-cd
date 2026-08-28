@@ -1,0 +1,80 @@
+<!--@subject {{trans "Your recent order attempt was not successful"}} @-->
+<!--@vars {
+"var order":"Order",
+"var order.increment_id":"Order Increment ID",
+"var order.customer_firstname":"Customer First Name",
+"var order_id":"Order DB ID (for layout)",
+"var product_links_html|raw":"Product links HTML (pre-rendered)",
+"var store.frontend_name":"Store Name",
+"var store_url":"Store URL"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<table width="100%" cellspacing="0" cellpadding="0">
+
+    <!-- GREETING -->
+    <tr>
+        <td style="padding: 28px 0 0;">
+            <p style="margin: 0 0 16px;">Dear Customer,</p>
+            <p style="margin: 0 0 16px;">
+                Thank you for your interest in our carpets.
+            </p>
+        </td>
+    </tr>
+
+    <!-- FAILED ORDER NOTICE -->
+    <tr>
+        <td style="padding: 0 0 16px;">
+            <p style="margin: 0 0 16px;">
+                Unfortunately, your recent order attempt was not successful, and we are unable to see the specific reason at this stage.
+            </p>
+            <p style="margin: 0 0 16px;">
+                Please note that during an order attempt, unique carpets may temporarily be marked as sold or reserved. If this occurs, we kindly recommend refreshing your browser and trying again.
+            </p>
+        </td>
+    </tr>
+
+    <!-- PRODUCT LINKS -->
+    <tr>
+        <td style="padding: 0 0 16px;">
+            <p style="margin: 0 0 12px;">
+                The carpet(s) is still available, and you can use the link(s) below to make a new payment attempt:
+            </p>
+            <div style="padding: 12px 16px; background-color: #f9f9f9;
+                        border-left: 3px solid #1a1a1a; border-radius: 2px; margin: 0 0 16px;">
+                {{var product_links_html|raw}}
+            </div>
+        </td>
+    </tr>
+    
+
+    <!-- CONFIRMATION NOTE -->
+    <tr>
+        <td style="padding: 0 0 16px;">
+            <p style="margin: 0;">
+                Please note that a successful order will display a confirmation message on screen and will be followed by an order confirmation email.
+            </p>
+        </td>
+    </tr>
+
+    <!-- WHY WE REACHED OUT -->
+    <tr>
+        <td style="padding: 0 0 16px;">
+            <p style="margin: 0;">
+                We are reaching out because many of our carpets are unique pieces, and we would not want you to miss the opportunity to order a carpet that you have selected.
+            </p>
+        </td>
+    </tr>
+
+    <!-- CONTACT -->
+    <tr>
+        <td style="padding: 0 0 28px; border-top: 1px solid #e8e8e8; padding-top: 16px;">
+            <p style="margin: 0;">
+                If you need any assistance, please do not hesitate to contact us.
+            </p>
+        </td>
+    </tr>
+
+</table>
+
+{{template config_path="design/email/footer_template"}}

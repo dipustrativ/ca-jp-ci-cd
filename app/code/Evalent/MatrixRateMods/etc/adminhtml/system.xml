@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="shipping">
+            <group id="shipping_label_options" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Shipping Label Options</label>
+                <field id="sender_name" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Shipping Label Sender name</label>
+                    <comment>This will replace the admin users First and Lastname on the shipping label</comment>
+                </field>
+                <field id="sender_company" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Shipping label company sender</label>
+                    <comment>This will replace the company name on the shipping label</comment>
+                </field>
+            </group>
+        </section>
+        <section id="carriers">
+            <group id="matrixrate">
+                <field id="force_weight" translate="label" type="select" sortOrder="999" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Force weight in cart</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Forces cart to have product with weight even if there is a price match</comment>
+                </field>
+                <field id="ups_tracking_url" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>UPS tracking URL</label>
+                    <comment>To insert tracking number use "{tracking_number}" (without quotes)</comment>
+                </field>
+                <field id="ups_tracking_url_dest" translate="label" sortOrder="111" showInDefault="1">
+                    <label>UPS tracking URL for destination country</label>
+                    <comment>Set a specifig tracking url for customer address country. To insert tracking number use "{tracking_number}" (without quotes)</comment>
+                    <frontend_model>Evalent\MatrixRateMods\Block\Adminhtml\Form\Field\TrackingCountryMatching</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="dhl_tracking_url" translate="label" type="text" sortOrder="115" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>DHL tracking URL</label>
+                    <comment>To insert tracking number use "{tracking_number}" (without quotes)</comment>
+                </field>
+                <field id="dhl_tracking_url_dest" translate="label" type="text" sortOrder="116" showInDefault="1">
+                    <label>DHL tracking URL for destination country</label>
+                    <comment>Set a specifig tracking url for customer address country. To insert tracking number use "{tracking_number}" (without quotes)</comment>
+                    <frontend_model>Evalent\MatrixRateMods\Block\Adminhtml\Form\Field\TrackingCountryMatching</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="gls_tracking_url" translate="label" type="text" sortOrder="125" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>GLS tracking URL</label>
+                    <comment>To insert tracking number use "{tracking_number}" (without quotes)</comment>
+                </field>
+                <field id="gls_tracking_url_dest" translate="label" type="text" sortOrder="126" showInDefault="1">
+                    <label>GLS tracking URL for destination country</label>
+                    <comment>Set a specifig tracking url for customer address country. To insert tracking number use "{tracking_number}" (without quotes)</comment>
+                    <frontend_model>Evalent\MatrixRateMods\Block\Adminhtml\Form\Field\TrackingCountryMatching</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                
+            </group>
+        </section>
+    </system>
+</config>

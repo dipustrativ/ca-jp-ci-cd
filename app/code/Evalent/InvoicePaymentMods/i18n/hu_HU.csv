@@ -1,0 +1,23 @@
+"Invoice: ","Számla: "
+"Order: ","Rendelés: "
+"Customer Number: ","Vásárlói azonosító: "
+"Invoice Date: ","Számla kelte: "
+"Sold to:","Eladva:"
+"CA - Sold to:","Eladva:"
+"Ship to:","Szállítás helye:"
+"Payment Method:","Fizetési mód:"
+"Shipping Method:","Szállítási mód:"
+"Order Summary","Rendelési összesítő"
+Products,Termékek
+"SKU",Cikkszám
+"CA - SKU",Cikkszám
+Price,Ár
+Quantity,Mennyiség
+Subtotal,Részösszeg
+"Subtotal:","Részösszeg:"
+"Tax","ÁFA"
+"CA - Tax","ÁFA"
+"CA - Grand Total (Excl. Tax)","Végösszeg (ÁFA nélkül)"
+"CA - Grand Total (Incl. Tax)","Végösszeg (ÁFÁ-val)"
+"CA - Qty","Mennyiség"
+"CA - Ship to:","Szállítás helye:"

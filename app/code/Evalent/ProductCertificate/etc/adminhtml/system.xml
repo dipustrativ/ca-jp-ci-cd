@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="sales_pdf">
+            <group id="coa" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Certificate of Authenticity (COA)</label>
+                <field id="production_type" translate="label" type="multiselect" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Generate for production types</label>
+                    <source_model>\Evalent\ProductCertificate\Model\Config\Source\ProductionType</source_model>
+                </field>
+                <field id="row_price_limit" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Row Price Threshold (in store currency)</label>
+                    <validate>validate-digits</validate>
+                    <comment>Compared to Base Price for product on order row in website/store currency (Incl Tax)</comment>
+                </field>
+                <field id="include_signature" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>include_signature</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Include signature.</comment>
+                </field>
+                <field id="footer_text" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Footer text</label>
+                    <comment>Footer text (excl date)</comment>
+                </field>
+                <field id="attach_to_order" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Attach PDF to Order</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>When set to Yes, certificate pdf document will be attached to the order email.</comment>
+                </field>
+                <field id="attach_to_order_comment" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Attach PDF to Order comment</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>When set to Yes, certificate pdf document will be attached to the order comment email.</comment>
+                </field>
+                <field id="attach_to_shipment" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Attach PDF to Shipment</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>When set to Yes, certificate pdf document will be attached to the shipment email.</comment>
+                </field>
+                <field id="attach_to_shipment_comment" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Attach PDF to Shipment comment</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>When set to Yes, certificate pdf document will be attached to the shipment comment email.</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

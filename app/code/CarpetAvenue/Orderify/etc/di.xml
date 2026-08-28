@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- <preference for="Magento\Sales\Block\Adminhtml\Order\View" type="CarpetAvenue\Orderify\Block\Adminhtml\Order\View"/>-->
+    <preference for="CarpetAvenue\Orderify\Api\BlacklistInterface" type="CarpetAvenue\Orderify\Model\Blocklist"/>
+
+    <type name="Magento\Sales\Block\Adminhtml\Order\View\Info">
+        <plugin name="show_state_message_plugin" type="CarpetAvenue\Orderify\Plugins\Adminhtml\View\ShippingStateMessagePlugin"/>
+    </type>
+
+    <virtualType name="CarpetAvenue\Orderify\Model\ResourceModel\Blacklist\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">carpetavenue_order_black_list</argument>
+            <argument name="resourceModel" xsi:type="string">CarpetAvenue\Orderify\Model\ResourceModel\Blacklist</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Magento\Sales\Model\ResourceModel\Order\Grid" type="Magento\Sales\Model\ResourceModel\Grid">
+        <arguments>
+            <argument name="columns" xsi:type="array">
+                <item name="is_pos_order" xsi:type="string">sales_order.is_pos_order</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="orderify_blacklist_listing_data_source"
+                      xsi:type="string">CarpetAvenue\Orderify\Model\ResourceModel\Blacklist\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Custom logger: writes to var/log/carpetavenue/orderify/orderify_YYYY-MM-DD.log -->
+    <virtualType name="CarpetAvenue\Orderify\Logger\OrderifyLogger"
+                 type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">CarpetAvenue\Orderify\Logger\Handler\DateRotating</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="CarpetAvenue\Orderify\Observer\Order\CancelInventoryReindex">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\Orderify\Logger\OrderifyLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="CarpetAvenue\Orderify\Model\Email\FailedPaymentSender">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\Orderify\Logger\OrderifyLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
+        <plugin name="carpetavenue_orderify_checkout_layout_processor"
+                type="CarpetAvenue\Orderify\Plugins\Checkout\LayoutProcessor"
+                sortOrder="100"/>
+    </type>
+
+    <type name="Mageplaza\Osc\Block\Checkout\LayoutProcessor">
+        <plugin name="carpetavenue_orderify_mageplaza_layout_processor"
+                type="CarpetAvenue\Orderify\Plugins\Checkout\MageplazaLayoutProcessor"
+                sortOrder="200"/>
+    </type>
+
+    <!-- Dedicated date-rotating log: var/log/carpetavenue/orderify/payment_icons_YYYY-MM-DD.log -->
+    <virtualType name="CarpetAvenue\Orderify\Logger\PaymentIconsLogger"
+                 type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">CarpetAvenue\Orderify\Logger\Handler\PaymentIconsLog</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payment-icon sheet importer logs to its own date-rotating log. -->
+    <type name="CarpetAvenue\Orderify\Model\PaymentIcon\SheetImporter">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\Orderify\Logger\PaymentIconsLogger</argument>
+        </arguments>
+    </type>
+
+    <!-- Dedicated date-rotating log: var/log/carpetavenue/orderify/adyen_auto_invoice_YYYY-MM-DD.log -->
+    <virtualType name="CarpetAvenue\Orderify\Logger\AdyenInvoiceLogger"
+                 type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">CarpetAvenue\Orderify\Logger\Handler\AdyenInvoiceLog</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Adyen auto-invoice cron + services log to their own date-rotating log. -->
+    <type name="CarpetAvenue\Orderify\Cron\ProcessAdyenInvoices">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\Orderify\Logger\AdyenInvoiceLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="CarpetAvenue\Orderify\Service\AdyenInvoice\Processor">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\Orderify\Logger\AdyenInvoiceLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="carpetavenue_orderify_payment_icons_update" xsi:type="object">CarpetAvenue\Orderify\Console\Command\UpdatePaymentIconsCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>

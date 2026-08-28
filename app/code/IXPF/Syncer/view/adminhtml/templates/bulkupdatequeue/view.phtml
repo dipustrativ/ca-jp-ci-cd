@@ -1,0 +1,263 @@
+<?php
+/**
+ * @var \IXPF\Syncer\Block\Adminhtml\BulkUpdateQueue\View $block
+ */
+$queue = $block->getQueueData();
+?>
+
+<div class="page-actions">
+    <button class="action-back" onclick="location.href='<?= $block->escapeUrl($block->getBackUrl()) ?>'" type="button">
+        <span><?= $block->escapeHtml(__('Back')) ?></span>
+    </button>
+</div>
+
+<?php if ($queue && $queue->getId()): ?>
+<div class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Bulk Update Queue Information')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__field">
+            <label class="admin__field-label"><strong><?= $block->escapeHtml(__('ID:')) ?></strong></label>
+            <div class="admin__field-value"><?= $block->escapeHtml($queue->getId()) ?></div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label"><strong><?= $block->escapeHtml(__('Store ID:')) ?></strong></label>
+            <div class="admin__field-value"><?= $block->escapeHtml($queue->getData('store_id')) ?></div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label"><strong><?= $block->escapeHtml(__('IXPF Batch ID:')) ?></strong></label>
+            <div class="admin__field-value"><?= $block->escapeHtml($queue->getData('ixpf_batch_id')) ?></div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label"><strong><?= $block->escapeHtml(__('Status:')) ?></strong></label>
+            <div class="admin__field-value">
+                <span class="grid-severity-<?= $block->escapeHtmlAttr(strtolower($queue->getData('status'))) ?>">
+                    <?= $block->escapeHtml(ucfirst($queue->getData('status'))) ?>
+                </span>
+            </div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label"><strong><?= $block->escapeHtml(__('Created At:')) ?></strong></label>
+            <div class="admin__field-value"><?= $block->escapeHtml($queue->getData('created_at')) ?></div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label"><strong><?= $block->escapeHtml(__('Updated At:')) ?></strong></label>
+            <div class="admin__field-value"><?= $block->escapeHtml($queue->getData('updated_at')) ?></div>
+        </div>
+    </div>
+</div>
+
+<?php if ($queue->getData('payload')): ?>
+<div class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Payload Data')) ?></span>
+        <button class="action-secondary collapse-all" data-target="payload-viewer" style="float: right;">
+            <span><?= $block->escapeHtml(__('Collapse All')) ?></span>
+        </button>
+        <button class="action-secondary expand-all" data-target="payload-viewer" style="float: right; margin-right: 10px;">
+            <span><?= $block->escapeHtml(__('Expand All')) ?></span>
+        </button>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="json-viewer-container" id="payload-viewer" data-json="<?= $block->getJsonData($queue->getData('payload')) ?>"></div>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php if ($queue->getData('response_result')): ?>
+<div class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Response Result')) ?></span>
+        <button class="action-secondary collapse-all" data-target="response-viewer" style="float: right;">
+            <span><?= $block->escapeHtml(__('Collapse All')) ?></span>
+        </button>
+        <button class="action-secondary expand-all" data-target="response-viewer" style="float: right; margin-right: 10px;">
+            <span><?= $block->escapeHtml(__('Expand All')) ?></span>
+        </button>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="json-viewer-container" id="response-viewer" data-json="<?= $block->getJsonData($queue->getData('response_result')) ?>"></div>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php if ($queue->getData('error_message')): ?>
+<div class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Error Message')) ?></span>
+        <button class="action-secondary collapse-all" data-target="error-viewer" style="float: right;">
+            <span><?= $block->escapeHtml(__('Collapse All')) ?></span>
+        </button>
+        <button class="action-secondary expand-all" data-target="error-viewer" style="float: right; margin-right: 10px;">
+            <span><?= $block->escapeHtml(__('Expand All')) ?></span>
+        </button>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="json-viewer-container error-content" id="error-viewer" data-json="<?= $block->getJsonData($queue->getData('error_message')) ?>"></div>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php if ($queue->getData('ixpf_response')): ?>
+<div class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('IXPF Response')) ?></span>
+        <button class="action-secondary collapse-all" data-target="ixpf-viewer" style="float: right;">
+            <span><?= $block->escapeHtml(__('Collapse All')) ?></span>
+        </button>
+        <button class="action-secondary expand-all" data-target="ixpf-viewer" style="float: right; margin-right: 10px;">
+            <span><?= $block->escapeHtml(__('Expand All')) ?></span>
+        </button>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="json-viewer-container" id="ixpf-viewer" data-json="<?= $block->getJsonData($queue->getData('ixpf_response')) ?>"></div>
+    </div>
+</div>
+<?php endif; ?>
+
+<style>
+.admin__field {
+    margin-bottom: 15px;
+}
+.admin__field-label {
+    display: inline-block;
+    width: 150px;
+    vertical-align: top;
+}
+.admin__field-value {
+    display: inline-block;
+}
+.json-viewer-container {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+}
+.json-toggle {
+    cursor: pointer;
+    user-select: none;
+    display: inline-block;
+    width: 12px;
+    color: #666;
+    font-size: 10px;
+    margin-right: 3px;
+}
+.json-toggle:hover {
+    color: #333;
+}
+.json-content-collapsed {
+    display: none;
+}
+.json-content-expanded {
+    display: block;
+}
+.json-key {
+    color: #881391;
+    font-weight: bold;
+}
+.json-string {
+    color: #1A1AA6;
+}
+.json-number {
+    color: #1C00CF;
+}
+.json-boolean {
+    color: #0D22AA;
+    font-weight: bold;
+}
+.json-null {
+    color: #808080;
+    font-style: italic;
+}
+.json-bracket {
+    color: #000000;
+    font-weight: bold;
+}
+.json-colon {
+    color: #000000;
+}
+.json-comma {
+    color: #000000;
+}
+.json-item {
+    margin: 2px 0;
+}
+.error-content .json-key {
+    color: #d9534f;
+}
+.grid-severity-pending {
+    color: #ff9800;
+    font-weight: bold;
+}
+.grid-severity-processing {
+    color: #2196F3;
+    font-weight: bold;
+}
+.grid-severity-completed {
+    color: #4CAF50;
+    font-weight: bold;
+}
+.grid-severity-failed {
+    color: #f44336;
+    font-weight: bold;
+}
+.admin__page-section {
+    margin-bottom: 30px;
+    border: 1px solid #e3e3e3;
+    padding: 20px;
+}
+.admin__page-section-title {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e3e3e3;
+}
+.admin__page-section-title .title {
+    font-size: 18px;
+    font-weight: 600;
+}
+.page-actions {
+    margin-bottom: 20px;
+}
+</style>
+
+<script>
+require([
+    'jquery',
+    'IXPF_Syncer/js/json-viewer'
+], function($, jsonViewer) {
+    'use strict';
+
+    $(document).ready(function() {
+        // Initialize JSON viewers
+        jsonViewer.init();
+
+        // Collapse all functionality
+        $('.collapse-all').on('click', function() {
+            var target = $(this).data('target');
+            $('#' + target).find('.json-toggle-expanded').each(function() {
+                $(this).click();
+            });
+        });
+
+        // Expand all functionality
+        $('.expand-all').on('click', function() {
+            var target = $(this).data('target');
+            $('#' + target).find('.json-toggle-collapsed').each(function() {
+                $(this).click();
+            });
+        });
+    });
+});
+</script>
+
+<?php else: ?>
+<div class="message message-error error">
+    <div><?= $block->escapeHtml(__('Queue record not found.')) ?></div>
+</div>
+<?php endif; ?>
+

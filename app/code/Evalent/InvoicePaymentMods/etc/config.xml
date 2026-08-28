@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <evinvoicepayment>
+                <active>1</active>
+                <model>Evalent\InvoicePaymentMods\Model\Payment</model>
+                <order_status>processing</order_status>
+                <title>Invoice Payment by e-mail.</title>
+                <allowspecific>0</allowspecific>
+                <group>offline</group>
+                <show_grand_total_tax_invoice_pdf>1</show_grand_total_tax_invoice_pdf>
+            </evinvoicepayment>
+        </payment>
+    </default>
+</config>

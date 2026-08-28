@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Matrixrate carrier customizations -->
+    <preference for="WebShopApps\MatrixRate\Model\ResourceModel\Carrier\Matrixrate" type="Evalent\MatrixRateMods\OverWrite\Model\ResourceModel\Carrier\Matrixrate" />
+    <preference for="Evalent\MatrixRateMods\Api\ConfigInterface" type="Evalent\MatrixRateMods\Model\Config" />
+    <type name="WebShopApps\MatrixRate\Model\Carrier\Matrixrate">
+        <plugin name="evalent_matrixratemods_model_carrier_matrixrate" type="Evalent\MatrixRateMods\Plugin\Model\Carrier\Matrixrate" />
+    </type>
+
+    <!-- Shipping mods -->
+    <preference for="\Magento\Ups\Model\Carrier" type="\Evalent\MatrixRateMods\Plugin\Ups\Model\Carrier" />
+    <preference for="WebShopApps\MatrixRate\Model\Carrier\Matrixrate" type="\Evalent\MatrixRateMods\OverWrite\MatrixRate\Model\Carrier" />
+    <type name="Magento\Shipping\Helper\Data">
+        <plugin name="evalent_ups_tracking" type="Evalent\MatrixRateMods\Plugin\Shipping\Helper\Data"/>
+    </type>
+<!--    There is some weird issue with klarna and matrixrate where the street and city is removed from the shipping address.-->
+<!--     This takes the city and street from billing address as these are the same in Klarna-->
+    <type name="Magento\Quote\Model\ValidationRules\ShippingAddressValidationRule">
+        <plugin name="evalent_missing_required_fields_fix" type="Evalent\MatrixRateMods\Plugin\Shipping\Validator\FixRequiredFields"/>
+    </type>
+
+</config>

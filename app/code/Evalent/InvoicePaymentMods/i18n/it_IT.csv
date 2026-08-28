@@ -1,0 +1,23 @@
+"Invoice: ","Fattura: "
+"Order: ","Ordine: "
+"Customer Number: ","Numero cliente: "
+"Invoice Date: ","Data fattura: "
+"Sold to:","Venduto a:"
+"CA - Sold to:","Venduto a:"
+"Ship to:","Spedire a:"
+"Payment Method:","Metodo di pagamento:"
+"Shipping Method:","Metodo di Spedizione:"
+"Order Summary","Riepilogo Ordine"
+Products,Prodotti
+"SKU",Cod.Art.
+"CA - SKU",Cod.Art.
+Price,Prezzo
+Quantity,Qtà
+Subtotal,Subtotale
+"Subtotal:","Subtotale:"
+"Tax",IVA
+"CA - Tax",IVA
+"CA - Grand Total (Excl. Tax)","Totale Complessivo escl. IVA"
+"CA - Grand Total (Incl. Tax)","Totale Complessivo incl. IVA"
+"CA - Qty","Qtà"
+"CA - Ship to:","Spedire a:"

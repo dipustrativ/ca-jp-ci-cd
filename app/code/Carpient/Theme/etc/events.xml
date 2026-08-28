@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpient. All rights reserved.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!--
+        Safety net: IXPF product create (Syncer purchase flow) saves the product
+        with no stock_data, so no legacy cataloginventory_stock_item row is ever
+        created. Without that row the product is skipped by the stock-status
+        indexer, drops out of the catalog salability join, and renders on the
+        storefront with no price / add-to-cart even when enabled. This observer
+        backfills a default stock item on save when one is missing.
+    -->
+    <event name="catalog_product_save_after">
+        <observer name="carpient_theme_ensure_stock_item"
+                  instance="Carpient\Theme\Observer\EnsureStockItem"/>
+    </event>
+</config>

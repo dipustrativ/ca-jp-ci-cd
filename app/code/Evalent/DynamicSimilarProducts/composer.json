@@ -1,0 +1,22 @@
+{
+    "name": "evalent/module-dynamicsimilarproducts",
+    "description": "Add related products to products based on category and other attribute. ",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "email": "tobias.nilsson@evalent.com",
+            "name": "Tobias Nilsson"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Evalent\\DynamicSimilarProducts\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}

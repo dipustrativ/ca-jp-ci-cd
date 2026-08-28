@@ -1,0 +1,79 @@
+<?php
+/** @var \CarpetAvenue\Widget\Block\Widget\CategoryList $block */
+?>
+<div class="block widget block-categories-list carpets-overview grid">
+    <div class="block-title">
+        <h2 class="widget_category-maincategory-name">
+            <?php echo __($block->getMainCategory()->getName()); ?>
+        </h2>
+        <div class="widget_category-btn-holder">
+            <a href="<?= $block->getMainCategory()->getUrl()?>" class="widget_category-show-all"><?= __("Show All")?></a>
+        </div>
+        <div class="category-description">
+            <div class="content">
+            <?php echo __($block->getMainCategory()->getDescription()); ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <?php $i = 0; foreach ($block->getSubCategories() as $category): $thumbnail = $category->getThumbnail(); ?>
+
+        <?php if($category->getLevel() <= 4 && $_subDescription = $category->getDescription()): ?>
+
+        <?php if($i > 0): ?></div><?php endif; ?>
+
+                <div class="category-view-holder category-view col-xs-12">
+
+                <div class="row">
+                    <?php if ($thumbnail):?>
+                        <div class="category-image cover col-md-2 col-xs-4 mb0--xs pb10--md">
+                            <img src="<?= $block->getImageUrl($thumbnail, 200, 200) ?>" alt="<?= $category->getName() ?>">
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="category description col-xs-12 col-md-10 pb15--xs pb10--md">
+                        <h3 class="widget_category-maincategory-name">
+                            <?php echo __($category->getName()); ?>
+                        </h3>
+                        <div class="content">
+                            <?php if ($thumbnail): ?>
+                                <img src="<?= $block->getImageUrl($thumbnail, 200, 200) ?>" alt="<?= $category->getName() ?>" class="category-image--mobile">
+                            <?php endif; ?>
+
+                            <?php echo strip_tags($_subDescription, ['<br>','<p>']); ?>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+    <?php if($i < count($block->getSubCategories())): ?><div class="children row"><?php endif; ?>
+
+        <?php else: ?>
+
+                <div class="widget_category-item col-xs-6 col-md-2 col-lg-2">
+
+                    <a href="<?= $category->getUrl() ?>">
+
+                        <?php if ($thumbnail):?>
+                            <div class="widget_category-image">
+                                <img src="<?= $block->getImageUrl($thumbnail, 200, 200) ?>" alt="<?= $category->getName() ?>">
+                            </div>
+                        <?php endif; ?>
+
+                        <span class="widget_category-title">
+                            <?php echo $category->getName(); ?>
+                        </span>
+                    </a>
+                </div>
+
+
+            <?php endif; ?>
+
+
+        <?php $i++; endforeach; ?>
+    </div>
+</div>
+</div>

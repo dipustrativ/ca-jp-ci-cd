@@ -1,0 +1,883 @@
+//
+//  Carpient header: USP bar, menu divider, menu bar + language switcher
+//  (split out of _carpient_footer.less — these rules are header-only)
+//  _____________________________________________
+
+//
+//  Hide wishlist in the header (account links + wishlist widget)
+//  _____________________________________________
+.page-header {
+    .link.wishlist,
+    .header.links .wishlist,
+    .wish.wrapper {
+        display: none !important;
+    }
+}
+
+//
+//  Luma's common section sets `.page-header { margin-bottom: @indent__base }`,
+//  which lands on every breakpoint. Phones want the header flush against the
+//  first content block, so drop it there only — desktop keeps the 20px.
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .page-header {
+        margin-bottom: 0;
+    }
+}
+
+//
+//  Inset divider line before the menu (carpient.com look)
+//  _____________________________________________
+.carpient-menu-divider {
+    border: 0;
+    border-top: 1px solid #e6e6e6;
+    height: 0;
+    margin: 0 auto;
+    padding: 0;
+    max-width: @ca-max-width;
+}
+
+//
+//  Carpient header USP bar (carpient.com look: plum strip, white icons + text)
+//
+//  Sizing follows the live carpient.com `cc-icons-with-text` section: 24px icons,
+//  12px text, and `--space-unit` (4px) padding — 2 units desktop / 3 units mobile,
+//  which puts the desktop strip at exactly 40px tall.
+//  _____________________________________________
+@usp-max:     1440px;
+@usp-plum:    #532a41;
+@usp-icon:    24px;
+@usp-pad-v:   8px;
+
+.carpient-usp-bar {
+    background: @usp-plum;
+    color: #ffffff;
+    font-size: 1.2rem;
+    position: relative;
+
+    // Equal columns with each item centred in its own column — same as the live
+    // `auto-cols-3` + `justify-center` grid. `space-between` would instead pin the
+    // first item flush left and the last flush right, with no room at the edges.
+    .carpient-usp-list {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        align-items: center;
+        gap: 20px;
+        list-style: none;
+        margin: 0 auto;
+        max-width: @usp-max;
+        padding: @usp-pad-v 20px;
+
+        li {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0;
+            color: #ffffff;
+            line-height: @usp-icon;
+        }
+
+        .usp-icon {
+            width: @usp-icon;
+            height: @usp-icon;
+            display: inline-block;
+            vertical-align: middle;
+            flex: 0 0 auto;
+        }
+    }
+
+    // Arrows only exist while slick is running (mobile); prev is never shown.
+    .carpient-usp-prev { display: none !important; }
+    .carpient-usp-next { display: none; }
+}
+
+//
+//  Mobile (< @screen__m): slick shows one USP at a time — swipe or chevron.
+//  Slick owns the track/transform; this only styles the slide and the chevron.
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .carpient-usp-bar {
+        // Clip the plain 3-across row until slick takes over: left to overflow it
+        // widens the document, and slick then measures that too-wide width.
+        overflow: hidden;
+
+        .carpient-usp-list.slick-initialized {
+            display: block;
+            max-width: none;
+            padding: 0;
+
+            li {
+                justify-content: center;
+                padding: 12px 44px;
+                box-sizing: border-box;
+                text-align: center;
+            }
+        }
+
+        .carpient-usp-next {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 44px;
+            padding: 0;
+            border: 0;
+            background: none;
+            box-shadow: none;
+            color: #ffffff;
+            cursor: pointer;
+            z-index: 2;
+
+            &:hover,
+            &:focus,
+            &:active {
+                background: none;
+                border: 0;
+                box-shadow: none;
+                color: #ffffff;
+            }
+
+            svg {
+                width: 20px;
+                height: 20px;
+                display: block;
+            }
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__s) {
+    .carpient-usp-bar {
+        .carpient-usp-list {
+            li {
+                gap: 8px;
+                padding: 12px 40px;
+            }
+
+            .usp-icon { width: 20px; height: 20px; }
+        }
+
+        .carpient-usp-next { width: 40px; }
+    }
+}
+
+//
+//  Menu bar extras: "Contact us" pill (menu row, right) and the utility row
+//  below it (About us | currency | language) — carpient.com "announcement" row.
+//  Both live inside .navigation.megamenu; see Evalent_MegaMenu/…/topmenu.phtml.
+//  _____________________________________________
+@nav-util-border: #d9d9d9;
+@nav-cta-bg:      #333333;
+
+//  Mobile off-canvas drawer: tab-bar height (Luma's is 71px and its content
+//  offset is hard-coded to match, so both move together), hairline and text.
+@nav-tab-h:       56px;
+@nav-tab-border:  #e6e6e6;
+@nav-drawer-text: #111111;
+
+//  Mega-dropdown tiles: 7 across on a wide desktop, capped image height.
+@nav-tile-cols:   7;
+@nav-tile-img:    180px;
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    // Menu bar: white background, black items (carpient.com)
+    .page-header .sections.nav-sections,
+    .nav-sections,
+    .nav-sections .navigation,
+    .navigation.megamenu {
+        background: #ffffff !important;
+    }
+
+    .page-header .sections.nav-sections {
+        position: relative;
+        //border-bottom: 1px solid #e6e6e6;
+    }
+
+    .navigation .level0 > .level-top,
+    .navigation .level0.active > .level-top,
+    .navigation .level0.has-active > .level-top,
+    .navigation .level0 > .level-top .ui-menu-icon:after,
+    .navigation .level0 > .level-top:after {
+        color: #111111 !important;
+    }
+
+    .navigation .level0 > .level-top:hover,
+    .navigation .level0.active > .level-top {
+        color: #000000 !important;
+    }
+
+    // Dropdown submenu panel: white background, dark text
+    .navigation.megamenu .submenu {
+        background: #ffffff !important;
+        border: 1px solid #e6e6e6;
+    }
+
+    .navigation.megamenu .submenu a,
+    .navigation.megamenu .submenu .megamenu__child-title,
+    .navigation.megamenu .submenu h3 {
+        color: #111111 !important;
+    }
+
+    .nav-sections { position: relative; }
+
+    // The menu <ul>, the CTA and the utility row share one wrap-flex row: the ul
+    // takes the free space, the pill sits at its right end, and the utility row
+    // is forced onto a second line. No hard-coded menu-row height anywhere.
+    // The pill FLOATS instead of being a flex/grid sibling of the menu <ul>.
+    // The mega-dropdown is `position: absolute; width: 100%` inside that <ul>, so
+    // any layout that narrows the <ul> narrows the whole dropdown with it; a float
+    // leaves the <ul> full width and only makes the menu items flow around it.
+    // Right edge lines up with the utility row's last item (both 20px in), which
+    // is how the reference stacks them.
+    .carpient-nav-cta {
+        float: right;
+        position: relative;
+        z-index: 99999;
+    }
+
+    .carpient-nav-utils {
+        clear: both;
+    }
+
+    // "Contact us" — small dark pill with an envelope icon
+    .carpient-contact-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 14px;
+        border-radius: 4px;
+        background: @nav-cta-bg;
+        border: 1px solid @nav-cta-bg;
+        color: #fff !important;
+        font-size: 1.3rem;
+        line-height: 1;
+        white-space: nowrap;
+
+        &:before {
+            content: '';
+            flex: 0 0 auto;
+            width: 15px;
+            height: 15px;
+            background-color: currentColor;
+            -webkit-mask: url('@{baseDir}images/icon-mail.svg') no-repeat center;
+            mask: url('@{baseDir}images/icon-mail.svg') no-repeat center;
+            -webkit-mask-size: contain;
+            mask-size: contain;
+        }
+
+        &:hover,
+        &:focus {
+            background: #5a5a5a;
+            border-color: #5a5a5a;
+            color: #ffffff;
+            text-decoration: none;
+        }
+    }
+
+    // Utility row — right aligned, pipe-separated
+    .carpient-nav-utils {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        // The row renders next to .navigation, not inside it (it must stay out of
+        // that block_html-cached block — see Magento_Theme/layout/default.xml), so
+        // restate what it used to inherit from `.navigation`: Figtree and weight 600.
+        font-family: 'Figtree', @font-family__base, sans-serif;
+        font-weight: 600;
+        // Content-box by default here, so the 40px of padding would be added on
+        // top of the 100% flex-basis and push a horizontal scrollbar onto the page.
+        box-sizing: border-box;
+        font-size: 1.3rem;
+
+        > * {
+            padding: 0 14px;
+            border-left: 1px solid @nav-util-border;
+            line-height: 1.2;
+        }
+
+        > *:first-child { border-left: 0; }
+        > *:last-child { padding-right: 0; }
+
+        .carpient-about-link {
+            color: #111111;
+
+            &:hover { color: #000000; text-decoration: underline; }
+        }
+
+        // Both switchers: blank hides .nav-sections .switcher on desktop
+        .switcher {
+            display: block !important;
+            margin: 0;
+            color: #111111;
+
+            > .label { .lib-visually-hidden(); }
+
+            .switcher-options { position: relative; }
+
+            .switcher-trigger {
+                cursor: pointer;
+
+                // Magento_Store shifts the trigger -45px on desktop and hides the
+                // store name; here the name is the label, so undo both and keep
+                // the flag :before in the padding it frees up.
+                > strong {
+                    left: 0 !important;
+                    position: relative;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 1.3rem;
+                    font-weight: 400;
+
+                    &:before { left: 0 !important; }
+
+                    > span { display: inline !important; }
+
+                    // Chevron
+                    &:after {
+                        content: '';
+                        width: 7px;
+                        height: 7px;
+                        margin-bottom: 3px;
+                        border-right: 1px solid currentColor;
+                        border-bottom: 1px solid currentColor;
+                        transform: rotate(45deg);
+                    }
+                }
+            }
+
+            // Flag sits in the trigger's left padding (language switcher only).
+            // 24x18 and a 10px gap to the label — the same flag box and gap the
+            // dropdown rows use, so trigger and rows read as one control.
+            &.switcher-language .switcher-trigger > strong {
+                padding-left: 34px;
+
+                &:before {
+                    width: 24px;
+                    height: 18px;
+                }
+            }
+
+            .switcher-dropdown {
+                display: none;
+                list-style: none;
+                margin: 0;
+                padding: 8px 0;
+                position: absolute;
+                right: 0;
+                // 4px of air so the panel reads as attached to the trigger rather
+                // than welded to it.
+                top: calc(~"100% + 4px");
+                z-index: 200;
+                // Hug the widest row. The panel is right-aligned to the trigger
+                // (it is the last item in the row, so it cannot open rightwards),
+                // and a fixed min-width padded it out to the LEFT with ~40px of
+                // dead space — which is what pushed it out from under the trigger
+                // and over "About us".
+                min-width: 0;
+                width: max-content;
+                background: #ffffff;
+                border: 1px solid #e6e6e6;
+                box-shadow: 0 3px 8px rgba(0, 0, 0, .15);
+                text-align: left;
+
+                li { margin: 0; }
+
+                // Magento_Store pins the flag at a fixed `top: 8px`, which lands
+                // between rows at this row height — centre it instead.
+                .switcher-option:before {
+                    top: 50%;
+                    left: 16px;
+                    margin-top: -9px;
+                    width: 24px;
+                    height: 18px;
+                }
+            }
+
+            .switcher-trigger.active ~ .switcher-dropdown,
+            .switcher-options.active .switcher-dropdown { display: block; }
+        }
+
+        // Selector is this long on purpose: it has to out-specify
+        // `.page-header .switcher.language .options ul.dropdown a { margin-left: 37px }`
+        // from Magento_Store's theme extend, which is (0,5,2).
+        .page-header & .switcher .switcher-options ul.switcher-dropdown li a {
+            display: block;
+            margin-left: 0;
+            padding: 8px 16px 8px 50px; // room for the flag :before
+            color: #333333 !important;
+            font-size: 1.2rem;
+
+            &:hover { color: #000000; background: #f6f6f6; text-decoration: none; }
+        }
+
+        .page-header & .switcher-currency .switcher-options ul.switcher-dropdown li a {
+            padding-left: 16px;
+        }
+    }
+
+    //
+    //  Sticky, phase 2: only the logo row stays pinned. sticky-header.js adds
+    //  .sticky-compact 50px after .sticky-pin.
+    //  _____________________________________________
+    .sticky.wrapper.sticky-compact {
+        // Only the menu row drops; the divider stays as the hairline under the
+        // pinned logo row (otherwise the compact header has no bottom edge).
+        .sections.nav-sections {
+            display: none;
+        }
+    }
+
+    //
+    //  Mega-dropdown: ONE level only, every child an equal tile in a single row
+    //  (carpient.com). Level-2 panels never open on desktop.
+    //
+    //  Every selector here is prefixed with `.page-header` on purpose. The rules
+    //  it has to beat live in an inline <style> inside Evalent_MegaMenu's
+    //  topmenu.phtml — same specificity as the un-prefixed selector and later in
+    //  the document, so `!important` alone loses.
+    //  _____________________________________________
+    .page-header .navigation.megamenu li.level0 > ul.submenu {
+        // Fixed 7 columns, `minmax(0, 1fr)` so a wide caption can never push a
+        // column past its share. Stepped down on narrower desktops below.
+        grid-template-columns: repeat(@nav-tile-cols, minmax(0, 1fr)) !important;
+        gap: 28px 20px !important;
+        padding: 30px 20px 34px !important;
+        // Stretch, not start: cells take the row height so every caption lands on
+        // the same line even when one child has no image or a shorter one.
+        align-items: stretch;
+        // Flush under the menu row: the <ul> is the containing block, so 100% of
+        // it is exactly the row height — no hard-coded 40px.
+        top: 100% !important;
+        border-top: 1px solid #e6e6e6;
+        border-bottom: 1px solid #e6e6e6;
+
+        // Module draws a 1px #ccc rule at `right: -25px`; the reference has none.
+        &:after {
+            display: none !important;
+        }
+    }
+
+    //  Luma bridges the 10px gap between menu items with a `:hover:after` box at
+    //  `left: 100%`. Our `.level0` is `position: static`, so that box resolves
+    //  against the full-width <ul> instead of the item and lands at 1920–1930 —
+    //  10px of horizontal page scroll for as long as a menu is hovered.
+    .page-header .navigation .level0:hover:after {
+        display: none;
+    }
+
+    //  The module paints two plates behind the panel — a `rgba(0,0,0,.5)` dim over
+    //  the whole page (`__backdrop-wrapper`, 100vw so it also shows as a grey
+    //  sliver either side of the panel) and a `#eee` plate the height of the panel
+    //  (`__backdrop-container`). The reference dropdown is plain white on an
+    //  undimmed page, so both paint nothing. They stay in the DOM: mega-menu.js
+    //  uses the wrapper as the hover-out region that closes the menu.
+    .page-header .megamenu__backdrop-wrapper,
+    .page-header .megamenu__backdrop-container {
+        background: none;
+    }
+
+    //  …and it must not take the pointer either. It starts 40px below the nav top,
+    //  which is exactly where the menu's second row sits once the items wrap
+    //  (≤1279px). Hovering a second-row item opened the panel, the overlay then
+    //  covered the item, the pointer "left" it and the panel shut again — those
+    //  menus could not be opened at all. Nothing under it needs clicking now that
+    //  it paints nothing; mega-menu.js only reads it in its mouseleave test, and
+    //  with the pointer falling through to the nav that test still holds.
+    .page-header .megamenu__backdrop-wrapper {
+        pointer-events: none;
+    }
+
+    // No second level, and no drill-in caret to hint at one.
+    .page-header .navigation.megamenu ul.submenu ul.submenu,
+    .page-header .navigation.megamenu ul.submenu .ui-menu-icon {
+        display: none !important;
+    }
+
+    // A child with sub-children is still just a tile — same box as the others.
+    .page-header .navigation.megamenu li.level0 > ul.submenu > li.level1 {
+        display: block;
+        width: auto;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+
+        // Caption pinned to the bottom of the (stretched) cell, so tiles whose
+        // image is shorter — or missing — still line their captions up with the
+        // rest of the row instead of floating halfway up.
+        > a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+            padding: 0;
+        }
+
+        // Images are CAPPED, never stretched: a big rug photo comes down to
+        // @nav-tile-img tall, while a small swatch (Colors / Shapes menus) keeps
+        // its own size and the row simply gets shorter.
+        //
+        // `width: fit-content`, not `auto` — the wrapper is a block, so `auto`
+        // means "fill the column", which is what stretched the tiles and exposed
+        // the module's #eee filler band around the image.
+        //
+        // Both the wrapper and the img need `aspect-ratio: auto` and explicit
+        // `object-fit`: the module pins them to `2 / 1` + `cover`, which crops
+        // and re-proportions whatever the category image actually is.
+        .megamenu__child-image.picture {
+            display: block;
+            // It is a flex item of the column <a>, which is as tall as the
+            // stretched row: unpinned, a taller neighbour in the same row would
+            // shrink this image to fit rather than grow the row.
+            flex: 0 0 auto;
+            width: fit-content;
+            height: auto;
+            max-width: 100%;
+            max-height: @nav-tile-img;
+            aspect-ratio: auto;
+            background: none;
+            clip-path: none;
+            overflow: hidden;
+            margin: 0 auto;
+            padding: 0;
+
+            img {
+                display: block;
+                width: auto;
+                height: auto;
+                max-width: 100%;
+                max-height: @nav-tile-img;
+                aspect-ratio: auto;
+                margin: 0 auto;
+                object-fit: contain;
+                object-position: center;
+            }
+        }
+
+        .megamenu__child-title {
+            width: 100%;
+            margin-top: 12px;
+            text-align: center;
+            font-size: 1.3rem;
+            line-height: 1.3;
+        }
+    }
+
+    // "Show all …" / promo blocks: normal last cells, not blocks pinned outside
+    // the panel at `left: 100%`.
+    .page-header .navigation.megamenu li.level0 > ul.submenu > .category-all,
+    .page-header .navigation.megamenu li.level0 > ul.submenu > .all-category--bottom,
+    .page-header .navigation.megamenu li.level0 > ul.submenu > li.megamenu--block:not(.Carpient) {
+        position: static !important;
+        transform: none !important;
+        top: auto !important;
+        left: auto !important;
+        width: auto !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        text-align: center !important;
+
+        &:after {
+            display: none !important;
+        }
+
+        a {
+            text-align: center !important;
+            width: auto !important;
+            padding: 0 !important;
+        }
+    }
+
+    // Menu items start on the container's padding edge, level with the search
+    // icon above them (module ships an 8px inset).
+    .page-header .navigation.megamenu > ul {
+        padding: 0 64px !important;
+    }
+
+    //  Column count steps down as the desktop narrows, so a tile never gets
+    //  squeezed below a readable width.
+    //
+    //  Nested inside this mixin, not written as a top-level `@media`: the mixin
+    //  body compiles into styles-l.css (where the repeat(7) base rule lives),
+    //  while a top-level media query lands in styles-m.css — which the page loads
+    //  first, so styles-l would win and the step-down would never apply.
+    @media (max-width: 1279px) {
+        .page-header .navigation.megamenu li.level0 > ul.submenu {
+            grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+        }
+    }
+
+    @media (max-width: 1023px) {
+        .page-header .navigation.megamenu li.level0 > ul.submenu {
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        }
+    }
+}
+
+//
+//  Mobile — the CTA and the utility row render inside the off-canvas drawer
+//  (they are children of .navigation.megamenu), so lay them out as plain rows.
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    // It separates the logo row from the menu row; there is no menu row here.
+    .carpient-menu-divider {
+        display: none;
+    }
+
+    // Column flex only to re-order: the pill is first in the DOM (it floats on
+    // desktop), but in the drawer it belongs under the category list. Drill-down
+    // submenus are `position: fixed` on mobile, so flexing the nav is safe.
+    .navigation.megamenu {
+        display: flex;
+        flex-direction: column;
+
+        // Evalent_MegaMenu gives the list `min-height: 100vh` as a "viewport" for
+        // its drill-down panels. Those panels are `position: fixed`, so they do
+        // not need it, and it would strand these rows ~700px below the last
+        // category with nothing in between.
+        > ul {
+            order: 0;
+            min-height: 0;
+        }
+
+        .carpient-nav-cta { order: 1; }
+
+        .carpient-nav-utils { order: 2; }
+
+        .megamenu__backdrop-wrapper { order: 3; }
+    }
+
+    .carpient-nav-cta {
+        padding: 18px 15px 6px;
+    }
+
+    // `.navigation a { display: block }` (Luma mobile) otherwise stretches the
+    // pill across the whole drawer.
+    .nav-sections .carpient-contact-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 18px;
+        background: @nav-cta-bg;
+        color: #ffffff;
+        font-size: 1.4rem;
+        line-height: 1;
+
+        &:before {
+            content: '';
+            flex: 0 0 auto;
+            width: 17px;
+            height: 17px;
+            background-color: currentColor;
+            -webkit-mask: url('@{baseDir}images/icon-mail.svg') no-repeat center;
+            mask: url('@{baseDir}images/icon-mail.svg') no-repeat center;
+            -webkit-mask-size: contain;
+            mask-size: contain;
+        }
+    }
+
+    .carpient-nav-utils {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        // Same reason as the desktop rule above: no longer inside `.navigation`.
+        font-family: 'Figtree', @font-family__base, sans-serif;
+        font-weight: 600;
+
+        // Luma's mobile nav pads links inside .nav-sections; zero it so the link
+        // starts on the same 15px edge as the pill above and the menu rows.
+        .nav-sections & .carpient-about-link {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+            color: @nav-drawer-text;
+            font-size: 1.4rem;
+        }
+
+        // The drawer already carries a language list in its own tab; this second
+        // copy (the desktop utility-row one) would just duplicate it.
+        .switcher {
+            display: none;
+        }
+    }
+
+    //
+    //  Drawer chrome: tab bar, menu rows, language tab.
+    //
+    //  Mobile rules for the megamenu's own internals live in the inline <style>
+    //  in Evalent_MegaMenu/…/topmenu.phtml (that module's mobile LESS is not
+    //  compiled into styles-m.css). Everything here is drawer-level — the tab
+    //  bar and the switcher are plain Magento_Theme markup — so it belongs in
+    //  the theme's LESS.
+    //  _____________________________________________
+    .nav-sections {
+        background: #ffffff;
+
+        // "Account" (store.links) renders empty: the account links were moved to
+        // the header's person icon, so the tab opens onto nothing. Drop it and
+        // let the two real tabs split the bar.
+        .nav-sections-item-title[aria-controls="store.links"],
+        .nav-sections-item-content[id="store.links"] {
+            display: none;
+        }
+
+        .nav-sections-item-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            width: 50%;
+            height: @nav-tab-h;
+            padding: 0;
+            background: #f4f4f4;
+            border: 0;
+            border-bottom: 1px solid @nav-tab-border;
+
+            // The Pe-icon glyph (set on div[aria-controls=…] in _extend.less)
+            &:before {
+                color: #6b6b6b;
+                font-size: 2.1rem;
+            }
+
+            // Settings is language-only here (currency stays hidden while one
+            // currency is allowed) — one flag glyph, not flag + banknote.
+            &[aria-controls="store.settings"]:before {
+                content: "\e654";
+            }
+
+            .nav-sections-item-switch {
+                color: #4a4a4a;
+                font-size: 1.2rem;
+                font-weight: 600;
+                letter-spacing: .02em;
+            }
+
+            // Inset shadow, not a border: a real border would change the tab
+            // height and desync it from the content's margin-top.
+            &.active {
+                background: #ffffff;
+                border-bottom-color: transparent;
+                box-shadow: inset 0 -2px 0 @usp-plum;
+
+                &:before { color: @usp-plum; }
+
+                .nav-sections-item-switch { color: @nav-drawer-text; }
+            }
+        }
+
+        // Luma hard-codes 71px here to clear its own 71px tab bar.
+        .nav-sections-item-content {
+            margin-top: @nav-tab-h;
+            padding: 0 0 24px !important; // beats topmenu.phtml's inline `10px 0 !important`
+        }
+
+        // Menu rows. `.navigation` is the black desktop bar (_extend.less); in
+        // the drawer it sits on white, so both the fill and the white item text
+        // have to come back to the light-background pair.
+        .navigation {
+            background: #ffffff;
+
+            .level0 > .level-top,
+            .level0 > .level-top .megamenu__child-title,
+            .submenu a,
+            .submenu .megamenu__child-title {
+                color: @nav-drawer-text;
+            }
+
+            .level0 > .level-top {
+                padding: 14px 44px 14px 15px;
+                font-size: 1.5rem;
+                font-weight: 500;
+                line-height: 1.3;
+            }
+        }
+    }
+
+    //
+    //  Language tab — a titled list, not a dropdown. Magento leaves the list
+    //  open on mobile (nothing toggles it), so the trigger is the "current"
+    //  row and the <ul> below is the picker.
+    //  _____________________________________________
+    .page-header .nav-sections-item-content[id="store.settings"] {
+        .switcher.language {
+            margin: 0;
+            padding: 0;
+            border-top: 0;
+            font-size: 1.4rem;
+            font-weight: 400;
+
+            // The tab above the panel is already titled "Language".
+            > .label {
+                .lib-visually-hidden();
+            }
+
+            // Flags: Magento_Store hangs them outside the text box (`left: -35px`
+            // on the trigger, `left: 2px` on the options) — inside a padded
+            // drawer that puts them off the edge. Put both in the row's padding.
+            .switcher-trigger {
+                padding: 0;
+
+                > strong {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 12px 15px;
+                    color: @nav-drawer-text;
+                    font-size: 1.4rem;
+                    font-weight: 600;
+
+                    &:before {
+                        position: static;
+                        flex: 0 0 24px;
+                        width: 24px;
+                        height: 18px;
+                        background-size: 100% 100%;
+                    }
+                }
+            }
+
+            ul.switcher-dropdown {
+                display: block;
+                margin: 0;
+                padding: 0;
+                list-style: none;
+
+                // Row hairlines inset 15px, same as the category rows.
+                > li.switcher-option {
+                    margin: 0 15px;
+                    border-top: 1px solid @nav-tab-border;
+
+                    &:before {
+                        top: 50%;
+                        left: 0;
+                        margin-top: -9px;
+                        width: 24px;
+                        height: 18px;
+                    }
+                }
+            }
+
+            // Long selector on purpose: it has to out-specify
+            // `.page-header .switcher.language .options ul.dropdown a { margin-left: 37px }`
+            // from Magento_Store's theme extend, which is (0,5,2).
+            .switcher-options ul.switcher-dropdown li.switcher-option a {
+                display: block;
+                margin: 0;
+                padding: 12px 0 12px 36px; // 24 flag + 12 gap, inside the li's 15px inset
+                color: @nav-drawer-text;
+                font-size: 1.4rem;
+                text-decoration: none;
+            }
+        }
+    }
+}

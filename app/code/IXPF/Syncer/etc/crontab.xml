@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/crontab.xsd">
+    <group id="default">
+        <job name="ixpf_changeable_product" instance="IXPF\Syncer\Cron\Product" method="execute">
+            <schedule>*/1 * * * *</schedule>
+        </job>
+        <job name="ixpf_changeable_order" instance="IXPF\Syncer\Cron\Order" method="execute">
+            <schedule>*/1 * * * *</schedule>
+        </job>
+        <job name="ixpf_changeable_customer" instance="IXPF\Syncer\Cron\Customer" method="execute">
+            <schedule>*/2 * * * *</schedule>
+        </job>
+        <job name="ixpf_webhook_pending_job_dispatch" instance="IXPF\Syncer\Cron\WebhookJobDispatch" method="execute">
+            <schedule>*/1 * * * *</schedule>
+        </job>
+        <job name="ixpf_webhook_failed_job_dispatch" instance="IXPF\Syncer\Cron\WebhookFailedJobDispatch" method="execute">
+            <schedule>*/10 * * * *</schedule>
+        </job>
+        <!--<job name="ixpf_purchase_product_create_and_response_to_ixpf" instance="IXPF\Syncer\Cron\Purchase" method="execute">
+            <schedule>*/1 * * * *</schedule>
+        </job>-->
+        <job name="ixpf_photo_studio_previous_image_webhook" instance="IXPF\Syncer\Cron\ProductGallery" method="execute">
+            <schedule>*/1 * * * *</schedule>
+        </job>
+        <job name="ixpf_photo_studio_webhook_trigger" instance="IXPF\Syncer\Cron\PhotoGalleryWebhookTrigger" method="execute">
+            <schedule>*/1 * * * *</schedule>
+        </job>
+        <job name="ixpf_photo_studio_failed_webhook" instance="IXPF\Syncer\Cron\ProductGalleryFailed" method="execute">
+            <schedule>*/10 * * * *</schedule>
+        </job>
+        <job name="ixpf_photo_studio_pipeline" instance="IXPF\Syncer\Cron\PhotoStudioPipeline" method="execute">
+            <schedule>*/1 * * * *</schedule>
+        </job>
+
+
+        <job name="ixpf_bulk_update_revert_async_job" instance="IXPF\Syncer\Cron\BulkRevert" method="execute">
+            <schedule>*/1 * * * *</schedule>
+        </job>
+
+    </group>
+</config>

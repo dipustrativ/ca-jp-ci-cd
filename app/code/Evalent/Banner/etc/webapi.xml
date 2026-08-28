@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+	<route method="POST" url="/V1/evalent-banners/banner">
+		<service class="Evalent\Banner\Api\BannerRepositoryInterface" method="save"/>
+		<resources>
+			<resource ref="Evalent_Banner::Banner_create"/>
+		</resources>
+	</route>
+	<route method="GET" url="/V1/evalent-banners/banner/search">
+		<service class="Evalent\Banner\Api\BannerRepositoryInterface" method="getList"/>
+		<resources>
+			<resource ref="Evalent_Banner::Banner_view"/>
+		</resources>
+	</route>
+	<route method="GET" url="/V1/evalent-banners/banner/:bannerId">
+		<service class="Evalent\Banner\Api\BannerRepositoryInterface" method="get"/>
+		<resources>
+			<resource ref="Evalent_Banner::Banner_view"/>
+		</resources>
+	</route>
+	<route method="PUT" url="/V1/evalent-banners/banner/:bannerId">
+		<service class="Evalent\Banner\Api\BannerRepositoryInterface" method="save"/>
+		<resources>
+			<resource ref="Evalent_Banner::Banner_update"/>
+		</resources>
+	</route>
+	<route method="DELETE" url="/V1/evalent-banners/banner/:bannerId">
+		<service class="Evalent\Banner\Api\BannerRepositoryInterface" method="deleteById"/>
+		<resources>
+			<resource ref="Evalent_Banner::Banner_delete"/>
+		</resources>
+	</route>
+</routes>

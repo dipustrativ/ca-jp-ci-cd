@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @package CarpetAvenue_B2B
+ * @author  Strativ Magento Team
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="CarpetAvenue\B2B\Block\Adminhtml\Reseller\View"
+                   name="carpetavenue_b2b_reseller_view"
+                   template="CarpetAvenue_B2B::reseller/view.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

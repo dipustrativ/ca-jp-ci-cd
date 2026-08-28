@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- Hide breadcrumbs, page title and subcategories collection on category view -->
+        <referenceBlock name="breadcrumbs" remove="true"/>
+        <referenceBlock name="page.main.title" remove="true"/>
+        <referenceBlock name="top.category.content" remove="true"/>
+        <referenceBlock name="top.category.heading" remove="true"/>
+
+        <!-- Transparent centered hero: category name + short description (ported from carpient.com transparent color-scheme section) -->
+        <referenceContainer name="columns.top">
+            <block class="Magento\Catalog\Block\Category\View"
+                   name="category.hero.transparent"
+                   template="Magento_Catalog::category/transparent-hero.phtml"
+                   before="-"/>
+        </referenceContainer>
+
+        <!-- Bottom category-view holder (parity with carpetavenue/rugs):
+             cover image (picture) + description with Read more/less, pinned to
+             the bottom of content after the product grid. -->
+        <referenceBlock name="category.image" template="Magento_Catalog::product/view/title-image.phtml"/>
+        <referenceContainer name="content">
+            <block class="Magento\Catalog\Block\Category\View"
+                   name="category.view.container"
+                   template="Magento_Catalog::category/view-holder.phtml"
+                   after="-"/>
+        </referenceContainer>
+        <move element="category.image" destination="category.view.container" before="-"/>
+        <move element="category.description" destination="category.view.container" after="-"/>
+    </body>
+</page>

@@ -1,0 +1,18 @@
+<?php
+/**
+ * Copyright © Carpient. All rights reserved.
+ *
+ * Styles live in web/css/source/_extend.less (.carpient-notfound).
+ * Translations live in the theme's i18n/<locale>.csv files.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ */
+?>
+<div class="carpient-notfound">
+    <p class="carpient-notfound__code">404</p>
+    <h1 class="carpient-notfound__title"><?= $block->escapeHtml(__('Page not found')) ?></h1>
+    <p class="carpient-notfound__text"><?= $block->escapeHtml(__('Sorry, the page you requested does not exist.')) ?></p>
+    <a class="carpient-notfound__button" href="<?= $block->escapeUrl($block->getBaseUrl()) ?>">
+        <?= $block->escapeHtml(__('Back to home')) ?>
+    </a>
+</div>

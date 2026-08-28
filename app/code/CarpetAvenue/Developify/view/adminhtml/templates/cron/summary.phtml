@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Developify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/** @var \CarpetAvenue\Developify\Block\Adminhtml\Cron\Summary $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$counts = $block->getCounts();
+?>
+<div class="developify-cron-summary">
+    <?php foreach ($counts as $status => $count): ?>
+        <div class="developify-cron-tile developify-cron-tile-<?= $escaper->escapeHtmlAttr($status) ?>">
+            <span class="developify-cron-tile-count"><?= $escaper->escapeHtml((string) $count) ?></span>
+            <span class="developify-cron-tile-label"><?= $escaper->escapeHtml($block->getStatusLabel($status)) ?></span>
+        </div>
+    <?php endforeach; ?>
+</div>
+<p class="developify-cron-summary-note">
+    <?= $escaper->escapeHtml(
+        __('Counts cover the most recent %1 schedule rows, cached for 60 seconds.', number_format($block->getWindow()))
+    ) ?>
+</p>

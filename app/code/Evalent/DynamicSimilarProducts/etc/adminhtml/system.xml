@@ -1,0 +1,87 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+		<section id="catalog">
+			<resource>Evalent_DynamicSimilarProducts::config_evalent_dynamicsimilarproducts</resource>
+			<group id="dynamic_related_products" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+				<label>Dynamic Related Products</label>
+				<field id="enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="select">
+					<label>Enabled</label>
+					<comment>If not enabled, Magento will use its default method for related product</comment>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+				<field id="list_size" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="5" translate="label" type="text">
+					<label>List size</label>
+					<comment>Amount of products which will be displayed in frontend</comment>
+				</field>
+				<field id="use_parent_category_threshold" showInDefault="1" sortOrder="6" translate="label" type="text">
+					<label>User Parent Category Threshold</label>
+					<comment>If result is lower than this, use the parent category to get a wider result</comment>
+				</field>
+				<field id="attribute_1" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+					<label>Main attribute</label>
+					<comment>The main attribute which will be in the sorting</comment>
+					<source_model>Evalent\DynamicSimilarProducts\Model\Source\Product\Attribute</source_model>
+				</field>
+				<field id="attribute_1_clause" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+					<label>Main attribute clause</label>
+					<comment>Must/Should</comment>
+					<source_model>Evalent\DynamicSimilarProducts\Model\Source\Search\Clause</source_model>
+				</field>
+				<field id="attribute_1_boost" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="12" translate="label" type="text">
+					<label>Main attribute Boost value</label>
+					<comment>Boost score for main attribute</comment>
+					<validate>validate-zero-or-greater</validate>
+				</field>
+				<field id="attribute_1_ignore" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="13" translate="label" type="select">
+					<label>Ignore similarity on value</label>
+					<comment>Ignore similarity on attriubte value</comment>
+					<source_model>Evalent\DynamicSimilarProducts\Model\Source\Product\Color</source_model>
+				</field>
+				<field id="attribute_2" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="select">
+					<label>Secondary Attribute</label>
+					<comment>The secondary attribute which will be in the sorting</comment>
+					<source_model>Evalent\DynamicSimilarProducts\Model\Source\Product\Attribute</source_model>
+				</field>
+				<field id="attribute_2_width" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="21" translate="label" type="text">
+					<label>Attribute 2 width</label>
+					<comment>Percent to use when matching on width and height</comment>
+					<validate>required-entry validate-zero-or-greater</validate>
+				</field>
+				<field id="attribute_3" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="22" translate="label" type="select">
+					<label>Tertiary Attribute</label>
+					<comment>The tertiary attribute which will be in the sorting</comment>
+					<source_model>Evalent\DynamicSimilarProducts\Model\Source\Product\Attribute</source_model>
+				</field>
+				<field id="attribute_3_boost" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="23" translate="label" type="text">
+					<label>Tertiary attribute Boost value</label>
+					<comment>Boost score for tertiary attribute</comment>
+					<validate>validate-zero-or-greater</validate>
+				</field>
+				<field id="attribute_3_clause" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="24" translate="label" type="select">
+					<label>Tertiary attribute clause</label>
+					<comment>Must/Should</comment>
+					<source_model>Evalent\DynamicSimilarProducts\Model\Source\Search\Clause</source_model>
+				</field>
+                <field id="attributes_sort_by" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="multiselect">
+                    <label>Attributes to Sort By</label>
+                    <comment>Make these attributes available to sort by</comment>
+                    <source_model>Evalent\DynamicSimilarProducts\Model\Source\Product\AttributeSortby</source_model>
+                </field>
+				<field id="button_font_size" showInDefault="1" showInStore="1" showInWebsite="1" canRestore="1" sortOrder="40" translate="label" type="select">
+					<label>Button font size on product page</label>
+					<comment>Change button font size to avoid text overlapping in different languages</comment>
+					<source_model>Evalent\DynamicSimilarProducts\Model\Source\Product\FontSize</source_model>
+				</field>
+				<field id="button_font_weight" showInDefault="1" showInStore="1" showInWebsite="1" canRestore="1" sortOrder="50" translate="label" type="select">
+					<label>Button font weight on product page</label>
+					<comment>Change button font weight</comment>
+					<source_model>Evalent\DynamicSimilarProducts\Model\Source\Product\FontWeight</source_model>
+				</field>
+				<field id="button_text" showInDefault="1" showInStore="1" showInWebsite="1" canRestore="1" sortOrder="60" translate="label" type="text">
+					<label>Button text</label>
+				</field>
+			</group>
+		</section>
+	</system>
+</config>

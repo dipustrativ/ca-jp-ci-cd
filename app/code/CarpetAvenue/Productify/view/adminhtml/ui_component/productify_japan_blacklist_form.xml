@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">productify_japan_blacklist_form.productify_japan_blacklist_form_data_source</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+
+    <settings>
+        <buttons>
+            <button name="back" class="CarpetAvenue\Productify\Block\Adminhtml\JapanBlacklist\Button\Back"/>
+            <button name="save" class="CarpetAvenue\Productify\Block\Adminhtml\JapanBlacklist\Button\Save"/>
+        </buttons>
+        <namespace>productify_japan_blacklist_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>productify_japan_blacklist_form.productify_japan_blacklist_form_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="productify_japan_blacklist_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">CarpetAvenue\Productify\Ui\DataProvider\Form\BlacklistAddDataProvider</argument>
+            <argument name="name" xsi:type="string">productify_japan_blacklist_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+        </argument>
+
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+
+        <settings>
+            <submitUrl path="*/*/save"/>
+        </settings>
+    </dataSource>
+
+
+    <fieldset name="productify_japan_blacklist_form_fieldset">
+        <settings>
+            <label/>
+        </settings>
+
+        <field name="sku" formElement="input">
+            <settings>
+                <label translate="true">SKU</label>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+    </fieldset>
+</form>

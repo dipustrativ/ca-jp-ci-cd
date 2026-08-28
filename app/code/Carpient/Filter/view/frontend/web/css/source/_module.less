@@ -1,0 +1,971 @@
+//
+//  Carpient_Filter — horizontal filter bar + inline dropdown panels.
+//  Mirrors the carpient.com reference. Scoped under .carpient-filter so it
+//  never affects other themes/stores that keep the CarpetAvenue modal shell.
+//  _____________________________________________
+
+//  Prefixed @cfilter-*, not @cf-*: the theme's _carpient_footer.less declares
+//  @cf-border (and @cf-black/@cf-grey/@cf-max) too. LESS variables are global
+//  and the last declaration in the merged scope wins for every use, so sharing
+//  the @cf- prefix silently handed this file the footer's dark-on-dark
+//  rgba(255,255,255,.15) — an invisible border on a white toolbar.
+@cfilter-border:      #e0e0e0;
+@cfilter-border-dark: #111;
+@cfilter-text:        #1a1a1a;
+@cfilter-muted:       #8c8c8c;
+@cfilter-accent:      #111;
+@cfilter-cta:         #e8853f;
+
+.carpient-filter {
+    position: relative;
+    margin: 6px 0 20px;
+
+    &__bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px 12px;
+        padding-bottom: 14px;
+        //  Divider under the filter bar — matches reference (#ebebeb, 1px).
+        border-bottom: 1px solid #ebebeb;
+    }
+
+    &__group {
+        position: relative;
+    }
+
+    //  Filter button
+    &__toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        padding: 9px 14px;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        color: @cfilter-text;
+        font-size: 1.4rem;
+        font-weight: 600;
+        line-height: 1.2;
+        cursor: pointer;
+    }
+
+    &__caret {
+        transition: transform 0.15s ease;
+        color: @cfilter-muted;
+    }
+
+    &__group.-open &__toggle {
+        border-color: #fff;
+    }
+
+    &__group.-open &__caret {
+        transform: rotate(180deg);
+    }
+
+    //  Dropdown panel
+    &__panel {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        z-index: 60;
+        width: max-content;
+        min-width: 300px;
+        max-width: 560px;
+        padding: 16px;
+        background: #fff;
+        border: 1px solid #e6e6e6;
+        border-radius: 6px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    &__options {
+        max-height: 340px;
+        overflow-y: auto;
+    }
+
+    //  Option list (reused CarpetAvenue renderer markup)
+    .am-filter-items {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .am-filter-item {
+        margin: 0;
+        padding: 0;
+
+        + .am-filter-item {
+            margin-top: 2px;
+        }
+    }
+
+    .am-filter-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 6px;
+        border-radius: 4px;
+        color: @cfilter-text;
+        font-size: 1.4rem;
+        line-height: 1.3;
+        text-decoration: none;
+        cursor: pointer;
+
+        &:hover {
+            background: #f5f5f5;
+        }
+    }
+
+    .am-filter-checkbox {
+        flex: 0 0 auto;
+        width: 18px;
+        height: 18px;
+        border: 1.5px solid #c4c4c4;
+        border-radius: 3px;
+        background: #fff;
+        position: relative;
+        box-sizing: border-box;
+    }
+
+    .am-filter-item.-selected {
+        .am-filter-checkbox {
+            border-color: @cfilter-accent;
+            background: @cfilter-accent;
+
+            &:after {
+                content: '';
+                position: absolute;
+                left: 5px;
+                top: 1px;
+                width: 5px;
+                height: 10px;
+                border: solid #fff;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+        }
+    }
+
+    .am-filter-label {
+        flex: 1 1 auto;
+    }
+
+    //  ── Options that carry an uploaded image (via admin "Setting" modal) ──
+    //  Default (e.g. Shape): the image is a small icon on the left of the row,
+    //  label + count follow inline — carpient.com "Shape" look. The swatch just
+    //  replaces the checkbox; the normal row layout is kept.
+    .am-filter-swatch {
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        background-color: transparent;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        box-sizing: border-box;
+    }
+
+    //  Selected state for icon-row options (Shape etc.): ring the icon + bold
+    //  the label + tint the row, mirroring the checkbox "checked" cue. Color has
+    //  its own circular selected style further down (higher specificity wins).
+    .am-filter-item.-has-image.-selected {
+        .am-filter-link {
+            background: #f5f5f5;
+        }
+
+        .am-filter-swatch {
+            border-radius: 4px;
+            box-shadow: 0 0 0 2px @cfilter-accent;
+        }
+
+        .am-filter-label {
+            color: @cfilter-text;
+            font-weight: 600;
+        }
+    }
+
+    //  Shape (and any imaged, non-color attribute): two columns of icon rows.
+    .am-filter--shape {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(150px, 1fr));
+        gap: 2px 28px;
+
+        .am-filter-item + .am-filter-item {
+            margin-top: 0;
+        }
+    }
+
+    //  Color: 5-column grid of ringed circular swatches, label beneath.
+    .am-filter--color {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 18px 10px;
+        min-width: 420px;
+
+        .am-filter-item {
+            margin: 0;
+
+            + .am-filter-item {
+                margin-top: 0;
+            }
+        }
+
+        .am-filter-item.-has-image {
+            .am-filter-link {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+                padding: 2px;
+                text-align: center;
+
+                &:hover {
+                    background: none;
+                }
+            }
+
+            //  Outer light ring; the image sits inside with a small white gap.
+            .am-filter-swatch {
+                width: 52px;
+                height: 52px;
+                border-radius: 50%;
+                background-color: #fff;
+                background-size: 74%;
+                border: 1px solid #e0e0e0;
+                transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            }
+
+            .am-filter-label {
+                flex: 0 0 auto;
+                color: #4d4d4d;
+                font-size: 1.25rem;
+                line-height: 1.2;
+            }
+
+            .count {
+                display: none;
+            }
+
+            .am-filter-link:hover .am-filter-swatch {
+                border-color: #b8b8b8;
+            }
+
+            &.-selected .am-filter-swatch {
+                border-color: @cfilter-accent;
+                box-shadow: 0 0 0 1px @cfilter-accent;
+            }
+        }
+    }
+
+    //  Size + Production type: two columns of large bordered "pill" buttons;
+    //  selected = filled dark (carpient.com "Size" look). No checkbox, no count.
+    .am-filter--size_group,
+    .am-filter--production_type {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px 16px;
+        min-width: 440px;
+
+        .am-filter-item {
+            margin: 0;
+
+            + .am-filter-item {
+                margin-top: 0;
+            }
+        }
+
+        .am-filter-checkbox,
+        .count {
+            display: none;
+        }
+
+        .am-filter-link {
+            justify-content: center;
+            height: 48px;
+            padding: 0 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1.4rem;
+            text-align: center;
+
+            &:hover {
+                background: #f5f5f5;
+            }
+        }
+
+        .am-filter-label {
+            flex: 0 0 auto;
+        }
+
+        .am-filter-item.-selected .am-filter-link {
+            background: @cfilter-accent;
+            border-color: @cfilter-accent;
+            color: #fff;
+
+            &:hover {
+                background: @cfilter-accent;
+            }
+        }
+    }
+
+    .am-filter-item .count {
+        flex: 0 0 auto;
+        color: @cfilter-muted;
+        font-size: 1.2rem;
+    }
+
+    .am-filter-item.-disabled .am-filter-link {
+        opacity: 0.4;
+        cursor: default;
+
+        &:hover {
+            background: none;
+        }
+    }
+
+    //  Price / decimal range slider inside a panel (carpient.com reference):
+    //  unit-prefixed input boxes, thick black track, round handles, tick labels.
+    .am-price-slider {
+        min-width: 440px;
+        padding: 6px 10px 4px;
+
+        &-inputs {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        //  Bordered rounded field: unit addon on the left, borderless input fill.
+        .am-price-field {
+            display: flex;
+            align-items: center;
+            flex: 1 1 0;
+            height: 44px;
+            padding: 0 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .am-price-units {
+            flex: 0 0 auto;
+            margin-right: 8px;
+            color: @cfilter-text;
+            font-size: 1.4rem;
+        }
+
+        .input-text {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            text-align: center;
+            font-size: 1.4rem;
+            color: @cfilter-text;
+
+            &:focus {
+                box-shadow: none;
+                outline: none;
+            }
+
+            //  Hide number-spinner arrows.
+            &::-webkit-outer-spin-button,
+            &::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+        }
+
+        .am-price-sep {
+            flex: 0 0 auto;
+            color: @cfilter-text;
+        }
+
+        //  jQuery-UI slider track + range + handles.
+        &-track.ui-slider {
+            position: relative;
+            height: 4px;
+            margin: 6px 12px 0;
+            background: @cfilter-accent;
+            border: 0;
+            border-radius: 2px;
+
+            .ui-slider-range {
+                background: @cfilter-accent;
+                border-radius: 2px;
+            }
+
+            .ui-slider-handle {
+                //  z-index 0, not jQuery UI's default: inside the mobile drawer
+                //  the handles otherwise paint over the sticky header and the
+                //  Show Rugs bar as you scroll past them. They still sit above
+                //  the range fill, which precedes them in the DOM.
+                z-index: 0;
+                width: 24px;
+                height: 24px;
+                top: 50%;
+                margin-top: -12px;
+                margin-left: -12px;
+                background: #fff;
+                border: 2px solid @cfilter-accent;
+                border-radius: 50%;
+                cursor: pointer;
+                outline: none;
+                box-sizing: border-box;
+                //  Claim the gesture so the drawer does not scroll under the drag.
+                touch-action: none;
+            }
+        }
+
+        //  Evenly-spaced value labels under the track.
+        .am-price-ticks {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 4px 0;
+
+            .am-price-tick {
+                color: @cfilter-muted;
+                font-size: 1.2rem;
+            }
+        }
+    }
+
+    //  Apply button — pill outline, left-aligned (carpient.com reference).
+    &__apply-wrap {
+        margin-top: 20px;
+    }
+
+    &__apply {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-width: 150px;
+        margin: 0;
+        padding: 12px 30px;
+        background: #fff;
+        border: 1.5px solid @cfilter-border-dark;
+        border-radius: 999px;
+        color: @cfilter-text;
+        font-size: 1.4rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s ease, color 0.15s ease;
+
+        &:hover {
+            background: @cfilter-accent;
+            color: #fff;
+        }
+
+        .am-items {
+            color: inherit;
+        }
+    }
+
+    //  Applied-filter chips row
+    &__state {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 12px;
+        margin-top: 18px;
+    }
+
+    &__statelabel {
+        color: @cfilter-text;
+        font-size: 1.4rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    //  Extra classes needed to beat blank's default link colour.
+    &__clear.action.clear {
+        margin-left: 4px;
+        color: @cfilter-text;
+        font-size: 1.4rem;
+        text-decoration: underline;
+
+        &:hover,
+        &:visited {
+            color: @cfilter-text;
+        }
+    }
+}
+
+//
+//  Desktop: the mobile chrome is markup that always renders, so hide it here
+//  rather than in the shared block — that way the max-@screen__m rules never
+//  have to out-rank a hide they'd otherwise be fighting across breakpoints.
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .carpient-filter__open,
+    .carpient-filter__drawerhead,
+    .carpient-filter__showwrap {
+        display: none;
+    }
+
+    //  Align the first label with the chips row / product count gutter.
+    //  Keyed off the group index — the hidden drawer head is child one.
+    .carpient-filter__group[data-filter-group="0"] > .carpient-filter__toggle {
+        padding-left: 0;
+    }
+}
+
+//  Full-width layout keeps the plain vertical filter helpers hidden
+.page-layout-fullwidth-filter {
+    .carpient-filter {
+        .block-title.filter-title {
+            display: none;
+        }
+    }
+}
+
+//
+//  Sort listbox — replaces the native <select> at every breakpoint.
+//  Built by filter-dropdown.js; the select stays as the form's source of truth.
+//  _____________________________________________
+.carpient-sort {
+    position: relative;
+    display: inline-flex;
+
+    &__toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        background: none;
+        border: 0;
+        color: @cfilter-text;
+        font-size: 1.5rem;
+        line-height: 1.2;
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+            background: none;
+            color: @cfilter-text;
+        }
+    }
+
+    &__caret {
+        flex: none;
+        color: @cfilter-text;
+        transition: transform .15s ease;
+    }
+
+    &.-open &__caret {
+        transform: rotate(180deg);
+    }
+
+    &__list {
+        position: absolute;
+        top: ~'calc(100% + 8px)';
+        right: 0;
+        z-index: 70;
+        min-width: 100%;
+        width: max-content;
+        margin: 0;
+        padding: 6px 0;
+        list-style: none;
+        background: #fff;
+        border: 1px solid @cfilter-border;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, .12);
+
+        &[hidden] {
+            display: none;
+        }
+
+        li {
+            margin: 0;
+        }
+    }
+
+    &__option {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 10px 16px;
+        background: none;
+        border: 0;
+        color: @cfilter-text;
+        font-size: 1.4rem;
+        white-space: nowrap;
+        text-align: left;
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+            background: #f5f5f5;
+            color: @cfilter-text;
+        }
+
+        &.-active {
+            text-decoration: underline;
+        }
+    }
+}
+
+//
+//  Mobile (< @screen__m): the horizontal bar is replaced by a single "Filter"
+//  button docked in the product toolbar next to Sort By (carpient.com mobile
+//  reference), and the bar itself becomes a right-hand off-canvas drawer whose
+//  groups are accordion rows. Desktop markup is unchanged — only presentation.
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+
+    //  Toolbar row: [ Sort By ⌄ | Filter ⚌ ], product count on its own row.
+    .toolbar-products.carpient-filter-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        gap: 0;
+        margin-bottom: 20px;
+        //  Reference draws rules, not a card: one above the control row, one
+        //  between it and the count, one under the count. No side borders, no
+        //  radius — so the count reads as its own row, outside the box.
+        border-top: 1px solid @cfilter-border;
+        border-bottom: 1px solid @cfilter-border;
+
+        .toolbar-sorter {
+            order: 2;
+            flex: 1 1 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            gap: 5px;
+            margin: 0;
+            padding: 0 12px;
+            border-left: 1px solid @cfilter-border;
+            box-sizing: border-box;
+        }
+
+        .toolbar-sorter.-has-listbox .sorter-label {
+            display: inline-block;
+            margin-right: 0px;
+            color: @cfilter-muted;
+            font-size: 1.3rem;
+            font-weight: 400;
+            white-space: nowrap;
+        }
+
+        //  Blank's asc/desc arrow is redundant next to the listbox on mobile.
+        .sorter-action {
+            display: none;
+        }
+
+        .carpient-filter__open {
+            order: 1;
+            flex: 1 1 50%;
+        }
+
+        //  "Items 1-24 of 1210" drops below the control row, full width, with
+        //  its own rule above it.
+        .toolbar-amount {
+            order: 3;
+            flex: 1 0 100%;
+            margin: 0;
+            padding: 14px 2px;
+            border-top: 1px solid @cfilter-border;
+            text-align: left;
+        }
+    }
+
+    .carpient-filter {
+        position: static;
+        margin: 6px 0 14px;
+
+        //  Drawer trigger. Styled here rather than in the toolbar block so it
+        //  still looks right in the split second before JS docks it.
+        &__open {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            box-sizing: border-box;
+            width: 100%;
+            height: 46px;
+            margin: 0;
+            padding: 0 14px;
+            background: #fff;
+            border: 0;
+            border-radius: 0;
+            color: @cfilter-text;
+            font-size: 1.4rem;
+            font-weight: 500;
+            line-height: 1.2;
+            cursor: pointer;
+
+            &:hover,
+            &:focus {
+                background: #fff;
+                color: @cfilter-text;
+            }
+        }
+
+        //  ── The bar, as an off-canvas drawer ──
+        &__bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            //  Above the sticky header: this theme runs z-indexes up to 99999
+            //  (see .carpient-nav-cta), so anything lower gets painted over.
+            z-index: 100001;
+            box-sizing: border-box;
+            //  Column flex, not block: it pins the header to the top and the
+            //  CTA to the bottom (margin-top:auto) without either leaving the
+            //  scroll container, which `position: fixed` children do not
+            //  survive reliably on iOS.
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            align-items: stretch;
+            //  Full-bleed on mobile: the groups and their option grids get the
+            //  whole viewport, no scrim gutter down the side.
+            width: 100%;
+            max-width: none;
+            padding: 0 16px 0;
+            border-bottom: 0;
+            background: #fff;
+            box-shadow: -8px 0 28px rgba(0, 0, 0, .18);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            transform: translate3d(100%, 0, 0);
+            transition: transform .28s cubic-bezier(.4, 0, .2, 1);
+            visibility: hidden;
+        }
+
+        &.-drawer-open &__bar {
+            transform: translate3d(0, 0, 0);
+            visibility: visible;
+        }
+
+        //  Scrim behind the open drawer.
+        &.-drawer-open:after {
+            content: '';
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100000;
+            background: rgba(0, 0, 0, .35);
+        }
+
+        //  Reference header: back chevron pinned left, title centred and
+        //  uppercase. Grid (not space-between) so the title stays centred on
+        //  the panel regardless of the chevron's width.
+        &__drawerhead {
+            flex: 0 0 auto;
+            display: grid;
+            grid-template-columns: 32px 1fr auto;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            margin: 0 -16px;
+            padding: 14px 16px;
+            background: #fff;
+            border-bottom: 1px solid #ebebeb;
+        }
+
+        &__clearall {
+            grid-column: 3;
+            justify-self: end;
+            white-space: nowrap;
+            color: @cfilter-muted;
+            font-size: 1.2rem;
+            text-decoration: underline;
+        }
+
+        &__drawertitle {
+            grid-column: 2;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            text-align: center;
+            color: @cfilter-text;
+        }
+
+        &__close {
+            grid-column: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 32px;
+            height: 32px;
+            margin: 0;
+            padding: 0;
+            background: none;
+            border: 0;
+            color: @cfilter-text;
+            cursor: pointer;
+        }
+
+        //  Sticky apply CTA. Carries .am-apply-close, so filter-ajax's batch
+        //  mode applies the staged selection and keeps .am-items live.
+        &__showwrap {
+            position: sticky;
+            bottom: 0;
+            z-index: 1;
+            box-sizing: border-box;
+            //  Pushed to the bottom when the groups are all collapsed, sticky
+            //  once they are open and the drawer scrolls.
+            margin: auto -16px 0;
+            padding: 12px 16px;
+            background: #fff;
+            border-top: 1px solid #ebebeb;
+        }
+
+        &__show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            margin: 0;
+            padding: 15px 16px;
+            // ponytail: sampled by eye off the reference screenshot — confirm
+            // the exact brand hex and swap here, it is used nowhere else.
+            background: @cfilter-cta;
+            border: 0;
+            border-radius: 3px;
+            color: @cfilter-text;
+            font-size: 1.4rem;
+            font-weight: 600;
+            cursor: pointer;
+
+            &:hover,
+            &:focus {
+                background: darken(@cfilter-cta, 6%);
+                color: @cfilter-text;
+            }
+        }
+
+        //  One CTA at the bottom replaces the per-group Apply pills.
+        &__apply-wrap {
+            display: none;
+        }
+
+        //  ── Groups become accordion rows ──
+        &__group {
+            position: static;
+            flex: 0 0 auto;
+            border-bottom: 1px solid #ebebeb;
+        }
+
+        &__toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 16px 2px;
+            font-size: 1.5rem;
+        }
+
+        //  Panel: in flow, full width. Every desktop min-width below is what
+        //  made this overflow a phone viewport.
+        &__panel {
+            position: static;
+            width: auto;
+            min-width: 0;
+            max-width: none;
+            padding: 0 2px 18px;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        //  Long option lists scroll inside their own block rather than making
+        //  the whole drawer long — matches the inner scrollbar the reference
+        //  shows on Color.
+        &__options {
+            max-height: 46vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .am-filter--color {
+            grid-template-columns: repeat(4, 1fr);
+            min-width: 0;
+            gap: 16px 8px;
+
+            .am-filter-item.-has-image .am-filter-swatch {
+                width: 46px;
+                height: 46px;
+            }
+        }
+
+        .am-filter--shape {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2px 12px;
+        }
+
+        .am-filter--size_group,
+        .am-filter--production_type {
+            min-width: 0;
+            gap: 8px 10px;
+        }
+
+        .am-price-slider {
+            min-width: 0;
+            padding: 6px 2px 4px;
+        }
+
+        &__apply {
+            width: 100%;
+        }
+    }
+
+    //  ── Sort listbox: fills its half of the toolbar row, panel goes full width
+    .carpient-sort {
+        display: block;
+        width: auto;
+
+        &__toggle {
+            display: flex;
+            justify-content: center;
+            width: auto;
+            height: 46px;
+            padding: 0px;
+            font-size: 1.4rem;
+        }
+
+        &__caret {
+            color: @cfilter-muted;
+        }
+
+        &__list {
+            top: 100%;
+            left: -60%;
+            right: -1px;
+            width: fit-content;
+        }
+    }
+
+    //  Freeze the page behind the drawer.
+    body.carpient-filter-drawer-open {
+        overflow: hidden;
+
+        //  .columns is `position: relative; z-index: 1`, which makes it a
+        //  stacking context — every z-index inside it, however large, is
+        //  flattened to 1 at root level, so the header logo (z-index: 5) paints
+        //  over the drawer. Dropping to `auto` stops .columns forming a context
+        //  at all, and only while the drawer is open.
+        .columns {
+            z-index: auto;
+        }
+    }
+}

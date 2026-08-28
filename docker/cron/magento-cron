@@ -1,0 +1,9 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Magento default cron group — orders, emails, cache flush, etc.
+# `. /etc/magento-env.sh` first: crond hands its children a bare environment, so
+# without it every getenv() in app/etc/env.php returns false and falls back to
+# the template defaults (DB_HOST -> "db", which does not resolve; empty
+# MAGE_CRYPT_KEY; etc). docker/entrypoint.sh writes the file at container start.
+* * * * * www-data . /etc/magento-env.sh && php -d memory_limit=2048M /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log 2>&1

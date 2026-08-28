@@ -1,0 +1,33 @@
+<!--@subject New Reseller Application — {{var company_name}}@-->
+<!--@vars {
+"var name":"Applicant Name",
+"var email":"Applicant Email",
+"var company_name":"Company Name",
+"var homepage":"Homepage",
+"var business_type":"Type of Business",
+"var sales_channels":"Sales Channels",
+"var message":"Message",
+"var application_id":"Application ID"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<table border="0" cellpadding="0" cellspacing="0" style="width:100%;">
+    <tr>
+        <td>
+            <h1>{{trans "New Reseller Application"}}</h1>
+            <p>{{trans "A new reseller application has been submitted (#%application_id)." application_id=$application_id}}</p>
+
+            <table border="0" cellpadding="6" cellspacing="0" style="width:100%; border-collapse:collapse;">
+                <tr><td style="font-weight:bold; width:180px;">{{trans "Name"}}</td><td>{{var name}}</td></tr>
+                <tr><td style="font-weight:bold;">{{trans "Email"}}</td><td>{{var email}}</td></tr>
+                <tr><td style="font-weight:bold;">{{trans "Company Name"}}</td><td>{{var company_name}}</td></tr>
+                <tr><td style="font-weight:bold;">{{trans "Homepage"}}</td><td>{{var homepage}}</td></tr>
+                <tr><td style="font-weight:bold;">{{trans "Type of Business"}}</td><td>{{var business_type}}</td></tr>
+                <tr><td style="font-weight:bold;">{{trans "Sales Channels"}}</td><td>{{var sales_channels}}</td></tr>
+                <tr><td style="font-weight:bold; vertical-align:top;">{{trans "Message"}}</td><td>{{var message}}</td></tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

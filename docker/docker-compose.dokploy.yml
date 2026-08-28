@@ -1,0 +1,261 @@
+# CarpetAvenue — Dokploy production, PULL a pre-built image (recommended path).
+#
+# Every service is a pulled image — zero host bind-mounts, so Dokploy needs no
+# git repo. CI (or you) builds carpient + carpient-nginx and pushes to the
+# registry; Dokploy pulls and restarts. Only the carpient image changes between
+# code deploys; nginx + infra images are effectively fixed.
+#
+# Dokploy setup (see docker/README.md §Dokploy-pull):
+#   Registries : add registry.carpetavenue.net (user/pass)
+#   Environment: paste docker/.env.production.example  (DB_HOST = external MySQL)
+#   Domains    : domain -> service `nginx`, port 80, HTTPS on (Traefik terminates TLS)
+# Host once   : sysctl -w vm.max_map_count=262144   (OpenSearch; persist in sysctl.conf)
+
+services:
+
+  cache:
+    image: valkey/valkey:9-alpine
+    container_name: carpient-cache
+    restart: unless-stopped
+    # cache db0 + page_cache db1 only; sessions are in the `sessions` service.
+    # allkeys-lru evicts tag->id SETS as readily as data, and a lost tag set makes
+    # cache:clean-by-tag silently miss. Defence is sizing, not another policy:
+    #   valkey-cli info stats | grep evicted_keys    # must stay 0
+    #
+    # Host budget (MySQL is external): OpenSearch ~3.3G (2G heap + off-heap) |
+    # php-fpm ~3.9G | cache 2G | sessions 0.25G | rabbitmq ~0.2G | cron ~0.3G |
+    # nginx ~0.05G | OS+docker ~0.6G  =>  ~10.6G. NEEDS A 12GB+ HOST. The earlier
+    # 1G/1G sizing fit 8GB; if this stack is still on 8GB it will OOM-kill php-fpm
+    # or OpenSearch under load, which reads as random 502s. Check before deploying:
+    #   free -g            # total must be >= 12
+    # If evicted_keys goes non-zero, add host RAM — do not take it from
+    # pm.max_children (docker/php/www.conf), sized off the same budget.
+    command: >
+      valkey-server
+      --maxmemory ${VALKEY_MAXMEMORY:-2gb}
+      --maxmemory-policy allkeys-lru
+      --save ""
+      ${VALKEY_PASSWORD:+--requirepass ${VALKEY_PASSWORD}}
+    volumes:
+      - valkey_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [magento_net]
+
+  sessions:
+    image: valkey/valkey:9-alpine
+    container_name: carpient-sessions
+    restart: unless-stopped
+    # Sessions only (db2). Magento's session handler sets a TTL on every key, so
+    # volatile-lru drops the oldest idle session under pressure — never a cache
+    # tag set. Separate instance so catalog cache churn cannot evict a live cart.
+    #
+    # ONE-TIME ON FIRST DEPLOY: existing sessions are in db2 of `cache` and are NOT
+    # migrated — every logged-in customer is signed out once and guest carts are
+    # lost. Deploy in a low-traffic window, or set VALKEY_SESSION_HOST=cache to
+    # keep sessions where they are.
+    command: >
+      valkey-server
+      --maxmemory ${VALKEY_SESSION_MAXMEMORY:-256mb}
+      --maxmemory-policy volatile-lru
+      --save ""
+      ${VALKEY_PASSWORD:+--requirepass ${VALKEY_PASSWORD}}
+    volumes:
+      - valkey_sessions:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [magento_net]
+
+  queue:
+    image: rabbitmq:4.2-management-alpine
+    container_name: carpient-queue
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-/}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [magento_net]
+
+  search:
+    image: opensearchproject/opensearch:3
+    container_name: carpient-search
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      OPENSEARCH_JAVA_OPTS: "-Xms2g -Xmx2g"
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile:  { soft: 65536, hard: 65536 }
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks: [magento_net]
+
+  # Runs setup:upgrade once per deploy, then exits.
+  #
+  # Nothing here has to clear var/view_preprocessed: env.php.template pins
+  # minify_html=0, so templates are read from the image, not from that tree. If
+  # you ever turn minification back on, the tree becomes build output living in
+  # a persistent volume and this deploy step has to restore it — read the note
+  # in docker/env.php.template first.
+  upgrade:
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient:${IMAGE_TAG:-latest}
+    container_name: carpient-upgrade
+    command: >
+      sh -c "chown -R www-data:www-data /var/www/html/var &&
+      php bin/magento maintenance:enable &&
+      php -d memory_limit=2G bin/magento setup:upgrade --keep-generated &&
+      php bin/magento maintenance:disable"
+    restart: "no"
+    depends_on:
+      cache:    { condition: service_healthy }
+      sessions: { condition: service_healthy }
+      queue:    { condition: service_healthy }
+      search:   { condition: service_healthy }
+    environment: &magento_env
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      VALKEY_HOST: ${VALKEY_HOST:-cache}
+      VALKEY_PORT: ${VALKEY_PORT:-6379}
+      VALKEY_PASSWORD: ${VALKEY_PASSWORD:-}
+      # Sessions on their own instance; env.php.template falls back to the cache
+      # instance if these are unset, so an older stack still boots unchanged.
+      VALKEY_SESSION_HOST: ${VALKEY_SESSION_HOST:-sessions}
+      VALKEY_SESSION_PORT: ${VALKEY_SESSION_PORT:-6379}
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-queue}
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_VHOST: ${RABBITMQ_VHOST:-/}
+      OPENSEARCH_HOST: ${OPENSEARCH_HOST:-search}
+      OPENSEARCH_PORT: ${OPENSEARCH_PORT:-9200}
+      MAGE_CRYPT_KEY: ${MAGE_CRYPT_KEY}
+      MAGE_GRAPHQL_ID_SALT: ${MAGE_GRAPHQL_ID_SALT}
+      DOMAIN: ${DOMAIN:-carpetavenue.net}
+      DEBUG_ENV: ${DEBUG_ENV:-false}
+    volumes:
+      - magento_var:/var/www/html/var
+    networks: [magento_net, dokploy-network]   # dokploy-network: reach the internal Dokploy MySQL
+
+  app:
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient:${IMAGE_TAG:-latest}
+    container_name: carpient-app
+    restart: unless-stopped
+    depends_on:
+      upgrade: { condition: service_completed_successfully }
+      queue:   { condition: service_healthy }
+      search:  { condition: service_healthy }
+    environment: *magento_env
+    volumes:
+      - magento_media:/var/www/html/pub/media
+      - magento_var:/var/www/html/var
+    networks:
+      magento_net:
+        aliases: [carpient-fpm]
+      dokploy-network:                         # reach the internal Dokploy MySQL
+
+  static:
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient:${IMAGE_TAG:-latest}
+    container_name: carpient-static
+    command: sh -c "rm -rf /mnt/static/* && cp -a /var/www/html/pub/static/. /mnt/static/"
+    restart: "no"
+    depends_on:
+      upgrade: { condition: service_completed_successfully }
+    volumes:
+      - magento_static:/mnt/static
+    networks: [magento_net]
+
+  cron:
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient:${IMAGE_TAG:-latest}
+    container_name: carpient-cron
+    command: cron -f
+    restart: unless-stopped
+    depends_on:
+      upgrade: { condition: service_completed_successfully }
+    environment: *magento_env
+    volumes:
+      - magento_media:/var/www/html/pub/media
+      - magento_var:/var/www/html/var
+    networks: [magento_net, dokploy-network]   # dokploy-network: reach the internal Dokploy MySQL
+
+  # Baked-config nginx (no bind-mounts). Traefik (Dokploy Domain tab) fronts it.
+  nginx:
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient-nginx:${NGINX_TAG:-latest}
+    container_name: carpient-nginx
+    restart: unless-stopped
+    depends_on:
+      - app
+      - static
+    expose:
+      - "80"
+    volumes:
+      - magento_media:/var/www/html/pub/media:ro
+      - magento_static:/var/www/html/pub/static:ro
+    healthcheck:
+      # 127.0.0.1 (NOT localhost — that hits IPv6 ::1, which nginx doesn't listen
+      # on → false "unhealthy" → Traefik drops the container → 404). health_check.php
+      # returns 200 via php-fpm.
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1/health_check.php || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks: [magento_net, dokploy-network]
+
+  # Nightly tar of magento_media -> GCS (via S3-interop HMAC keys). Only
+  # magento_media is backed up: it's the one volume not reproducible from a
+  # build (uploaded product images). var/static/valkey/rabbitmq/opensearch
+  # are all regenerable — see docker/README.md §11.
+  backup:
+    image: offen/docker-volume-backup:v2
+    container_name: carpient-backup
+    restart: unless-stopped
+    environment:
+      BACKUP_CRON_EXPRESSION: "0 3 * * *"
+      BACKUP_FILENAME: "media-%Y-%m-%d.tar.gz"
+      BACKUP_RETENTION_DAYS: "14"
+      BACKUP_PRUNING_LEEWAY: "5m"
+      AWS_ENDPOINT: storage.googleapis.com
+      AWS_ENDPOINT_PROTO: https
+      AWS_S3_BUCKET_NAME: ${BACKUP_GCS_BUCKET}
+      AWS_ACCESS_KEY_ID: ${BACKUP_GCS_HMAC_KEY}
+      AWS_SECRET_ACCESS_KEY: ${BACKUP_GCS_HMAC_SECRET}
+    volumes:
+      - magento_media:/backup/magento_media:ro
+    networks: [magento_net]
+
+volumes:
+  magento_media:
+  magento_var:
+  magento_static:
+  valkey_data:
+  valkey_sessions:
+  rabbitmq_data:
+  opensearch_data:
+
+networks:
+  magento_net:
+    driver: bridge
+  dokploy-network:
+    external: true

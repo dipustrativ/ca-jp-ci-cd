@@ -1,0 +1,39 @@
+<?php
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * CMS Static Section Block — section wrapper with page-main inner container.
+ *
+ * @var $block \CarpetAvenue\Widget\Block\Widget\SectionBlock
+ */
+
+$blockName = 'block-page-section';
+$border = '';
+$background = '';
+
+if ($block->useBorder()) {
+    $border = $blockName . '--border';
+}
+
+if ($block->useBackgroundColor() == 'background_color') {
+    $background = $blockName . '--background';
+}
+
+if ($block->useBackgroundColor() == 'background_color_darker') {
+    $background = $blockName . '--background darker';
+}
+
+if ($block->useBackgroundColor() == 'pattern') {
+    $background = $blockName . '--pattern';
+}
+
+$mobileHide = $block->hideOnMobile() == '1' ? 'hide-mobile' : '';
+?>
+
+<?php if ($block->getText()) : ?>
+    <div class="widget block <?= /* @noEscape */ $blockName . ' ' . $border . ' ' . $background . ' ' . $mobileHide ?>">
+        <div class="page-main">
+            <?= /* @noEscape */ $block->getText() ?>
+        </div>
+    </div>
+<?php endif; ?>

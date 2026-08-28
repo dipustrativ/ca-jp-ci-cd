@@ -1,0 +1,218 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+
+/**
+ * Product additional attributes template
+ *
+ * @var $block \Magento\Catalog\Block\Product\View\Attributes
+ */
+?>
+<?php
+    $_helper = $this->helper(Magento\Catalog\Helper\Output::class);
+    $_product = $block->getProduct();
+?>
+<?php if ($_additional = $block->getAdditionalData()) :?>
+    <div class="additional-attributes-wrapper table-wrapper" id="product-attributes-collapsible">
+
+        <div class="attributes-collapse-trigger" data-role="trigger">
+            <h3><?= __($block->getTitle()); ?></h3>
+            <span class="collapse-arrow"></span>
+        </div>
+
+        <div data-role="content" style="padding: 10px 10px">
+        <table class="data table additional-attributes" id="product-attribute-specs-table">
+            <caption class="table-caption"><?= $block->escapeHtml(__('More Information')) ?></caption>
+            <tbody>
+            <?php
+            // Weirdness below to remove/mod attributes before printout
+            $widthKey = '';
+
+            $widthValue = '';
+            $lengthValue = '';
+
+            $sizeLabel = 'Size';
+
+            // NOTE: check if the attribute 'shape' is round.
+            // I also remove the shape attribute from frontend
+            $isRound = false;
+            $shapeKey = '';
+
+            foreach ($_additional as $key => $_data) {
+                if ($_data['code'] == 'width') {
+                    $widthKey = $key;
+                    $widthValue = $_data['value'];
+                }
+                if ($_data['code'] == 'length') {
+                    $lengthValue = $_data['value'];
+                }
+                if ($_data['code'] == 'shape') {
+                    $shapeKey = $key;
+
+                    // Trouble arises here if attribute is changed in admin
+                    if ($_product->getData('shape') == 20) {
+                        $isRound = true;
+                    }
+                }
+            }
+
+            $sizeValue = $widthValue . ' x ' . $lengthValue . ' cm';
+
+            if ($isRound) {
+                $sizeLabel = 'Diameter';
+                $sizeValue = '∅ ' . $widthValue . ' cm';
+            }
+
+            unset($_additional[$widthKey]);
+            unset($_additional[$shapeKey]);
+            // Weirdness above to remove/mod attributes before printout
+            ?>
+            <?php foreach ($_additional as $_data) : ?>
+                <?php
+                    if ($_data['code'] == 'age' && str_contains($_data['value'], '0-20')) {
+                        continue;
+                    }
+                ?>
+                <tr>
+                    <?php if ( $_data['code'] == 'length' && ( !empty($widthValue) && !empty($lengthValue) ) ) : ?>
+                        <th class="col label" scope="row"><?= $block->escapeHtml(__($sizeLabel)) ?></th>
+                        <td class="col data" data-th="Size">
+                            <?= $block->escapeHtml($sizeValue) ?>
+                        </td>
+                    <?php elseif ( $_data['code'] == 'knot_density' ) : ?>
+                        <th class="col label" scope="row"><?= $block->escapeHtml($_data['label']) ?></th>
+                        <td class="col data" data-th="<?= $block->escapeHtmlAttr($_data['label']) ?>">
+                            <?= /* @noEscape */ '<span class="height-fix">~</span> ' . $_helper->productAttribute($_product, number_format((float)$_data['value'], 0, '', ' '), $_data['code']) . ' / m²' ?>
+                        </td>
+                    <?php elseif ( $_data['code'] == 'points' ) : ?>
+                        <th class="col label" scope="row"><?= $block->escapeHtml($_data['label']) ?></th>
+                        <td class="col data" data-th="<?= $block->escapeHtmlAttr($_data['label']) ?>">
+                            <?= /* @noEscape */ $_helper->productAttribute($_product, number_format((float)$_data['value'], 0, '', ' '), $_data['code']) . ' / m²' ?>
+                        </td>
+                    <?php elseif ( $_data['code'] == 'thickness' ) : ?>
+                        <th class="col label" scope="row"><?= $block->escapeHtml($_data['label']) ?></th>
+                        <td class="col data" data-th="<?= $block->escapeHtmlAttr($_data['label']) ?>">
+                            <?= /* @noEscape */ $_helper->productAttribute($_product, $_data['value'], $_data['code']) . ' mm' ?>
+                        </td>
+                    <?php else : ?>
+                        <th class="col label" scope="row"><?= $block->escapeHtml($_data['label']) ?></th>
+                        <td class="col data" data-th="<?= $block->escapeHtmlAttr($_data['label']) ?>">
+                            <?= /* @noEscape */ $_helper->productAttribute($_product, $_data['value'], $_data['code']) ?>
+                        </td>
+                    <?php endif; ?>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        </div>
+    </div>
+    <script>
+        require(['jquery', 'domReady!'], function($) {
+            var $wrapper = $('#product-attributes-collapsible');
+            var $content = $wrapper.find('[data-role="content"]');
+            var $trigger = $wrapper.find('[data-role="trigger"]');
+
+            // Start collapsed
+            $content.hide();
+
+            $trigger.on('click', function(e) {
+                e.stopPropagation();
+                $wrapper.toggleClass('_active');
+                $content.slideToggle(300);
+            });
+        });
+    </script>
+    <style>
+        .additional-attributes-wrapper .attributes-collapse-trigger {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 0;
+            user-select: none;
+        }
+        .additional-attributes-wrapper .attributes-collapse-trigger h3 {
+            margin: 0;
+            font-size: 1.1em;
+        }
+        .additional-attributes-wrapper .attributes-collapse-trigger .collapse-arrow {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-right: 2px solid #333;
+            border-bottom: 2px solid #333;
+            transform: rotate(45deg);
+            transition: transform 0.3s ease;
+            margin-left: 10px;
+        }
+        .additional-attributes-wrapper._active .attributes-collapse-trigger .collapse-arrow {
+            transform: rotate(-135deg);
+        }
+        .additional-attributes-wrapper._active .attributes-collapse-trigger {
+            border-radius: 4px 4px 0 0;
+            border-bottom: none;
+        }
+        .additional-attributes-wrapper [data-role="content"] {
+            display: none;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+        }
+
+        @media (min-width: 769px), print {
+            table#product-attribute-specs-table {
+                 margin-top: 0px !important;
+            }
+        }
+
+        @media only screen and (max-width: 639px) {
+            .table-wrapper .table:not(.totals):not(.cart):not(.table-comparison) > tbody > tr {
+                padding: 1px 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #product-attribute-specs-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                display: table !important;
+            }
+            #product-attribute-specs-table tbody {
+                display: table-row-group !important;
+            }
+            #product-attribute-specs-table tr {
+                display: table-row !important;
+                border-bottom: 1px solid #e0e0e0 !important;
+            }
+            #product-attribute-specs-table th,
+            #product-attribute-specs-table td {
+                display: table-cell !important;
+                width: auto !important;
+                padding: 10px 8px !important;
+                border: none !important;
+                background: none !important;
+                text-align: left !important;
+                vertical-align: middle !important;
+            }
+            #product-attribute-specs-table th {
+                font-weight: 700 !important;
+                width: 45% !important;
+            }
+            #product-attribute-specs-table td::before {
+                display: none !important;
+            }
+        }
+
+
+    </style>
+<?php endif;?>
+
+<?= $block->getChildHtml(); ?>

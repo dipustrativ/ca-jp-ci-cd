@@ -1,0 +1,19 @@
+<?php
+/**
+ * Bottom category-view holder wrapper.
+ *
+ * Renders the .category-view-holder .category-view div only when it actually
+ * has content — the cover image and/or the description. Prevents an empty
+ * holder div (and its spacing/border) on categories that have neither.
+ *
+ * @var $block \Magento\Catalog\Block\Category\View
+ */
+$imageHtml       = trim($block->getChildHtml('category.image'));
+$descriptionHtml = trim($block->getChildHtml('category.description'));
+?>
+<?php if ($imageHtml !== '' || $descriptionHtml !== ''): ?>
+    <div class="category-view-holder category-view">
+        <?= /* @noEscape */ $imageHtml ?>
+        <?= /* @noEscape */ $descriptionHtml ?>
+    </div>
+<?php endif; ?>

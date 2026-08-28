@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="evalent_banner_api_data_bannerinterface_save_before">
+        <observer instance="Evalent\Banner\Observer\Model\Banner\SaveBefore" name="evalent_banner_check_if_save_allowed"/>
+    </event>
+    <event name="evalent_banner_api_data_bannerinterface_delete_before">
+        <observer instance="Evalent\Banner\Observer\Model\Banner\DeleteBefore" name="evalent_banner_check_if_delete_allowed"/>
+    </event>
+</config>

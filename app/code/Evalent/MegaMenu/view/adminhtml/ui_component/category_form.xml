@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<fieldset name="display_settings">
+		<field name="additional_megamenu_data" formElement="multiselect" sortOrder="20">
+			<settings>
+				<dataType>string</dataType>
+				<label translate="true">Additional Data for Mega Menu</label>
+			</settings>
+			<formElements>
+				<multiselect>
+					<settings>
+						<options class="Evalent\MegaMenu\Model\Config\Source\AdditionalData"/>
+					</settings>
+				</multiselect>
+			</formElements>
+		</field>
+		<field name="custom_block" formElement="select" sortOrder="25">
+			<settings>
+				<dataType>string</dataType>
+				<label translate="true">Custom block which will be displayed in the mega menu</label>
+			</settings>
+			<formElements>
+				<select>
+					<settings>
+						<options class="Evalent\MegaMenu\Model\Config\Source\Blocks"/>
+					</settings>
+				</select>
+			</formElements>
+		</field>
+		<field name="showall_custom_label" sortOrder="30" formElement="input">
+			<settings>
+				<dataType>string</dataType>
+				<label translate="true">Custom Show All Button Label</label>
+			</settings>
+		</field>
+
+		<field name="background_color" sortOrder="100" formElement="colorPicker">
+			<settings>
+				<label translate="true">Background Color</label>
+				<componentType>colorPicker</componentType>
+				<dataScope>background_color</dataScope>
+				<dataType>text</dataType>
+			</settings>
+			<formElements>
+				<colorPicker>
+					<settings>
+						<colorPickerMode>full</colorPickerMode>
+						<colorFormat>hex</colorFormat>
+					</settings>
+				</colorPicker>
+			</formElements>
+		</field>
+
+		<field name="foreground_color" sortOrder="101" formElement="colorPicker">
+			<settings>
+				<label translate="true">Foreground Color</label>
+				<componentType>colorPicker</componentType>
+				<dataScope>foreground_color</dataScope>
+				<dataType>text</dataType>
+			</settings>
+			<formElements>
+				<colorPicker>
+					<settings>
+						<colorPickerMode>full</colorPickerMode>
+						<colorFormat>hex</colorFormat>
+					</settings>
+				</colorPicker>
+			</formElements>
+		</field>
+	</fieldset>
+	<fieldset name="search_engine_optimization">
+		<field name="custom_url" formElement="input" sortOrder="125">
+			<settings>
+				<dataType>string</dataType>
+				<label translate="true">Custom URL. Will override URL key in links.</label>
+			</settings>
+		</field>
+	</fieldset>
+</form>

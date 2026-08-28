@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+
+        <!-- Container for elements which needs to break content max-width -->
+        <referenceContainer name="page.wrapper">
+            <container name="after.main.section"
+                       htmlTag="div"
+                       htmlClass="content--full-width checkout-cart-index__bottom"
+                       after="main.content">
+                <container name="after.main.section.container"
+                           htmlTag="div"
+                           htmlClass="page-main" />
+            </container>
+        </referenceContainer>
+
+        <!-- CMS-block containing icon usps visible below cart item list -->
+        <container name="checkout.cart.bottom.container" htmlTag="div" htmlClass="icon-usps__wrapper">
+            <block class="Magento\Cms\Block\Block" name="icon.usps" after="-">
+                <arguments>
+                    <argument xsi:type="string" name="block_id">icon-usps</argument>
+                </arguments>
+            </block>
+        </container>
+
+        <move element="checkout.cart.bottom.container" destination="checkout.cart.container" after="-" />
+
+        <!-- Crosssell heading. Uses the default Magento_Catalog product/list/items.phtml template -->
+        <referenceBlock name="checkout.cart.crosssell">
+            <arguments>
+                <argument xsi:type="string" name="block_title">We recommend the following products:</argument>
+                <argument xsi:type="boolean" name="show_cart">true</argument>
+                <argument xsi:type="boolean" name="show_description">true</argument>
+            </arguments>
+        </referenceBlock>
+
+        <referenceBlock name="checkout.cart.shipping">
+            <container name="checkout.cart.shipping.after"
+                       as="after_shipping"
+                       label="Shipping Methods After"
+                       after="-" />
+        </referenceBlock>
+
+        <referenceBlock name="checkout.cart.methods.bottom">
+            <container name="checkout.cart.methods.before"
+                       as="before_methods"
+                       label="Payment Methods Before Checkout Button"
+                       before="-" />
+        </referenceBlock>
+
+        <referenceBlock name="checkout.cart.empty">
+            <container name="shopping.cart.empty.after" as="shopping.cart.table.after" label="Empty Shopping Cart Content After"/>
+        </referenceBlock>
+
+        <!-- Remove "Check Out with Multiple Addresses" link -->
+        <referenceBlock name="checkout.cart.methods.multishipping" remove="true"/>
+
+    </body>
+</page>

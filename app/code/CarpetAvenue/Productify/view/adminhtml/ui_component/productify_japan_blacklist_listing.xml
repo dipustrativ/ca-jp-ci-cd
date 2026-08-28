@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">productify_japan_blacklist_listing.productify_japan_blacklist_listing_data_source</item>
+        </item>
+        <item name="buttons" xsi:type="array">
+            <item name="add" xsi:type="array">
+                <item name="name" xsi:type="string">add</item>
+                <item name="label" xsi:type="string" translate="true">Add New SKU</item>
+                <item name="url" xsi:type="string">productify/japan/new</item>
+                <item name="class" xsi:type="string">primary</item>
+            </item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>productify_japan_blacklist_listing.productify_japan_blacklist_listing_data_source</dep>
+        </deps>
+        <spinner>productify_japan_blacklist_columns</spinner>
+    </settings>
+
+    <dataSource name="productify_japan_blacklist_listing_data_source" component="Magento_Ui/js/grid/provider">
+
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">sku</param>
+            </storageConfig>
+        </settings>
+        <aclResource>Magento_Catalog::catalog</aclResource>
+        <dataProvider name="productify_japan_blacklist_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>sku</requestFieldName>
+                <primaryFieldName>sku</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <paging name="listing_paging"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+    </listingToolbar>
+
+    <columns name="productify_japan_blacklist_columns">
+        <column name="sku">
+            <settings>
+                <label translate="true">SKU</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+
+        <actionsColumn name="actions" class="CarpetAvenue\Productify\Ui\Component\Listing\Column\JpBlacklistAction">
+            <settings>
+                <label translate="true">Actions</label>
+                <indexField>sku</indexField>
+            </settings>
+        </actionsColumn>
+
+    </columns>
+</listing>

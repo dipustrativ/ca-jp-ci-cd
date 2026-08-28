@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">ixpfsyncer_purchaseorder_product_listing.ixpfsyncer_purchaseorder_product_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>ixpfsyncer_purchaseorder_product_listing.ixpfsyncer_purchaseorder_product_listing_data_source</dep>
+        </deps>
+        <spinner>ixpfsyncer_purchaseorder_product_columns</spinner>
+    </settings>
+
+    <dataSource name="ixpfsyncer_purchaseorder_product_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">entity_id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>IXPF_Syncer::webhook_list</aclResource>
+        <dataProvider name="ixpfsyncer_purchaseorder_product_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>ixpf_purchase_id</requestFieldName>
+                <primaryFieldName>ixpf_purchase_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="ixpfsyncer_purchaseorder_product_columns">
+
+        <column name="sku">
+            <settings>
+                <label translate="true">SKU</label>
+                <filter>text</filter>
+                <dataScope>Sku</dataScope>
+            </settings>
+        </column>
+        <column name="behavior">
+            <settings>
+                <label translate="true">Behavior</label>
+                <dataScope>behavior</dataScope>
+            </settings>
+        </column>
+        <column name="name">
+            <settings>
+                <label translate="true">Name</label>
+                <dataScope>name</dataScope>
+            </settings>
+        </column>
+        <column name="qty">
+            <settings>
+                <label translate="true">Qty</label>
+                <dataScope>qty</dataScope>
+            </settings>
+        </column>
+        <column name="price">
+            <settings>
+                <label translate="true">Price</label>
+                <dataScope>price</dataScope>
+            </settings>
+        </column>
+        <column name="cost">
+            <settings>
+                <label translate="true">Cost</label>
+                <dataScope>cost</dataScope>
+            </settings>
+        </column>
+        <column name="process_status">
+            <settings>
+                <label translate="true">Process Status</label>
+                <dataScope>process_status</dataScope>
+            </settings>
+        </column>
+        <column name="error_message">
+            <settings>
+                <label translate="true">Error message</label>
+                <dataScope>error_message</dataScope>
+            </settings>
+        </column>
+        <column name="created_at"  class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <label translate="true">Created At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>created_at</dataScope>
+            </settings>
+        </column>
+    </columns>
+</listing>

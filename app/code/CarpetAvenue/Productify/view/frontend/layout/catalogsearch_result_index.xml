@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © Carpet Avenue GmbH. All rights reserved.
+*
+*
+* This source file is subject to the Carpet Avenue GmbH license
+*
+* @category  Product
+* @package   CarpetAvenue_Productify
+* @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+* @author    Strativ Magento Team
+*/
+-->
+<!--
+    layout="2columns-left" came from the merged Lof_AjaxScroll module. The active
+    theme also sets it on this handle, so it is belt-and-braces here — but keep it
+    so the search page does not depend on theme load order.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      layout="2columns-left"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <!-- Infinite scroll (merged Lof_AjaxScroll) -->
+    <update handle="ajaxscroll"/>
+    <body>
+        <!-- Layered navigation renderers (merged CarpetAvenue_LayeredNavigation) -->
+        <referenceBlock name="catalogsearch.navigation.renderer" template="CarpetAvenue_Productify::layer/filter.phtml"/>
+        <referenceBlock name="catalogsearch.navigation.state" template="CarpetAvenue_Productify::layer/state.phtml"/>
+
+        <referenceContainer name="after.body.start">
+            <block class="CarpetAvenue\Productify\Block\BfCache\Init" name="productify.bfcache.init.search" template="CarpetAvenue_Productify::bfcache/init.phtml"/>
+        </referenceContainer>
+
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template" name="carpetavenue.layerednav.ajax.search" template="CarpetAvenue_Productify::ajax/init.phtml">
+                <arguments>
+                    <argument name="filter_config" xsi:type="object">CarpetAvenue\Productify\LayeredNavigation\ViewModel\FilterConfig</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

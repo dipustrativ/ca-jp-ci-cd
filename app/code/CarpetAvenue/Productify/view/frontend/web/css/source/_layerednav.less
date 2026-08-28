@@ -1,0 +1,192 @@
+//
+//  Copyright © CarpetAvenue. All rights reserved.
+//  Enhanced layered navigation: checkbox filter options + active filter chips.
+//
+
+& when (@media-common = true) {
+    .am-filter-items {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .am-filter-item {
+        margin: 0 0 4px;
+
+        .am-filter-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 2px;
+            color: @text__color;
+            text-decoration: none;
+
+            &:hover .am-filter-checkbox {
+                border-color: @color-gray34;
+            }
+
+            .count {
+                margin-left: auto;
+                color: @color-gray56;
+                font-size: 1.2rem;
+
+                &:before {
+                    content: '(';
+                }
+
+                &:after {
+                    content: ')';
+                }
+            }
+        }
+
+        .am-filter-checkbox {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            border: 1px solid @color-gray68;
+            border-radius: 3px;
+            background: @color-white;
+            position: relative;
+        }
+
+        &.-selected .am-filter-checkbox {
+            background: @color-gray20;
+            border-color: @color-gray20;
+
+            &:after {
+                content: '';
+                position: absolute;
+                left: 4px;
+                top: 1px;
+                width: 5px;
+                height: 9px;
+                border: solid @color-white;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+        }
+
+        &.-disabled {
+            opacity: .45;
+
+            .am-filter-link {
+                cursor: default;
+            }
+        }
+    }
+
+    .am-price-slider {
+        padding: 8px 6px 4px;
+
+        .am-price-slider-inputs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+
+            input[type='number'] {
+                width: 80px;
+                text-align: center;
+            }
+        }
+
+        .am-price-slider-track {
+            height: 4px;
+            margin: 0 8px 14px;
+            border-radius: 2px;
+            background: @color-gray82;
+            position: relative;
+
+            .ui-slider-range {
+                position: absolute;
+                height: 100%;
+                background: @color-gray20;
+            }
+
+            //  Matches base theme "-improved" Amasty slider handles
+            .ui-slider-handle {
+                position: absolute;
+                top: -8px;
+                width: 20px;
+                height: 20px;
+                margin-left: -10px;
+                border: 2px solid #333;
+                border-radius: 50%;
+                background: @color-white;
+                box-sizing: border-box;
+                cursor: pointer;
+
+                &:hover {
+                    box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.15);
+                }
+
+                &:focus {
+                    outline: none;
+                    box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.15);
+                }
+            }
+        }
+    }
+
+    //  Blank sets `.filter .filter-current .item { margin-bottom: 10px }`, which
+    //  made the row taller than the pills and dropped the FILTER label and
+    //  "Clear all" below the chip text. Needs the extra class to out-rank it.
+    .filter .am-filter-chips .items .am-chip {
+        margin: 0;
+    }
+
+    .am-filter-chips {
+        margin: 0 0 10px;
+
+        .items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .am-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px;
+            border: 0;
+            border-radius: 999px;
+            background: @color-gray95;
+            font-size: 1.4rem;
+            line-height: 1.2;
+
+            //  Attribute name for screen readers only.
+            .am-chip-name {
+                .lib-visually-hidden();
+            }
+
+            .am-chip-remove {
+                display: inline-flex;
+                width: 14px;
+                height: 14px;
+                align-items: center;
+                justify-content: center;
+                color: @color-gray20 !important;
+                text-decoration: none;
+
+                > span {
+                    display: none;
+                }
+
+                &:before {
+                    content: '\2715';
+                    font-size: 1.1rem;
+                    line-height: 1;
+                }
+
+                &:hover {
+                    color: @color-black;
+                }
+            }
+        }
+    }
+}

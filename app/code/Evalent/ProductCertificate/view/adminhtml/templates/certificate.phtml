@@ -1,0 +1,28 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+</head>
+<body>
+<?php
+/** @var \Evalent\ProductCertificate\Block\Certificate $block */
+$products = $block->getProducts();
+$i = 0;
+
+/** @var \Evalent\ProductCertificate\Block\Details $details */
+$details = $block->getLayout()->createBlock('Evalent\ProductCertificate\Block\Details');
+$details->setStoreId($block->getStoreId());
+?>
+<style>
+	.page-break {
+		page-break-after: always;
+	}
+</style>
+
+<?php foreach ($products as $product): ?>
+    <?= $details->setProduct($product)->toHtml() ?>
+    <?php if ($i < count($products) - 1): ?>
+        <div class="page-break"></div>
+    <?php endif; ?>
+    <?php $i++; ?>
+<?php endforeach; ?>
+</body>

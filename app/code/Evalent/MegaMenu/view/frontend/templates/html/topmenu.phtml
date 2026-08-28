@@ -1,0 +1,28 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * Top menu for store
+ *
+ * @var $block \Evalent\MegaMenu\Block\Html\Topmenu
+ */
+
+//$columnsLimit = $block->getColumnsLimit() ?: 0;
+//$_menuHtml = $block->getHtml('level-top', 'submenu', $columnsLimit);
+$_menuHtml = $block->getToMenuHtml();
+?>
+
+<nav class="navigation megamenu" data-action="navigation">
+    <ul data-mage-init='{"menu":{"responsive":true, "expanded":true, "position":{"my":"left top","at":"left bottom"}}}'>
+        <?= /* @noEscape */ $_menuHtml?>
+        <?= $block->getChildHtml() ?>
+    </ul>
+    <div class="megamenu__backdrop-wrapper"
+         data-role="menu-background-overlay"
+         style="display: none;">
+        <div class="megamenu__backdrop-container" data-role="menu-background"></div>
+    </div>
+</nav>

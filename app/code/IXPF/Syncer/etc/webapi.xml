@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi/etc/webapi.xsd">
+    <route url="/V1/ixpf/stores" method="GET">
+        <service class="IXPF\Syncer\Api\Store\StoreApi" method="getList"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+
+    <route url="/V1/ixpf/store-info/:storeId" method="GET">
+        <service class="IXPF\Syncer\Api\Store\StoreApi" method="getInformation"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+
+    <!-- product routes -->
+    <route url="/V1/ixpf/products" method="GET">
+        <service class="IXPF\Syncer\Api\Product\ProductApi" method="list"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+
+</routes>

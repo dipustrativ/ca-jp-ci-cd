@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @package   CarpetAvenue_Core
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+      layout="admin-1column">
+    <body>
+        <referenceContainer name="content">
+            <block class="CarpetAvenue\Core\Block\Adminhtml\Doc\Index"
+                   name="carpetavenue_core_doc_index"
+                   template="CarpetAvenue_Core::doc/index.phtml"/>
+        </referenceContainer>
+    </body>
+</page>
+

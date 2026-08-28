@@ -1,0 +1,15 @@
+<?php
+use CarpetAvenue\Productify\Block\BfCache\Init;
+/** @var Init $block */
+?>
+<?php if (!$block->isEnabled()) { return; } ?>
+
+<script type="text/x-magento-init">
+    {
+      "*": {
+        "CarpetAvenue_Productify/js/plp-snapshot": {
+          "maxAgeSeconds": <?= (int)$block->getMaxAgeSeconds() ?>
+    }
+  }
+}
+</script>

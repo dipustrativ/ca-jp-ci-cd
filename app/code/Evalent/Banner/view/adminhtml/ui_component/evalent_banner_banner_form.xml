@@ -1,0 +1,906 @@
+<?xml version="1.0" ?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">evalent_banner_banner_form.banner_form_data_source</item>
+		</item>
+		<item name="label" translate="true" xsi:type="string">General Information</item>
+		<item name="template" xsi:type="string">templates/form/collapsible</item>
+	</argument>
+	<settings>
+		<buttons>
+			<button class="Evalent\Banner\Block\Adminhtml\Banner\Edit\BackButton" name="back"/>
+			<button class="Evalent\Banner\Block\Adminhtml\Banner\Edit\DeleteButton" name="delete"/>
+			<button class="Evalent\Banner\Block\Adminhtml\Banner\Edit\SaveButton" name="save"/>
+			<button class="Evalent\Banner\Block\Adminhtml\Banner\Edit\SaveAndContinueButton" name="save_and_continue"/>
+		</buttons>
+		<namespace>evalent_banner_banner_form</namespace>
+		<dataScope>data</dataScope>
+		<deps>
+			<dep>evalent_banner_banner_form.banner_form_data_source</dep>
+		</deps>
+	</settings>
+	<dataSource name="banner_form_data_source">
+		<argument name="data" xsi:type="array">
+			<item name="js_config" xsi:type="array">
+				<item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+			</item>
+		</argument>
+		<settings>
+			<submitUrl path="*/*/save"/>
+		</settings>
+		<dataProvider class="Evalent\Banner\Ui\Dataprovider\Form\BannerDataProvider" name="banner_form_data_source">
+			<settings>
+				<requestFieldName>entity_id</requestFieldName>
+				<primaryFieldName>entity_id</primaryFieldName>
+			</settings>
+		</dataProvider>
+	</dataSource>
+	<fieldset name="general">
+		<settings>
+			<label>Banner Info</label>
+		</settings>
+		<field formElement="checkbox" name="enabled" sortOrder="10">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">Banner</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Enabled</label>
+				<dataScope>enabled</dataScope>
+				<validation>
+					<rule name="required-entry" xsi:type="boolean">false</rule>
+				</validation>
+			</settings>
+			<formElements>
+				<checkbox>
+					<settings>
+						<prefer>toggle</prefer>
+						<valueMap>
+							<map name="false" xsi:type="string">2</map>
+							<map name="true" xsi:type="string">1</map>
+						</valueMap>
+					</settings>
+				</checkbox>
+			</formElements>
+		</field>
+		<field formElement="input" name="name" sortOrder="20">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">Banner</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Name</label>
+				<dataScope>name</dataScope>
+				<validation>
+					<rule name="required-entry" xsi:type="boolean">true</rule>
+				</validation>
+			</settings>
+		</field>
+        <field name="date_start">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="label" xsi:type="string" translate="true">Date Start</item>
+                    <item name="formElement" xsi:type="string">date</item>
+                    <item name="source" xsi:type="string">Banner</item>
+                    <item name="sortOrder" xsi:type="number">50</item>
+                    <item name="dataScope" xsi:type="string">date_start</item>
+                    <item name="notice" xsi:type="string" translate="true">Start date from when this banner will be displayed</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">false</item>
+                    </item>
+                    <item name="options" xsi:type="array">
+                        <item name="dateFormat" xsi:type="string">yyyy-MM-dd</item>
+                        <item name="timeFormat" xsi:type="string">HH:mm:ss</item>
+                        <item name="showsTime" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <scopeLabel>[STORE VIEW]</scopeLabel>
+            </settings>
+        </field>
+        <field name="date_end">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="label" xsi:type="string" translate="true">Date End</item>
+                    <item name="formElement" xsi:type="string">date</item>
+                    <item name="source" xsi:type="string">Banner</item>
+                    <item name="sortOrder" xsi:type="number">51</item>
+                    <item name="dataScope" xsi:type="string">date_end</item>
+                    <item name="notice" xsi:type="string" translate="true">End date when this banner will stop being displayed</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">false</item>
+                    </item>
+                    <item name="options" xsi:type="array">
+                        <item name="dateFormat" xsi:type="string">yyyy-MM-dd</item>
+                        <item name="timeFormat" xsi:type="string">HH:mm:ss</item>
+                        <item name="showsTime" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <scopeLabel>[STORE VIEW]</scopeLabel>
+            </settings>
+        </field>
+	</fieldset>
+	<fieldset name="content">
+		<settings>
+			<label>Content</label>
+			<collapsible>true</collapsible>
+		</settings>
+		<field formElement="input" name="heading" sortOrder="50">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">Banner</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Heading</label>
+				<dataScope>heading</dataScope>
+				<validation>
+					<rule name="required-entry" xsi:type="boolean">false</rule>
+				</validation>
+				<scopeLabel>[STORE VIEW]</scopeLabel>
+			</settings>
+		</field>
+        <field formElement="input" name="heading_secondary" sortOrder="51">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">Banner</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Heading Secondary</label>
+                <dataScope>heading_secondary</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <scopeLabel>[STORE VIEW]</scopeLabel>
+            </settings>
+        </field>
+		<field formElement="textarea" name="description" sortOrder="60">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">Banner</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Description</label>
+				<dataScope>description</dataScope>
+				<validation>
+					<rule name="required-entry" xsi:type="boolean">false</rule>
+				</validation>
+				<scopeLabel>[STORE VIEW]</scopeLabel>
+			</settings>
+		</field>
+		<field formElement="input" name="button_text" sortOrder="70">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">Banner</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Button Text</label>
+				<dataScope>button_text</dataScope>
+				<validation>
+					<rule name="required-entry" xsi:type="boolean">false</rule>
+				</validation>
+				<scopeLabel>[STORE VIEW]</scopeLabel>
+			</settings>
+		</field>
+		<field formElement="select" name="button_style" sortOrder="100">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">Banner</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Button Style</label>
+				<dataScope>button_style</dataScope>
+				<validation>
+					<rule name="required-entry" xsi:type="boolean">false</rule>
+				</validation>
+				<scopeLabel>[STORE VIEW]</scopeLabel>
+			</settings>
+			<formElements>
+				<select>
+					<settings>
+						<options class="Evalent\Banner\Model\Config\Source\ButtonStyle"/>
+					</settings>
+				</select>
+			</formElements>
+		</field>
+		<field formElement="select" name="button_content_theme" sortOrder="110">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">Banner</item>
+					<item name="notice" xsi:type="string" translate="true">Color theme of content text and button</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Content Theme</label>
+				<dataScope>button_content_theme</dataScope>
+				<validation>
+					<rule name="required-entry" xsi:type="boolean">false</rule>
+				</validation>
+				<scopeLabel>[STORE VIEW]</scopeLabel>
+			</settings>
+			<formElements>
+				<select>
+					<settings>
+						<options class="Evalent\Banner\Model\Config\Source\ButtonContentTheme"/>
+					</settings>
+				</select>
+			</formElements>
+		</field>
+        <field formElement="select" name="content_custom_color" sortOrder="111">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string">Custom Color</item>
+                    <item name="notice" xsi:type="string" translate="true">Custom color of content text and button when Color Theme is set to "Custom"</item>
+                    <item name="labelVisible" xsi:type="boolean">true</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">colorPicker</item>
+                    <item name="source" xsi:type="string">Banner</item>
+                    <item name="colorFormat" xsi:type="string">hex</item>
+                    <item name="colorPickerMode" xsi:type="string">full</item>
+                </item>
+            </argument>
+            <settings>
+                <dataScope>content_custom_color</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <scopeLabel>[STORE VIEW]</scopeLabel>
+            </settings>
+        </field>
+        <field formElement="select" name="description_background_color" sortOrder="112">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string">Description Background Color</item>
+                    <item name="notice" xsi:type="string" translate="true">Description Background Color only work when you are new layout 2025</item>
+                    <item name="labelVisible" xsi:type="boolean">true</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">colorPicker</item>
+                    <item name="source" xsi:type="string">Banner</item>
+                    <item name="colorFormat" xsi:type="string">hex</item>
+                    <item name="colorPickerMode" xsi:type="string">full</item>
+                </item>
+            </argument>
+            <settings>
+                <dataScope>description_background_color</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <scopeLabel>[STORE VIEW]</scopeLabel>
+            </settings>
+        </field>
+		<field formElement="select" name="description_text_color" sortOrder="113">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="label" xsi:type="string">Description Text Color</item>
+					<item name="notice" xsi:type="string" translate="true">Description Text Color only work when you are new layout 2025</item>
+					<item name="labelVisible" xsi:type="boolean">true</item>
+					<item name="visible" xsi:type="boolean">true</item>
+					<item name="dataType" xsi:type="string">text</item>
+					<item name="formElement" xsi:type="string">colorPicker</item>
+					<item name="source" xsi:type="string">Banner</item>
+					<item name="colorFormat" xsi:type="string">hex</item>
+					<item name="colorPickerMode" xsi:type="string">full</item>
+				</item>
+			</argument>
+			<settings>
+				<dataScope>description_text_color</dataScope>
+				<validation>
+					<rule name="required-entry" xsi:type="boolean">false</rule>
+				</validation>
+				<scopeLabel>[STORE VIEW]</scopeLabel>
+			</settings>
+		</field>
+        <field formElement="select" name="button_text_color" sortOrder="115">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string">Custom Button Text Color</item>
+                    <item name="notice" xsi:type="string" translate="true">Custom color of button text when Color Theme is set to "Custom"</item>
+                    <item name="labelVisible" xsi:type="boolean">true</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">colorPicker</item>
+                    <item name="source" xsi:type="string">Banner</item>
+                    <item name="colorFormat" xsi:type="string">hex</item>
+                    <item name="colorPickerMode" xsi:type="string">full</item>
+                </item>
+            </argument>
+            <settings>
+                <dataScope>button_text_color</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <scopeLabel>[STORE VIEW]</scopeLabel>
+            </settings>
+        </field>
+        <field formElement="select" name="button_cta_hover" sortOrder="116">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string">Custom Button Hover Color</item>
+                    <item name="notice" xsi:type="string" translate="true">Custom color Hover Button</item>
+                    <item name="labelVisible" xsi:type="boolean">true</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">colorPicker</item>
+                    <item name="source" xsi:type="string">Banner</item>
+                    <item name="colorFormat" xsi:type="string">hex</item>
+                    <item name="colorPickerMode" xsi:type="string">full</item>
+                </item>
+            </argument>
+            <settings>
+                <dataScope>button_cta_hover</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <scopeLabel>[STORE VIEW]</scopeLabel>
+            </settings>
+        </field>
+        <field formElement="select" name="button_background_color" sortOrder="117">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string">Button Background Color</item>
+                    <item name="notice" xsi:type="string" translate="true">Single Banner Link button Background Color (Only work on new layout)</item>
+                    <item name="labelVisible" xsi:type="boolean">true</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">colorPicker</item>
+                    <item name="source" xsi:type="string">Banner</item>
+                    <item name="colorFormat" xsi:type="string">hex</item>
+                    <item name="colorPickerMode" xsi:type="string">full</item>
+                </item>
+            </argument>
+            <settings>
+                <dataScope>button_background_color</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <scopeLabel>[STORE VIEW]</scopeLabel>
+            </settings>
+        </field>
+        <field formElement="checkbox" name="shadow_effect" sortOrder="118">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">Banner</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Shadow Effect</label>
+                <dataScope>shadow_effect</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <prefer>toggle</prefer>
+                        <valueMap>
+                            <map name="true" xsi:type="string">1</map>
+                            <map name="false" xsi:type="string">2</map>
+                        </valueMap>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field formElement="select" name="description_position" sortOrder="119">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">Banner</item>
+                    <item name="notice" xsi:type="string" translate="true">The position of the description text</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Description Position</label>
+                <dataScope>description_position</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <scopeLabel>[STORE VIEW]</scopeLabel>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Evalent\Banner\Model\Config\Source\DescriptionPosition"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+		<field formElement="select" name="heading_tag" sortOrder="120">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">Banner</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Heading Tag</label>
+				<dataScope>heading_tag</dataScope>
+				<validation>
+					<rule name="required-entry" xsi:type="boolean">false</rule>
+				</validation>
+				<scopeLabel>[STORE VIEW]</scopeLabel>
+			</settings>
+			<formElements>
+				<select>
+					<settings>
+						<options class="Evalent\Banner\Model\Config\Source\HeadingTag"/>
+					</settings>
+				</select>
+			</formElements>
+		</field>
+		<fieldset name="desktop">
+			<settings>
+				<label translate="true">Desktop</label>
+				<collapsible>true</collapsible>
+			</settings>
+			<field formElement="imageUploader" name="desktop_image" sortOrder="30">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="source" xsi:type="string">Banner</item>
+					</item>
+				</argument>
+				<settings>
+					<label translate="true">Desktop Image</label>
+					<dataScope>desktop_image</dataScope>
+					<validation>
+						<rule name="required-entry" xsi:type="boolean">false</rule>
+					</validation>
+					<componentType>imageUploader</componentType>
+					<scopeLabel>[STORE VIEW]</scopeLabel>
+				</settings>
+				<formElements>
+					<imageUploader>
+						<settings>
+							<allowedExtensions>jpg jpeg gif png</allowedExtensions>
+							<maxFileSize>3097152</maxFileSize>
+							<uploaderConfig>
+								<param xsi:type="string" name="url">evalent_banner/banner_image/uploaddesktop</param>
+							</uploaderConfig>
+							<previewTmpl>Magento_Catalog/image-preview</previewTmpl>
+						</settings>
+					</imageUploader>
+				</formElements>
+			</field>
+			<field formElement="checkbox" name="button_enabled_desktop" sortOrder="80">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="source" xsi:type="string">Banner</item>
+					</item>
+				</argument>
+				<settings>
+					<dataType>text</dataType>
+					<label translate="true">Button Visible</label>
+					<dataScope>button_enabled_desktop</dataScope>
+					<validation>
+						<rule name="required-entry" xsi:type="boolean">false</rule>
+					</validation>
+					<scopeLabel>[STORE VIEW]</scopeLabel>
+				</settings>
+				<formElements>
+					<checkbox>
+						<settings>
+							<prefer>toggle</prefer>
+							<valueMap>
+								<map name="false" xsi:type="string">0</map>
+								<map name="true" xsi:type="string">1</map>
+							</valueMap>
+						</settings>
+					</checkbox>
+				</formElements>
+			</field>
+			<field formElement="select" name="content_align_desktop" sortOrder="120">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="source" xsi:type="string">Banner</item>
+					</item>
+				</argument>
+				<settings>
+					<dataType>text</dataType>
+					<label translate="true">Content Align</label>
+					<dataScope>content_align_desktop</dataScope>
+					<validation>
+						<rule name="required-entry" xsi:type="boolean">false</rule>
+					</validation>
+					<scopeLabel>[STORE VIEW]</scopeLabel>
+				</settings>
+				<formElements>
+					<select>
+						<settings>
+							<options class="Evalent\Banner\Model\Config\Source\ContentAlign"/>
+						</settings>
+					</select>
+				</formElements>
+			</field>
+			<field formElement="select" name="text_align_desktop" sortOrder="140">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="source" xsi:type="string">Banner</item>
+					</item>
+				</argument>
+				<settings>
+					<dataType>text</dataType>
+					<label translate="true">Text Align</label>
+					<dataScope>text_align_desktop</dataScope>
+					<validation>
+						<rule name="required-entry" xsi:type="boolean">false</rule>
+					</validation>
+					<scopeLabel>[STORE VIEW]</scopeLabel>
+				</settings>
+				<formElements>
+					<select>
+						<settings>
+							<options class="Evalent\Banner\Model\Config\Source\TextAlign"/>
+						</settings>
+					</select>
+				</formElements>
+			</field>
+			<field formElement="select" name="heading_size_desktop" sortOrder="150">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="source" xsi:type="string">Banner</item>
+                        <item name="notice" xsi:type="string" translate="true">Size approximations applies to standard banners, not CTA widgets</item>
+					</item>
+				</argument>
+				<settings>
+					<dataType>text</dataType>
+					<label translate="true">Heading Size</label>
+					<dataScope>heading_size_desktop</dataScope>
+					<validation>
+						<rule name="required-entry" xsi:type="boolean">false</rule>
+					</validation>
+					<scopeLabel>[STORE VIEW]</scopeLabel>
+				</settings>
+				<formElements>
+					<select>
+						<settings>
+							<options class="Evalent\Banner\Model\Config\Source\HeadingSize"/>
+						</settings>
+					</select>
+				</formElements>
+			</field>
+            <field formElement="select" name="heading_secondary_size_desktop" sortOrder="151">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="source" xsi:type="string">Banner</item>
+                        <item name="notice" xsi:type="string" translate="true">Size approximations applies to standard banners, not CTA widgets</item>
+                    </item>
+                </argument>
+                <settings>
+                    <dataType>text</dataType>
+                    <label translate="true">Secondary Heading Size</label>
+                    <dataScope>heading_secondary_size_desktop</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <scopeLabel>[STORE VIEW]</scopeLabel>
+                </settings>
+                <formElements>
+                    <select>
+                        <settings>
+                            <options class="Evalent\Banner\Model\Config\Source\HeadingSecondarySize"/>
+                        </settings>
+                    </select>
+                </formElements>
+            </field>
+            <field formElement="select" name="description_size_desktop" sortOrder="152">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="source" xsi:type="string">Banner</item>
+                        <item name="notice" xsi:type="string" translate="true">Size approximations applies to standard banners, not CTA widgets</item>
+                    </item>
+                </argument>
+                <settings>
+                    <dataType>text</dataType>
+                    <label translate="true">Description Size</label>
+                    <dataScope>description_size_desktop</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <scopeLabel>[STORE VIEW]</scopeLabel>
+                </settings>
+                <formElements>
+                    <select>
+                        <settings>
+                            <options class="Evalent\Banner\Model\Config\Source\DescriptionSize"/>
+                        </settings>
+                    </select>
+                </formElements>
+            </field>
+            <field formElement="select" name="button_size_desktop" sortOrder="153">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="source" xsi:type="string">Banner</item>
+                    </item>
+                </argument>
+                <settings>
+                    <dataType>text</dataType>
+                    <label translate="true">Button Size</label>
+                    <dataScope>button_size_desktop</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <scopeLabel>[STORE VIEW]</scopeLabel>
+                </settings>
+                <formElements>
+                    <select>
+                        <settings>
+                            <options class="Evalent\Banner\Model\Config\Source\ButtonSize"/>
+                        </settings>
+                    </select>
+                </formElements>
+            </field>
+		</fieldset>
+		<fieldset name="mobile">
+			<settings>
+				<label translate="true">Mobile</label>
+				<collapsible>true</collapsible>
+			</settings>
+			<field formElement="imageUploader" name="mobile_image" sortOrder="40">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="source" xsi:type="string">Banner</item>
+					</item>
+				</argument>
+				<settings>
+					<label translate="true">Mobile Image</label>
+					<dataScope>mobile_image</dataScope>
+					<validation>
+						<rule name="required-entry" xsi:type="boolean">false</rule>
+					</validation>
+					<componentType>imageUploader</componentType>
+					<scopeLabel>[STORE VIEW]</scopeLabel>
+				</settings>
+				<formElements>
+					<imageUploader>
+						<settings>
+							<allowedExtensions>jpg jpeg gif png</allowedExtensions>
+							<maxFileSize>3097152</maxFileSize>
+							<uploaderConfig>
+								<param xsi:type="string" name="url">evalent_banner/banner_image/uploadmobile</param>
+							</uploaderConfig>
+							<previewTmpl>Magento_Catalog/image-preview</previewTmpl>
+						</settings>
+					</imageUploader>
+				</formElements>
+			</field>
+			<field formElement="checkbox" name="button_enabled_mobile" sortOrder="90">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="source" xsi:type="string">Banner</item>
+					</item>
+				</argument>
+				<settings>
+					<dataType>text</dataType>
+					<label translate="true">Button Visible</label>
+					<dataScope>button_enabled_mobile</dataScope>
+					<validation>
+						<rule name="required-entry" xsi:type="boolean">false</rule>
+					</validation>
+					<scopeLabel>[STORE VIEW]</scopeLabel>
+				</settings>
+				<formElements>
+					<checkbox>
+						<settings>
+							<prefer>toggle</prefer>
+							<valueMap>
+								<map name="false" xsi:type="string">0</map>
+								<map name="true" xsi:type="string">1</map>
+							</valueMap>
+						</settings>
+					</checkbox>
+				</formElements>
+			</field>
+			<field formElement="select" name="content_align_mobile" sortOrder="130">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="source" xsi:type="string">Banner</item>
+					</item>
+				</argument>
+				<settings>
+					<dataType>text</dataType>
+					<label translate="true">Content Align</label>
+					<dataScope>content_align_mobile</dataScope>
+					<validation>
+						<rule name="required-entry" xsi:type="boolean">false</rule>
+					</validation>
+					<scopeLabel>[STORE VIEW]</scopeLabel>
+				</settings>
+				<formElements>
+					<select>
+						<settings>
+							<options class="Evalent\Banner\Model\Config\Source\ContentAlign"/>
+						</settings>
+					</select>
+				</formElements>
+			</field>
+			<field formElement="select" name="text_align_mobile" sortOrder="150">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="source" xsi:type="string">Banner</item>
+					</item>
+				</argument>
+				<settings>
+					<dataType>text</dataType>
+					<label translate="true">Text Align</label>
+					<dataScope>text_align_mobile</dataScope>
+					<validation>
+						<rule name="required-entry" xsi:type="boolean">false</rule>
+					</validation>
+					<scopeLabel>[STORE VIEW]</scopeLabel>
+				</settings>
+				<formElements>
+					<select>
+						<settings>
+							<options class="Evalent\Banner\Model\Config\Source\TextAlign"/>
+						</settings>
+					</select>
+				</formElements>
+			</field>
+			<field formElement="select" name="heading_size_mobile" sortOrder="160">
+				<argument name="data" xsi:type="array">
+					<item name="config" xsi:type="array">
+						<item name="source" xsi:type="string">Banner</item>
+                        <item name="notice" xsi:type="string" translate="true">Approximate pixel sizes</item>
+                    </item>
+				</argument>
+				<settings>
+					<dataType>text</dataType>
+					<label translate="true">Heading Size</label>
+					<dataScope>heading_size_mobile</dataScope>
+					<validation>
+						<rule name="required-entry" xsi:type="boolean">false</rule>
+					</validation>
+					<scopeLabel>[STORE VIEW]</scopeLabel>
+				</settings>
+				<formElements>
+					<select>
+						<settings>
+							<options class="Evalent\Banner\Model\Config\Source\HeadingSizeMobile"/>
+						</settings>
+					</select>
+				</formElements>
+			</field>
+            <field formElement="select" name="heading_secondary_size_mobile" sortOrder="161">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="source" xsi:type="string">Banner</item>
+                        <item name="notice" xsi:type="string" translate="true">Approximate pixel sizes</item>
+                    </item>
+                </argument>
+                <settings>
+                    <dataType>text</dataType>
+                    <label translate="true">Secondary Heading Size</label>
+                    <dataScope>heading_secondary_size_mobile</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <scopeLabel>[STORE VIEW]</scopeLabel>
+                </settings>
+                <formElements>
+                    <select>
+                        <settings>
+                            <options class="Evalent\Banner\Model\Config\Source\HeadingSecondarySizeMobile"/>
+                        </settings>
+                    </select>
+                </formElements>
+            </field>
+            <field formElement="select" name="description_size_mobile" sortOrder="162">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="source" xsi:type="string">Banner</item>
+                        <item name="notice" xsi:type="string" translate="true">Approximate pixel sizes</item>
+                    </item>
+                </argument>
+                <settings>
+                    <dataType>text</dataType>
+                    <label translate="true">Description Size</label>
+                    <dataScope>description_size_mobile</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <scopeLabel>[STORE VIEW]</scopeLabel>
+                </settings>
+                <formElements>
+                    <select>
+                        <settings>
+                            <options class="Evalent\Banner\Model\Config\Source\DescriptionSizeMobile"/>
+                        </settings>
+                    </select>
+                </formElements>
+            </field>
+            <field formElement="select" name="button_size_mobile" sortOrder="163">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="source" xsi:type="string">Banner</item>
+                    </item>
+                </argument>
+                <settings>
+                    <dataType>text</dataType>
+                    <label translate="true">Button Size</label>
+                    <dataScope>button_size_mobile</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <scopeLabel>[STORE VIEW]</scopeLabel>
+                </settings>
+                <formElements>
+                    <select>
+                        <settings>
+                            <options class="Evalent\Banner\Model\Config\Source\ButtonSizeMobile"/>
+                        </settings>
+                    </select>
+                </formElements>
+            </field>
+		</fieldset>
+	</fieldset>
+	<fieldset name="banner_link">
+		<settings>
+			<label>Banner Link</label>
+			<collapsible>true</collapsible>
+		</settings>
+		<field formElement="input" name="banner_link_url" sortOrder="160">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">Banner</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Banner Link URL</label>
+				<dataScope>banner_link_url</dataScope>
+				<validation>
+					<rule name="required-entry" xsi:type="boolean">false</rule>
+				</validation>
+			</settings>
+		</field>
+		<field formElement="checkbox" name="banner_link_url_new_window" sortOrder="170">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">Banner</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Open URL in New Window</label>
+				<dataScope>banner_link_url_new_window</dataScope>
+				<validation>
+					<rule name="required-entry" xsi:type="boolean">false</rule>
+				</validation>
+			</settings>
+			<formElements>
+				<checkbox>
+					<settings>
+						<prefer>toggle</prefer>
+						<valueMap>
+							<map name="false" xsi:type="string">0</map>
+							<map name="true" xsi:type="string">1</map>
+						</valueMap>
+					</settings>
+				</checkbox>
+			</formElements>
+		</field>
+	</fieldset>
+</form>

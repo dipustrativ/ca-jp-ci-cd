@@ -1,0 +1,173 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Evalent\Banner\Model\Attribute;
+
+use Magento\Eav\Api\AttributeRepositoryInterface as AttributeRepository;
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\EntityManager\MetadataPool;
+use Magento\Store\Model\Store;
+
+class ScopeOverriddenValue extends \Magento\Catalog\Model\Attribute\ScopeOverriddenValue
+{
+
+    /**
+     * @var \Magento\Eav\Api\AttributeRepositoryInterface
+     */
+    private $attributeRepository;
+
+    /**
+     * @var \Magento\Framework\EntityManager\MetadataPool
+     */
+    private $metadataPool;
+
+    /**
+     * @var \Magento\Framework\Api\SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * @var \Magento\Framework\App\ResourceConnection
+     */
+    private $resourceConnection;
+
+    /**
+     * @var \Magento\Framework\Api\FilterBuilder
+     */
+    private $filterBuilder;
+
+
+    /**
+     * @var array
+     */
+    private $attributesValues;
+
+    public function __construct(
+        AttributeRepository $attributeRepository,
+        MetadataPool $metadataPool,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        FilterBuilder $filterBuilder,
+        ResourceConnection $resourceConnection
+    ) {
+        parent::__construct($attributeRepository, $metadataPool,
+            $searchCriteriaBuilder, $filterBuilder, $resourceConnection);
+        $this->attributeRepository = $attributeRepository;
+        $this->metadataPool = $metadataPool;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->filterBuilder = $filterBuilder;
+        $this->resourceConnection = $resourceConnection;
+    }
+
+    /**
+     * Whether attribute value is overridden in specific store
+     *
+     * @param string                               $entityType
+     * @param \Magento\Catalog\Model\AbstractModel $entity
+     * @param string                               $attributeCode
+     * @param int|string                           $storeId
+     *
+     * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function containsValue($entityType, $entity, $attributeCode, $storeId)
+    {
+        if ((int)$storeId === Store::DEFAULT_STORE_ID) {
+            return false;
+        }
+        if ($this->attributesValues === null) {
+            $this->initAttributeValues($entityType, $entity, (int)$storeId);
+        }
+
+        return isset($this->attributesValues[$storeId])
+            && array_key_exists($attributeCode, $this->attributesValues[$storeId]);
+    }
+
+    /**
+     * Get attribute default values
+     *
+     * @param string                               $entityType
+     * @param \Magento\Catalog\Model\AbstractModel $entity
+     *
+     * @return array
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @deprecated 101.0.0
+     */
+    public function getDefaultValues($entityType, $entity)
+    {
+        if ($this->attributesValues === null) {
+            $this->initAttributeValues($entityType, $entity, (int)$entity->getStoreId());
+        }
+
+        return isset($this->attributesValues[Store::DEFAULT_STORE_ID])
+            ? $this->attributesValues[Store::DEFAULT_STORE_ID]
+            : [];
+    }
+
+    /**
+     * @param string                               $entityType
+     * @param \Magento\Catalog\Model\AbstractModel $entity
+     * @param int                                  $storeId
+     *
+     * @return void
+     * @throws \Exception
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function initAttributeValues($entityType, $entity, $storeId)
+    {
+        $metadata = $this->metadataPool->getMetadata($entityType);
+        /** @var \Magento\Eav\Model\Entity\Attribute\AbstractAttribute $attribute */
+        $attributeTables = [];
+        if ($metadata->getEavEntityType()) {
+            foreach ($this->getAttributes($entityType) as $attribute) {
+                if (!$attribute->isStatic()) {
+                    $attributeTables[$attribute->getBackend()->getTable()][] = $attribute->getAttributeId();
+                }
+            }
+            $storeIds = [Store::DEFAULT_STORE_ID];
+            if ($storeId !== Store::DEFAULT_STORE_ID) {
+                $storeIds[] = $storeId;
+            }
+            $selects = [];
+            foreach ($attributeTables as $attributeTable => $attributeCodes) {
+                $select = $metadata->getEntityConnection()->select()
+                    ->from(['t' => $attributeTable], ['value' => 't.value', 'store_id' => 't.store_id'])
+                    ->join(
+                        ['a' => $this->resourceConnection->getTableName('eav_attribute')],
+                        'a.attribute_id = t.attribute_id',
+                        ['attribute_code' => 'a.attribute_code']
+                    )
+                    ->where($metadata->getLinkField() . ' = ?', $entity->getData($metadata->getLinkField()))
+                    ->where('t.attribute_id IN (?)', $attributeCodes)
+                    ->where('t.store_id IN (?)', $storeIds);
+                $selects[] = $select;
+            }
+
+            $unionSelect = new \Magento\Framework\DB\Sql\UnionExpression(
+                $selects,
+                \Magento\Framework\DB\Select::SQL_UNION_ALL
+            );
+            $attributes = $metadata->getEntityConnection()->fetchAll((string)$unionSelect);
+            foreach ($attributes as $attribute) {
+                $this->attributesValues[$attribute['store_id']][$attribute['attribute_code']] = $attribute['value'];
+            }
+        }
+    }
+
+
+    /**
+     * @param string $entityType
+     *
+     * @return \Magento\Eav\Api\Data\AttributeInterface[]
+     * @throws \Exception
+     */
+    private function getAttributes($entityType)
+    {
+        $metadata = $this->metadataPool->getMetadata($entityType);
+        $searchResult = $this->attributeRepository->getList($metadata->getEavEntityType(), $this->searchCriteriaBuilder->create());
+        return $searchResult->getItems();
+    }
+}

@@ -1,0 +1,124 @@
+<?php
+
+/** @var \Evalent\AdminActivityLog\Block\Adminhtml\ModelActivity\View\Info $block */
+
+/** @var \Evalent\AdminActivityLog\Api\Data\ModelActivityInterface $activity */
+$activity = $block->getActivity();
+
+$activityDate = $block->formatDate(
+    $activity->getDatetime(),
+    \IntlDateFormatter::MEDIUM,
+    true
+);
+?>
+
+    <section class="admin__page-section order-view-account-information">
+        <div class="admin__page-section-title">
+            <span class="title"><?= $block->escapeHtml(__('Object & Account Information')) ?></span>
+        </div>
+        <div class="admin__page-section-content">
+            <div class="admin__page-section-item order-information">
+                <?php /* Order Information */ ?>
+                <div class="admin__page-section-item-title">
+                <span class="title">
+                    <?= $block->escapeHtml(__('Activity #%1',
+                        $activity->getModelactivityId())) ?>
+                </span>
+                </div>
+                <div class="admin__page-section-item-content">
+                    <table class="admin__table-secondary order-information-table">
+                        <tr>
+                            <th><?= $block->escapeHtml(__('Activity Date')) ?></th>
+                            <td><?= $block->escapeHtml($activityDate) ?></td>
+                        </tr>
+                        <?php if ($block->getModelName() != ""): ?>
+                            <tr>
+                                <th><?= $block->escapeHtml(__('Type')) ?></th>
+                                <td>
+                                    <span id="type"><?= $block->escapeHtml($block->getModelName()) ?></span>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                        <tr>
+                            <th><?= $block->escapeHtml(__('Resource')) ?></th>
+                            <td>
+                                <span id="order_status"><?= $block->escapeHtml($activity->getModelType()) ?></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?= $block->escapeHtml(__('Action type')) ?></th>
+                            <td>
+                                <span id="order_status"><?= $block->escapeHtml($activity->getActionType()) ?></span>
+                            </td>
+                        </tr>
+                        <th><?= $block->escapeHtml(__('Entity Id')) ?></th>
+                        <td>
+                            <span id="order_status"><?= $block->escapeHtml($activity->getModelEntityId()) ?></span>
+                        </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="admin__page-section-item order-account-information">
+                <?php /* Account Information */ ?>
+                <div class="admin__page-section-item-title">
+                    <span class="title"><?= $block->escapeHtml(__('Account Information')) ?></span>
+                </div>
+                <div class="admin__page-section-item-content">
+                    <table class="admin__table-secondary order-account-information-table">
+                        <tr>
+                            <th><?= $block->escapeHtml(__('Username')) ?></th>
+                            <td>
+                                <?= $block->escapeHtml($activity->getUsername()) ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?= $block->escapeHtml(__('Full name')) ?></th>
+                            <td>
+                                <?= $block->escapeHtml($activity->getFullName()) ?>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<?php if (strtolower($activity->getActionType()) != 'delete'): ?>
+
+    <section class="admin__page-section order-view-account-information">
+        <div class="admin__page-section-title">
+            <span class="title"><?= $block->escapeHtml(__('Changed values')) ?></span>
+        </div>
+        <div class="admin__page-section-content">
+            <div class="admin__page-section-item order-information">
+                <div class="admin__page-section-item-title">
+    <span class="title">
+        <?= $block->escapeHtml(__('Old values')) ?>
+    </span>
+                </div>
+                <div class="admin__page-section-item-content">
+                    <table class="admin__table-secondary admin__table-activity-log-primary">
+                        <tr>
+                            <td><?= $block->escapeHtml($block->getOldValues(), ['br', 'b']) ?></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="admin__page-section-item order-account-information">
+                <div class="admin__page-section-item-title">
+                    <span class="title"><?= $block->escapeHtml(__('New values')) ?></span>
+                </div>
+                <div class="admin__page-section-item-content">
+                    <table class="admin__table-secondary admin__table-activity-log-secondary">
+                        <tr>
+                            <td><?= $block->escapeHtml($block->getNewValues(), ['br', 'b']) ?></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+<?php endif; ?>

@@ -1,0 +1,166 @@
+//
+//  Carpient custom footer (carpient.com look: white bg, 4 columns, black text)
+//  _____________________________________________
+
+@cf-max:    1280px;
+@cf-black:  #ffffff;
+@cf-grey:   #c1c1c1;
+@cf-border: rgba(255, 255, 255, .15);
+
+.page-footer {
+    background: #292d34;
+    border-top: 1px solid @cf-border;
+    margin-top: 40px;
+}
+
+.carpient-footer-inner {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    padding: 25px 0px 30px;
+}
+
+.carpient-footer-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+
+    .carpient-footer-col {
+        h3, h4, strong, .footer-heading {
+            color: @cf-black;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 0 14px;
+            text-transform: none;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            li { margin: 0 0 10px; }
+        }
+
+        a {
+            color: @cf-grey;
+            font-size: 1.5rem;
+
+            &:hover {
+                color: #ffffff;
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+.carpient-footer-bottom {
+    border-top: 1px solid @cf-border;
+    margin-top: 40px;
+    padding-top: 20px;
+    text-align: left;
+    color: @cf-grey;
+    font-size: 1.2rem;
+}
+
+// Hide Magento default copyright bar
+.copyright {
+    display: none !important;
+}
+
+//  White logo strip below the copyright, full bleed
+.carpient-footer-logobar {
+    background: #ffffff;
+    padding: 5px 0 0 0;
+    text-align: center;
+
+    .logo {
+        display: inline-block;
+        float: none;
+        margin: 0;
+        max-width: 180px;
+        width: 100%;
+
+        img {
+            display: block;
+            height: auto;
+            width: 100%;
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    //  50px side padding eats a quarter of a 390px viewport — pull it in.
+    .carpient-footer-inner {
+        padding: 0 20px 25px !important;
+    }
+
+    //  Stacked, not 2-up: the columns are accordion rows on mobile.
+    .carpient-footer-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+    }
+
+    .carpient-footer-bottom {
+        margin-top: 0px;
+    }
+
+    //
+    //  Accordion (Service / Carpient). Closed by default: the class hooks come
+    //  from js/footer-accordion.js, the collapsing is all here.
+    //  _____________________________________________
+    .carpient-footer-grid {
+        .carpient-footer-col--toggle {
+            border-top: 1px solid @cf-border;
+
+            .footer-heading {
+                cursor: pointer;
+                margin: 0;
+                padding: 16px 24px 16px 0;
+                position: relative;
+                user-select: none;
+
+                //  Chevron, pointing down when closed and up when open.
+                &:after {
+                    content: '';
+                    position: absolute;
+                    right: 6px;
+                    top: 50%;
+                    width: 8px;
+                    height: 8px;
+                    margin-top: -6px;
+                    border-right: 1.5px solid @cf-black;
+                    border-bottom: 1.5px solid @cf-black;
+                    transform: rotate(45deg);
+                    transition: transform .2s ease, margin-top .2s ease;
+                }
+
+                &:focus-visible {
+                    outline: 1px solid @cf-black;
+                    outline-offset: 2px;
+                }
+            }
+
+            ul {
+                // ponytail: max-height transition needs a fixed ceiling; 500px clears
+                // the longest column (5 links) with room to spare. Swap for a
+                // grid-template-rows 0fr/1fr transition if a column ever outgrows it.
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height .28s ease;
+            }
+
+            &.is-open {
+                ul {
+                    max-height: 500px;
+                    padding-bottom: 6px;
+                }
+
+                .footer-heading:after {
+                    margin-top: -2px;
+                    transform: rotate(-135deg);
+                }
+            }
+        }
+    }
+}

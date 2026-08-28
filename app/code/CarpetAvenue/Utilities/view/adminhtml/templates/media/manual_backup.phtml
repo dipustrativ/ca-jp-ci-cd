@@ -1,0 +1,142 @@
+<?php
+/**
+ * @var \CarpetAvenue\Utilities\Block\Adminhtml\Media\ManualBackup $block
+ */
+$hasResult  = $block->hasLastResult();
+$resultName = $block->getLastResultName();
+?>
+<div class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Manual Media Backup')) ?></span>
+    </div>
+
+    <div class="admin__page-section-content" style="max-width:800px;">
+
+        <p class="note" style="margin-bottom:20px;">
+            <?= $block->escapeHtml(__('Upload a CSV with image paths to back them up to GCS. Max 50 paths per UI upload. For larger batches use the CLI:')) ?>
+            <br/>
+            <code style="font-size:12px;">bin/magento carpetavenue:media:manual-backup --csv=/path/to/file.csv</code>
+            <br/>
+            <span style="font-size:12px;color:#666;">
+                <?= $block->escapeHtml(__('GCS bucket and path prefix are taken from Stores → Configuration → CarpetAvenue → Utilities → Media Cleanup & Backup → Manual Media Backup.')) ?>
+            </span>
+        </p>
+
+        <!-- ── Upload & Process ──────────────────────────────────────────── -->
+        <form id="ca-manualbackup-form"
+              method="post"
+              action="<?= $block->escapeUrl($block->getProcessUrl()) ?>"
+              enctype="multipart/form-data">
+
+            <input type="hidden" name="form_key" value="<?= $block->escapeHtmlAttr($block->getFormKey()) ?>"/>
+
+            <fieldset class="admin__fieldset">
+
+                <div class="admin__field _required">
+                    <label class="admin__field-label" for="ca-mb-csv-file">
+                        <span><?= $block->escapeHtml(__('CSV File')) ?></span>
+                    </label>
+                    <div class="admin__field-control">
+                        <input type="file"
+                               id="ca-mb-csv-file"
+                               name="csv_file"
+                               accept=".csv,text/csv"
+                               class="admin__control-file"/>
+                        <p class="admin__field-note">
+                            <?= $block->escapeHtml(__('"image_path" header required. Paths relative to pub/media/catalog/product/. Max 50 paths.')) ?>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin__field no-label" style="margin-top:20px;">
+                    <div class="admin__field-control">
+                        <button id="ca-mb-submit"
+                                type="submit"
+                                class="action-default scalable save primary"
+                                style="min-width:180px;">
+                            <span><?= $block->escapeHtml(__('Process CSV & Backup')) ?></span>
+                        </button>
+                        <span id="ca-mb-spinner"
+                              style="display:none;margin-left:16px;vertical-align:middle;color:#666;">
+                            <?= $block->escapeHtml(__('Processing… please wait.')) ?>
+                        </span>
+                    </div>
+                </div>
+
+            </fieldset>
+        </form>
+
+        <!-- ── Download last result ──────────────────────────────────────── -->
+        <div style="margin-top:24px;padding:14px;background:#f8f8f8;border:1px solid #e0e0e0;border-radius:4px;">
+            <strong><?= $block->escapeHtml(__('Last Backup Result')) ?></strong>
+            <?php if ($hasResult): ?>
+            <p style="margin:6px 0 10px;color:#555;font-size:13px;">
+                <code><?= $block->escapeHtml($resultName) ?></code>
+            </p>
+            <a href="<?= $block->escapeUrl($block->getDownloadResultUrl()) ?>"
+               class="action-default scalable"
+               style="display:inline-block;padding:6px 16px;border:1px solid #aaa;border-radius:3px;text-decoration:none;color:#333;">
+                <?= $block->escapeHtml(__('Download Result CSV')) ?>
+            </a>
+            <?php else: ?>
+            <p style="margin:6px 0 0;color:#999;font-size:13px;">
+                <?= $block->escapeHtml(__('No result yet. Run a backup to generate one.')) ?>
+            </p>
+            <?php endif; ?>
+        </div>
+
+        <!-- ── CSV format ────────────────────────────────────────────────── -->
+        <div style="margin-top:20px;padding:12px 14px;background:#fffbe6;border:1px solid #ffe58f;border-radius:4px;font-size:13px;">
+            <strong><?= $block->escapeHtml(__('CSV Format')) ?></strong>
+            <ul style="margin:6px 0 0 18px;line-height:1.8;">
+                <li><?= $block->escapeHtml(__('"image_path" header required (case-insensitive).')) ?></li>
+                <li><?= $block->escapeHtml(__('Paths relative to pub/media/catalog/product/ — no leading slash.')) ?></li>
+                <li><?= $block->escapeHtml(__('Allowed characters: letters, digits, hyphens, underscores, dots, forward slashes.')) ?></li>
+                <li><?= $block->escapeHtml(__('Allowed extensions: jpg, jpeg, png, gif, webp, svg, bmp, tiff, tif.')) ?></li>
+            </ul>
+            <p style="margin:8px 0 0;"><strong><?= $block->escapeHtml(__('Result CSV columns:')) ?></strong>
+                <code>image_path</code>, <code>bucket_full_path</code>
+                (<?= $block->escapeHtml(__('full gs://bucket/prefix/path when backed up, empty otherwise')) ?>)
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+require(['jquery'], function ($) {
+    'use strict';
+
+    var MAX_UI_ROWS = 50;
+
+    // Pre-validate row count using FileReader before submit
+    $('#ca-mb-csv-file').on('change', function () {
+        var file = this.files && this.files[0];
+        if (!file) { return; }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var lines    = e.target.result.split('\n').filter(function (l) { return l.trim() !== ''; });
+            var dataRows = lines.length - 1;
+            if (dataRows > MAX_UI_ROWS) {
+                alert(
+                    '<?= $block->escapeJs(__('This CSV has ')) ?>' + dataRows +
+                    '<?= $block->escapeJs(__(' rows — exceeds the UI limit of 50.')) ?>' +
+                    '\n\n<?= $block->escapeJs(__('Use the CLI for large batches. Upload the CSV via the config panel to get the saved path, then run:')) ?>' +
+                    '\nbin/magento carpetavenue:media:manual-backup --csv=...'
+                );
+                $('#ca-mb-csv-file').val('');
+            }
+        };
+        reader.readAsText(file);
+    });
+
+    $('#ca-manualbackup-form').on('submit', function () {
+        if (!$('#ca-mb-csv-file').val()) {
+            alert('<?= $block->escapeJs(__('Please select a CSV file.')) ?>');
+            return false;
+        }
+        $('#ca-mb-submit').prop('disabled', true);
+        $('#ca-mb-spinner').show();
+    });
+});
+</script>

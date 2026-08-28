@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Pass the option-image view model to the filter option renderer so color (and
+ * any other imaged option) can show its uploaded swatch. Carpient_Filter.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="catalog.navigation.renderer">
+            <arguments>
+                <argument name="option_image_view_model" xsi:type="object">Carpient\Filter\ViewModel\OptionImages</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

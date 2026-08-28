@@ -1,0 +1,52 @@
+<?php
+/** @var \CarpetAvenue\Orderify\Block\Adminhtml\Order\RefundStatisticsSection $block */
+
+?>
+<style>
+    .overview-wrapper {
+        display: flex;
+        gap: 0;
+        margin-bottom: 20px;
+    }
+    .overview-box {
+        flex: 1;
+        background: #fff;
+        border: 1px solid #dcdcdc;
+        padding: 15px;
+        border-radius: 0;
+    }
+    .overview-title {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+        text-transform: uppercase;
+    }
+    .overview-text {
+        font-size: 13px;
+        line-height: 18px;
+    }
+</style>
+
+<div class="order-customer-refund-statistics">
+
+</div>
+
+<script type="text/javascript">
+    require(['jquery', 'mage/url'], function($, urlBuilder){
+        $(document).ready(function(){
+
+            $.ajax({
+                url: "<?= $block->getAjaxUrl();?>",
+                type: 'GET',
+                success: function(response) {
+                    $('.order-customer-refund-statistics').html(response);
+                },
+                error: function(e) {
+
+                }
+            });
+        });
+    });
+</script>

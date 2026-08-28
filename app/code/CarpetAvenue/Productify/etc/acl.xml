@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Product
+ * @package   CarpetAvenue_Productify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="CarpetAvenue_Core::carpetavenue">
+                    <resource id="CarpetAvenue_Productify::productify" title="Productify" translate="title" sortOrder="700">
+                        <resource id="CarpetAvenue_Productify::productify_cronjob" title="Cron Job Setting" translate="title"/>
+                        <resource id="CarpetAvenue_Productify::productify_groupproducts" title="Group Products" translate="title"/>
+                        <resource id="CarpetAvenue_Productify::productify_rewriteurl" title="Rewrite URL" translate="title"/>
+                        <resource id="CarpetAvenue_Productify::productify_campaign" title="Campaign Config" translate="title"/>
+                        <resource id="CarpetAvenue_Productify::productify_bf_cache" title="BF cache" translate="title"/>
+                        <!-- Merged features. productify_ajaxscroll replaces the
+                             Lof_All::config resource the AjaxScroll config
+                             section used to point at. -->
+                        <resource id="CarpetAvenue_Productify::productify_layerednav" title="Layered Navigation" translate="title"/>
+                        <resource id="CarpetAvenue_Productify::productify_ajaxscroll" title="Infinite Scroll" translate="title"/>
+                        <resource id="CarpetAvenue_Productify::productify_product_status" title="Advanced Product Status" translate="title"/>
+                        <resource id="CarpetAvenue_Productify::productify_enhance_category" title="Category Enhancements" translate="title"/>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

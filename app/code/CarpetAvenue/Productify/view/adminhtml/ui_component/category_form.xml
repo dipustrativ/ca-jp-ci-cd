@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <!-- ===================================================================
+         Content fieldset — merged from CarpetAvenue_EnhanceCategory.
+         Backed by the category attributes installed by
+         EnhanceCategory\Setup\Patch\Data\{AddCategoryImageAttributes,
+         AddCategoryShortDescription}.
+         =================================================================== -->
+    <fieldset name="content">
+        <field name="short_description" sortOrder="55" formElement="textarea">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Short Description</label>
+                <visible>true</visible>
+                <required>false</required>
+            </settings>
+        </field>
+        <field name="thumbnail" sortOrder="41" formElement="imageUploader">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <elementTmpl>ui/form/element/uploader/image</elementTmpl>
+                <dataType>string</dataType>
+                <label translate="true">Thumbnail</label>
+                <visible>true</visible>
+                <required>false</required>
+            </settings>
+            <formElements>
+                <imageUploader>
+                    <settings>
+                        <required>false</required>
+                        <uploaderConfig>
+                            <param xsi:type="url" name="url" path="catalog/category_image/upload"/>
+                        </uploaderConfig>
+                        <previewTmpl>Magento_Catalog/image-preview</previewTmpl>
+                        <openDialogTitle>Media Gallery</openDialogTitle>
+                        <initialMediaGalleryOpenSubpath>catalog/category</initialMediaGalleryOpenSubpath>
+                        <allowedExtensions>jpg jpeg gif png</allowedExtensions>
+                        <maxFileSize>4194304</maxFileSize>
+                    </settings>
+                </imageUploader>
+            </formElements>
+        </field>
+        <field name="mobile_image" sortOrder="41" formElement="imageUploader">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <elementTmpl>ui/form/element/uploader/image</elementTmpl>
+                <dataType>string</dataType>
+                <label translate="true">Mobile Image</label>
+                <visible>true</visible>
+                <required>false</required>
+            </settings>
+            <formElements>
+                <imageUploader>
+                    <settings>
+                        <required>false</required>
+                        <uploaderConfig>
+                            <param xsi:type="url" name="url" path="catalog/category_image/upload"/>
+                        </uploaderConfig>
+                        <previewTmpl>Magento_Catalog/image-preview</previewTmpl>
+                        <openDialogTitle>Media Gallery</openDialogTitle>
+                        <initialMediaGalleryOpenSubpath>catalog/category</initialMediaGalleryOpenSubpath>
+                        <allowedExtensions>jpg jpeg gif png</allowedExtensions>
+                        <maxFileSize>4194304</maxFileSize>
+                    </settings>
+                </imageUploader>
+            </formElements>
+        </field>
+    </fieldset>
+
+    <fieldset name="display_settings">
+        <field name="custom_title" formElement="input" sortOrder="13">
+            <settings>
+                <dataType>string</dataType>
+                <label translate="true">Custom Title</label>
+                <notice translate="true">Title will overright the category name in category page title</notice>
+            </settings>
+        </field>
+        <field name="megamenu_badge" formElement="input" sortOrder="14">
+            <settings>
+                <dataType>string</dataType>
+                <label translate="true">Mega Menu Badge</label>
+                <notice translate="true">Enter badge text to display in Mega Menu</notice>
+            </settings>
+        </field>
+        <field name="megamenu_badge_color" formElement="colorPicker" sortOrder="15">
+            <settings>
+                <label translate="true">Mega Menu Badge Bg Color</label>
+                <componentType>colorPicker</componentType>
+                <dataScope>megamenu_badge_color</dataScope>
+                <dataType>text</dataType>
+            </settings>
+            <formElements>
+                <colorPicker>
+                    <settings>
+                        <colorPickerMode>full</colorPickerMode>
+                        <colorFormat>hex</colorFormat>
+                    </settings>
+                </colorPicker>
+            </formElements>
+        </field>
+        <field name="top_banner" sortOrder="16" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>int</dataType>
+                <label translate="true">Top Banner</label>
+                <dataScope>top_banner</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="CarpetAvenue\Productify\Model\Config\Source\BannerList"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="custom_bottom_block" sortOrder="17" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>string</dataType>
+                <label translate="true">Category Page Bottom Block</label>
+                <dataScope>custom_bottom_block</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="CarpetAvenue\Productify\Model\Config\Source\BlockList"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="hide_bottom_block_link" formElement="checkbox" sortOrder="18">
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Hide Links in Bottom Block</label>
+                <notice translate="true">When enabled, anchor tags inside the custom bottom CMS block will be hidden via CSS</notice>
+                <dataScope>hide_bottom_block_link</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="show_description_top" formElement="checkbox" sortOrder="19">
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Show description on top</label>
+                <dataScope>show_description_top</dataScope>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>0</value>
+                            <actions>
+                                <action name="0">
+                                    <target>category_form.category_form.display_settings.description_read_more</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="1">
+                                    <target>category_form.category_form.display_settings.description_read_more_chars</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>category_form.category_form.display_settings.description_read_more</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="description_read_more" formElement="checkbox" sortOrder="20">
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Enable Read More for Description</label>
+                <notice translate="true">When enabled, long descriptions will be truncated with a "Read More" toggle</notice>
+                <dataScope>description_read_more</dataScope>
+                <visible>false</visible>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>0</value>
+                            <actions>
+                                <action name="0">
+                                    <target>category_form.category_form.display_settings.description_read_more_chars</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>category_form.category_form.display_settings.description_read_more_chars</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="description_read_more_chars" formElement="input" sortOrder="21">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Read More Character Limit</label>
+                <notice translate="true">Max characters to show before "Read More". Set to 0 to use the default 2-sentence logic.</notice>
+                <dataScope>description_read_more_chars</dataScope>
+                <visible>false</visible>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="category_custom_css" formElement="textarea" sortOrder="22">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Custom CSS</label>
+                <notice translate="true">Add custom CSS for this category page. Example: .breadcrumbs { display: none; }</notice>
+                <dataScope>category_custom_css</dataScope>
+            </settings>
+        </field>
+
+    </fieldset>
+</form>

@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <bfcache>
+            <general>
+                <enabled>1</enabled>
+                <max_age>600</max_age>
+            </general>
+        </bfcache>
+        <productify>
+            <general>
+                <round_shape_option_id>20</round_shape_option_id>
+                <primary_shape_option_id>19</primary_shape_option_id>
+            </general>
+            <catalog_price>
+                <hide_zeros>1</hide_zeros>
+            </catalog_price>
+            <search_suggest>
+                <enabled>1</enabled>
+                <min_chars>2</min_chars>
+                <product_limit>8</product_limit>
+                <cache_ttl>300</cache_ttl>
+            </search_suggest>
+
+            <!-- Merged CarpetAvenue_LayeredNavigation (was carpetavenue_layerednav/*) -->
+            <layerednav>
+                <general>
+                    <enabled>1</enabled>
+                    <multiselect_enabled>1</multiselect_enabled>
+                    <batch_apply>1</batch_apply>
+                </general>
+                <ajax>
+                    <enabled>1</enabled>
+                </ajax>
+                <slider>
+                    <enabled>1</enabled>
+                    <step>1</step>
+                </slider>
+                <seo>
+                    <enabled>1</enabled>
+                    <allow_index_single_filter>0</allow_index_single_filter>
+                    <multi_value_separator>_</multi_value_separator>
+                </seo>
+            </layerednav>
+
+            <!-- Merged CarpetAvenue_ProductStatus (was catalog/advanced_product_status/*) -->
+            <product_status>
+                <online_enabled>0</online_enabled>
+                <approve_enabled>0</approve_enabled>
+                <weight_enabled>0</weight_enabled>
+            </product_status>
+
+            <!-- Merged CarpetAvenue_EnhanceCategory (was catalog/frontend/product_category_link_position) -->
+            <enhance_category>
+                <product_category_link_position>0</product_category_link_position>
+            </enhance_category>
+
+            <!-- Merged Lof_AjaxScroll (was lofajaxscroll/*) -->
+            <ajaxscroll>
+                <general>
+                    <enabled>1</enabled>
+                </general>
+                <instances>
+                    <enabled_grid>1</enabled_grid>
+                    <enabled_layer>1</enabled_layer>
+                    <enabled_search>1</enabled_search>
+                    <enabled_advanced>1</enabled_advanced>
+                    <enabled_brand>1</enabled_brand>
+                    <delay>600</delay>
+                </instances>
+                <selectors>
+                    <content>.main</content>
+                    <pagination>.toolbar .pages</pagination>
+                    <toolbar>.toolbar</toolbar>
+                    <next>.next</next>
+                    <grid_mode>.products-grid</grid_mode>
+                    <list_mode>.products-list</list_mode>
+                </selectors>
+                <design>
+                    <loading_image></loading_image>
+                    <loading_text><![CDATA[<em>Loading - please wait...</em>]]></loading_text>
+                    <done_text><![CDATA[<em>Congratulations, you've reached the end of the internet.</em>]]></done_text>
+                    <hide_toolbar>1</hide_toolbar>
+                    <buffer>150</buffer>
+                    <load_more>5</load_more>
+                    <load_more_text>See more</load_more_text>
+                    <load_prev_text>Previous</load_prev_text>
+                    <local_mode>0</local_mode>
+                    <show_progressbar>1</show_progressbar>
+                </design>
+            </ajaxscroll>
+        </productify>
+        <catalog>
+            <related_carousel_products>
+                <enabled>1</enabled>
+                <enabled_request_param>0</enabled_request_param>
+                <request_param_name/>
+                <request_param_value/>
+                <list_size>12</list_size>
+                <attribute_1/>
+                <attribute_2/>
+                <underline_color>#333</underline_color>
+                <price_color>#2d8e3c</price_color>
+                <product_name_color>#333</product_name_color>
+            </related_carousel_products>
+        </catalog>
+    </default>
+</config>

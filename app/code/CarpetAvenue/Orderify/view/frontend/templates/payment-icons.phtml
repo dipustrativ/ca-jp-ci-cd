@@ -1,0 +1,21 @@
+<?php
+/** @var \CarpetAvenue\Orderify\Block\PaymentIcons $block */
+$icons = $block->isEnabled() ? $block->getIcons() : [];
+?>
+<?php if ($icons) :?>
+    <div class="ca-payment-icons ca-payment-icons--<?= $block->escapeHtmlAttr($block->getAlign()) ?><?= ($cssClass = $block->getCustomClass()) ? ' ' . $block->escapeHtmlAttr($cssClass) : '' ?>">
+        <?php if ($heading = $block->getHeading()) :?>
+            <span class="ca-payment-icons__heading"><?= $block->escapeHtml($heading) ?></span>
+        <?php endif; ?>
+        <ul class="ca-payment-icons__list">
+            <?php foreach ($icons as $icon) :?>
+                <li class="ca-payment-icons__item">
+                    <img class="ca-payment-icons__img"
+                         src="<?= $block->escapeUrl($icon['url']) ?>"
+                         alt="<?= $block->escapeHtmlAttr($icon['label']) ?>"
+                         width="48" height="30" loading="lazy"/>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>

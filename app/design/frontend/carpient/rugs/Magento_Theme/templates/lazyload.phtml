@@ -1,0 +1,38 @@
+<script type="text/javascript">
+    require([
+        'jquery',
+        'Magento_Theme/js/lazyload'
+    ], function ($) {
+
+        $(".lazy-load").lazyload({
+            effect : "fadeIn",
+            threshold: 1000
+        });
+
+        $(document).on('amshopby-mixin:afterChangeContent', function (e) {
+
+            $(".product-image-photo.lazy-load").lazyload({
+                effect : "fadeIn",
+                threshold: 1000
+            });
+        });
+
+        $(document).on('minicart:open', function (e) {
+
+            $(".product-image-photo.lazy-load").lazyload({
+                effect : "fadeIn",
+                threshold: 0
+            });
+        });
+
+        $(document).on('ev-megamenu:open', function (e) {
+
+            $(".megamenu__child-image .lazy-load").lazyload({
+                effect : "fadeIn",
+                threshold: 0
+            });
+        });
+
+    });
+
+</script>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+    <body>
+        <referenceContainer name="content">
+            <block name="carpet_orderify_optional_region_state" class="CarpetAvenue\Orderify\Block\OnestepCheckout\OptionalStateRegion" template="CarpetAvenue_Orderify::onesetpcheckout/optional_region_state.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

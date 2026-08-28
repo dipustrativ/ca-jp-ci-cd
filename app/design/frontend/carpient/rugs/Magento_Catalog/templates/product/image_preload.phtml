@@ -1,0 +1,14 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var $block \Magento\Catalog\Block\Product\View */
+
+$_image = $block->getImage($block->getProduct(), 'product_page_image_medium');
+?>
+
+<link rel="preload" fetchpriority="high" as="image"
+      href="<?= $block->escapeUrl($_image->getImageUrl()) ?>" type="image/webp">
+

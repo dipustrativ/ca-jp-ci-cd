@@ -1,0 +1,187 @@
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_Osc
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+
+#field-position-sortable .suggest-position {
+    background: #cccccc;
+    height: 4rem;
+    float: left;
+}
+
+/* ------------------------------------------------------------------- */
+
+/* General */
+
+.field-wrapper.sorted-wrapper {
+    background-color: #fafafa;
+    border-left: none;
+}
+
+.field-wrapper.available-wrapper {
+    background-color: #e3e3e3;
+    border-right: none;
+}
+
+.field-wrapper {
+    display: table-cell;
+    vertical-align: top;
+    float: unset;
+    border-radius: 10px;
+}
+
+.field-wrapper ul {
+    width: 100%;
+    min-height: 450px;
+    padding-top: 5px;
+    list-style-type: none;
+}
+
+.field-wrapper ul li {
+    width: 48%;
+    margin: 1%;
+}
+
+.field-wrapper ul li.wide {
+    width: 98%;
+}
+
+.field-wrapper ul li.medium {
+    width: 72%;
+}
+
+.field-wrapper ul li.short {
+    width: 23%;
+}
+
+.field-wrapper.available-wrapper ul li {
+    width: 96%;
+    margin: 2%;
+}
+
+.field-wrapper ul li .attribute-label {
+    border: 1px solid #cccccc;
+    text-align: center;
+    padding: 10px 10px;
+    cursor: move;
+    background: #ffffff;
+    height: 20px !important;
+    box-sizing: content-box;
+}
+
+.field-wrapper ul li.ui-state-disabled {
+    opacity: 1;
+}
+
+.field-wrapper ul li.ui-state-disabled .attribute-label {
+    background-color: #514943;
+    border-color: #514943;
+    color: #ffffff;
+}
+
+.available-wrapper .ui-resizable-handle {
+    display: none !important;
+}
+
+#field-position-sortable .ui-resizable-s {
+    display: none !important;
+}
+
+/* Containment area */
+
+.ui-resizable-border {
+    border: 1px dotted #cccccc;
+}
+
+#mposc-field-tabs a {
+    width: 100%;
+    padding: 5px;
+    font-size: 2rem;
+    line-height: 1.5;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-height: 125px;
+}
+
+#mposc-field-tabs a._active {
+    background-color: #4440A3;
+    border-color: #4440A3;
+    color: #ffffff;
+}
+
+#field-position-sortable .attribute-required {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+}
+
+.available-wrapper .attribute-required, .mposc-field-container {
+    display: none;
+}
+
+.mposc-field-container .containment.row {
+    display: flex;
+}
+
+.f-left {
+    float: left;
+}
+
+#field-position-sortable > .mposc-field-container > .messages > .message:last-child {
+    margin: 0;
+}
+div#mposc-field-tabs {
+    display: flex;
+    flex-direction: column;
+}
+div#field-position-sortable {
+    width: 100%;
+    margin-left: 2%;
+    padding: 10px;
+}
+.field-wrapper.sorted-wrapper {
+    margin-left: 2%;
+    background-color: #fafafa;
+}
+.mposc-field-container {
+    width: 100%;
+}
+a.button.action-default {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+a.button.action-default span{
+    padding-left:10px;
+}
+div#position-save-messages {
+    margin-bottom: 20px;
+}
+
+#mposc-field-tabs {
+    height: 500px;
+    width: 20%;
+    overflow: scroll;
+    overflow-x: hidden;
+}
+
+img.icon_type_custom_image {
+    width: 20px;
+    height: 20px;
+}
+

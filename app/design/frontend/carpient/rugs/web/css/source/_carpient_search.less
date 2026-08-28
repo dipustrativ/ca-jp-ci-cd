@@ -1,0 +1,585 @@
+//
+//  Header search — open state + suggestion dropdown
+//  Closed state (icon only) lives in _extend.less with the rest of the header row.
+//
+//  Open: the bar expands in place in the left header zone — close X, then a grey
+//  pill field. Nothing else in the row moves: the logo keeps its absolute centre
+//  and the account/cart icons stay put, so the bar is capped to stop short of the
+//  logo instead of taking the row over. The page behind dims. The dropdown hangs
+//  off the form, so it stays put whether or not sticky-header.js has pinned the
+//  header; it starts at the bar's left edge but sizes itself, since the bar is too
+//  narrow for the sidebar plus two product columns.
+//  _____________________________________________
+
+@ps-bar-max:      640px;
+@ps-close-width:  44px;   //  close X (@ca-header-icon-size) + the 14px bar gap
+@ps-bar-total:    @ps-bar-max + @ps-close-width;
+@ps-bar-share:    35%;    //  bar width as a share of the header row (reference)
+@ps-panel-max:    860px;  //  suggestion panel — wider than the bar it hangs off
+@ps-logo-clear:   160px;  //  half the 280px centred logo + 20px breathing room
+@ps-border:       #e6e6e6;
+@ps-divider:      #ececec;
+@ps-muted:        #7d7d7d;
+@ps-field-bg:     #f0f0f0;
+@ps-field-border: transparent;
+@ps-skeleton:     #f2f2f2;
+@ps-skeleton-hi:  #e8e8e8;
+@ps-mobile-bar-height: 64px;
+
+.page-header .header.content {
+    position: relative;
+}
+
+//  Dim the page. The sticky wrapper is only `position: fixed` once pinned, so
+//  it needs its own stacking context here or the header dims with the page.
+//  The dim has to clear the highest in-content layer — the gallery's slick arrows
+//  (10) and slide counter (9) — or those stay bright over a dimmed page.
+@ps-dim-z:    50;
+
+body.search-open {
+    .page-wrapper:before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: @ps-dim-z;
+    }
+
+    .sticky.wrapper {
+        position: relative;
+        z-index: (@ps-dim-z + 1);
+        background: #ffffff;
+    }
+}
+
+.block-search.active {
+    //  Stays in flow: the close X sits at the row's left edge and the field grows
+    //  from there. `relative` only so the dropdown stacks over the rest of the
+    //  header row (the whole row already clears the page dim via .sticky.wrapper).
+    position: relative;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    //  Never reach the centred logo. Whichever is smallest: the field cap (wide
+    //  screens), 35% of the row (the reference proportion, keeps the gap looking
+    //  the same at any width), or half the row less the logo's half-width (the
+    //  hard no-overlap floor, only bites below ~950px).
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    max-width: ~"min(@{ps-bar-total}, @{ps-bar-share}, calc(50% - @{ps-logo-clear}))";
+    margin: 0;
+    padding: 0;
+
+    //  Trigger becomes the close X, far left
+    .block-title:before {
+        content: "\e680";
+    }
+
+    .block-content {
+        display: block;
+        flex: 1 1 auto;
+        position: static;
+        //  `width: 100%` here would be 100% of the bar and push the field past
+        //  its right edge by the close button + gap.
+        width: auto;
+        min-width: 0;
+        max-width: @ps-bar-max;
+        margin: 0;
+    }
+
+    .form.minisearch {
+        position: relative;
+        margin: 0;
+    }
+
+    .field.search {
+        position: relative;
+        margin: 0;
+
+        //  Magnifier inside the field
+        .label {
+            position: absolute !important;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: auto !important;
+            height: auto !important;
+            margin: 0 !important;
+            clip: auto !important;
+            z-index: 2;
+            pointer-events: none;
+
+            &:before {
+                .ca-icon("\e618");
+                font-size: 2.2rem;
+                color: #5f5f5f;
+            }
+
+            span {
+                display: none;
+            }
+        }
+
+        .control {
+            margin: 0;
+            padding: 0;
+            border-top: 0;
+            position: static;
+        }
+
+        input {
+            position: static;
+            left: auto;
+            margin: 0;
+            width: 100%;
+            height: 48px;
+            border: 1px solid @ps-field-border;
+            border-radius: 8px;
+            background: @ps-field-bg;
+            padding: 0 48px 0 50px;
+            font-size: 1.6rem;
+
+            &:focus {
+                border-color: #9c9c9c;
+                box-shadow: none;
+            }
+        }
+    }
+
+    //  Clear X — only once something has been typed
+    .action.clear {
+        display: none;
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2;
+        padding: 6px;
+        border: 0;
+        background: none;
+        color: #5f5f5f;
+        cursor: pointer;
+        line-height: 0;
+    }
+
+    input:not(:placeholder-shown) ~ .action.clear {
+        display: block;
+    }
+
+    //  Enter submits; a visible button would crowd the bar
+    .actions {
+        display: none;
+    }
+}
+
+//
+//  Suggestion dropdown
+//  _____________________________________________
+.productify-suggest {
+    display: none;
+    position: absolute;
+    top: ~"calc(100% + 8px)";
+    left: 0;
+    right: 0;
+    z-index: 7;
+    max-height: ~"calc(100vh - 180px)";
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid @ps-border;
+    border-radius: 10px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+    text-align: left;
+
+    &.is-open {
+        display: block;
+    }
+
+    //  "Nothing found" hugs its text instead of spanning the whole bar
+    &:has(.productify-suggest__empty) {
+        right: auto;
+        width: max-content;
+        max-width: 100%;
+    }
+
+    //  In the header the bar is deliberately narrow, which is not enough room for
+    //  the sidebar + two product columns. The panel is anchored to the bar's left
+    //  edge but sized by its own content instead, up to @ps-panel-max.
+    .block-search.active & {
+        right: auto;
+        width: max-content;
+        min-width: 100%;
+        max-width: ~"min(@{ps-panel-max}, calc(100vw - 40px))";
+    }
+
+    &__inner {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr);
+
+        //  Only collections/pages matched, or only products — one column, no
+        //  divider hanging beside an empty half.
+        &--single {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    &__side {
+        padding: 22px 24px;
+        border-right: 1px solid @ps-divider;
+    }
+
+    &__inner--single &__side {
+        border-right: 0;
+    }
+
+    &__group + &__group {
+        margin-top: 22px;
+    }
+
+    &__heading {
+        margin: 0 0 12px;
+        .lib-font-size(12px);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: @ps-muted;
+    }
+
+    &__list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li + li {
+            margin-top: 10px;
+        }
+    }
+
+    &__link {
+        display: block;
+        color: @ca-black;
+        .lib-font-size(15px);
+
+        b {
+            font-weight: @font-weight__bold;
+        }
+
+        &:visited,
+        &:hover,
+        &:focus,
+        &.is-selected {
+            color: @ca-black;
+        }
+
+        &:hover,
+        &:focus,
+        &.is-selected {
+            text-decoration: underline;
+        }
+    }
+
+    &__main {
+        padding: 22px 24px;
+    }
+
+    &__grid {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px 24px;
+    }
+
+    &__product {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 6px;
+        margin: -6px;
+        border-radius: 6px;
+        color: @ca-black;
+
+        &:visited {
+            color: @ca-black;
+        }
+
+        &:hover,
+        &:focus,
+        &.is-selected {
+            background: #f6f6f6;
+            color: @ca-black;
+            text-decoration: none;
+        }
+    }
+
+    &__thumb {
+        flex: 0 0 64px;
+        width: 64px;
+        height: 80px;
+        overflow: hidden;
+        border-radius: 4px;
+        background: @ps-skeleton;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+    }
+
+    &__info {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    &__name {
+        display: block;
+        font-weight: @font-weight__bold;
+        .lib-font-size(14px);
+    }
+
+    &__size {
+        display: block;
+        margin-top: 2px;
+        color: @ps-muted;
+        .lib-font-size(13px);
+    }
+
+    &__price {
+        display: block;
+        margin-top: 6px;
+        .lib-font-size(14px);
+    }
+
+    &__price-label {
+        color: @ps-muted;
+        font-weight: @font-weight__regular;
+    }
+
+    &__price-old {
+        margin: 0 4px;
+        color: @ps-muted;
+        text-decoration: line-through;
+        font-weight: @font-weight__regular;
+    }
+
+    &__price-value {
+        font-weight: @font-weight__bold;
+        color: @ca-price;
+    }
+
+    &__all {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid @ps-divider;
+        color: @ca-black;
+        font-weight: @font-weight__semibold;
+        .lib-font-size(14px);
+
+        &:visited {
+            color: @ca-black;
+        }
+
+        &:hover,
+        &:focus,
+        &.is-selected {
+            color: @ca-black;
+            text-decoration: underline;
+        }
+    }
+
+    &__empty {
+        padding: 18px 22px;
+        .lib-font-size(15px);
+        white-space: nowrap;
+
+        b {
+            font-weight: @font-weight__bold;
+        }
+    }
+
+    //
+    //  Skeleton shown while a query is in flight
+    //  _____________________________________________
+    &__skeleton {
+        list-style: none;
+        margin: 0;
+        padding: 20px 22px;
+        display: grid;
+        gap: 16px;
+    }
+
+    &__skeleton-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    &__skeleton-thumb,
+    &__skeleton-lines span {
+        background: linear-gradient(90deg, @ps-skeleton 25%, @ps-skeleton-hi 37%, @ps-skeleton 63%);
+        background-size: 400% 100%;
+        animation: productify-suggest-shimmer 1.2s ease-in-out infinite;
+    }
+
+    &__skeleton-thumb {
+        flex: 0 0 64px;
+        width: 64px;
+        height: 80px;
+        border-radius: 4px;
+    }
+
+    &__skeleton-lines {
+        flex: 1 1 auto;
+        display: grid;
+        gap: 8px;
+
+        span {
+            display: block;
+            height: 10px;
+            border-radius: 3px;
+        }
+
+        span:nth-child(1) {
+            width: 55%;
+        }
+
+        span:nth-child(2) {
+            width: 30%;
+        }
+
+        span:nth-child(3) {
+            width: 40%;
+        }
+    }
+}
+
+@keyframes productify-suggest-shimmer {
+    0% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .productify-suggest__skeleton-thumb,
+    .productify-suggest__skeleton-lines span {
+        animation: none;
+    }
+}
+
+//
+//  Search results page band — same dropdown, narrower host
+//  _____________________________________________
+.carpient-search-band .productify-suggest {
+    top: ~"calc(100% + 6px)";
+}
+
+//
+//  Mobile / tablet
+//  _____________________________________________
+@media (max-width: 768px) {
+    //  Phone: search takes over the screen. Anchoring bar and panel to the
+    //  viewport (not to the header row) also keeps them intact on pages whose
+    //  content is wider than the viewport.
+    body.search-open {
+        overflow: hidden;
+    }
+
+    //  Full-screen bar covers the row — no room to keep the logo alongside it
+    body.search-open .header-wrapper__centered {
+        display: none;
+    }
+
+    .block-search.active {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        //  `fixed` children resolve against a transformed ancestor, so the
+        //  desktop centring transform has to go for the panel below to work.
+        transform: none;
+        //  The desktop cap keeps the bar clear of the centred logo; here the bar
+        //  owns the viewport, so it has to go.
+        max-width: none;
+        z-index: 100;
+        gap: 10px;
+        height: @ps-mobile-bar-height;
+        padding: 0 12px;
+        background: #ffffff;
+        border-bottom: 1px solid @ps-divider;
+
+        .field.search input {
+            height: 44px;
+            padding: 0 42px 0 44px;
+            font-size: 1.5rem;
+        }
+    }
+
+    //  Header panel fills the rest of the screen under the fixed bar. Scoped to
+    //  the header — the search-results band keeps its in-flow dropdown below.
+    .block-search.active .productify-suggest {
+        position: fixed;
+        top: @ps-mobile-bar-height;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 100;
+        //  Undo the desktop content-sized panel — here it fills the viewport.
+        width: auto;
+        min-width: 0;
+        max-width: none;
+        max-height: none;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .productify-suggest {
+        &:has(.productify-suggest__empty) {
+            right: 0;
+            width: auto;
+        }
+
+        &__inner {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        &__side {
+            border-right: 0;
+            border-bottom: 1px solid @ps-divider;
+            padding: 16px 18px;
+        }
+
+        &__main {
+            padding: 16px 18px;
+        }
+
+        &__grid {
+            gap: 14px;
+        }
+
+        &__empty {
+            white-space: normal;
+        }
+    }
+}
+
+@media (max-width: 575px) {
+    .productify-suggest__grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

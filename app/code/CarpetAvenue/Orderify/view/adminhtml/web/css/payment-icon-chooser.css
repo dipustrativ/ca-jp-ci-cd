@@ -1,0 +1,57 @@
+.payment-icon-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.payment-icon-field .payment-icon-preview {
+    width: 40px;
+    height: 26px;
+    object-fit: contain;
+    border: 1px solid #d6d6d6;
+    border-radius: 3px;
+    background: #fff;
+    padding: 2px;
+    display: none;
+}
+
+.payment-icon-modal .payment-icon-upload {
+    margin-bottom: 16px;
+}
+.payment-icon-modal .payment-icon-upload__btn input[type="file"] {
+    display: none;
+}
+.payment-icon-modal .payment-icon-upload__status {
+    margin-left: 10px;
+    color: #555;
+}
+.payment-icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 12px;
+}
+.payment-icon-grid__item {
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+    background: #fff;
+}
+.payment-icon-grid__item:hover {
+    border-color: #007bdb;
+    box-shadow: 0 0 0 1px #007bdb;
+}
+.payment-icon-grid__item img {
+    display: block;
+    max-width: 100%;
+    height: 40px;
+    object-fit: contain;
+    margin: 0 auto 6px;
+}
+.payment-icon-grid__item span {
+    display: block;
+    font-size: 11px;
+    word-break: break-all;
+    color: #303030;
+}

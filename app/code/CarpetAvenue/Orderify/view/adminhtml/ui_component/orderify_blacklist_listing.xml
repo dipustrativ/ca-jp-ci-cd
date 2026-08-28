@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">orderify_blacklist_listing.orderify_blacklist_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>orderify_blacklist_listing.orderify_blacklist_listing_data_source</dep>
+        </deps>
+        <spinner>orderify_blacklist_listing_columns</spinner>
+    </settings>
+
+    <dataSource name="orderify_blacklist_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">entity_id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>CarpetAvenue_Orderify::orderify</aclResource>
+        <dataProvider name="orderify_blacklist_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>entity_id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="orderify_blacklist_listing_columns">
+        <column name="entity_id">
+            <settings>
+                <label translate="true">ID</label>
+            </settings>
+        </column>
+        <column name="blacklist_type" class="IXPF\Syncer\Ui\Component\Listing\Column\TriggerStatus">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">CarpetAvenue\Orderify\Model\Source\BlacklistType</item>
+            </argument>
+            <settings>
+                <label translate="true">Blacklist Type</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <dataScope>blacklist_type</dataScope>
+            </settings>
+        </column>
+        <column name="blacklist_value">
+            <settings>
+                <label translate="true">Blacklist Value</label>
+                <filter>text</filter>
+                <dataScope>object_id</dataScope>
+            </settings>
+        </column>
+        <column name="note">
+            <settings>
+                <label translate="true">Note</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="created_at"  class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <label translate="true">Created At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>created_at</dataScope>
+            </settings>
+        </column>
+
+        <actionsColumn name="actions" class="CarpetAvenue\Orderify\Ui\Component\Listing\Column\Action">
+            <settings>
+                <label translate="true">Actions</label>
+                <indexField>entity_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

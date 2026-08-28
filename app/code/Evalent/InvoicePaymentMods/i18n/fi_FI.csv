@@ -1,0 +1,23 @@
+"Invoice: ","Laskun: "
+"Order: ","Tilausten: "
+"Customer Number: ","Asiakasnumero: "
+"Invoice Date: ","Laskun päivämäärä: "
+"Sold to:","Tilaaja: "
+"CA - Sold to:","Tilaaja: "
+"Ship to:","Toimitusosoite:"
+"Payment Method:","Maksutapa:"
+"Shipping Method:","Toimitustapa:"
+"Order Summary","Tilauksen yhteenveto"
+Products,Tuotteet
+"SKU",Tuotenro
+"CA - SKU","Tuotenro"
+Price,Hinta
+Quantity,Määrä
+Subtotal,Välisumma
+"Subtotal:","Välisumma:"
+"Tax","ALV"
+"CA - Tax","ALV"
+"CA - Grand Total (Excl. Tax)","Yhteensä veroton"
+"CA - Grand Total (Incl. Tax)","Yhteensä verollinen"
+"CA - Qty","Määrä"
+"CA - Ship to:","Toimitusosoite:"

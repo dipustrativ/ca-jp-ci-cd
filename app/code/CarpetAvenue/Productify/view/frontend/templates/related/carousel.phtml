@@ -1,0 +1,141 @@
+<?php
+/**
+ * Related products carousel (Owl).
+ * Merged from Evalent_RelatedCarouselProducts (reference project).
+ *
+ * @var $block \CarpetAvenue\Productify\Block\Product\ProductList\RelatedCarousel
+ */
+
+$helper = $this->helper(CarpetAvenue\Productify\Helper\RelatedCarouselData::class);
+$requestParam = $helper->getRequestParamName();
+?>
+<?php if ($block->isBlockVisible()): ?>
+    <?php
+    $type = 'related_carousel';
+    $class = $type;
+    $nameColor = $helper->getProductNameColor() ?? '';
+    $underlineColor = $helper->getUnderlineColor() ?? '#454545';
+    $priceColor = $helper->getPriceColor() ?? '';
+
+    $image = 'related_products_carousel_list';
+    $items = $block->getItems();
+
+    $count = 0;
+    ?>
+    <?php if ($items->getSize()): ?>
+        <div class="block-content content" aria-labelledby="block-<?= /* @escapeNotVerified */ $class ?>-heading">
+            <div class="ev-products wrapper grid products-grid products-<?= /* @escapeNotVerified */ $type ?>">
+                <div class="products ev-list items ev-product-items owl-carousel owl-theme s<?= /* @escapeNotVerified */ $type ?>">
+                    <?php foreach ($items as $_item): ?>
+                        <div class="ev-product-item-info <?= /* @escapeNotVerified */ $count == 0 ? 'first-chose-item' : '' ?>">
+
+                            <div class="hover-details">
+                                <a href="<?= /* @escapeNotVerified */ $block->getProductUrl($_item) ?>" class="product photo product-item-photo">
+                                    <?= $block->getImage($_item, $image)->toHtml() ?>
+                                </a>
+                            </div>
+
+                            <?php
+                            /* Determine if product is on sale */
+                            $regularPrice = $_item->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\RegularPrice::PRICE_CODE)->getAmount()->getValue();
+                            $finalPrice = $_item->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)->getAmount()->getValue();
+
+                            if ($regularPrice !== $finalPrice) :
+                                $discountPercentage = round(100 * (1 - ($finalPrice / $regularPrice)), 0, PHP_ROUND_HALF_UP); ?>
+                                <div class="product-item__flag--discount"><?= '-' . $block->escapeHtml($discountPercentage) . '%' ?></div>
+                            <?php endif; ?>
+
+                            <div class="product details product-item-details">
+
+                                <strong class="product name product-item-name">
+                                    <a class="product-item-link" title="<?= $block->escapeHtml($_item->getName()) ?>"
+                                       style="color: <?= $nameColor ?>"
+                                       href="<?= /* @escapeNotVerified */ $block->getProductUrl($_item) ?>">
+                                        <?= $block->escapeHtml($_item->getName()) ?>
+                                    </a>
+                                </strong>
+
+                                <div class="size">
+                                    <?php
+                                    $sizeValue = $this->helper(\CarpetAvenue\Productify\Helper\Data::class)->formatSize(
+                                        $_item->getData('width'),
+                                        $_item->getData('length'),
+                                        $_item->getData('shape')
+                                    );
+                                    $count++;
+                                    echo $block->escapeHtml($sizeValue);
+                                    ?>
+                                </div>
+
+                                <div class="product-item-summary" style="color: <?= $priceColor ?>">
+                                    <?= /* @noEscape */ $block->getProductPrice($_item) ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach ?>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            require([
+                "jquery",
+                "owlcarousel",
+                "mage/translate"
+            ], function ($) {
+
+                let selector = $('.s<?=$type?>');
+
+                let owlInit = function () {
+                  $('.first-chose-item').parent().addClass('chose-related');
+                }
+
+                selector.owlCarousel({
+                    loop: true,
+                    nav: true,
+                    rewind: false,
+                    items: 10,
+                    onInitialized: owlInit,
+                    responsive: {
+                        0: {
+                            items: 3
+                        },
+                        420: {
+                            items: 4
+                        },
+                        480: {
+                            items: 5
+                        },
+                        600: {
+                            items: 6
+                        },
+                        768: {
+                            items: 8
+                        },
+                        900: {
+                            items: 10
+                        }
+                    }
+                });
+            });
+        </script>
+        <style>
+            .owl-item {
+                background-image: linear-gradient(to right, <?= $underlineColor?> 0%, <?= $underlineColor?> 100%);
+            }
+        </style>
+    <?php endif; ?>
+<?php endif; ?>
+<?php if ($requestParam !== ''): ?>
+<script>
+    function getGsParameter(queryString) {
+        let urlParams = new URLSearchParams(queryString);
+        let getParam = urlParams.get('<?=$requestParam ?>');
+        if (getParam) {
+            document.cookie = "<?=$requestParam ?>=1";
+        }
+    }
+    let queryString = window.location.search;
+    getGsParameter(queryString)
+</script>
+<?php endif; ?>

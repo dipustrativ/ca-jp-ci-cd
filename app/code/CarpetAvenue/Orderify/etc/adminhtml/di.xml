@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <type name="Magento\Tax\Model\TaxCalculation">
+        <plugin name="carpetavenue_tax_calc_country"
+                type="CarpetAvenue\Orderify\Plugins\Adminhtml\Tax\TaxCalculationCountryPlugin"
+                sortOrder="10"/>
+    </type>
+
+    <type name="Magento\Sales\Block\Adminhtml\Order\View">
+        <plugin name="carpetavenue_orderify_failed_payment_reminder_button"
+                type="CarpetAvenue\Orderify\Plugins\Adminhtml\Order\AddFailedPaymentReminderButton"
+                sortOrder="20"/>
+    </type>
+
+    <!-- Creditmemo PDF renderer overrides (merged from Evalent_CreditmemoMods) -->
+    <preference for="Magento\Sales\Model\Order\Pdf\Creditmemo" type="CarpetAvenue\Orderify\Model\Order\Pdf\Creditmemo" />
+    <preference for="Magento\Sales\Model\Order\Pdf\Items\Creditmemo\DefaultCreditmemo" type="CarpetAvenue\Orderify\Model\Order\Pdf\Items\Creditmemo\DefaultCreditmemo" />
+
+<!--    When adding an adjustment over 1000 it adds a comma (,) which causes the value to be invalid. -->
+<!--    To combat this we disable the formatting inside the text inputs-->
+    <type name="Magento\Sales\Block\Adminhtml\Order\Creditmemo\Create\Adjustments">
+        <plugin name="carpetavenue_orderify_disable_creditmemo_currency_format" type="CarpetAvenue\Orderify\Plugins\Adminhtml\Creditmemo\DisableCreditmemoCurrencyFormatting"/>
+    </type>
+
+</config>

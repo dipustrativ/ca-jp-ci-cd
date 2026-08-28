@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_B2B
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carpetavenue_b2b>
+            <catalog>
+                <sales_mode>b2c</sales_mode>
+            </catalog>
+            <general>
+                <require_approval>1</require_approval>
+                <default_to_business>1</default_to_business>
+                <send_approval_email>1</send_approval_email>
+                <pending_message>Your account is pending approval. You will be able to place orders once an administrator approves your account.</pending_message>
+                <email_identity>general</email_identity>
+                <email_template>carpetavenue_b2b_general_email_template</email_template>
+            </general>
+            <reseller>
+                <notify_enabled>1</notify_enabled>
+                <email_identity>general</email_identity>
+                <email_template>carpetavenue_b2b_reseller_email_template</email_template>
+                <intro_block>become_a_carpient_reseller_intro</intro_block>
+                <recaptcha_enabled>1</recaptcha_enabled>
+            </reseller>
+        </carpetavenue_b2b>
+        <!-- reCAPTCHA type for the native framework; the master on/off is carpetavenue_b2b/reseller/recaptcha_enabled -->
+        <recaptcha_frontend>
+            <type_for>
+                <carpetavenue_b2b_reseller>recaptcha_v3</carpetavenue_b2b_reseller>
+            </type_for>
+        </recaptcha_frontend>
+    </default>
+</config>

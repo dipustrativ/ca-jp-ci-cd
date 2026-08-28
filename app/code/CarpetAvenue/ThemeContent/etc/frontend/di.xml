@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Store\Block\Switcher">
+        <plugin name="carpetavenue_switcher_all_websites"
+                type="CarpetAvenue\ThemeContent\Plugin\Store\AllWebsitesSwitcher"/>
+    </type>
+</config>

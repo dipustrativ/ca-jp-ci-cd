@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Backend\Model\Auth">
+        <plugin name="evalent_adminlog_logout" type="Evalent\AdminActivityLog\Plugin\Backend\Auth"/>
+    </type>
+    <type name="Magento\Config\Model\Config">
+        <plugin name="evalent_adminlog_config_save" type="Evalent\AdminActivityLog\Plugin\Config\AroundSaveConfig"/>
+    </type>
+    <type name="Magento\Framework\App\Config\Value">
+        <plugin name="evalent_adminlog_app_config_save" type="Evalent\AdminActivityLog\Plugin\Config\AroundSaveAppConfig"/>
+    </type>
+
+    <!-- Cache plugins -->
+    <type name="Magento\Backend\Controller\Adminhtml\Cache\MassRefresh">
+        <plugin name="evalent_cache_massrefresh_activity" type="Evalent\AdminActivityLog\Plugin\Cache\AfterCacheRefresh"/>
+    </type>
+    <!-- \Cache plugins -->
+
+    <type name="Evalent\AdminActivityLog\Observer\Model\SaveAfter">
+        <arguments>
+            <argument name="ignoreResourceModel" xsi:type="array">
+                <item name="indexer_state" xsi:type="string">Magento\Indexer\Model\ResourceModel\Indexer\State</item>
+                <item name="config_data" xsi:type="string">Magento\Config\Model\ResourceModel\Config\Data</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Evalent\AdminActivityLog\Observer\Model\DeleteAfter">
+        <arguments>
+            <argument name="ignoreResourceModel" xsi:type="array">
+                <item name="indexer_state" xsi:type="string">Magento\Indexer\Model\ResourceModel\Indexer\State</item>
+                <item name="config_data" xsi:type="string">Magento\Config\Model\ResourceModel\Config\Data</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

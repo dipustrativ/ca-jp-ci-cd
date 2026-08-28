@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <listingToolbar name="listing_top">
+        <massaction name="listing_massaction" component="Magento_Ui/js/grid/tree-massactions">
+
+            <action name="order_status_ready_for_handling">
+                <settings>
+                    <url path="orderify/order/readyforhandling"/>
+                    <type>order_status_ready_for_handling</type>
+                    <label translate="true">Ready For Handling</label>
+
+                    <confirm>
+                        <title translate="true">Ready For Handling</title>
+                        <message translate="true">
+                            Are you sure you want to update selected orders?
+                        </message>
+                    </confirm>
+                </settings>
+            </action>
+
+        </massaction>
+    </listingToolbar>
+</listing>

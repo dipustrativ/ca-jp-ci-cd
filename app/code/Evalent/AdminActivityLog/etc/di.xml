@@ -1,0 +1,72 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!--Model Activity-->
+    <preference for="Evalent\AdminActivityLog\Api\ModelActivityRepositoryInterface" type="Evalent\AdminActivityLog\Model\ModelActivityRepository"/>
+    <preference for="Evalent\AdminActivityLog\Api\Data\ModelActivityInterface" type="Evalent\AdminActivityLog\Model\ModelActivity"/>
+    <preference for="Evalent\AdminActivityLog\Api\Data\ModelActivitySearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <virtualType name="Evalent\AdminActivityLog\Model\ResourceModel\ModelActivity\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">evalent_adminactivitylog_modelactivity</argument>
+            <argument name="resourceModel" xsi:type="string">Evalent\AdminActivityLog\Model\ResourceModel\ModelActivity\Collection</argument>
+        </arguments>
+    </virtualType>
+    <!-- /Model Activity-->
+    <!--Config Activity-->
+    <preference for="Evalent\AdminActivityLog\Api\ConfigActivityRepositoryInterface" type="Evalent\AdminActivityLog\Model\ConfigActivityRepository"/>
+    <preference for="Evalent\AdminActivityLog\Api\Data\ConfigActivityInterface" type="Evalent\AdminActivityLog\Model\ConfigActivity"/>
+    <preference for="Evalent\AdminActivityLog\Api\Data\ConfigActivitySearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <virtualType name="Evalent\AdminActivityLog\Model\ResourceModel\ConfigActivity\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">evalent_adminactivitylog_configactivity</argument>
+            <argument name="resourceModel" xsi:type="string">Evalent\AdminActivityLog\Model\ResourceModel\ConfigActivity\Collection</argument>
+        </arguments>
+    </virtualType>
+    <!--/Config Activity-->
+    <!--Login Activity-->
+    <preference for="Evalent\AdminActivityLog\Api\LoginActivityRepositoryInterface" type="Evalent\AdminActivityLog\Model\LoginActivityRepository"/>
+    <preference for="Evalent\AdminActivityLog\Api\Data\LoginActivityInterface" type="Evalent\AdminActivityLog\Model\LoginActivity"/>
+    <preference for="Evalent\AdminActivityLog\Api\Data\LoginActivitySearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <virtualType name="Evalent\AdminActivityLog\Model\ResourceModel\LoginActivity\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">evalent_adminactivitylog_loginactivity</argument>
+            <argument name="resourceModel" xsi:type="string">Evalent\AdminActivityLog\Model\ResourceModel\LoginActivity\Collection</argument>
+        </arguments>
+    </virtualType>
+    <!--/Login Activity-->
+
+    <!--Cms Activity-->
+    <preference for="Evalent\AdminActivityLog\Api\CmsActivityRepositoryInterface" type="Evalent\AdminActivityLog\Model\CmsActivityRepository"/>
+    <preference for="Evalent\AdminActivityLog\Api\Data\CmsActivityInterface" type="Evalent\AdminActivityLog\Model\CmsActivity"/>
+    <preference for="Evalent\AdminActivityLog\Api\Data\CmsActivitySearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <virtualType name="Evalent\AdminActivityLog\Model\ResourceModel\CmsActivity\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">evalent_adminactivitylog_cmsactivity</argument>
+            <argument name="resourceModel" xsi:type="string">Evalent\AdminActivityLog\Model\ResourceModel\CmsActivity\Collection</argument>
+        </arguments>
+    </virtualType>
+    <!--/Cms Activity-->
+    <!--Cache Activity-->
+    <preference for="Evalent\AdminActivityLog\Api\CacheActivityRepositoryInterface" type="Evalent\AdminActivityLog\Model\CacheActivityRepository"/>
+    <preference for="Evalent\AdminActivityLog\Api\Data\CacheActivityInterface" type="Evalent\AdminActivityLog\Model\CacheActivity"/>
+    <preference for="Evalent\AdminActivityLog\Api\Data\CacheActivitySearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <virtualType name="Evalent\AdminActivityLog\Model\ResourceModel\CacheActivity\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">evalent_adminactivitylog_cacheactivity</argument>
+            <argument name="resourceModel" xsi:type="string">Evalent\AdminActivityLog\Model\ResourceModel\CacheActivity\Collection</argument>
+        </arguments>
+    </virtualType>
+    <!-- /Cache Activity-->
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="evalent_adminactivitylog_modelactivity_grid_data_source" xsi:type="string">Evalent\AdminActivityLog\Model\ResourceModel\ModelActivity\Grid\Collection</item>
+                <item name="evalent_adminactivitylog_loginactivity_grid_data_source" xsi:type="string">Evalent\AdminActivityLog\Model\ResourceModel\LoginActivity\Grid\Collection</item>
+                <item name="evalent_adminactivitylog_cmsactivity_grid_data_source" xsi:type="string">Evalent\AdminActivityLog\Model\ResourceModel\CmsActivity\Grid\Collection</item>
+                <item name="evalent_adminactivitylog_configactivity_grid_data_source" xsi:type="string">Evalent\AdminActivityLog\Model\ResourceModel\ConfigActivity\Grid\Collection</item>
+                <item name="evalent_adminactivitylog_cacheactivity_grid_data_source" xsi:type="string">Evalent\AdminActivityLog\Model\ResourceModel\CacheActivity\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>

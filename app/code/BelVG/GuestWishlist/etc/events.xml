@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+ * BelVG LLC.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://store.belvg.com/BelVG-LICENSE-COMMUNITY.txt
+ *
+ ********************************************************************
+ * @category   BelVG
+ * @package    BelVG_GuestWishlist
+ * @copyright  Copyright (c) BelVG LLC. (http://www.belvg.com)
+ * @license    http://store.belvg.com/BelVG-LICENSE-COMMUNITY.txt
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="customer_customer_authenticated">
+        <observer name="guestwishlist_customer_authenticated" instance="BelVG\GuestWishlist\Observer\CustomerAuthenticated" />
+    </event>
+    <event name="customer_register_success">
+        <observer name="guestwishlist_customer_register_success" instance="BelVG\GuestWishlist\Observer\CustomerRegisterSuccess" />
+    </event>
+    <event name="controller_action_predispatch_gwishlist_index_send">
+        <observer name="CheckCaptchaGuestWishlistForm" instance="BelVG\GuestWishlist\Observer\CheckCaptchaForm" />
+    </event>
+</config>

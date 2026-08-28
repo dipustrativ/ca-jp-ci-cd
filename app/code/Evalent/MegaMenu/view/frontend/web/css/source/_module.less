@@ -1,0 +1,810 @@
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+
+  .megamenu {
+    &.navigation {
+      .submenu {
+
+        .megamenu--block {
+
+          strong {
+            a.link {
+              color: #000;
+              padding: 0;
+              display: inline-block;
+            }
+          }
+          label.contact-label {
+            min-width: 20%;
+            display: inline-block;
+          }
+
+          .ui-widget-content[role="menu"] {
+            display: block !important;
+            height: auto !important;
+            padding: 0 0 10px 0;
+          }
+
+          .category-all {
+            display: block !important;
+          }
+
+        }
+
+        .level1 {
+          .megamenu__child-title {
+            line-height: 1.1;
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+          }
+        }
+
+        & > .category-all {
+          display: block !important;
+          position: relative;
+
+          a {
+            background: none;
+            color: #2c8e3b;
+            border: 0;
+
+            br {
+              display: none;
+            }
+
+            &:after {
+              content: "";
+              display: inline-block;
+              width: 5px;
+              height: 5px;
+              top: 50%;
+              right: 5px;
+              border-top: 2px solid #2c8e3b;
+              border-right: 2px solid #2c8e3b;
+              position: absolute;
+              transform: rotate(45deg) translateY(-50%);
+            }
+          }
+
+          &.active {
+            a {
+              color: #2c8e3b;
+            }
+          }
+
+        }
+
+      }
+    }
+    .megamenu_badge {
+      position: absolute;
+      top: -9px;
+      background: yellow;
+      width: max-content;
+      font-size: 12px;
+      padding: 2px 8px;
+      line-height: 12px;
+      border-radius: 2px;
+    }
+  }
+}
+
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+  // Root acts as the viewport for the sliding drill-down panels.
+  // Small top gap so the list doesn't butt against the drawer's close arrow.
+  .navigation.megamenu > ul {
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100vh;
+    padding-top: 10px;
+  }
+
+  .megamenu {
+    &.navigation {
+
+      // Each submenu becomes a full-screen overlay panel that slides in from
+      // the right, covering the site header/footer and the drawer's side gap.
+      // Animate `left` (not `transform`) so nested fixed panels keep anchoring
+      // to the viewport instead of a transformed ancestor.
+      .submenu {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 100%;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        margin: 0;
+        padding: 0;
+        background: @color-white;
+        transition: left .25s ease;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        z-index: 100;
+
+        &.is-active {
+          left: 0;
+        }
+      }
+
+      // Rows for every level. Divider is an inset hairline (15px gap each
+      // side) drawn on a pseudo so it never spans the full panel width —
+      // gives the menu a lighter, premium feel.
+      .level0,
+      .submenu > li {
+        width: 100%;
+        margin: 0;
+        position: relative;
+        border-bottom: 0;
+
+        &:after {
+          content: "";
+          position: absolute;
+          left: 15px;
+          right: 15px;
+          bottom: 0;
+          height: 1px;
+          background: #ececec;
+        }
+      }
+
+      // Active / current category: no orange fill, no green border — just a
+      // bold green label (premium, matches reference).
+      .level0.active > a,
+      .level0.has-active > a,
+      .submenu .active > a {
+        background: none !important;
+        border: 0 !important;
+
+        .megamenu__child-title {
+          color: #2c8e3b;
+          font-weight: @font-weight__bold;
+        }
+      }
+
+      .level0 > a.level-top {
+        display: block;
+        width: 100%;
+        padding: 14px 40px 14px 15px;
+        box-sizing: border-box;
+
+        .megamenu__child-title {
+          padding: 0;
+        }
+      }
+
+      // Subcategory rows: small thumbnail on the left + title
+      .submenu > li > a {
+        .lib-vendor-prefix-display(flex);
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 8px 40px 8px 15px;
+        box-sizing: border-box;
+      }
+
+      // Standard small thumbnail (not full-width). Source images are ~square,
+      // so the box is ~70% of the width-height (15% cropped off top + bottom)
+      // to read as a landscape tile like the reference, image kept centred.
+      .megamenu__child-image.picture {
+        order: 0;
+        flex: 0 0 56px;
+        width: 56px;
+        height: 40px;
+        clip-path: none;
+        margin: 0;
+        overflow: hidden;
+
+        img {
+          width: 56px;
+          height: 40px;
+          object-fit: cover;
+          object-position: center;
+        }
+      }
+
+      .megamenu__child-title {
+        order: 1;
+        text-align: left;
+        margin: 0;
+        border: 0;
+        width: auto;
+      }
+
+      // Drill-in arrow (only rendered for rows that have children).
+      // Wide hit zone so tapping the arrow drills in while tapping the
+      // text/title navigates to the category page.
+      .ui-menu-icon {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 56px;
+        height: auto;
+        transform: none;
+        cursor: pointer;
+        z-index: 2;
+
+        // Neutralize the base theme's icon-font glyph (rendered on the same
+        // :after via .lib-icon-font in lib/_navigation.less) so only our
+        // border-chevron shows — otherwise two arrows render side by side.
+        &:after {
+          content: "" !important;
+          font: 0/0 a !important;
+          display: block;
+          width: 8px;
+          height: 8px;
+          border-top: 1px solid #999;
+          border-right: 1px solid #999;
+          transform: rotate(45deg);
+          position: absolute;
+          top: 50%;
+          right: 18px;
+          left: auto;
+          margin: -4px 0 0 0;
+        }
+      }
+
+      // Promo / highlight blocks (e.g. "Popular", "HIGHLIGHTS"): plain rows,
+      // no drill arrow, no back header — same inset divider as normal rows.
+      .megamenu--block {
+        .ui-menu-icon,
+        .menu-back {
+          display: none !important;
+        }
+      }
+
+      // Back header at the top of each panel
+      .menu-back {
+        .lib-vendor-prefix-display(flex);
+        align-items: center;
+        gap: 12px;
+        padding: 14px 15px;
+        font-weight: @font-weight__bold;
+        cursor: pointer;
+
+        &:before {
+          content: "";
+          display: inline-block;
+          width: 10px;
+          height: 10px;
+          border-left: 2px solid #333;
+          border-bottom: 2px solid #333;
+          transform: rotate(45deg);
+        }
+      }
+
+      // "All <category>" link pinned at the bottom of each panel.
+      // Breathing room above/below so it isn't a full-bleed banner.
+      .all-category--bottom {
+        border-bottom: 0;
+        margin: 8px 0;
+
+        &:after {
+          display: none;
+        }
+
+        a {
+          .lib-vendor-prefix-display(flex);
+          align-items: center;
+          justify-content: space-between;
+          padding: 16px 15px;
+          font-weight: @font-weight__bold;
+          color: #333;
+          border: 0;
+
+          &:after {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-top: 2px solid #333;
+            border-right: 2px solid #333;
+            transform: rotate(45deg);
+          }
+        }
+      }
+
+      // CMS blocks inside the menu (e.g. "HIGHLIGHTS"): inset, with space
+      // before/after so a banner image never runs edge-to-edge.
+      .megamenu--block {
+        padding: 10px 15px !important;
+        font-size: 1.4rem;
+        line-height: 1.5;
+        width: auto !important;
+
+        h2, h3, h4 {
+          margin-bottom: 0;
+        }
+
+        img {
+          max-width: 100%;
+          height: auto;
+        }
+      }
+    }
+
+    #megamenu-usp {
+      padding: 15px;
+    }
+  }
+}
+
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+
+  .navigation.megamenu {
+
+    /* Lib nav ships z-index: 3, the same as `.ev-banners__link` (the hero
+       banner/slider fills the whole link, position: absolute, z-index: 3).
+       Equal z-index => later DOM wins => the banner painted over the open
+       dropdown, so moving the pointer down into the slider area hovered the
+       banner instead of the submenu and the menu closed. Lift the nav one
+       step above it.
+       Ceiling: must stay BELOW `.block-search` (z-index: 6) — the header is
+       only a stacking context while stuck, so unstuck the nav and the search
+       autocomplete panel compare directly and anything >= 6 hides the
+       suggestions behind the menu bar. 4 or 5 only. */
+    z-index: 4;
+
+    /* To allow for childs of siblings in the visible menu to expand full content-width */
+    li.level0 {
+      position: static;
+
+      &.green {
+        & > .level-top {
+          color: #2c8e3b;
+          font-weight: @font-weight__bold;
+        }
+      }
+      &.red {
+        & > .level-top {
+          color: #b32e27;
+          font-weight: @font-weight__bold;
+        }
+      }
+
+      &.right {
+        float: right;
+        margin-left: 20px;
+        margin-right: 0;
+      }
+
+      &.right_display {
+        float: right;
+        margin-left: 20px;
+        margin-right: 0;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &.active {
+        & > .level-top {
+          font-weight: @font-weight__bold;
+        }
+      }
+
+      & > a {
+        &:hover {
+          scale: 1.05;
+          transition: all 0.3s ease-in-out;
+        }
+      }
+
+      .ui-state-active {
+        & + ul.submenu {
+          display: grid !important;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 2rem;
+          top: 40px !important;
+          left: 0px !important;
+        }
+      }
+
+      ul.submenu {
+        display: grid;
+        backface-visibility: hidden;
+        height: auto;
+        background: @color-white;
+        box-shadow: none;
+        border: none;
+        font-weight: 400;
+        width: 100%;
+        padding: 20px 0 20px 0;
+        box-sizing: border-box;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+        top: 40px !important;
+        left: 0 !important;
+
+        // Kill the Magento blank desktop mixin's submenu-item hover state
+        // (lib/_navigation.less): it paints a grey `background` fill and adds
+        // a hover `border`. The border grows the flex row so the thumbnail
+        // jumps/reflows on hover, and the grey box is off-brand. Neutralise it
+        // for every submenu link/row, not just `.level1`.
+        a,
+        li > a {
+          &:hover,
+          &.ui-state-focus {
+            background: none !important;
+            border-color: transparent !important;
+          }
+        }
+
+        &:after {
+          content: "";
+          width: 1px;
+          height: 90%;
+          display: inline-block;
+          background: #ccc;
+          position: absolute;
+          right: -25px;
+          left: auto !important;
+          top: 10px;
+          bottom: auto;
+        }
+
+        li {
+          &.megamenu--block {
+            padding: 20px 30px 30px;
+            font-weight: @font-weight__heavier;
+            box-sizing: border-box;
+
+            &.Carpient {
+              grid-column: span 2 / 1;
+              bottom: 0;
+              width: 100%;
+            }
+          }
+        }
+
+        li.megamenu--block:not(.Carpient), .category-all {
+          transform: translate3d(10%, 0, 0);
+          left: 100%;
+          top: 0;
+          position: absolute !important;
+          display: block;
+          width: 40%;
+          height: 50px;
+          padding: 0;
+
+          h2, h3, h4 {
+            margin-left: 10px;
+          }
+        }
+
+        li.megamenu--block:not(.Carpient) {
+          min-height: 50px;
+          height: auto;
+
+          a {
+            padding: 8px 20px 8px 10px;
+          }
+
+          &:after {
+            height: 1px;
+            width: 100%;
+            content: "";
+            display: block;
+            background: #ccc;
+            left: 10px;
+            bottom: 0;
+            position: absolute;
+          }
+        }
+
+        .category-all {
+          top: 20px;
+          width: 40%;
+          display: block !important;
+          text-align: left;
+          height: 100px !important;
+          margin: 10px 0 0 0;
+
+          a {
+            text-align: left;
+            width: auto;
+          }
+
+        }
+
+        li.megamenu--block + .category-all {
+          top: 215px !important;
+        }
+        li.megamenu--block.Carpient + .category-all {
+          top: 20px;
+        }
+
+        .level1 {
+          font-size: 1.2rem;
+          display: inline-block;
+          color: #8b8b8b;
+          width: 100%;
+          height: auto;
+          box-sizing: border-box;
+
+          .ui-menu-icon {
+            display: none;
+          }
+
+          .megamenu__child-title {
+            line-height: 1.1;
+            width: 100%;
+            text-align: center;
+            margin-top: 5px;
+          }
+
+          a {
+            position: relative;
+            text-align: center;
+            .lib-vendor-prefix-display(flex);
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0;
+            height: 100%;
+
+            &:hover,
+            &.ui-state-focus {
+              background: none;
+              color: @color-black;
+            }
+          }
+
+          &.active {
+            & > a {
+              border: none;
+
+              span {
+                border-bottom: 3px solid #2c8e3b;
+                padding-bottom: 3px;
+              }
+            }
+          }
+        }
+
+      }
+
+      &.nav-2 {
+        ul.submenu {
+          li.megamenu--block {
+            & + .category-all {
+              top: 170px;
+            }
+          }
+        }
+      }
+
+      &.right {
+        ul.submenu {
+          grid-template-columns: 1fr !important;
+          grid-template-rows: 0 !important;
+          width: 100%;
+          height: auto;
+          min-height: 350px;
+          left: 0 !important;
+          top: 0;
+
+          li.megamenu--block {
+            width: 100%;
+            position: relative !important;
+            transform: none;
+            left: 0;
+            top: 0;
+
+            h1,h2,h3,h4 {
+              margin-left: 0;
+            }
+
+            &:after {
+              display: none;
+            }
+          }
+
+          .category-all {
+            display: none;
+          }
+
+          &:after {
+            display: none;
+          }
+        }
+      }
+
+      .category-all {
+        //position: absolute;
+        //bottom: 0;
+        //width: 100%;
+        text-align: left;
+        //left: 50%;
+        //transform: translateX(-50%);
+        //background: @color-black;
+        padding: 0;
+        margin-top: 30px;
+        margin-bottom: 10px;
+        width: ~"calc(20% - 60px)";
+        margin-right: 30px;
+        .lib-vendor-prefix-display(flex);
+        .lib-vendor-prefix-flex-direction(column);
+        float: none;
+        position: absolute;
+        right: 0;
+        bottom: 10px;
+
+        a {
+
+          padding: 8px 20px 8px 8px;
+          font-size: 1.6rem;
+          line-height: 1.3;
+          display: inline-block;
+          border: none;
+          position: relative;
+
+
+          &:hover {
+            //color: @color-white !important;
+            //background: darken(#2c8e3b, 10%);
+            border-radius: 5px;
+          }
+        }
+      }
+    }
+
+    img {
+      //max-width: 100%;
+      width: 100%;
+      aspect-ratio: 2 / 1;
+      object-fit: cover;
+    }
+  }
+
+  #megamenu-usp {
+    position: absolute;
+    bottom: 0;
+    top: auto;
+    left: 0;
+    right: 0;
+    margin: 0;
+    z-index: 100;
+    width: 100%;
+    height: 50px;
+    display: none;
+    justify-content: space-around;
+    align-items: center;
+    background: #d1d1d1;
+
+    .top-static-content {
+      width: 100%;
+    }
+
+    ul {
+      .lib-vendor-prefix-display(flex);
+      justify-content: space-evenly;
+      align-items: center;
+
+      li {
+        margin: 0;
+
+        span {
+          .lib-font-size(28);
+          vertical-align: middle;
+          color: #333;
+          font-weight: 900;
+        }
+      }
+    }
+  }
+  .megamenu__backdrop-container {
+    max-height: calc(~"100vh - 110px");
+    position: relative;
+  }
+  .megamenu__backdrop-wrapper{
+    height: 100vh;
+  }
+
+  .megamenu {
+
+    &__child-image {
+      &.picture {
+        padding-top: 0;
+        height: auto;
+        overflow: hidden;
+        width: 100%;
+        aspect-ratio: 2 / 1;
+        object-fit: cover;
+        background: #eee;
+      }
+    }
+
+    // Backdrop
+    &__backdrop {
+      &-wrapper {
+        //position: fixed;
+        position: absolute;
+        background: rgba(0,0,0,0.5);
+        left: ~"calc(50% - 50vw)";
+        top: 40px !important;
+        width: ~"calc(100vw - 0px)";
+        text-align: center;
+        max-height: ~"calc(100vh - 130px)";
+      }
+
+      &-container {
+        background: #eee;
+        //margin-bottom: 20px;
+        margin-bottom: 0;
+        max-height: ~"calc(100vh - 160px)";
+      }
+    }
+
+    // Show all subcategori items
+    &__show-all {
+      position: relative;
+      z-index: 10000;
+      &:hover {
+        button {
+          background: black;
+          color: white;
+          cursor: pointer;
+        }
+      }
+    }
+
+    // Sub-category images
+    &__child-image {
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      width: 100%;
+      //height: 20vh;
+      padding-top: 100%;
+      margin-bottom: 5px;
+    }
+  }
+}
+
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+
+  .navigation.megamenu {
+    li.level0 {
+      ul.submenu {
+        .level1 {
+          //width: 190px;
+          font-size: 1.4rem;
+        }
+      }
+    }
+  }
+}
+
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__xl) {
+
+  .navigation.megamenu {
+    li.level0 {
+      ul.submenu {
+        .level1 {
+          //width: 210px;
+          font-size: 1.6rem;
+        }
+      }
+    }
+  }
+}

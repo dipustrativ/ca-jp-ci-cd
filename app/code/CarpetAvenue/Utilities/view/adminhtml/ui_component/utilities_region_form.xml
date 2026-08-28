@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">utilities_region_form.utilities_region_form_data_source</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+
+    <settings>
+        <buttons>
+            <button name="back"   class="CarpetAvenue\Utilities\Block\Adminhtml\Region\Button\Back"/>
+            <button name="delete" class="CarpetAvenue\Utilities\Block\Adminhtml\Region\Button\Delete"/>
+            <button name="save"   class="CarpetAvenue\Utilities\Block\Adminhtml\Region\Button\Save"/>
+        </buttons>
+        <namespace>utilities_region_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>utilities_region_form.utilities_region_form_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="utilities_region_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">CarpetAvenue\Utilities\Ui\DataProvider\RegionFormDataProvider</argument>
+            <argument name="name" xsi:type="string">utilities_region_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">region_id</argument>
+            <argument name="requestFieldName" xsi:type="string">region_id</argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="utilities/region/save"/>
+        </settings>
+    </dataSource>
+
+    <fieldset name="general">
+        <settings>
+            <label translate="true">Region Information</label>
+        </settings>
+
+        <!-- Hidden region_id for edit mode -->
+        <field name="region_id" formElement="hidden">
+            <settings>
+                <dataType>text</dataType>
+            </settings>
+        </field>
+
+        <!-- Country selector -->
+        <field name="country_id" sortOrder="10" formElement="select">
+            <settings>
+                <label translate="true">Country</label>
+                <dataType>text</dataType>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Directory\Model\Config\Source\Country"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <!-- Region code (e.g. CA, NSW, BW) -->
+        <field name="code" sortOrder="20" formElement="input">
+            <settings>
+                <label translate="true">Region Code</label>
+                <dataType>text</dataType>
+                <notice translate="true">Short code for the region (e.g. CA, NSW).</notice>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="max_text_length" xsi:type="number">32</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <!-- Default (English) region name -->
+        <field name="default_name" sortOrder="30" formElement="input">
+            <settings>
+                <label translate="true">Default Name</label>
+                <dataType>text</dataType>
+                <notice translate="true">English name used as the default across all store views.</notice>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="max_text_length" xsi:type="number">255</rule>
+                </validation>
+            </settings>
+        </field>
+
+    </fieldset>
+</form>
+

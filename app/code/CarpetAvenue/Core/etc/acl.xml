@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Core
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin" title="Magento Admin">
+                <!--
+                    Top-level umbrella for ALL CarpetAvenue custom modules.
+                    Every other CarpetAvenue_* module nests its ACL resources here.
+                -->
+                <resource id="CarpetAvenue_Core::carpetavenue" title="CarpetAvenue"
+                          translate="title" sortOrder="900">
+
+                    <!-- Core module resources -->
+                    <resource id="CarpetAvenue_Core::core" title="Core Features"
+                              translate="title" sortOrder="10">
+                        <resource id="CarpetAvenue_Core::custom_code" title="Custom CSS/JS"
+                                  translate="title" sortOrder="100"/>
+                        <resource id="CarpetAvenue_Core::notification" title="Notification"
+                                  translate="title" sortOrder="200"/>
+                        <resource id="CarpetAvenue_Core::documentation" title="Documentation"
+                                  translate="title" sortOrder="1000"/>
+                    </resource>
+
+                    <!-- Miscellaneous group (Documentation link, future catch-all items) -->
+                    <resource id="CarpetAvenue_Core::miscellaneous" title="Miscellaneous"
+                              translate="title" sortOrder="999">
+                        <resource id="CarpetAvenue_Core::miscellaneous_documentation"
+                                  title="Documentation" translate="title" sortOrder="10"/>
+                    </resource>
+
+                    <!--
+                        Other CarpetAvenue modules (e.g. CarpetAvenue_Shipping) declare
+                        their own resources nested under CarpetAvenue_Core::carpetavenue
+                        in their own acl.xml files.
+                    -->
+
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

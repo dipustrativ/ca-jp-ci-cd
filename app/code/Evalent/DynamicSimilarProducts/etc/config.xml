@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+	<default>
+		<catalog>
+			<dynamic_related_products>
+				<enabled>1</enabled>
+				<list_size>10</list_size>
+				<use_parent_category_threshold>0</use_parent_category_threshold>
+				<attribute_1/>
+				<attribute_1_clause>must</attribute_1_clause>
+				<attribute_1_boost>1</attribute_1_boost>
+				<attribute_1_ignore/>
+				<attribute_2/>
+				<attribute_2_width>20</attribute_2_width>
+				<attribute_3_boost>1</attribute_3_boost>
+				<attribute_3_clause>must</attribute_3_clause>
+				<button_font_size>20px</button_font_size>
+				<button_font_weight>400</button_font_weight>
+				<button_font_size/>
+			</dynamic_related_products>
+		</catalog>
+	</default>
+</config>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!--<referenceContainer name="content.aside">
+            &lt;!&ndash;
+            <block class="Evalent\DynamicSimilarProducts\Block\Product\ProductList\Similar"
+                name="catalog.product.similar"
+                template="Evalent_DynamicSimilarProducts::product/list/items.phtml"
+                after="catalog.product.related" />
+            &ndash;&gt;
+            <block class="Evalent\DynamicSimilarProducts\Block\Product\ProductList\Similar"
+                   name="catalog.product.similar"
+                   template="Magento_Catalog::product/list/items.phtml"
+                   after="catalog.product.related">
+                <arguments>
+                    <argument name="type" xsi:type="string">similar</argument>&lt;!&ndash; hack so we can use default template &ndash;&gt;
+                </arguments>
+                <block class="Magento\Catalog\Block\Product\ProductList\Item\Container" name="catalog.product.similar.addto" as="addto">
+                    <block class="Magento\Catalog\Block\Product\ProductList\Item\AddTo\Compare"
+                           name="catalog.product.similar.addto.compare" as="compare"
+                           template="Magento_Catalog::product/list/addto/compare.phtml"/>
+                    <block class="Magento\Wishlist\Block\Catalog\Product\ProductList\Item\AddTo\Wishlist"
+                           name="catalog.product.similar.addto.wishlist" as="wishlist" before="compare"
+                           template="Magento_Wishlist::catalog/product/list/addto/wishlist.phtml"/>
+                </block>
+            </block>
+        </referenceContainer>-->
+        <referenceBlock name="product.info.addtocart">
+            <arguments>
+                <argument name="view_model" xsi:type="object">Evalent\DynamicSimilarProducts\ViewModel\Product\View\GetButtonSettings</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

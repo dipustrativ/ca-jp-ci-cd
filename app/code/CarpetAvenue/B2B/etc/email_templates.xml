@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @package CarpetAvenue_B2B
+ * @author  Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <!-- Template ids MUST equal the underscored config path they default (Source\Email\Template convention). -->
+    <template id="carpetavenue_b2b_general_email_template"
+              label="B2B Account Approved"
+              file="account_approved.html"
+              type="html"
+              module="CarpetAvenue_B2B"
+              area="frontend"/>
+    <template id="carpetavenue_b2b_reseller_email_template"
+              label="B2B Reseller Application (admin notification)"
+              file="reseller_application.html"
+              type="html"
+              module="CarpetAvenue_B2B"
+              area="frontend"/>
+</config>

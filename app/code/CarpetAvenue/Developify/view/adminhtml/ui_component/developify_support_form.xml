@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">
+                developify_support_form.developify_support_form_data_source
+            </item>
+            <item name="component" xsi:type="string">Magento_Ui/js/form/form</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Update Order Status</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+
+    <settings>
+        <buttons>
+            <button name="save" class="CarpetAvenue\Developify\Block\Adminhtml\Button\SaveButton"/>
+        </buttons>
+        <namespace>developify_support_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>developify_support_form.developify_support_form_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="developify_support_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="developify/support/updateorder"/>
+        </settings>
+        <dataProvider class="CarpetAvenue\Developify\Ui\DataProvider\EmptyDataProvider"
+                      name="developify_support_form_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <fieldset name="general">
+        <settings>
+            <label translate="true">General Settings</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+
+        <field name="type" formElement="select">
+            <settings>
+                <label translate="true">Type</label>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="CarpetAvenue\Developify\Model\Config\Source\Type"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="increment_id" formElement="input">
+            <settings>
+                <label translate="true">Order Increment ID</label>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="order_status" formElement="select">
+            <settings>
+                <label translate="true">Order Status</label>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="CarpetAvenue\Developify\Model\Config\Source\OrderStatus"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="customer_group_id" formElement="select">
+            <settings>
+                <label translate="true">Customer Group</label>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Customer\Model\Config\Source\Group"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+    </fieldset>
+
+</form>

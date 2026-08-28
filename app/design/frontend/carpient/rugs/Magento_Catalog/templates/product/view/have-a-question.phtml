@@ -1,0 +1,45 @@
+<?php
+/**
+ * "Have a Question?" section on the product detail page.
+ *
+ * Collapsible helper block that points customers at the contact form. Reuses
+ * the Specifications collapse pattern (.additional-attributes-wrapper trigger /
+ * arrow styles). Ported from the reference carpient.com storefront (below the
+ * Specifications section).
+ *
+ * @var $block \Magento\Catalog\Block\Product\View
+ */
+$contactUrl = $block->getUrl('contact');
+$formLink   = '<a href="' . $block->escapeUrl($contactUrl) . '">'
+    . $block->escapeHtml(__('this form'))
+    . '</a>';
+?>
+<div class="additional-attributes-wrapper product-question" id="product-question-collapsible">
+    <div class="attributes-collapse-trigger" data-role="trigger">
+        <h3><?= $block->escapeHtml(__('Have a Question?')) ?></h3>
+        <span class="collapse-arrow"></span>
+    </div>
+    <div class="product-question__content" data-role="content" style="padding: 10px 16px">
+        <p class="product-question__text">
+            <?= /* @noEscape — link is escaped above, sentence is trusted i18n */
+                __('Please use %1 to send us an email. We respond within 24 hours on business days.', $formLink)
+            ?>
+        </p>
+    </div>
+</div>
+<script>
+    require(['jquery', 'domReady!'], function ($) {
+        var $wrapper = $('#product-question-collapsible');
+        var $content = $wrapper.find('[data-role="content"]');
+        var $trigger = $wrapper.find('[data-role="trigger"]');
+
+        // Start collapsed
+        $content.hide();
+
+        $trigger.on('click', function (e) {
+            e.stopPropagation();
+            $wrapper.toggleClass('_active');
+            $content.slideToggle(300);
+        });
+    });
+</script>

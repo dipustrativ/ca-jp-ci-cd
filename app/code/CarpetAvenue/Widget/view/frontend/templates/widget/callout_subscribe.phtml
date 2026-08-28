@@ -1,0 +1,123 @@
+<?php
+// @codingStandardsIgnoreFile
+date_default_timezone_set("Europe/Stockholm");
+?>
+
+<?php $_fontsize = $block->getFontSize(); ?>
+<?php $_textcolor = $block->getTextColor(); ?>
+<?php $_bgcolor = $block->getBgColor(); ?>
+<?php $_showBtn = $block->getData("closebtn"); ?>
+<?php $_countdown = date_format(date_create($block->getCountdown()),"Y/m/d H:i"); ?>
+<?php $_showDaysBefore = $block->getShowDaysBefore(); ?>
+<?php $date = date("Y/m/d H:i"); ?>
+<?php $_daysLabel = __("Days"); ?>
+<?php $_dayLabel = __("Day"); ?>
+<?php $_lastDayLabel = __("Last Day"); ?>
+<?php $_daysLeft = strtotime($date) - strtotime($_countdown); ?>
+<?php $_diff = ceil(abs($_daysLeft / 86400)); ?>
+<?php $_hiddenCountdown = ($_showDaysBefore > 0 && $_diff > $_showDaysBefore); ?>
+<?php $_showLastDay = $block->getData("show_lastday"); ?>
+<?php $_popupButtonText = __($block->getButtonText()); ?>
+<?php $_popupId = $block->getPopupId(); ?>
+<?php $_isSticky = $block->getIsSticky(); ?>
+
+<?php if($_countdown < $date && !empty($block->getCountdown())) : else: ?>
+<div class="callout-widget callout-widget--subscribe" style="background: <?php if($_bgcolor): echo $_bgcolor; endif; ?>;">
+
+    <div class="callout-widget__content <?= $_hiddenCountdown ? 'hide-countdown' : '' ?>" style="font-size: <?= $_fontsize ?>; color: <?= $_textcolor ?>;">
+        <?php if($_message = $block->getMessage()): ?>
+            <span class="callout-widget__msg">
+                <?= $_hiddenCountdown ? substr($_message, 0, strrpos( $_message, '-')) : $_message; ?>
+            </span>
+
+            <?php if($_popupId && $_popupButtonText): ?>
+                <span>
+                    <a href="#" class="callout-widget__sub_form_trigger callout-widget__showmore-link"><?= $_popupButtonText ?></a>
+                </span>
+            <?php endif; ?>
+
+        <?php endif; ?>
+
+        <?php if($_showBtn): ?>
+            <a href="#" title="<?= __("Close") ?>" class="close-btn">
+                <span><?= __("X") ?></span>
+            </a>
+        <?php endif; ?>
+
+    </div>
+</div>
+
+
+<script>
+    require(
+        [
+            'jquery',
+            'countdown',
+            "mage/translate"
+        ],
+        function($) {
+
+            if(!$('body').hasClass('callout-widget-active')) {
+                $('body').addClass('callout-widget-active');
+            }
+
+            <?php if($_isSticky): ?>
+            $('.top-container').first().addClass('sticky');
+            <?php endif; ?>
+
+            <?php if($_showBtn): ?>
+            if($('.callout-widget .close-btn').length) {
+                $('.callout-widget .close-btn').on('click', function (e) {
+                    $(this).closest('.callout-widget').hide();
+                    $('body').removeClass('callout-widget-active');
+                    e.preventDefault()
+                });
+            }
+            <?php endif; ?>
+
+            <?php if($_countdown && !$_hiddenCountdown && !empty($block->getCountdown())): ?>
+
+            $(".callout-widget__msg")
+                .countdown("<?= date("Y/m/d H:i",strtotime($_countdown." +1 minutes"))?>", function (event) {
+
+                    let _daysLeft = event.strftime('%-D');
+                    let _text = "<?= $block->getMessage(); ?>";
+                    let _showLastDay = "<?= $_showLastDay; ?>";
+
+                    if(_daysLeft > 0 || _showLastDay != "1") {
+
+                        $(this).html(
+                            event.strftime(
+                                $.mage.__(_text)
+                                    .replace('%countdown', '%-D')
+                                    .replace('%days', _daysLeft > 1 ? "<?= $_daysLabel ?>" : "<?= $_dayLabel ?>")
+                            )
+                        );
+
+                    } else {
+                        let _sub = _text.substring(_text.lastIndexOf("-") + 1, _text.length);
+
+                        $(this).html(
+                            event.strftime(
+                                $.mage.__(_text)
+                                    .replace(_sub, "<?= " ".$_lastDayLabel ?>")
+                            )
+                        );
+                    }
+
+                }).on('finish.countdown', function() {
+                    $(".callout-widget").hide();
+                    $('body').removeClass('callout-widget-active');
+                });
+
+            <?php endif; ?>
+
+            $('.callout-widget__sub_form_trigger').on('click', function (){
+                window._klOnsite = window._klOnsite || [];
+                window._klOnsite.push(['openForm', '<?= $_popupId ?>']);
+            });
+        }
+    );
+
+</script>
+<?php endif; ?>

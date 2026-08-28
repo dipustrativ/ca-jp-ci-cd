@@ -1,0 +1,12 @@
+<?php
+/** @var Magento\Catalog\Block\Product\View $block */
+
+$product = $block->getProduct();
+
+if ($product->getData("carpient")):
+    ?>
+    <div class="carpient-tag">
+        <span class="noselect"></span>
+        <img src="<?= $this->getViewFileUrl('images/Carpient_tag.svg') ?>" alt="Carpient logo tag" width="105" height="15" />
+    </div>
+<?php endif; ?>

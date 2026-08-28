@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+
+    <widget class="CarpetAvenue\Productify\Block\Widget\ShowroomBanner" id="carpetavenue_productify_showroombanner">
+        <label>Showroom Banner</label>
+        <description>Renders a single banner With Description</description>
+        <parameters>
+            <parameter name="template" xsi:type="select" required="true" visible="true">
+                <label>Template</label>
+                <options>
+                    <option name="default_showroom_banner" value="widget/default_showroom_banner.phtml">
+                        <label>Default</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="banner" sort_order="45" visible="true" xsi:type="select" source_model="Evalent\Banner\Ui\Component\Widget\Parameter\Banners">
+                <label>Banner to display</label>
+            </parameter>
+            <parameter name="css_class" sort_order="50" visible="true" xsi:type="text">
+                <label>CSS class</label>
+                <description>Optional CSS class for this banner container</description>
+            </parameter>
+        </parameters>
+    </widget>
+
+</widgets>

@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+		<section id="sales" type="text" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+			<group id="omnibus" showInDefault="1" showInWebsite="1" showInStore="1" translate="label" sortOrder="2000">
+				<label>Omnibus</label>
+				<field id="frontend_enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Enabled in frontend</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+				<field id="lowest_price_days" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Show lowest price within days</label>
+					<validate>validate-digits</validate>
+				</field>
+				<field id="cron_enabled" translate="label comment" type="select" sortOrder="50" showInDefault="1">
+					<label>Cron Enabled</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+				<field id="ignore_skus" translate="label comment" type="textarea" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Ignore for SKUs</label>
+					<comment>Comma separated list of SKUs to ignore</comment>
+				</field>
+			</group>
+		</section>
+	</system>
+</config>

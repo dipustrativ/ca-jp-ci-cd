@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @package   CarpetAvenue_Productify
+ * @author    Strativ Magento Team
+ *
+ * Merged from CarpetAvenue_EnhanceCategory/etc/adminhtml/di.xml.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Category product-assignment grid with thumbnail column -->
+    <preference for="Magento\Catalog\Block\Adminhtml\Category\AssignProducts"
+                type="CarpetAvenue\Productify\EnhanceCategory\Block\Adminhtml\Category\AssignProducts"/>
+    <preference for="Magento\Catalog\Controller\Adminhtml\Category\Grid"
+                type="CarpetAvenue\Productify\EnhanceCategory\Controller\Adminhtml\Category\Grid"/>
+    <!-- Applies the configured default position when a product is linked to a
+         category on product save. No cleaner hook exists for this. -->
+    <preference for="Magento\Catalog\Model\Category\Link\SaveHandler"
+                type="CarpetAvenue\Productify\EnhanceCategory\Rewrite\Magento\Catalog\Model\Category\Link\SaveHandler"/>
+    <type name="Magento\Catalog\Model\Category">
+        <plugin name="carpetavenue_enhancecategory_category_link_plugin"
+                type="CarpetAvenue\Productify\EnhanceCategory\Rewrite\Magento\Catalog\Model\Category"/>
+    </type>
+</config>

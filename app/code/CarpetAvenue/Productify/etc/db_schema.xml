@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Product
+ * @package   CarpetAvenue_Productify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <table name="carpetavenue_productify_group_product_cache" resource="default" engine="innodb" comment="Product Group Variant Cache">
+        <column name="design_id_group" xsi:type="varchar" nullable="false" length="64" comment="Design ID"/>
+        <column name="store_id" xsi:type="smallint" nullable="false" comment="Store ID"/>
+        <column name="json_data" xsi:type="mediumblob" nullable="false" comment="Variant Cache JSON"/>
+        <column name="updated_at" xsi:type="timestamp" on_update="true" default="CURRENT_TIMESTAMP" nullable="false" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="design_id_group"/>
+            <column name="store_id"/>
+        </constraint>
+
+        <index indexType="btree" referenceId="CA_IDX_PRODUCTIFY_DESIGN_ID_GROUP">
+            <column name="store_id"/>
+        </index>
+    </table>
+
+    <table name="carpetavenue_productify_variant_reference" resource="default" engine="innodb" comment="Product Variant Reference Table">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="int" name="product_id" unsigned="true" nullable="false" comment="Product ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" comment="Store ID"/>
+        <column xsi:type="mediumtext" name="reference_data" nullable="false" comment="Reference Data JSON"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="CARPETAVENUE_PRODUCTIFY_VARIANT_REF_PRODUCT_ID_STORE_ID">
+            <column name="product_id"/>
+            <column name="store_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="CARPETAVENUE_PRODUCTIFY_VARIANT_REF_PRODUCT_ID_CATALOG_PRODUCT_ENTITY_ENTITY_ID" table="carpetavenue_productify_variant_reference" column="product_id" referenceTable="catalog_product_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="CARPETAVENUE_PRODUCTIFY_VARIANT_REF_STORE_ID_STORE_STORE_ID" table="carpetavenue_productify_variant_reference" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
+        <index referenceId="CARPETAVENUE_PRODUCTIFY_VARIANT_REF_PRODUCT_ID" indexType="btree">
+            <column name="product_id"/>
+        </index>
+        <index referenceId="CARPETAVENUE_PRODUCTIFY_VARIANT_REF_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+        <index referenceId="CARPETAVENUE_PRODUCTIFY_VARIANT_REF_UPDATED_AT" indexType="btree">
+            <column name="updated_at"/>
+        </index>
+    </table>
+
+    <!-- Queue Feature DB design -->
+    <table name="carpetavenue_productify_queue" resource="default" engine="innodb" comment="Carpet Avenue Productify Queue">
+        <column xsi:type="bigint" name="id" nullable="false" identity="true" unsigned="true" comment="Primary Key"/>
+        <column xsi:type="int" name="product_id" nullable="false" unsigned="true" comment="Product ID"/>
+        <column xsi:type="varchar" name="trigger_from" nullable="false" length="50" comment="Trigger Source (product_changes / full_reindex)"/>
+        <column xsi:type="smallint" name="priority" nullable="false" default="5" comment="Processing Priority"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="20" default="pending" comment="Queue Status (pending, processing, complete, failed)"/>
+        <column xsi:type="text" name="message" nullable="true" comment="Last Status Message"/>
+        <column xsi:type="timestamp" name="added_on_queue" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="Added on Queue"/>
+        <column xsi:type="timestamp" name="process_at" nullable="true" comment="Processed At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UNQ_PRODUCT_ID">
+            <column name="product_id"/>
+        </constraint>
+        <index referenceId="IDX_PRIORITY_STATUS">
+            <column name="priority"/>
+            <column name="status"/>
+        </index>
+    </table>
+    
+    <!-- Omnibus Feature -->
+    <table name="carpetavenue_productify_omni_lowest" resource="default" engine="innodb" comment="Carpet Avenue Omnibus Lowest">
+        <column xsi:type="int" name="product_id" unsigned="true" nullable="false" comment="Product ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" comment="Store ID"/>
+        <column xsi:type="decimal" name="lowest_30d_price" precision="12" scale="4" nullable="true" comment="Lowest price in last 30 days"/>
+        <column xsi:type="timestamp" name="lowest_30d_since" nullable="true" comment="When this lowest became effective (UTC)"/>
+        <column xsi:type="varchar" name="formatted_text" length="255" nullable="true" comment="Preformatted label for frontend"/>
+        <column xsi:type="timestamp" name="window_start" nullable="false" comment="30d window start (UTC)"/>
+        <column xsi:type="timestamp" name="window_end" nullable="false" comment="30d window end (UTC)"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated at (UTC)"/>
+        <constraint xsi:type="primary" referenceId="CAP_OMNI_LOWEST_PK">
+            <column name="product_id"/><column name="store_id"/>
+        </constraint>
+        <index referenceId="CAP_OMNI_LOWEST_STORE_UPDATED">
+            <column name="store_id"/><column name="updated_at"/>
+        </index>
+    </table>
+
+    <table name="carpetavenue_productify_omni_price_event" resource="default" engine="innodb" comment="Carpet Avenue Price Change Events">
+        <column xsi:type="int" name="event_id" identity="true" unsigned="true" nullable="false" comment="ID"/>
+        <column xsi:type="int" name="product_id" unsigned="true" nullable="false" comment="Product ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" comment="Store ID"/>
+        <column xsi:type="decimal" name="price" precision="12" scale="4" nullable="false" comment="Effective final price (store currency)"/>
+        <column xsi:type="timestamp" name="effective_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="When change took effect (UTC)"/>
+        <column xsi:type="varchar" name="source" length="16" nullable="false" default="system" comment="admin|api|import|rule|cron"/>
+        <column xsi:type="text" name="meta" nullable="true" comment="Optional JSON"/>
+        <constraint xsi:type="primary" referenceId="CAP_OMNI_EVENT_PK">
+            <column name="event_id"/>
+        </constraint>
+        <index referenceId="CAP_OMNI_EVENT_Q">
+            <column name="product_id"/><column name="store_id"/><column name="effective_at"/>
+        </index>
+    </table>
+
+    <table name="carpetavenue_productify_collection" resource="default" engine="innodb" comment="Productify Collection Data">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" comment="Product ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" comment="Store ID"/>
+        <column xsi:type="varchar" name="sku" nullable="false" length="64" comment="Product SKU"/>
+        <column xsi:type="text" name="url" nullable="true" comment="Product URL"/>
+        <column xsi:type="boolean" name="final_status" nullable="false" default="true" comment="Final Status"/>
+        <column xsi:type="tinyint" name="is_salable" unsigned="true" nullable="false" default="0" comment="Is Salable"/>
+        <column xsi:type="tinyint" name="online" unsigned="true" nullable="false" default="0" comment="Online Status"/>
+        <column xsi:type="tinyint" name="status" unsigned="true" nullable="false" default="0" comment="Product Status"/>
+
+        <!-- Images -->
+        <column xsi:type="text" name="image" nullable="true" comment="Product Image URL"/>
+        <column xsi:type="text" name="swatch_image" nullable="true" comment="Swatch Image URL"/>
+
+        <!-- Currency -->
+        <column xsi:type="varchar" name="currency" nullable="false" length="3" comment="Currency Code"/>
+        <column xsi:type="varchar" name="currency_symbol" nullable="true" length="10" comment="Currency Symbol"/>
+
+        <!-- Raw Price Numbers -->
+        <column xsi:type="decimal" name="price" scale="4" precision="20" unsigned="false" nullable="false" default="0.0000" comment="Price"/>
+        <column xsi:type="decimal" name="final_price" scale="4" precision="20" unsigned="false" nullable="true" default="0.0000" comment="Final Price"/>
+        <column xsi:type="decimal" name="special_price" scale="4" precision="20" unsigned="false" nullable="false" default="0.0000" comment="Special Price"/>
+        <column xsi:type="decimal" name="maximum_price" scale="4" precision="20" unsigned="false" nullable="true" default="0.0000" comment="Maximum Price"/>
+        <column xsi:type="decimal" name="minimum_price" scale="4" precision="20" unsigned="false" nullable="true" default="0.0000" comment="Minimum Price"/>
+
+        <!-- Formatted Price Strings -->
+        <column xsi:type="varchar" name="price_formatted" nullable="true" length="255" comment="Formatted Price"/>
+        <column xsi:type="varchar" name="final_price_formatted" nullable="true" length="255" comment="Formatted Final Price"/>
+        <column xsi:type="varchar" name="special_price_formatted" nullable="true" length="255" comment="Formatted Special Price"/>
+        <column xsi:type="varchar" name="minimum_price_formated" nullable="true" length="255" comment="Formatted Minimum Price"/>
+
+        <!-- Attribute Labels -->
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Product name"/>
+        <column xsi:type="varchar" name="color" nullable="true" length="255" comment="Color Attribute"/>
+        <column xsi:type="varchar" name="size" nullable="true" length="255" comment="Size Attribute"/>
+        <column xsi:type="varchar" name="shape" nullable="true" length="255" comment="Shape Attribute"/>
+        <column xsi:type="varchar" name="shape_key" nullable="true" length="255" comment="Shape Attribute Key"/>
+        <column xsi:type="varchar" name="design_id_group" nullable="true" length="255" comment="Design id group"/>
+        <column xsi:type="varchar" name="config_color" nullable="true" length="255" comment="Config color"/>
+        <column xsi:type="varchar" name="configurable_size" nullable="true" length="255" comment="Config size"/>
+
+        <!-- Timestamps -->
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="CARPETAVENUE_PRODUCTIFY_COLLECTION_SKU" indexType="btree">
+            <column name="sku"/>
+        </index>
+        <index referenceId="CARPETAVENUE_PRODUCTIFY_COLLECTION_STATUS" indexType="btree">
+            <column name="status"/>
+            <column name="id"/>
+        </index>
+        <index referenceId="CARPETAVENUE_PRODUCTIFY_COLLECTION_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+
+    <table name="carpetavenue_productify_product_change_log" resource="default" engine="innodb" comment="Productify Product change logs">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" comment="Product ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" comment="Store ID"/>
+        <column xsi:type="varchar" name="sku" nullable="false" length="64" comment="Product SKU"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="64" comment="Product name"/>
+        <column xsi:type="varchar" name="previous_name" nullable="false" length="64" comment="Updated Product name"/>
+
+        <!-- Timestamps -->
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="CARPETAVENUE_PRODUCTIFY_COLLECTION_SKU" indexType="btree">
+            <column name="sku"/>
+        </index>
+        <index referenceId="CARPETAVENUE_PRODUCTIFY_COLLECTION_STATUS" indexType="btree">
+            <column name="id"/>
+        </index>
+        <index referenceId="CARPETAVENUE_PRODUCTIFY_COLLECTION_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+</schema>

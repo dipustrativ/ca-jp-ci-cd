@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">ixpfsyncer_orderapiactivity_listing.ixpfsyncer_orderapiactivity_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>ixpfsyncer_orderapiactivity_listing.ixpfsyncer_orderapiactivity_listing_data_source</dep>
+        </deps>
+        <spinner>ixpfsyncer_orderapiactivity_columns</spinner>
+    </settings>
+
+    <dataSource name="ixpfsyncer_orderapiactivity_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">entity_id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>IXPF_Syncer::order_api_activity</aclResource>
+        <dataProvider name="ixpfsyncer_orderapiactivity_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>entity_id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="ixpfsyncer_orderapiactivity_columns">
+        <column name="entity_id" sortOrder="10">
+            <settings>
+                <label translate="true">ID</label>
+                <filter>textRange</filter>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="activity_type" sortOrder="20">
+            <settings>
+                <label translate="true">Activity Type</label>
+                <filter>text</filter>
+                <dataScope>activity_type</dataScope>
+            </settings>
+        </column>
+        <column name="resource" sortOrder="30">
+            <settings>
+                <label translate="true">Resource</label>
+                <filter>text</filter>
+                <dataScope>resource</dataScope>
+            </settings>
+        </column>
+        <column name="reference_id" sortOrder="40">
+            <settings>
+                <label translate="true">Reference ID</label>
+                <filter>text</filter>
+                <dataScope>reference_id</dataScope>
+            </settings>
+        </column>
+        <column name="status" sortOrder="50">
+            <settings>
+                <label translate="true">Status</label>
+                <filter>text</filter>
+                <dataScope>status</dataScope>
+            </settings>
+        </column>
+        <column name="message" sortOrder="60">
+            <settings>
+                <label translate="true">Message</label>
+                <filter>text</filter>
+                <dataScope>message</dataScope>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date" sortOrder="70">
+            <settings>
+                <label translate="true">Created At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>created_at</dataScope>
+            </settings>
+        </column>
+    </columns>
+</listing>

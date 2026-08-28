@@ -1,0 +1,27 @@
+<?php
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * Global custom CSS — loaded on every page via head.additional
+ */
+?>
+<style>
+    /* ══════════════════════════════════════════
+       Global Custom CSS
+    ══════════════════════════════════════════ */
+
+    /* Trustpilot wrappers */
+    .trustpilot-horizontal-carousel-wrapper {
+        display: none;
+    }
+    .trustpilot-mini-carousel-wrapper {
+        display: none;
+    }
+
+    @media (min-width: 560px) {
+        .trustpilot-horizontal-carousel-wrapper { display: block; width: 100%; }
+    }
+    @media (max-width: 559px) {
+        .trustpilot-mini-carousel-wrapper { display: block; width: 100%; margin: 20px 0; }
+    }
+</style>

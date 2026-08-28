@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">ixpf_product_bulk_update_queue_listing.ixpf_product_bulk_update_queue_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>ixpf_product_bulk_update_queue_listing.ixpf_product_bulk_update_queue_listing_data_source</dep>
+        </deps>
+        <spinner>ixpf_product_bulk_update_queue_columns</spinner>
+    </settings>
+
+    <dataSource name="ixpf_product_bulk_update_queue_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">entity_id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>IXPF_Syncer::bulk_update_revert</aclResource>
+        <dataProvider name="ixpf_product_bulk_update_queue_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>entity_id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters">
+            <filterSelect name="status" provider="${ $.parentName }">
+                <settings>
+                    <options class="IXPF\Syncer\Model\Config\Source\QueueStatus"/>
+                    <caption translate="true">Select...</caption>
+                    <label translate="true">Status</label>
+                    <dataScope>status</dataScope>
+                </settings>
+            </filterSelect>
+        </filters>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="ixpf_product_bulk_update_queue_columns">
+        <column name="entity_id">
+            <settings>
+                <label translate="true">ID</label>
+                <filter>text</filter>
+                <sorting>desc</sorting>
+                <dataScope>entity_id</dataScope>
+            </settings>
+        </column>
+        <column name="store_id">
+            <settings>
+                <label translate="true">Store ID</label>
+                <filter>text</filter>
+                <dataScope>store_id</dataScope>
+            </settings>
+        </column>
+        <column name="ixpf_batch_id">
+            <settings>
+                <label translate="true">IXPF Batch ID</label>
+                <filter>text</filter>
+                <dataScope>ixpf_batch_id</dataScope>
+            </settings>
+        </column>
+        <column name="status" class="IXPF\Syncer\Ui\Component\Listing\Column\BulkUpdateQueueStatus">
+            <settings>
+                <label translate="true">Status</label>
+                <dataScope>status</dataScope>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <label translate="true">Created At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>created_at</dataScope>
+            </settings>
+        </column>
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <label translate="true">Updated At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>updated_at</dataScope>
+            </settings>
+        </column>
+
+        <actionsColumn name="actions" class="IXPF\Syncer\Ui\Component\Listing\Column\BulkUpdateQueueActions">
+            <settings>
+                <label translate="true">Actions</label>
+                <indexField>entity_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>
+

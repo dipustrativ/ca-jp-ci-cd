@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Order
+ * @package   CarpetAvenue_Orderify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="CarpetAvenue_Orderify" setup_version="1.0.0">
+        <sequence>
+            <module name="CarpetAvenue_Core"/>
+            <module name="Magento_Sales"/>
+            <module name="Magento_Email"/>
+            <module name="Magento_InventoryApi"/>
+            <module name="Magento_InventoryIndexer"/>
+            <module name="Magento_AdminNotification"/>
+            <module name="Adyen_Payment"/>
+        </sequence>
+    </module>
+</config>

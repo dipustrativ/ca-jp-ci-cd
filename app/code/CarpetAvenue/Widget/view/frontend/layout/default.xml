@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- Container for elements which need to break content max-width
+             (target for CMS Static Section Block widgets) -->
+        <referenceContainer name="page.wrapper">
+            <container name="main.full"
+                       label="Full Width Content"
+                       htmlTag="div"
+                       htmlClass="content--full-width"
+                       after="main.content"/>
+        </referenceContainer>
+        <block class="Magento\Catalog\Block\Product\ProductList\Item\Container" name="categoryproductlistwidget.addto">
+            <block class="Magento\Catalog\Block\Product\ProductList\Item\AddTo\Compare"
+                   name="categoryproductlistwidget.product.addto.compare" as="compare"
+                   template="Magento_Catalog::product/list/addto/compare.phtml"/>
+            <block class="Magento\Wishlist\Block\Catalog\Product\ProductList\Item\AddTo\Wishlist"
+                   name="categoryproductlistwidget.product.addto.wishlist" as="wishlist" before="compare"
+                   template="Magento_Wishlist::catalog/product/list/addto/wishlist.phtml"/>
+        </block>
+
+        <referenceBlock name="categoryproductlistwidget.product.addto.compare" remove="1"/>
+    </body>
+</page>

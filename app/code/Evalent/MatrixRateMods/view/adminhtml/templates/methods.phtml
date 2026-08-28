@@ -1,0 +1,62 @@
+<?php
+/** @var Evalent\MatrixRateMods\Block\Methods $block */
+
+$methods = $block->getAvailableMethods();
+?>
+<div id="method-loading-mask" data-role="spinner" class="admin__data-grid-loading-mask" style="display: none;">
+	<div class="spinner">
+	</div>
+</div>
+<select name="method" id="shipping-method-select" value="<?= array_keys($block->getCurrentMethod())[0] ?>">
+	<?php foreach ($methods as $method => $title): ?>
+		<option value="<?= $method ?>"><?= $title ?></option>
+	<?php endforeach; ?>
+</select>
+<button title="Update Shipping Method" type="button" disabled="disabled" class="action-default scalable" id="update-shipping-method">
+    <span>Update Shipping Method</span>
+</button>
+<script>
+    requirejs(['jquery'], function($) {
+    	let current = '<?= array_keys($block->getCurrentMethod())[0] ?>';
+
+    	let load = () => {
+			$('#method-loading-mask').show();
+		};
+
+    	let stopLoad = () => {
+			$('#method-loading-mask').hide();
+		};
+
+    	let toggleButton = () => {
+			$('#update-shipping-method').prop('disabled', $('#shipping-method-select').val() === current);
+		}
+
+    	$('#update-shipping-method').on('click', (e) => {
+    		e.preventDefault();
+			const method = $('#shipping-method-select').val();
+			load();
+			$.ajax({
+			  url: '<?= $block->getUpdateUrl() ?>',
+			  type: 'POST',
+			  dataType: 'json',
+			  data: {order: <?= $block->getOrder()->getEntityId() ?>, method, form_key: window.FORM_KEY},
+			  success: (response) => {
+				console.log(response);
+				current = method;
+			  },
+			  error: (response) => {
+				console.error(response);
+				alert('Something went wrong while updating the shipping method.');
+			  },
+			  complete: (response) => {
+			  	stopLoad();
+				toggleButton();
+			  }
+			});
+		});
+
+    	$('#shipping-method-select').on('change', (e) => {
+    		toggleButton();
+		});
+    });
+</script>

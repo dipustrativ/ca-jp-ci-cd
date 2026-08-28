@@ -1,0 +1,7 @@
+.admin__scope-old #manage-options-panel .input-text{
+    min-width: 110px !important;
+}
+
+.admin__scope-old #swatch-visual-options-panel .data-table input[type="text"] {
+    min-width: 110px !important;
+}

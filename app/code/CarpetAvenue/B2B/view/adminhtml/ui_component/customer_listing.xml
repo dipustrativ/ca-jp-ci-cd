@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @package CarpetAvenue_B2B
+ * @author  Strativ Magento Team
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <listingToolbar name="listing_top">
+        <massaction name="listing_massaction">
+            <action name="approve">
+                <settings>
+                    <confirm>
+                        <message translate="true">Approve the selected customers?</message>
+                        <title translate="true">Approve customers</title>
+                    </confirm>
+                    <url path="carpetavenue_b2b/customer/massapprove"/>
+                    <type>approve</type>
+                    <label translate="true">Approve (B2B)</label>
+                </settings>
+            </action>
+        </massaction>
+    </listingToolbar>
+    <columns name="customer_columns">
+        <column name="is_approved" component="Magento_Ui/js/grid/columns/select" sortOrder="75">
+            <settings>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Approved</label>
+            </settings>
+        </column>
+    </columns>
+</listing>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Product
+ * @package   CarpetAvenue_Productify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="productify_product_indexer_view" instance="CarpetAvenue\Productify\Cron\ProcessView" method="execute">
+            <schedule>*/1 * * * *</schedule>
+        </job>
+        <job name="productify_product_indexer_queue_process" instance="CarpetAvenue\Productify\Cron\ProcessQueue" method="execute">
+            <schedule>*/2 * * * *</schedule>
+        </job>
+        <job name="carpetavenue_productify_queue_maintenance" instance="CarpetAvenue\Productify\Cron\QueueMaintenance" method="execute">
+            <schedule>*/15 * * * *</schedule>
+        </job>
+        <job name="carpetavenue_productify_campaign_cache_clean" instance="CarpetAvenue\Productify\Cron\CampaignCacheClean" method="execute">
+            <schedule>1 * * * *</schedule>
+        </job>
+        <job name="carpetavenue_productify_generate_missing_urls" instance="CarpetAvenue\Productify\Cron\GenerateMissingUrls" method="execute">
+            <schedule>*/10 * * * *</schedule>
+        </job>
+        <job name="carpetavenue_productify_assign_color_shape_category" instance="CarpetAvenue\Productify\Cron\AssignColorShapeCategories" method="execute">
+            <schedule>30 3 * * *</schedule>
+        </job>
+    </group>
+
+    <!-- Prune old events (> 40 days) to keep the table tiny -->
+    <group id="default">
+        <job name="productify_omni_prune_events" instance="CarpetAvenue\Productify\Cron\PruneEvents" method="execute">
+            <schedule>10 0 * * *</schedule>
+        </job>
+
+        <!-- Refresh snapshots whose minimum may have aged out of the 30d window -->
+        <job name="productify_omni_refresh_aged_out" instance="CarpetAvenue\Productify\Cron\RefreshAgedOut" method="execute">
+            <schedule>*/15 * * * *</schedule>
+        </job>
+    </group>
+</config>

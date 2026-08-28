@@ -1,0 +1,31 @@
+<?php
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Active filters as removable chips.
+ *
+ * @var \Magento\LayeredNavigation\Block\Navigation\State $block
+ */
+$activeFilters = $block->getActiveFilters();
+?>
+<?php if (!empty($activeFilters)): ?>
+    <div class="filter-current am-filter-chips" data-count="<?= count($activeFilters) ?>">
+        <ol class="items">
+            <?php foreach ($activeFilters as $filterItem): ?>
+                <li class="item am-chip">
+                    <span class="am-chip-name"><?= $block->escapeHtml(__($filterItem->getName())) ?>:</span>
+                    <span class="am-chip-value"><?= $block->escapeHtml($block->stripTags($filterItem->getLabel())) ?></span>
+                    <a class="action remove am-chip-remove"
+                       href="<?= $block->escapeUrl($filterItem->getRemoveUrl()) ?>"
+                       <?php if (method_exists($filterItem, 'getRequestVar')): ?>
+                       data-req-var="<?= $block->escapeHtmlAttr($filterItem->getRequestVar()) ?>"
+                       data-value="<?= $block->escapeHtmlAttr($filterItem->getValueString()) ?>"
+                       <?php endif; ?>
+                       title="<?= $block->escapeHtmlAttr(__('Remove %1', $block->stripTags($filterItem->getLabel()))) ?>">
+                        <span><?= $block->escapeHtml(__('Remove This Item')) ?></span>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ol>
+    </div>
+<?php endif; ?>

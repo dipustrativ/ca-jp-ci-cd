@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Swap the attribute-option grid template for one that adds a per-option
+ * "Setting" button (image upload/delete modal). Carpient_Filter.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="main.advanced" template="Carpient_Filter::catalog/product/attribute/options.phtml"/>
+    </body>
+</page>

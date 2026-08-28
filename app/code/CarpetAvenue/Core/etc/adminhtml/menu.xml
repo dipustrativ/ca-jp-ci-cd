@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Core
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <!--
+            Top-level "CarpetAvenue" menu entry in the admin sidebar.
+            All other CarpetAvenue_* modules add their sub-menus as children
+            of this node (parent="CarpetAvenue_Core::carpetavenue").
+        -->
+        <add id="CarpetAvenue_Core::carpetavenue"
+             title="CarpetAvenue"
+             module="CarpetAvenue_Core"
+             sortOrder="50"
+             resource="CarpetAvenue_Core::carpetavenue"/>
+
+        <!-- Miscellaneous group – catch-all for core utilities -->
+        <add id="CarpetAvenue_Core::miscellaneous"
+             title="Miscellaneous"
+             module="CarpetAvenue_Core"
+             sortOrder="999"
+             parent="CarpetAvenue_Core::carpetavenue"
+             resource="CarpetAvenue_Core::miscellaneous"/>
+
+        <!-- Documentation hub – central chapter-wise documentation index -->
+        <add id="CarpetAvenue_Core::documentation_menu"
+             title="Documentation"
+             module="CarpetAvenue_Core"
+             sortOrder="10"
+             parent="CarpetAvenue_Core::miscellaneous"
+             action="carpetavenue/doc/index"
+             resource="CarpetAvenue_Core::miscellaneous_documentation"/>
+    </menu>
+</config>
+

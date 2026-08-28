@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <type name="Magento\Catalog\Block\Product\ImageFactory">
+        <plugin name="carpetavenue_core_strip_store_param_from_image_url"
+                type="CarpetAvenue\Core\Plugin\StripStoreParamFromImageUrl"
+                sortOrder="10"/>
+    </type>
+
+    <type name="Magento\Store\Api\StoreCookieManagerInterface">
+        <plugin name="carpetavenue_core_ignore_store_cookie"
+                type="CarpetAvenue\Core\Plugin\IgnoreStoreCookie"
+                sortOrder="10"/>
+    </type>
+
+</config>

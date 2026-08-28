@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="evalent_banner" translate="label" type="text" sortOrder="98" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Banners</label>
+            <tab>general</tab>
+            <resource>Evalent_Banner::config_evalentbanner</resource>
+
+            <group id="evalent_banner_main" translate="label" type="text" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>General Settings</label>
+
+                <field id="quality" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label><![CDATA[Compression Quality (0-100)]]></label>
+                </field>
+
+                <field id="desktop_width" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label><![CDATA[Desktop Resolution Width]]></label>
+                </field>
+
+                <field id="desktop_height" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label><![CDATA[Desktop Resolution Height]]></label>
+                </field>
+
+                <field id="mobile_width" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label><![CDATA[Mobile Resolution Width]]></label>
+                </field>
+
+                <field id="mobile_height" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label><![CDATA[Mobile Resolution Height]]></label>
+                </field>
+
+            </group>
+        </section>
+    </system>
+</config>

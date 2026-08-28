@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpient. All rights reserved.
+ *
+ * Figtree is self-hosted (@font-face in web/css/source/_figtree-font.less).
+ * <font> emits rel="preload" as="font" crossorigin — the crossorigin is required
+ * even same-origin, or the preload is discarded and the font fetched twice.
+ * Only the latin subset is preloaded; latin-ext loads on demand.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <font src="fonts/figtree-latin.woff2"/>
+    </head>
+</page>

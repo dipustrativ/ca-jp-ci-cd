@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="breadcrumbs">
+            <arguments>
+                <argument name="class" xsi:type="string">Evalent\DynamicSimilarProducts\Plugin\Block\Theme\Html\Breadcrumbs</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceContainer name="columns.top">
+            <block class="Evalent\DynamicSimilarProducts\Block\Html\Title" name="page.similar.title" before="-" template="Magento_Theme::html/title.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

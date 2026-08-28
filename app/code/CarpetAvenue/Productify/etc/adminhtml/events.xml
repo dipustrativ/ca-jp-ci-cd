@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @package   CarpetAvenue_Productify
+ * @author    Strativ Magento Team
+ *
+ * Merged from CarpetAvenue_ProductStatus/etc/adminhtml/events.xml.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- Enforces the approved/online/weight rules when an admin saves a product -->
+    <event name="catalog_product_save_before">
+        <observer name="carpetavenue_productstatus_product_save_before"
+                  instance="CarpetAvenue\Productify\ProductStatus\Observer\ProductBeforeSave"/>
+    </event>
+</config>

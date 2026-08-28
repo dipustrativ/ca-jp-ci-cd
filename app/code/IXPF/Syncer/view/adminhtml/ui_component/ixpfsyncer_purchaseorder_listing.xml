@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">ixpfsyncer_purchaseorder_listing.ixpfsyncer_purchaseorder_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>ixpfsyncer_purchaseorder_listing.ixpfsyncer_purchaseorder_listing_data_source</dep>
+        </deps>
+        <spinner>ixpfsyncer_purchaseorder_columns</spinner>
+    </settings>
+
+    <dataSource name="ixpfsyncer_purchaseorder_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">entity_id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>IXPF_Syncer::webhook_list</aclResource>
+        <dataProvider name="ixpfsyncer_purchaseorder_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>ixpf_purchase_id</requestFieldName>
+                <primaryFieldName>ixpf_purchase_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="ixpfsyncer_purchaseorder_columns">
+        <column name="ixpf_purchase_id">
+            <settings>
+                <label translate="true">IXPF Purchase ID</label>
+                <filter>text</filter>
+                <dataScope>ixpf_purchase_id</dataScope>
+            </settings>
+        </column>
+        <column name="purchase_name">
+            <settings>
+                <label translate="true">Purchase File Name</label>
+                <filter>text</filter>
+                <dataScope>purchase_name</dataScope>
+            </settings>
+        </column>
+        <column name="total_payload">
+            <settings>
+                <label translate="true">Total Batch Requested</label>
+                <dataScope>total_payload</dataScope>
+            </settings>
+        </column>
+        <!--<column name="process_status">
+            <settings>
+                <label translate="true">Status</label>
+                <dataScope>process_status</dataScope>
+            </settings>
+        </column>-->
+        <column name="total_products">
+            <settings>
+                <label translate="true">Total Products</label>
+                <dataScope>total_products</dataScope>
+            </settings>
+        </column>
+        <column name="total_success_products">
+            <settings>
+                <label translate="true">Total Success Products</label>
+                <dataScope>total_success_products</dataScope>
+            </settings>
+        </column>
+        <column name="total_failed_products">
+            <settings>
+                <label translate="true">Total Failed Products</label>
+                <dataScope>total_failed_products</dataScope>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="IXPF\Syncer\Ui\Component\Listing\Column\PurchaseOrderAction">
+            <settings>
+                <label translate="true">View Products</label>
+                <indexField>ixpf_purchase_id</indexField>
+            </settings>
+        </actionsColumn>
+
+    </columns>
+</listing>

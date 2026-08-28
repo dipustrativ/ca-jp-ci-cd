@@ -1,0 +1,25 @@
+"Invoice: ","Rechnung: "
+"Order: ","Bestellung: "
+"Customer Number: ","Kundennummer: "
+"Invoice Date: ","Rechnungsdatum: "
+"Sold to:","Verkauft an:"
+"CA - Sold to:","Verkauft an:"
+"Ship to:","Versand an:"
+"Payment Method:","Zahlungsart:"
+"Shipping Method:","Versandart:"
+"Order Summary","Bestellübersicht"
+Products,Artikel
+"SKU",Artikelnummer
+"CA - SKU",Artikelnummer
+Price,Preis
+Quantity,Menge
+Subtotal,Zwischensumme
+"Subtotal:","Zwischensumme:"
+"Grand Total Excl. Tax","Gesamtsumme (exkl. MwSt.)"
+"Grand Total Incl. Tax","Gesamtsumme (inkl. MwSt.)"
+"Tax","MwSt."
+"CA - Tax","MwSt."
+"CA - Grand Total (Excl. Tax)","Gesamtsumme (exkl. MwSt.)"
+"CA - Grand Total (Incl. Tax)","Gesamtsumme (inkl. MwSt.)"
+"CA - Qty","Menge"
+"CA - Ship to:","Versand an:"

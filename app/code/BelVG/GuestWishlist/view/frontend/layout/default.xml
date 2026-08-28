@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+ * BelVG LLC.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://store.belvg.com/BelVG-LICENSE-COMMUNITY.txt
+ *
+ ********************************************************************
+ * @category   BelVG
+ * @package    BelVG_GuestWishlist
+ * @copyright  Copyright (c) BelVG LLC. (http://www.belvg.com)
+ * @license    http://store.belvg.com/BelVG-LICENSE-COMMUNITY.txt
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<body>
+    <referenceContainer name="header-wrapper">
+        <container name="wishlist-link-wrapper" label="Wishlist Link Wrapper" as="wishlist-link-wrapper" after="compare-link-wrapper" htmlTag="ul" htmlClass="wish wrapper">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="catalog.wishlist.link" before="-"
+                   template="BelVG_GuestWishlist::link.phtml"/>
+        </container>
+    </referenceContainer>
+    <referenceContainer name="before.body.end">
+        <block class="Magento\Framework\View\Element\Js\Components" name="guest.wishlist.body_end.components" as="guestwishlist.components" template="BelVG_GuestWishlist::js/components.phtml" before="-"/>
+    </referenceContainer>
+</body>
+</page>

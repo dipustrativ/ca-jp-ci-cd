@@ -1,0 +1,1392 @@
+//
+//  Carpient Rugs — category product grid + full-width filter bar.
+//  Grid-item visuals ported from carpetavenue/rugs (kept identical); the
+//  filter modal + full-width mechanism reuse CarpetAvenue_Productify.
+//  _____________________________________________
+
+@ca-price:                        #7c232e;
+@ca-green:                        #2C8E3B;
+
+//
+//  Bold product names site-wide (blank parent doesn't set it)
+//  _____________________________________________
+.page-wrapper .product-item-name,
+.page-wrapper .product.name a {
+    font-weight: 500;
+}
+
+//
+//  Hover second image — crossfade, parity with carpient.com
+//  _____________________________________________
+//  The second image is rendered stacked on top of the main one and faded in
+//  over 0.5s, instead of swapping the main <img> src (which flashed while the
+//  new file loaded and fought the lazyload plugin over data-original).
+//  Unscoped on purpose: category, search, product widgets, similar-products
+//  and recently-viewed all render the same .product-item-photo link.
+.product-item-photo.has-hover-image {
+    position: relative;
+    display: block;
+
+    //  Touch devices have no hover, so the second image is dead weight there —
+    //  display:none keeps the lazy <img> from ever entering the viewport, so
+    //  it isn't downloaded either (~1MB saved on a 24-product grid).
+    .product-image-photo--hover {
+        display: none;
+    }
+
+    @media (hover: hover) {
+        .product-image-photo--hover {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            //  Without an explicit z-index the main <img> paints on top of this
+            //  absolutely positioned sibling and the hover image never shows.
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            //  Rug shots vary in ratio, so contain leaves bars — fill them, else
+            //  the main image shows through around the hover one.
+            background: @color-white;
+            opacity: 0;
+            transition: opacity .5s;
+            pointer-events: none;
+        }
+
+        &:hover .product-image-photo--hover {
+            opacity: 1;
+        }
+    }
+}
+
+//
+//  Full-width grid — no left sidebar; filters sit above the grid
+//  _____________________________________________
+.page-layout-2columns-left.page-layout-fullwidth-filter {
+    .column.main {
+        width: 100%;
+        padding-left: 0;
+    }
+
+    //  Empty sidebar collapses
+    .sidebar.sidebar-main,
+    .sidebar.sidebar-additional {
+        display: none;
+    }
+
+    //  Floating "scroll to filter" helper — redundant (filters already on top)
+    .wrap-filter-top-button {
+        display: none;
+    }
+
+    //  Layered navigation as a horizontal button bar — every button opens the
+    //  slide-out filter modal (see .modal-slide.filter-modal below)
+    .block.filter {
+        margin-bottom: 20px;
+
+        .block-title.filter-title {
+            display: none;
+        }
+
+        //  The horizontal `display: flex; flex-wrap: wrap` that used to live
+        //  here moved to the min-@screen__m block further down: below that
+        //  breakpoint Carpient_Filter turns this same element into a stacked
+        //  off-canvas drawer, and this rule is six classes deep, so it
+        //  out-ranked anything sane the module could write and laid the
+        //  drawer's groups out as a wrapping row. Scoping it is the fix, not
+        //  a longer selector on the other side.
+
+        //  Hidden until the filter-modal widget moves it into the modal
+        #filter-popup {
+            display: none;
+        }
+
+        button.button-filter {
+            position: relative;
+            margin: 0;
+            padding: 10px 34px 10px 14px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: @button__border-radius;
+            .lib-font-size(14px);
+            font-weight: @font-weight__bold;
+            line-height: 1.2;
+            cursor: pointer;
+
+            &:after {
+                content: '\e622';
+                font-family: 'luma-icons';
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 9px;
+                font-weight: normal;
+            }
+
+            &:hover {
+                border-color: #c6c6c6;
+            }
+        }
+
+        //  Active filters row: "All filters" opener + chips + clear
+        .filter-state-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 14px;
+            width: 100%;
+
+            button.open-filter-popup {
+                flex-shrink: 0;
+                margin: 0;
+                padding: 0;
+                border: 0;
+                background: none;
+                color: #333;
+                font-weight: 600;
+                text-transform: uppercase;
+                cursor: pointer;
+
+                &:before {
+                    margin-right: 10px;
+                    .lib-css(color, #888);
+                    .lib-font-size(20);
+                    vertical-align: middle;
+                }
+            }
+
+            .am-filter-chips,
+            .filter-actions {
+                margin: 0;
+            }
+        }
+    }
+}
+
+//
+//  Filter slide-out modal (right side) — matches reference theme
+//  _____________________________________________
+.modal-slide.filter-modal {
+    left: 0;
+
+    &:not(._show) .modal-inner-wrap {
+        transform: translateX(100%);
+    }
+
+    .modal-inner-wrap {
+        position: relative; // anchor for the bottom apply bar
+    }
+
+    &._inner-scroll .modal-content {
+        overflow-y: auto;
+        height: 100%;
+        padding: 0 0 70px; // keep last options clear of the apply bar
+        box-sizing: border-box;
+    }
+
+    .modal-header {
+        position: relative;
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+
+        .modal-title {
+            position: absolute;
+            left: 25%;
+            right: 25%;
+            top: 25%;
+            bottom: 25%;
+            margin: auto;
+            padding: 0;
+            border: 0;
+            text-align: center;
+            .lib-font-size(25);
+        }
+    }
+
+    .action-close {
+        left: auto;
+        right: 0;
+
+        &:before {
+            .lib-css(color, #333);
+            .lib-font-size(20);
+            line-height: 40px;
+        }
+    }
+
+    #filter-popup {
+        .filter-options {
+            display: block;
+            margin: 0;
+        }
+
+        .filter-options-item {
+            position: relative;
+            display: block;
+            margin: 0;
+            border: 0;
+
+            &:after {
+                content: '';
+                display: block;
+                position: absolute;
+                width: 100%;
+                height: 1px;
+                border-bottom: 1px solid #ccc;
+            }
+        }
+
+        .filter-options-title {
+            position: relative;
+            margin: 0;
+            .lib-font-size(15);
+            font-weight: 700;
+            text-transform: none;
+            cursor: pointer;
+
+            // The toggle is clickable, so a click/keyboard focus otherwise
+            // leaves a browser border + grey background on it — strip those.
+            &,
+            &:hover,
+            &:focus,
+            &:active {
+                background: transparent;
+                border: 0;
+                outline: 0;
+                box-shadow: none;
+            }
+
+            &:after {
+                content: '\e900';
+                font-family: 'nav-icons';
+                position: absolute;
+                right: 0;
+                top: auto;
+                .lib-font-size(20);
+            }
+        }
+
+        //  Each filter's options slide in as a full-height panel over the list.
+        .filter-options-content {
+            display: block !important; // stay in flow so the slide transition works
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 20px 20px 80px; // bottom space for the apply bar
+            background: #e8e8e8;
+            z-index: 99;
+            transform: translate(100vw);
+            transition: transform 0.1s;
+            overflow: auto;
+            .lib-font-size(16);
+
+            &:before {
+                content: '';
+                display: block;
+                position: absolute;
+                width: 100%;
+                height: 100px;
+                left: 0;
+                right: 0;
+                top: 0;
+                background: #fff;
+                z-index: 0;
+            }
+        }
+
+        .filter-options-content__title {
+            display: inline-block;
+            position: relative;
+            transform: translateY(-20px);
+            width: 65%;
+            margin: 0 auto;
+            padding: 15px 20px;
+            text-align: center;
+            line-height: 1;
+            font-size: 2rem;
+            font-weight: 700;
+            box-sizing: border-box;
+        }
+
+        .filter-options-item.active .filter-options-content {
+            transform: translate(0);
+        }
+
+        button.filter-options-back {
+            display: inline-block;
+            position: relative;
+            margin-left: -20px;
+            border: 0;
+            border-radius: 0;
+            background: #e8e8e8;
+
+            &:before {
+                content: '\e901';
+                font-family: 'nav-icons';
+                margin-right: 10px;
+            }
+        }
+
+        //  Option rows: white cards on the grey panel
+        .am-filter-items {
+            position: relative;
+
+            .am-filter-item {
+                background: #fff;
+                margin: 10px 0;
+                padding: 5px;
+                border: 2px solid transparent;
+
+                &:hover {
+                    border-color: #429a3c;
+                }
+            }
+        }
+
+        .am-price-slider {
+            position: relative;
+            background: #fff;
+            margin: 10px 0;
+            padding: 12px 10px;
+        }
+    }
+
+    //  Bottom-pinned apply bar: Clear + Show
+    .am_shopby_apply_filters {
+        position: absolute;
+        bottom: 0;
+        top: auto;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 100; // above the slide-in option panels (z-index 99)
+
+        .am-show-button {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            margin-bottom: 0;
+            padding: 10px 0;
+            background: #fff;
+            box-shadow: none;
+        }
+
+        .amshopby-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 45%;
+            margin: 0;
+            padding: 10px;
+            border-radius: 0;
+            box-sizing: border-box;
+            background: #000;
+            border: 1px solid #000;
+            color: #fff;
+            font-weight: @font-weight__bold;
+            text-align: center;
+            text-decoration: none;
+
+            > span {
+                width: auto;
+            }
+
+            .am-items {
+                margin-left: 5px;
+            }
+
+            &.filter-clear.action.clear {
+                border-radius: 0;
+                border-color: #000;
+                background: #fff;
+                .lib-css(color, #000);
+            }
+        }
+    }
+}
+
+//
+//  Grid wrapper
+//  _____________________________________________
+//  The PDP "You might also like" widget (.block-products-list) reuses the same
+//  card markup, so it inherits the identical catalog card look. The native
+//  "Recently Viewed" widget (.block-viewed-products-grid) renders the exact
+//  same .products-grid > .product-items > .product-item structure underneath
+//  its own wrapper class, so it's added here for the same reason.
+.catalog-category-view,
+.catalogsearch-result-index,
+.catalog-product-view .block-products-list,
+.catalog-product-view .block-viewed-products-grid {
+
+    .products {
+        margin: 18px 0;
+    }
+
+    .products-grid .product-items {
+        .product-item {
+            .lib-font-size(14px);
+            margin-bottom: 20px;
+            line-height: 1.1;
+            letter-spacing: normal;
+            vertical-align: top;
+
+            //  Card
+            .product-item-info {
+                position: relative;
+                width: auto;
+                text-align: left;
+            }
+
+            .product-item-photo {
+                display: block;
+            }
+
+            //  Uniform portrait card box (Magento sets aspect-ratio 320/420 on
+            //  the container from view.xml). Rug images vary wildly in ratio
+            //  (tall runners to wide landscapes), so contain the image inside
+            //  the fixed box — whole rug shown, nothing cropped, no overflow,
+            //  and the hover second image auto-fits the identical box.
+            .product-image-container {
+                display: block;
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+            }
+
+            .product-image-wrapper {
+                height: 100%;
+                width: 100%;
+            }
+
+            .product-image-photo {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                object-position: center;
+                margin: 0;
+            }
+
+            .product-item-details {
+                position: static;
+                padding: 12px 10px 16px;
+            }
+
+            //  Name
+            .product-item-name {
+                .lib-font-size(16px);
+                font-weight: @font-weight__bold;
+                margin: 0 0 4px;
+
+                .product-item-link {
+                    color: @primary__color;
+                }
+            }
+
+            //  Size line
+            .size {
+                .lib-font-size(13px);
+                color: #7d7d7d;
+                margin-bottom: 6px;
+            }
+
+            //  Price — left-aligned, "Rec. price:" label, sale colouring
+            .price-box.price-final_price {
+                margin: 6px 0 0;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+
+                &:before {
+                    content: var(--rec-price-label-c, "Rec. price:");
+                    .lib-font-size(13px);
+                    color: #7d7d7d;
+                    font-weight: @font-weight__regular;
+                    margin-right: 6px;
+                    white-space: nowrap;
+                }
+
+                .price-label {
+                    display: none;
+                }
+
+                .price-container .price {
+                    .lib-font-size(16px);
+                    font-weight: @font-weight__bold;
+                    color: @ca-price;
+                }
+
+                .special-price {
+                    order: 1;
+
+                    .price-wrapper .price {
+                        color: @ca-price;
+                    }
+                }
+
+                .old-price {
+                    margin: 0 8px 0 0;
+                    text-decoration: line-through;
+
+                    .price-container .price {
+                        color: #7d7d7d;
+                        font-weight: @font-weight__regular;
+                        .lib-font-size(14px);
+                    }
+                }
+            }
+
+            //  Add-to-cart / wishlist actions
+            .product-item-inner {
+                border: 0;
+                box-shadow: none;
+            }
+
+            .product-item-actions {
+                margin: 10px 0 0;
+
+                .tocart {
+                    .lib-css(border-radius, @button__border-radius);
+                    .lib-font-size(13px);
+                    line-height: 1;
+                    padding: 10px 15px;
+                    white-space: nowrap;
+                }
+
+                .towishlist {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    z-index: 2;
+                    margin: 0;
+                    font-size: 0;
+                    background: rgba(255, 255, 255, 0.95);
+                    border-radius: 50px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.13);
+                }
+            }
+        }
+    }
+}
+
+//
+//  Bestsellers / Product-SKU-slider widget — match the catalogue card look.
+//  It's a slick slider whose slides are direct children of .products-grid with
+//  no .product-items wrapper, so the card block above can't reach it. Card
+//  visuals only (slick owns the column layout). Discount flag is global below.
+//  _____________________________________________
+.carpet-sku-slider .product-item {
+    text-align: left;
+
+    .product-item-info {
+        position: relative;
+        text-align: left;
+    }
+
+    .product-image-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    .product-image-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .product-item-name {
+        .lib-font-size(16px);
+        font-weight: @font-weight__bold;
+        margin: 0 0 4px;
+
+        .product-item-link {
+            color: @primary__color;
+        }
+    }
+
+    .size {
+        .lib-font-size(13px);
+        color: #7d7d7d;
+        margin-bottom: 6px;
+    }
+
+    .price-box.price-final_price {
+        margin: 6px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+
+        &:before {
+            content: var(--rec-price-label-c, "Rec. price:");
+            .lib-font-size(13px);
+            color: #7d7d7d;
+            font-weight: @font-weight__regular;
+            margin-right: 6px;
+            white-space: nowrap;
+        }
+
+        .price-label {
+            display: none;
+        }
+
+        .price-container .price {
+            .lib-font-size(16px);
+            font-weight: @font-weight__bold;
+            color: @ca-price;
+        }
+
+        .special-price {
+            order: 1;
+
+            .price-wrapper .price {
+                color: #000;
+                font-weight: 500 !important;
+            }
+        }
+
+        .old-price {
+            margin: 0 8px 0 0;
+            text-decoration: line-through;
+
+            .price-container .price {
+                color: #7d7d7d;
+                font-weight: @font-weight__regular;
+                .lib-font-size(14px);
+            }
+        }
+    }
+}
+
+//
+//  Discount flag — maroon ribbon (top-left)
+//  _____________________________________________
+.product-item__flag--discount {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    width: 39px;
+    padding: 1.2rem;
+    line-height: 1.1;
+    color: @color-white;
+    font-weight: @font-weight__bold;
+    .lib-font-size(15px);
+    background: url('@{baseDir}images/catalog_flags/discount_1.svg') no-repeat;
+    background-size: 100%;
+}
+
+//
+//  Sold badge
+//  _____________________________________________
+.sold-caption {
+    display: inline-block;
+    margin: 5px auto 0;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    background: #d00;
+    color: @color-white;
+    .lib-font-size(13px);
+}
+
+//
+//  Bottom category description — Read more / Read less (parity with carpetavenue)
+//  _____________________________________________
+.toggle-readmore {
+    position: relative;
+
+    //  .content sits one level deeper than the toggle since the Read more link
+    //  moved inside the contained PageBuilder row — descendant, not child.
+    .content {
+        position: relative;
+        overflow: hidden;
+        transition: max-height 0.5s;
+        div{
+            padding: 0px !important;
+        }
+    }
+
+    &:not(.toggle-readmore--expand) {
+        .content:after {
+            content: "";
+            display: block;
+            height: 50px;
+            width: 100%;
+            top: 6ch;
+            position: absolute;
+            background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 0)), to(#ffffff));
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #ffffff);
+        }
+    }
+
+    &.category-description:not(.toggle-readmore--expand) {
+        .content {
+            max-height: 11ch;
+        }
+    }
+
+    &--expand {
+        .content {
+            max-height: 2000px;
+        }
+    }
+}
+
+.product-read-more {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+//  Bottom category-view-holder layout (parity with carpetavenue)
+.category-view-holder {
+    position: relative;
+}
+
+.catalog-category-view,
+.catalogsearch-result-index {
+    .column.main > .category-view-holder.category-view {
+        .category-image.cover {
+            display: none;
+
+            .image {
+                display: block;
+                height: auto;
+                max-width: 100%;
+                object-fit: cover;
+                border-radius: 0;
+            }
+        }
+    }
+}
+
+
+
+
+//  Desktop: holder becomes a flex row with a small 150px thumbnail
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    //  Horizontal filter bar (desktop only — see the note in .block.filter).
+    .page-layout-2columns-left.page-layout-fullwidth-filter .block.filter .block-content.filter-content {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px 20px;
+    }
+
+    .catalog-category-view,
+    .catalogsearch-result-index {
+        .column.main > .category-view-holder.category-view {
+            display: flex;
+            align-items: flex-start;
+
+            .category-image.cover {
+                display: block;
+                margin-right: 20px;
+                flex: 0 0 auto;
+
+                .image {
+                    max-width: 150px;
+                    height: 150px;
+                    width: 150px;
+                }
+            }
+
+            .category-description {
+                flex: 1 1 auto;
+                min-width: 0;
+                margin: 0px;
+            }
+        }
+    }
+}
+
+//
+//  Load-more ("See more") + product count — matches carpient.com reference
+//  (boost-sd pagination button + product-count text)
+//  _____________________________________________
+.catalog-category-view,
+.catalogsearch-result-index {
+
+    //  Share the column gutter — blank's @indent__s padding put the count on
+    //  a left edge of its own.
+    .toolbar-products {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    //  Product count — reference: 15px / 400 / #3d4246
+    .toolbar-amount {
+        .lib-font-size(15px);
+        font-weight: @font-weight__regular;
+        color: #3d4246;
+    }
+
+    //  No "per page" limiter (reference has none)
+    .field.limiter,
+    .toolbar-products .limiter {
+        display: none;
+    }
+
+    //
+    //  Sort By — reference boost-sd sort: borderless value + caret, 15px/#222
+    //  _____________________________________________
+    .toolbar-sorter.sorter {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sorter-label {
+        margin: 0;
+        color: #222;
+        .lib-font-size(15px);
+        font-weight: @font-weight__regular;
+    }
+
+    //  Native select restyled to the plain "Relevance v" look. It stays as
+    //  productListToolbarForm's source of truth and is what no-JS sorts with,
+    //  so it keeps this styling — .carpient-sort only hides it once built,
+    //  which also means no unstyled flash while JS boots.
+    .sorter-options {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        min-width: auto;
+        height: auto;
+        margin: 0;
+        padding: 4px 26px 4px 4px;
+        background: transparent;
+        border: 0;
+        color: #222;
+        .lib-font-size(15px);
+        font-weight: @font-weight__regular;
+        line-height: 1.2;
+        cursor: pointer;
+        text-align: right;
+        text-align-last: right;
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23222' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 4px center;
+
+        &:focus {
+            outline: 0;
+        }
+    }
+
+    .toolbar-sorter.-has-listbox .sorter-options {
+        display: none;
+    }
+
+    //  No separate asc/desc direction toggle (reference has none)
+    .sorter-action {
+        display: none;
+    }
+
+    //  Infinite-scroll trigger area (centered under the grid).
+    //  Was Lof_AjaxScroll; now CarpetAvenue_Productify > AjaxScroll.
+    .ias-trigger,
+    .ias-noneleft,
+    .ias-spinner {
+        clear: both;
+        width: 100%;
+        margin: 8px 0 0px;
+        text-align: center;
+    }
+
+    //  "Showing 1 - 50 of 611 products", above the button.
+    .ias-count {
+        margin-bottom: 14px;
+        .lib-font-size(15px);
+        font-weight: @font-weight__regular;
+        color: #3d4246;
+    }
+
+    //  "See more" button — reference boost-sd pagination button:
+    //  dark rectangle (#202123), white 16px/600, square corners.
+    .ias-trigger-next {
+        .progressbar {
+            display: none;
+        }
+
+        a {
+            display: inline-block;
+            min-width: 282px;
+            box-sizing: border-box;
+            margin: 0 auto;
+            padding: 12px 24px;
+            background: #202123;
+            border: 1px solid #202123;
+            border-radius: 0;
+            color: @color-white;
+            .lib-font-size(16px);
+            font-weight: @font-weight__semibold;
+            line-height: 1.25;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease;
+
+            &:hover,
+            &:focus {
+                background: #000;
+                border-color: #000;
+                color: @color-white;
+                text-decoration: none;
+            }
+        }
+    }
+}
+
+//
+//  Filter modal — mobile
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .modal-slide.filter-modal {
+        padding: 0;
+
+        #filter-popup {
+            button.filter-options-back {
+                float: right;
+                margin-top: 20px;
+                top: -23px;
+                left: 10px;
+            }
+
+            .filter-options-title {
+                padding: 10px 40px 10px 10px;
+            }
+
+            .filter-options-content__title {
+                margin-top: 10px;
+            }
+
+            .filter-options-item:after {
+                margin-left: -10px;
+            }
+        }
+    }
+}
+
+//
+//  Filter modal — desktop: 30% wide panel docked right
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .modal-slide.filter-modal {
+        left: 70%;
+        right: 0;
+
+        #filter-popup {
+            button.filter-options-back {
+                top: -20px;
+                left: 0;
+            }
+
+            .filter-options-title {
+                padding: 20px 40px 20px 10px;
+            }
+
+            .filter-options-item {
+                padding: 0 25px;
+
+                &:after {
+                    margin-left: -25px;
+                }
+
+                &:hover {
+                    background: #f2f2f2;
+                }
+            }
+        }
+    }
+}
+
+//
+//  Desktop grid — 5 products per row (matches reference)
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+    .page-products {
+        .products-grid {
+            .product-item {
+                width: calc(~'(100% - 8%) / 5');
+
+                &:nth-child(4n + 1) {
+                    margin-left: 2%;
+                }
+
+                &:nth-child(5n + 1) {
+                    margin-left: 0;
+                }
+            }
+        }
+    }
+}
+
+//
+//  Product detail page (ported from carpetavenue/rugs)
+//  _____________________________________________
+@import "_product-view";
+@import "_carpient";
+@import "_slider";
+
+//
+//  PDP accordions -> reference "disclosure disclosure--row" look
+//  (rows with faint top/bottom hairlines, tall summary, big title + chevron).
+//  !important beats the templates' inline <style>.
+//  _____________________________________________
+.catalog-product-view {
+    .additional-attributes-wrapper,
+    .collapsible-block,
+    .product-desc,
+    #product-desc {
+        border: 0 !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        background: none !important;
+    }
+
+    .attributes-collapse-trigger {
+        padding: 22px 0 !important;
+        border: 0 !important;
+        border-top: 1px solid rgba(12, 12, 12, 0.15) !important;
+        border-radius: 0 !important;
+        background: none !important;
+
+        h3 {
+            .lib-font-size(17px);
+            font-weight: 600 !important;
+            margin: 0 !important;
+        }
+    }
+
+    .additional-attributes-wrapper [data-role="content"],
+    .collapsible-block [data-role="content"],
+    .product-desc [data-role="content"] {
+        border: 0 !important;
+        border-radius: 0 !important;
+        padding: 0 0 24px !important;
+    }
+
+    //  Bottom hairline closing the accordion group
+    .product-info-details,
+    .product-bottom_holder {
+        border-bottom: 1px solid rgba(12, 12, 12, 0.15);
+    }
+
+    //  Add to Cart — black
+    .box-tocart .action.tocart,
+    .product-add-form button.tocart,
+    button.action.tocart.primary {
+        background: #0c0c0c !important;
+        border-color: #0c0c0c !important;
+        color: #ffffff !important;
+
+        &:hover,
+        &:focus,
+        &:active {
+            background: #000000 !important;
+            border-color: #000000 !important;
+            color: #ffffff !important;
+        }
+    }
+
+    //  No wishlist action on the PDP (main + similar products)
+    .action.towishlist {
+        display: none !important;
+    }
+
+    //  Reseller CTA (B2B catalog mode) — full-width primary button, matches
+    //  the reference PDP call-to-action; no cart icon. Overrides the buy-box
+    //  width cap (.box-tocart max-width 350px) and the .actions .tocart 70%
+    //  flex-basis, which otherwise keep the button narrow.
+    .product-add-form .box-tocart--reseller {
+        flex-basis: 100% !important;
+        width: 100% !important;
+        max-width: none !important;
+
+        .fieldset,
+        .actions {
+            width: 100%;
+        }
+
+        .actions {
+            margin-left: 0 !important;
+        }
+
+        .actions .action.tocart.reseller-cta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-basis: 100%;
+            width: 100% !important;
+            min-height: 58px;
+            margin: 0;
+            padding: 16px 24px;
+            box-sizing: border-box;
+            .lib-font-size(16px);
+            font-weight: 300;
+            line-height: 1;
+            text-align: center;
+            text-decoration: none;
+
+            span:before {
+                content: none !important;
+                display: none !important;
+            }
+        }
+    }
+}
+
+//
+//  Product USP list -> reference "slade-icons" (40px icon + text rows)
+//  _____________________________________________
+.catalog-product-view {
+    .product-ups-list .slade-icons {
+        margin: 18px 0;
+    }
+
+    .slade-icons .icons-container {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .slade-icons .icon-text-pair {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        img {
+            flex: 0 0 auto;
+            width: 40px;
+            height: 40px;
+        }
+
+        p {
+            margin: 0;
+            .lib-font-size(15px);
+            color: #0c0c0c;
+            line-height: 1.3;
+        }
+    }
+}
+
+//
+//  PDP prices -> black (final, incl/excl tax, weee, old/special)
+//  _____________________________________________
+.catalog-product-view {
+    .product-info-price,
+    .price-box.price-final_price {
+        .price-container .price,
+        .price-including-tax .price,
+        .price-excluding-tax .price,
+        .special-price .price,
+        .old-price .price,
+        .weee .price,
+        .price {
+            color: #0c0c0c !important;
+        }
+    }
+}
+
+//
+//  PDP: VAT label text black; discount "Save %" text gray (not green)
+//  _____________________________________________
+.catalog-product-view {
+    .vat-incl,
+    .vat-excl,
+    .price-container > span.vat-incl,
+    .price-container > span.vat-excl {
+        color: #0c0c0c !important;
+    }
+
+    .product-item__price--discount,
+    .product-price__discount,
+    .price--discount {
+        color: #7d7d7d !important;
+    }
+}
+
+//  Main price box -> black (all descendants)
+.catalog-product-view .main .product-info-main .product-info-price .price-box,
+.catalog-product-view .product-info-main .product-info-price .price-box {
+    color: #0c0c0c !important;
+
+    .price,
+    .price-container .price,
+    span {
+        color: #0c0c0c !important;
+    }
+}
+
+//  Hide carpient tag in the stock/sku row
+.catalog-product-view .main .product-info-main .product-info-stock-sku .carpient-tag,
+.catalog-product-view .product-info-main .product-info-stock-sku .carpient-tag {
+    display: none !important;
+}
+
+//  Size attribute row -> no bottom margin
+.catalog-product-view .main .size-product__attribute,
+.catalog-product-view .size-product__attribute {
+    margin-bottom: 0 !important;
+}
+
+//  Category / search grid product price -> black
+.catalog-category-view .products-grid .product-items .product-item .price-box.price-final_price .price-container .price,
+.catalogsearch-result-index .products-grid .product-items .product-item .price-box.price-final_price .price-container .price,
+.catalog-product-view .block-products-list .products-grid .product-items .product-item .price-box.price-final_price .price-container .price {
+    color: #0c0c0c !important;
+    font-weight: 500 !important;
+}
+
+//  "Recently Viewed" (native Magento_Catalog widget) renders a plain
+//  .price-box, with no .price-final_price modifier — the two rules above
+//  never match it, so the "Rec. price:" label and price color are repeated
+//  here scoped to the bare class.
+.catalog-product-view .block-viewed-products-grid .products-grid .product-items .product-item .price-box {
+    margin: 6px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+
+    &:before {
+        content: var(--rec-price-label-c, "Rec. price:");
+        .lib-font-size(13px);
+        color: #7d7d7d;
+        font-weight: @font-weight__regular;
+        margin-right: 6px;
+        white-space: nowrap;
+    }
+
+    .price-container .price {
+        .lib-font-size(16px);
+        font-weight: 500;
+        color: #0c0c0c !important;
+    }
+}
+
+//  The "size" column (CarpetAvenue_Productify's widget_recently_viewed.xml
+//  override) is a later, separate ui_component file from the base one that
+//  declares name/price, so its sortOrder isn't merged numerically against
+//  theirs — it renders before the name instead of between name and price.
+//  Force the visual order to match "You might also like" (name, size, price)
+//  instead of chasing the UI component merge order.
+.catalog-product-view .block-viewed-products-grid .product-item-details {
+    display: flex;
+    flex-direction: column;
+
+    .product-item-name {
+        order: 1;
+    }
+
+    .size {
+        order: 2;
+    }
+
+    .price-box {
+        order: 3;
+    }
+
+    .product-item-actions {
+        order: 4;
+    }
+
+    //  Magento core's widget_recently_viewed.xml always registers a
+    //  "learn-more" column to description-area regardless of show_attributes,
+    //  so this wrapper renders even though we never enabled that attribute -
+    //  it's always empty here.
+    .product-item-description {
+        display: none;
+    }
+}
+
+//  "Recently Viewed" title
+.catalog-product-view .block-viewed-products-grid .block-title strong {
+    .lib-font-size(25px);
+    color: #333333;
+    font-weight: 400;
+}
+
+//  "You might also like" widget — 5 rugs per row (match catalogue). Overrides
+//  the legacy .ev-product-item / bootstrap col-* / fixed 280px-image rules that
+//  otherwise squeeze the card content (char-by-char name wrap, tiny image).
+//  "Recently Viewed" (.block-viewed-products-grid) shares this block too, for
+//  the same 5-column grid layout.
+.catalog-product-view .block-products-list,
+.catalog-product-view .block-viewed-products-grid {
+    .block-content .products-grid .product-items {
+        display: grid !important;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 24px 20px;
+        margin: 0;
+        width: 100%;
+        float: none;
+    }
+
+    .products-grid .product-items .product-item {
+        width: auto !important;
+        max-width: none !important;
+        min-width: 0 !important;   // let the grid track drive the width
+        margin: 0 !important;
+        padding: 0 !important;
+        left: auto !important;
+        float: none !important;
+    }
+
+    .products-grid .product-items .product-item .product-item-info,
+    .products-grid .product-items .product-item .product-item-details,
+    .products-grid .product-items .product-item .product-image-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        //  Details carries 10px side padding — without border-box the forced
+        //  width:100% pushes 20px past the card and the whole page scrolls.
+        box-sizing: border-box !important;
+    }
+
+    .products-grid .product-items .product-item .product-image-photo {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain;
+    }
+
+    @media (max-width: @screen__m) {
+        .block-content .products-grid .product-items {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}
+
+.category-description{
+    margin: 0px;
+}
+
+@media (max-width: 767px) {
+    .page-layout-2columns-left.page-layout-fullwidth-filter {
+        .column.main {
+            padding-bottom: 20px !important;
+        }
+    }
+    .toolbar-products{
+        margin-bottom: 20px;
+    }
+    .block-viewed-products-grid{
+        margin-bottom: 0px;
+    }
+}
+
+//  PDP breadcrumbs spacing lives in _product-view.less (single rule).

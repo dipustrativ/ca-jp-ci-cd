@@ -1,0 +1,121 @@
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_DeliveryTime
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+
+/**************************************************** Shipping method area ****************************************************/
+.delivery-date .title, .delivery-time .title, .house-security-code .title, .delivery-comment .title {
+    margin-bottom: 8px;
+}
+
+.delivery-date .control input {
+    width: 73%;
+    position: relative;
+    display: inline-block;
+}
+
+@media (max-width: 786px), print {
+    .delivery-date, .delivery-time{
+        width: 100% !important;
+    }
+}
+
+
+.delivery-date .remove-delivery-date {
+    cursor: pointer;
+    position: relative;
+    right: 45px;
+    display: inline-block;
+}
+
+.delivery-date, .delivery-time {
+    display: inline-block;
+    width: 45%;
+    margin-bottom: 20px;
+}
+
+.delivery-comment, .house-security-code {
+    width: 90%;
+    margin-bottom: 20px;
+}
+
+/* fix error datetime icon in m242 */
+.hasDatepicker~.ui-datepicker-trigger {
+    background-image: none;
+    background: none;
+    -moz-box-sizing: content-box;
+    border: 0;
+    box-shadow: none;
+    line-height: inherit;
+    margin: 0;
+    padding: 0;
+    text-shadow: none;
+    font-weight: 400;
+    display: block;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: -4px;
+    vertical-align: middle;
+}
+
+.hasDatepicker~.ui-datepicker-trigger:focus,._has-datepicker~.ui-datepicker-trigger:active {
+    background: none;
+    border: none
+}
+
+.hasDatepicker~.ui-datepicker-trigger:hover {
+    background: none;
+    border: none
+}
+
+.hasDatepicker~.ui-datepicker-trigger.disabled,._has-datepicker~.ui-datepicker-trigger[disabled],fieldset[disabled] ._has-datepicker~.ui-datepicker-trigger {
+    pointer-events: none;
+    opacity: .5
+}
+
+.hasDatepicker~.ui-datepicker-trigger>span {
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px
+}
+
+.hasDatepicker~.ui-datepicker-trigger:before {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 23px;
+    line-height: 23px;
+    color: #7d7d7d;
+    content: '\e612';
+    font-family: 'luma-icons';
+    vertical-align: middle;
+    display: inline-block;
+    font-weight: normal;
+    overflow: hidden;
+    speak: none;
+    text-align: center
+}
+
+.hasDatepicker~.ui-datepicker-trigger:focus {
+    box-shadow: none;
+    outline: 0
+}

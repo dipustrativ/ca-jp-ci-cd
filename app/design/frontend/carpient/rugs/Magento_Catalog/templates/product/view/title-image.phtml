@@ -1,0 +1,44 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php
+/**
+ * Bottom category cover image.
+ *
+ * Renders only when the admin has uploaded a Category Image on the category.
+ * There is deliberately no fallback to Thumbnail — that one is the small tile
+ * image used by the category grid/mega menu, not a cover.
+ *
+ * getImageUrl() copes with both storage forms the uploader produces
+ * ("file.jpg" and "/media/catalog/category/file.jpg"), so never prefix a
+ * media path by hand here.
+ *
+ * @var $block \Magento\Catalog\Block\Category\View
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+// phpcs:disable Magento2.Security.LanguageConstruct.DirectOutput
+
+$_helper   = $this->helper(Magento\Catalog\Helper\Output::class);
+$_category = $block->getCurrentCategory();
+$_imgUrl   = $_category->getImageUrl();
+?>
+<?php if ($_imgUrl): ?>
+    <?php
+    $_imgMobile = $_category->getImageUrl('mobile_image') ?: $_imgUrl;
+    $_imgHtml = '<div class="category-image cover">'
+        . '<picture>'
+        . '<source media="(max-width: 767px)" srcset="' . $block->escapeUrl($_imgMobile) . '">'
+        . '<img src="' . $block->escapeUrl($_imgUrl) . '"'
+        . ' alt="' . $block->escapeHtmlAttr($_category->getName()) . '"'
+        . ' title="' . $block->escapeHtmlAttr($_category->getName()) . '"'
+        . ' class="image" />'
+        . '</picture>'
+        . $block->getChildHtml()
+        . '</div>';
+    /* @noEscape */ echo $_helper->categoryAttribute($_category, $_imgHtml, 'image');
+    ?>
+<?php endif; ?>

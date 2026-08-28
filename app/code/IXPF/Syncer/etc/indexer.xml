@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Indexer/etc/indexer.xsd">
+    <indexer id="ixpf_changeable_product" view_id="ixpf_changeable_product" class="IXPF\Syncer\Model\Indexer\Product">
+        <title translate="true">Ixpf Product Webhook</title>
+        <description translate="true">Ixpf changeable product trigger by webhook</description>
+    </indexer>
+    <indexer id="ixpf_changeable_order" view_id="ixpf_changeable_order" class="IXPF\Syncer\Model\Indexer\Order">
+        <title translate="true">Ixpf Order Webhook</title>
+        <description translate="true">Ixpf changeable order trigger by webhook</description>
+    </indexer>
+    <indexer id="ixpf_changeable_customer" view_id="ixpf_changeable_customer" class="IXPF\Syncer\Model\Indexer\Customer">
+        <title translate="true">Ixpf Customer Webhook</title>
+        <description translate="true">Ixpf changeable customer trigger by webhook</description>
+    </indexer>
+</config>

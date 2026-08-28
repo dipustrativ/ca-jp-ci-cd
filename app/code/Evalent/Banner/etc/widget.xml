@@ -1,0 +1,340 @@
+<?xml version="1.0" ?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+	<widget class="Evalent\Banner\Block\Widget\SingleBanner" id="evalent_banner_singlebanner">
+		<label>Banner</label>
+		<description>Renders a single banner</description>
+		<parameters>
+			<parameter name="template" xsi:type="select" required="true" visible="true">
+				<label>Template</label>
+				<options>
+					<option name="default" value="widget/single_banner.phtml" selected="true">
+						<label>Default</label>
+					</option>
+				</options>
+			</parameter>
+			<parameter name="margin_top_desktop" sort_order="30" visible="true" xsi:type="select" source_model="Evalent\Banner\Model\Config\Source\Margins">
+				<label>Margin Top (Desktop)</label>
+			</parameter>
+			<parameter name="margin_bottom_desktop" sort_order="35" visible="true" xsi:type="select" source_model="Evalent\Banner\Model\Config\Source\Margins">
+				<label>Margin Bottom (Desktop)</label>
+			</parameter>
+			<parameter name="margin_top_mobile" sort_order="40" visible="true" xsi:type="select" source_model="Evalent\Banner\Model\Config\Source\Margins">
+				<label>Margin Top (Mobile)</label>
+			</parameter>
+			<parameter name="margin_bottom_mobile" sort_order="45" visible="true" xsi:type="select" source_model="Evalent\Banner\Model\Config\Source\Margins">
+				<label>Margin Bottom (Mobile)</label>
+			</parameter>
+			<parameter name="display_mode" sort_order="45" visible="true" xsi:type="select" source_model="Evalent\Banner\Model\Config\Source\DisplayMode">
+				<label>Display Mode</label>
+			</parameter>
+			<parameter name="banner" sort_order="45" visible="true" xsi:type="select" source_model="Evalent\Banner\Ui\Component\Widget\Parameter\Banners">
+				<label>Banner to display</label>
+			</parameter>
+			<parameter name="css_class" sort_order="50" visible="true" xsi:type="text">
+				<label>CSS class</label>
+				<description>Optional CSS class for this banner container</description>
+			</parameter>
+		</parameters>
+	</widget>
+	<widget class="Evalent\Banner\Block\Widget\MultipleBanner" id="evalent_banner_multiplebanner">
+		<label>Banner group</label>
+		<description>Define a group of banners and how they interact with each other</description>
+		<parameters>
+			<parameter name="template" xsi:type="select" required="true" visible="true">
+				<label>Template</label>
+				<options>
+					<option name="default" value="widget/multiple_banner.phtml" selected="true">
+						<label>Default</label>
+					</option>
+                    <option name="new_layout_1_3" value="widget/multiple_banner_1_3.phtml" selected="false">
+                        <label>New Layout (1/3)</label>
+                    </option>
+				</options>
+			</parameter>
+			<parameter name="gutter_desktop" sort_order="20" visible="true" xsi:type="select" source_model="Evalent\Banner\Model\Config\Source\Gutters">
+				<label>Gutter (Desktop)</label>
+			</parameter>
+			<parameter name="gutter_mobile" sort_order="25" visible="true" xsi:type="select" source_model="Evalent\Banner\Model\Config\Source\Gutters">
+				<label>Gutter (Mobile)</label>
+			</parameter>
+			<parameter name="margin_top_desktop" sort_order="30" visible="true" xsi:type="select" source_model="Evalent\Banner\Model\Config\Source\Margins">
+				<label>Margin Top (Desktop)</label>
+			</parameter>
+			<parameter name="margin_bottom_desktop" sort_order="35" visible="true" xsi:type="select" source_model="Evalent\Banner\Model\Config\Source\Margins">
+				<label>Margin Bottom (Desktop)</label>
+			</parameter>
+			<parameter name="margin_top_mobile" sort_order="40" visible="true" xsi:type="select" source_model="Evalent\Banner\Model\Config\Source\Margins">
+				<label>Margin Top (Mobile)</label>
+			</parameter>
+			<parameter name="margin_bottom_mobile" sort_order="45" visible="true" xsi:type="select" source_model="Evalent\Banner\Model\Config\Source\Margins">
+				<label>Margin Bottom (Mobile)</label>
+			</parameter>
+			<parameter name="display_mode" sort_order="50" visible="true" xsi:type="select" source_model="Evalent\Banner\Model\Config\Source\DisplayMode">
+				<label>Display Mode</label>
+			</parameter>
+			<parameter name="banner_list" sort_order="100" visible="true" xsi:type="block">
+				<label>Add banners</label>
+				<block class="Evalent\Banner\Block\Adminhtml\Banner\BannersList" />
+			</parameter>
+		</parameters>
+	</widget>
+    <widget class="Evalent\Banner\Block\Widget\CtaWidget" id="evalent_banner_cta">
+        <label>Banner Call to Action</label>
+        <description>Display a CTA banner with an image and background color in a 2 column layout</description>
+        <parameters>
+            <parameter name="banner" sort_order="1" visible="true" xsi:type="select" source_model="Evalent\Banner\Ui\Component\Widget\Parameter\Banners">
+                <label>Banner to display</label>
+            </parameter>
+            <parameter name="is_clickable" required="false" xsi:type="select" visible="true" sort_order="2">
+                <label translate="true">Is Clickable?</label>
+                <options>
+                    <option name="yes" value="1" selected="true">
+                        <label translate="true">Yes</label>
+                    </option>
+                    <option name="no" value="0" >
+                        <label translate="true">No</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="template" xsi:type="select" required="true" visible="true">
+                <label>Template</label>
+                <options>
+                    <option name="default" value="widget/cta_banner.phtml" selected="true">
+                        <label>Default</label>
+                    </option>
+                    <option name="new_layout_2025" value="widget/cta_banner_new_layout_2025.phtml" selected="true">
+                        <label>New Layout (Image + Text)</label>
+                    </option>
+                    <option name="category_description_banner" value="widget/cta_banner_category_details.phtml" selected="true">
+                        <label>Category Description Banner</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="bgcolor" required="true" xsi:type="block" visible="true" sort_order="5">
+                <label translate="true">Background Color</label>
+                <block class="Evalent\Banner\Block\Adminhtml\Banner\Widget\Color">
+                    <data>
+                        <item name="value" xsi:type="string">#000000</item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="buttoncolor" required="true" xsi:type="block" visible="true" sort_order="6">
+                <label translate="true">Button Color</label>
+                <description>Button background color</description>
+                <block class="Evalent\Banner\Block\Adminhtml\Banner\Widget\Color">
+                    <data>
+                        <item name="value" xsi:type="string">#ffffff</item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="textcolor" required="true" xsi:type="block" visible="true" sort_order="7">
+                <label translate="true">Headline Color</label>
+                <description>Headline text color</description>
+                <block class="Evalent\Banner\Block\Adminhtml\Banner\Widget\Color">
+                    <data>
+                        <item name="value" xsi:type="string">#ffffff</item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="textcolor_desc" required="true" xsi:type="block" visible="true" sort_order="8">
+                <label translate="true">Description Color</label>
+                <description>Description text color</description>
+                <block class="Evalent\Banner\Block\Adminhtml\Banner\Widget\Color">
+                    <data>
+                        <item name="value" xsi:type="string">#ffffff</item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="textcolor_button" required="true" xsi:type="block" visible="true" sort_order="9">
+                <label translate="true">Button Text Color</label>
+                <description>Button text color</description>
+                <block class="Evalent\Banner\Block\Adminhtml\Banner\Widget\Color">
+                    <data>
+                        <item name="value" xsi:type="string">#000000</item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="image_layout" xsi:type="select" visible="true" required="false" sort_order="17">
+                <label translate="true">Image Layout Desktop</label>
+                <description>Position of the banner image on Desktop</description>
+                <options>
+                    <option name="right" value="right" selected="true">
+                        <label translate="true">Right side</label>
+                    </option>
+                    <option name="left" value="left">
+                        <label translate="true">Left side</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="image_layout_mobile" xsi:type="select" visible="true" required="false" sort_order="18">
+                <label translate="true">Image Layout Mobile</label>
+                <description>Position of the banner image on Mobile</description>
+                <options>
+                    <option name="right" value="right" selected="true">
+                        <label translate="true">Bottom</label>
+                    </option>
+                    <option name="left" value="left">
+                        <label translate="true">Top</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="is_fullwidth" required="false" xsi:type="select" visible="true" sort_order="19">
+                <label translate="true">Is full width?</label>
+                <description>Banner uses Full Page Width</description>
+                <options>
+                    <option name="no" value="0" selected="true">
+                        <label translate="true">No</label>
+                    </option>
+                    <option name="yes" value="1">
+                        <label translate="true">Yes</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="product_sku" required="false" sort_order="20" visible="true" xsi:type="text">
+                <label translate="true">Highlight Product SKU</label>
+                <description>Optionally show a product by given SKU.</description>
+            </parameter>
+            <parameter name="dot_x" required="false" sort_order="21" visible="true" xsi:type="text">
+                <label translate="true">Highlight position X</label>
+                <description>The X position of the dot from the Left in percentage (0-100)</description>
+            </parameter>
+            <parameter name="dot_y" required="false" sort_order="22" visible="true" xsi:type="text">
+                <label translate="true">Highlight position Y</label>
+                <description>The Y position of the dot from the Top in percentage (0-100)</description>
+            </parameter>
+            <parameter name="margin" xsi:type="select" visible="true" required="false" sort_order="76">
+                <label translate="true">Margin Desktop</label>
+                <description>Margin above and below the banner on Desktop</description>
+                <options>
+                    <option name="none" value="0" selected="true">
+                        <label translate="true">None</label>
+                    </option>
+                    <option name="5" value="5">
+                        <label translate="true">5px</label>
+                    </option>
+                    <option name="10" value="10">
+                        <label translate="true">10px</label>
+                    </option>
+                    <option name="15" value="15">
+                        <label translate="true">15px</label>
+                    </option>
+                    <option name="20" value="20">
+                        <label translate="true">20px</label>
+                    </option>
+                    <option name="25" value="25">
+                        <label translate="true">25px</label>
+                    </option>
+                    <option name="30" value="30">
+                        <label translate="true">30px</label>
+                    </option>
+                    <option name="35" value="35">
+                        <label translate="true">35px</label>
+                    </option>
+                    <option name="40" value="40">
+                        <label translate="true">40px</label>
+                    </option>
+                    <option name="45" value="45">
+                        <label translate="true">45px</label>
+                    </option>
+                    <option name="50" value="50">
+                        <label translate="true">50px</label>
+                    </option>
+                </options>
+            </parameter>
+
+            <parameter name="margin_mobile" xsi:type="select" visible="true" required="false" sort_order="77">
+                <label translate="true">Margin Mobile</label>
+                <description>Margin above and below the banner on Mobile</description>
+                <options>
+                    <option name="none" value="0" selected="true">
+                        <label translate="true">None</label>
+                    </option>
+                    <option name="5" value="5">
+                        <label translate="true">5px</label>
+                    </option>
+                    <option name="10" value="10">
+                        <label translate="true">10px</label>
+                    </option>
+                    <option name="15" value="15">
+                        <label translate="true">15px</label>
+                    </option>
+                    <option name="20" value="20">
+                        <label translate="true">20px</label>
+                    </option>
+                    <option name="25" value="25">
+                        <label translate="true">25px</label>
+                    </option>
+                    <option name="30" value="30">
+                        <label translate="true">30px</label>
+                    </option>
+                    <option name="35" value="35">
+                        <label translate="true">35px</label>
+                    </option>
+                    <option name="40" value="40">
+                        <label translate="true">40px</label>
+                    </option>
+                    <option name="45" value="45">
+                        <label translate="true">45px</label>
+                    </option>
+                    <option name="50" value="50">
+                        <label translate="true">50px</label>
+                    </option>
+                </options>
+            </parameter>
+
+            <parameter name="padding" xsi:type="select" visible="true" required="false" sort_order="78">
+                <label translate="true">Padding Desktop</label>
+                <description>Padding left and right of banner on Desktop</description>
+                <options>
+                    <option name="none" value="0">
+                        <label translate="true">Default</label>
+                    </option>
+
+                    <option name="40" value="40" selected="true">
+                        <label translate="true">40px</label>
+                    </option>
+
+                    <option name="60" value="60">
+                        <label translate="true">60px</label>
+                    </option>
+
+                    <option name="80" value="80">
+                        <label translate="true">80px</label>
+                    </option>
+
+                    <option name="100" value="100">
+                        <label translate="true">100px</label>
+                    </option>
+
+                </options>
+            </parameter>
+
+            <parameter name="padding_mobile" xsi:type="select" visible="true" required="false" sort_order="79">
+                <label translate="true">Padding Mobile</label>
+                <description>Padding left and right of banner on Mobile</description>
+                <options>
+                    <option name="none" value="0">
+                        <label translate="true">Default</label>
+                    </option>
+
+                    <option name="40" value="40" selected="true">
+                        <label translate="true">40px</label>
+                    </option>
+
+                    <option name="60" value="60">
+                        <label translate="true">60px</label>
+                    </option>
+
+                    <option name="80" value="80">
+                        <label translate="true">80px</label>
+                    </option>
+
+                    <option name="100" value="100">
+                        <label translate="true">100px</label>
+                    </option>
+
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>

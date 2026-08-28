@@ -1,0 +1,330 @@
+<?php
+$helper = $this->helper('CarpetAvenue\Productify\AjaxScroll\Helper\Data');
+$productListMode = $block->getProductListMode();
+$enable = $block->isEnable();
+$delay = $helper->getConfig('productify/ajaxscroll/instances/delay');
+$delay = $delay?(int)$delay:600;
+$toolbarAugment = true;
+$toolbarShowOnlyTotal = true;
+
+if($helper->isEnabled() && $enable) { ?>
+<script>
+	require(['jquery',
+		'CarpetAvenue_Productify/js/ajaxscroll/script'
+		], function ($) {
+
+        var showProgressbar = "<?= $helper->getConfig('productify/ajaxscroll/design/show_progressbar') ? '1' : '0'; ?>";
+        var elementAmount = null;
+
+		$( window ).on('collectionUpdated', function() {
+
+            if(jQuery().ias) {
+                $.ias('destroy');
+            }
+			$('<?php echo $helper->getConfig('productify/ajaxscroll/selectors/toolbar') ?>').<?php echo $helper->getConfig('productify/ajaxscroll/design/hide_toolbar') ? 'hide' : 'show' ?>();
+
+            windowLoadedFlag = false;
+            elementAmount = $('<?php echo $helper->getConfig('productify/ajaxscroll/selectors/toolbar') ?>').find(".toolbar-amount");
+            preved = false;
+            nexed = false;
+            amountSeen = 0;
+            amountPrev = 0;
+
+			window.onload = function () {
+				windowLoadedFlag = true;
+			};
+			var jQueryWaiter = function () {
+				var functions = [];
+				var timer = function() {
+					if( typeof window.jQuery != 'undefined') {
+						while (functions.length) {
+							functions.shift()(window.jQuery);
+						}
+					} else {
+						window.setTimeout(timer, 100);
+					}
+				};
+				timer();
+				return {
+					execute: function(onJQueryReady) {
+						if (window.jQuery) {
+							onJQueryReady(window.jQuery);
+						} else {
+							functions.push(onJQueryReady);
+						}
+					}
+				};
+			}();
+
+			window.SgyIAS = {
+				debug: false,
+				_log: function(object) {
+					//console.log(object);
+				},
+				init: function(){
+					jQuery(function($) {
+						var config = {
+							item: (jQuery('<?php echo $helper->getConfig('productify/ajaxscroll/selectors/list_mode') ?>').length ? '<?php echo $helper->getConfig('productify/ajaxscroll/selectors/list_mode') ?>' : '<?php echo $helper->getConfig('productify/ajaxscroll/selectors/grid_mode') ?>'),
+							container : '<?php echo $helper->getConfig('productify/ajaxscroll/selectors/content') ?>',
+							next: '<?php echo $helper->getConfig('productify/ajaxscroll/selectors/next') ?>',
+							pagination: '<?php echo $helper->getConfig('productify/ajaxscroll/selectors/pagination') ?>',
+							parameter: <?php echo $helper->getConfig('productify/ajaxscroll/instances/enable_parameter') ? 'true' : 'false' ?>,
+							delay: <?php echo $delay; ?>,
+							negativeMargin: <?php echo (int) $helper->getConfig('productify/ajaxscroll/design/buffer') ?>,
+							history: {
+								prev: '.toolbar.toolbar-products:first-child .previous'
+							},
+							noneleft: {
+								text: '<?php echo $helper->jsQuoteEscape(__($helper->getConfigData('productify/ajaxscroll/design/done_text'))) ?>',
+								html: '<div class="ias-noneleft" style="text-align: center;">{text}</div>'
+							},
+							spinner: {
+								<?php if($block->getLoaderImage() !== false): ?>
+								src: '<?php echo $block->getLoaderImage(); ?>',
+							<?php endif; ?>
+							html: '<div class="ias-spinner" style="text-align: center;"><img style="display:inline" src="{src}"/> <?php echo $helper->jsQuoteEscape(__($helper->getConfigData('productify/ajaxscroll/design/loading_text'))); ?></div>'
+						},
+						trigger: {
+							text: '<?php echo $helper->jsQuoteEscape(__($helper->getConfigData('productify/ajaxscroll/design/load_more_text'))) ?>',
+							html: '<div class="ias-trigger ias-trigger-next" style="text-align: center; cursor: pointer;"><a>{text}</a></div>',
+							textPrev: '<?php echo $helper->jsQuoteEscape(__($helper->getConfigData('productify/ajaxscroll/design/load_prev_text'))) ?>',
+							htmlPrev: '<div class="ias-trigger ias-trigger-prev" style="text-align: center; cursor: pointer;"><a>{text}</a></div>',
+							offset: <?php echo (int) $helper->getConfigData('productify/ajaxscroll/design/load_more') ?>
+						}
+
+					};
+
+					if (window.ias_config){
+						$.extend(config, window.ias_config);
+					}
+
+					SgyIAS._log({extension: 'ias', config: config});
+					window.ias = $.ias(config);
+
+					SgyIAS._log({extension: 'paging'});
+					window.ias.extension(new IASPagingExtension());
+
+					SgyIAS._log({extension: 'spinner'});
+					if(typeof(IASSpinnerExtension) !== "undefined")
+					window.ias.extension(new IASSpinnerExtension(config.spinner));
+
+					SgyIAS._log({extension: 'noneleft'});
+					window.ias.extension(new IASNoneLeftExtension(config.noneleft));
+
+                    window.ias.extension(new IASHistoryExtension(config.history));
+
+					SgyIAS._log({extension: 'trigger'});
+					window.ias.extension(new IASTriggerExtension(config.trigger));
+						// debug events
+						window.ias.on('scroll', function(scrollOffset, scrollThreshold){
+							SgyIAS._log({eventName: 'scroll', scrollOffset: scrollOffset, scrollThreshold: scrollThreshold});
+						});
+						window.ias.on('load', function(event){
+							SgyIAS._log({eventName:'load', event: event});
+						});
+						window.ias.on('loaded', function(data, items){
+							SgyIAS._log({eventName: 'loaded', data: data, items: items});
+
+                            if(items.length > 0) {
+                                let elementToolbar = items[0]["nextElementSibling"];
+                                elementAmount = $(elementToolbar).find(".toolbar-amount");
+
+                                <?php if($toolbarAugment): ?>
+
+                                let amountFrom = parseInt($(elementAmount).find("span.amount-from").text());
+                                let amountCurrent = parseInt($(elementAmount).find('span.amount-current').text());
+
+                                if(preved) {
+                                    amountPrev = amountFrom;
+                                }
+
+                                if(nexed) {
+                                    amountSeen = amountCurrent;
+                                }
+
+                                $(elementAmount).find(".toolbar-number.amount-from").text(amountPrev);
+                                // $(elementAmount).find(".toolbar-number.amount-current").text(amountSeen);
+                                $('.toolbar-number.amount-current').text(amountSeen);
+                                <?php endif; ?>
+                            }
+						});
+						window.ias.on('rendered', function(items){
+							SgyIAS._log({eventName: 'rendered', items: items});
+
+							// Appended tiles carry both the theme .size and the
+							// group-meta .size — de-duplicate (fn from default.phtml).
+							if (typeof window.updateProductifyMeta === 'function') {
+								window.updateProductifyMeta();
+							}
+
+							if(typeof(initLofLazyLoad) === 'function') {
+								initLofLazyLoad();
+							} else if (typeof($(items).find('.lof-lazy').lazy) === 'function') {
+								$(items).find('.lof-lazy').lazy({
+									bind: "event",
+									delay: 0
+								});
+							} else if (typeof($(items).find('.lazy-load').lazyload) === 'function') {
+                                $(items).find('.lazy-load').lazyload({
+                                    effect : "fadeIn",
+                                    threshold: 500
+                                });
+                            }
+
+                            <?php if($toolbarShowOnlyTotal == false): ?>
+                            if(elementAmount != null) {
+                                setTopToolbarAmount();
+                            }
+                            <?php endif; ?>
+
+						});
+						window.ias.on('noneLeft', function(){
+							SgyIAS._log({eventName: 'noneLeft'});
+						});
+						window.ias.on('next', function(url){
+							SgyIAS._log({eventName: 'next', url: url});
+
+                            nexed = true;
+                            preved = false;
+						});
+                        window.ias.on('prev', function(url){
+                            SgyIAS._log({eventName: 'prev', url: url});
+
+                            nexed = false;
+                            preved = true;
+                        });
+						window.ias.on('ready', function(){
+							SgyIAS._log({eventName: 'ready'});
+
+                            elementAmount = $('<?php echo $helper->getConfig('productify/ajaxscroll/selectors/toolbar') ?>').find(".toolbar-amount");
+                            amountPrev = parseInt($(elementAmount).find(".toolbar-number.amount-from").text());
+                            amountSeen = parseInt($(elementAmount).find(".toolbar-number.amount-current").text());
+
+                            if(elementAmount != null) {
+                                showProgressBar();
+                                setTopToolbarAmount();
+                            }
+
+						});
+
+                        //  Product count above the "See more" button. The old code
+                        //  bound "onShowNextTrigger", an event IAS does not have,
+                        //  so it only ever threw. IAS events are no good here
+                        //  either: the trigger extension returns false from its
+                        //  own "next" listener to stop the auto-load, which halts
+                        //  the callback chain before anything bound after it runs.
+                        //  Painting when the trigger node appears sidesteps all of
+                        //  that and also survives the AJAX filter swap.
+                        var countTpl = '<?php echo $helper->jsQuoteEscape(__('Showing %1 - %2 of %3 products')) ?>';
+
+                        function renderIasCount() {
+                            var $trigger = $('.ias-trigger-next'),
+                                total = $('.toolbar-number').last().text().replace(/[^0-9]/g, ''),
+                                loaded = $('.products.wrapper .product-item').length,
+                                $count,
+                                text;
+
+                            if (!$trigger.length || !loaded || !total) {
+                                return;
+                            }
+
+                            text = countTpl.replace('%1', 1).replace('%2', loaded).replace('%3', total);
+                            $count = $trigger.find('.ias-count');
+
+                            //  Writing the text mutates the tree the observer
+                            //  watches — bail when nothing changed or it loops.
+                            if ($count.length && $count.text() === text) {
+                                return;
+                            }
+
+                            if (!$count.length) {
+                                $count = $('<div class="ias-count"></div>').prependTo($trigger);
+                            }
+                            $count.text(text);
+                        }
+
+                        if (window.MutationObserver && !window.iasCountObserver) {
+                            window.iasCountObserver = new MutationObserver(renderIasCount);
+                            window.iasCountObserver.observe(
+                                document.querySelector('.column.main') || document.body,
+                                {childList: true, subtree: true}
+                            );
+                        }
+                        renderIasCount();
+
+						if(windowLoadedFlag){
+							$(window).load();
+						}
+
+						SgyIAS._log('Done loading IAS.');
+
+					});
+
+				}
+			};
+			jQueryWaiter.execute(function(){
+				SgyIAS.init();
+
+			});
+
+		});
+
+        function setTopToolbarAmount() {
+            let elAmountClone = $(elementAmount).clone();
+            let elementAmountTop = $(".toolbar.toolbar-products").first().find(".toolbar-amount");
+            let elementAmountTopEl = null;
+
+            if(elAmountClone !== "undefined") {
+                <?php if($toolbarShowOnlyTotal): ?>
+
+                if($(elAmountClone).find(".amount-from").length > 0 && $(elAmountClone).find(".amount-current").length > 0) {
+                    $(elAmountClone).find(".amount-from")[0].nextSibling.nodeValue = "";
+                    $(elAmountClone).find(".amount-current")[0].nextSibling.nodeValue = "";
+                    $(elAmountClone).find(".amount-total").after(" ");
+                    $(elAmountClone).find(".amount-from").remove();
+                    $(elAmountClone).find(".amount-current").remove();
+                    $(elAmountClone).find(".amount-total").prependTo(elAmountClone);
+                }
+
+                <?php endif; ?>
+            }
+
+            if($(".toolbar.toolbar-products").first().find(".toolbar-amount")) {
+                elementAmountTopEl = $(elementAmountTop).replaceWith(elAmountClone);
+            } else {
+                elementAmountTopEl = $(".toolbar.toolbar-products").first().find(".modes").after(elAmountClone);
+            }
+
+        }
+
+        function showProgressBar() {
+
+            if(!$('.ias-trigger-next .progressbar').length && showProgressbar === "1") {
+                let partialAmount = $(elementAmount).find('span.amount-current').text();
+                let totalAmount = $(elementAmount).find('span.amount-total').text();
+                let _percent = (100 * partialAmount) / totalAmount;
+
+                $('.ias-trigger-next .toolbar-amount')
+                    .after('<div class="progressbar"><span class="progressbar__fill" style="width: '+_percent+'%;"></span></div>');
+            }
+        }
+
+        $(document).ready(function () {
+
+            // Init on fresh loads too (history.state is null then) — otherwise
+            // infinite scroll only starts after the first AJAX filter action.
+            if(!window.history.state || !window.history.state.hasOwnProperty('html')) {
+
+                $('body').trigger('collectionUpdated');
+
+                if(elementAmount != null) {
+                    setTopToolbarAmount();
+                }
+            }
+        });
+
+    });
+
+//]]>
+</script>
+<?php } ?>

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="CarpetAvenue_Orderify::orderify" title="Orderify" module="CarpetAvenue_Orderify" sortOrder="50" parent="Magento_Sales::sales" resource="CarpetAvenue_Orderify::orderify"/>
+        <add id="CarpetAvenue_Orderify::orderify_blacklist" title="Address / Email / IP Blacklist" module="CarpetAvenue_Orderify" sortOrder="51" parent="CarpetAvenue_Orderify::orderify" action="orderify/blacklist/index" resource="CarpetAvenue_Orderify::orderify"/>
+    </menu>
+</config>

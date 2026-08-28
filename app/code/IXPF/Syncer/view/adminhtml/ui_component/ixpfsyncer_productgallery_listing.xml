@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">ixpfsyncer_productgallery_listing.ixpfsyncer_productgallery_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>ixpfsyncer_productgallery_listing.ixpfsyncer_productgallery_listing_data_source</dep>
+        </deps>
+        <spinner>ixpfsyncer_productgallery_columns</spinner>
+    </settings>
+
+    <dataSource name="ixpfsyncer_productgallery_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">entity_id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>IXPF_Syncer::webhook_list</aclResource>
+        <dataProvider name="ixpfsyncer_productgallery_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>entity_id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+<!--        <massaction name="listing_massaction">-->
+<!--            <action name="retry">-->
+<!--                <settings>-->
+<!--                    <type>retry</type>-->
+<!--                    <label translate="true">Retry</label>-->
+<!--                    <url path="ixpfsyncer/webhook/massretry"/>-->
+<!--                    <confirm>-->
+<!--                        <title translate="true">Retry Selected Items</title>-->
+<!--                        <message translate="true">Are you sure you want to retry selected webhook(s)?</message>-->
+<!--                    </confirm>-->
+<!--                </settings>-->
+<!--            </action>-->
+<!--        </massaction>-->
+    </listingToolbar>
+
+    <columns name="ixpfsyncer_productgallery_columns">
+<!--        <selectionsColumn name="ids" sortOrder="0">-->
+<!--            <settings>-->
+<!--                <indexField>entity_id</indexField>-->
+<!--            </settings>-->
+<!--        </selectionsColumn>-->
+
+        <column name="entity_id">
+            <settings>
+                <label translate="true">ID</label>
+            </settings>
+        </column>
+        <column name="type">
+            <settings>
+                <label translate="true">Type</label>
+                <filter>text</filter>
+                <dataScope>type</dataScope>
+            </settings>
+        </column>
+        <column name="object_id">
+            <settings>
+                <label translate="true">Type ID</label>
+                <filter>text</filter>
+                <dataScope>object_id</dataScope>
+            </settings>
+        </column>
+
+
+        <column name="status" class="IXPF\Syncer\Ui\Component\Listing\Column\ProductGalleryWebhookStatus">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">IXPF\Syncer\Model\Source\ProductGalleryWebhookStatus</item>
+            </argument>
+            <settings>
+                <label translate="true">Status</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <dataScope>status</dataScope>
+            </settings>
+        </column>
+
+        <column name="created_at"  class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <label translate="true">Created At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>created_at</dataScope>
+            </settings>
+        </column>
+
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <sorting>desc</sorting>
+                <dataType>date</dataType>
+                <label translate="true">Last Updated At</label>
+                <dataScope>updated_at</dataScope>
+            </settings>
+        </column>
+
+        <actionsColumn name="actions" class="IXPF\Syncer\Ui\Component\Listing\Column\ProductGalleryAction">
+            <settings>
+                <label translate="true">Actions</label>
+                <indexField>entity_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

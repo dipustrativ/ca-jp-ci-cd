@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="CarpetAvenue_Utilities">
+        <sequence>
+            <module name="Magento_Backend"/>
+            <module name="Magento_Directory"/>
+            <module name="Magento_SalesRule"/>
+            <module name="CarpetAvenue_Core"/>
+            <!-- Web Images (merged from MagestyApps_WebImages): every plugin
+                 target lives in one of these, so they must load first. -->
+            <module name="Magento_Cms"/>
+            <module name="Magento_Catalog"/>
+            <module name="Magento_MediaStorage"/>
+            <module name="Magento_Theme"/>
+            <module name="Magento_Swatches"/>
+        </sequence>
+    </module>
+</config>

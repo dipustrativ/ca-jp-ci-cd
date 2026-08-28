@@ -1,0 +1,28 @@
+#!/bin/sh
+# CarpetAvenue — run Magento CLI on the production host without exec'ing in.
+#
+# Install once, as root, on the Dokploy host:
+#   install -m755 docker/host/magento /usr/local/bin/magento
+#   ln -sf /usr/local/bin/magento /usr/local/bin/magerun
+#
+# Then, from a plain ssh session:
+#   magento cache:flush
+#   magento indexer:reindex
+#   magerun sys:info
+#   magerun db:query "select 1"
+#
+# Dispatches on its own basename, so the symlink is the whole magerun install.
+# -u www-data: the image has no USER, so a bare exec runs as root and leaves
+# root-owned files in var/ that php-fpm then can't write. The app tree is
+# www-data:www-data (Dockerfile COPY --chown), so www-data can do everything
+# including setup:upgrade.
+# Container name comes from `container_name:` in docker-compose.dokploy.yml.
+set -e
+
+container=${CARPIENT_CONTAINER:-carpient-app}
+[ -t 0 ] && tty=-t || tty=
+
+case "${0##*/}" in
+  magerun|n98*) exec docker exec -i $tty -u www-data "$container" php n98-magerun2.phar "$@" ;;
+  *)            exec docker exec -i $tty -u www-data "$container" php bin/magento "$@" ;;
+esac

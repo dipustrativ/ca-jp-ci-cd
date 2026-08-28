@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Order
+ * @package   CarpetAvenue_Orderify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <orderify>
+            <cancel_inventory_reindex>
+                <enabled>1</enabled>
+            </cancel_inventory_reindex>
+            <failed_payment_email>
+                <enabled>1</enabled>
+                <sender>general</sender>
+                <template>orderify_failed_payment_email_template</template>
+            </failed_payment_email>
+            <adyen_auto_invoice>
+                <enabled>0</enabled>
+                <min_order_age_minutes>10</min_order_age_minutes>
+                <batch_size>50</batch_size>
+            </adyen_auto_invoice>
+            <payment_icons>
+                <enabled>0</enabled>
+                <heading>Nous acceptons</heading>
+                <sheet_id>1g0cZQAxXR7T0y2gLjs8IQxNYhKCAI1vI</sheet_id>
+                <gid>0</gid>
+            </payment_icons>
+        </orderify>
+    </default>
+</config>

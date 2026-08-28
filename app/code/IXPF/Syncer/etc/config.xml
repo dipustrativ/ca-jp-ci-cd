@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <ixpfng_order>
+            <order_create>
+                <enabled>0</enabled>
+                <allow_oversell>0</allow_oversell>
+            </order_create>
+        </ixpfng_order>
+        <ixpfng_purchase>
+            <purchase>
+                <root_category_id>1</root_category_id>
+            </purchase>
+        </ixpfng_purchase>
+    </default>
+</config>

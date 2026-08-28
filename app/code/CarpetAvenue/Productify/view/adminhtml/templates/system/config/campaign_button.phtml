@@ -1,0 +1,41 @@
+<button id="open_campaign_modal" type="button" class="action-default scalable">
+    <span><?= __('View Active Campaigns') ?></span>
+</button>
+
+<div id="campaign-modal" style="display:none;">
+    <div class="admin__page-section">
+        <div class="campaign-modal-content">
+            <div class="admin__data-grid-wrap" id="campaign-modal-content"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "#campaign-modal": {
+            "Magento_Ui/js/modal/modal": {
+                "type": "popup",
+                "title": "Active Campaigns",
+                "trigger": "#open_campaign_modal",
+                "responsive": true,
+                "innerScroll": true,
+                "buttons": [
+                    {
+                        "text": "Close",
+                        "class": "action-secondary",
+                        "actions": ["closeModal"]
+                    }
+                ]
+            }
+        }
+    }
+</script>
+<script>
+    require(['jquery'], function($) {
+        $('#open_campaign_modal').on('click', function() {
+            console.log('Button clicked, loading campaigns...');
+            var url = '<?= $this->getUrl("productify/campaign/activelist") ?>';
+            $('#campaign-modal-content').load(url);
+        });
+    });
+</script>

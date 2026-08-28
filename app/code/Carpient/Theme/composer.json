@@ -1,0 +1,21 @@
+{
+    "name": "carpient/module-theme",
+    "description": "Carpient theme content: CMS blocks for the carpient/rugs header and footer",
+    "type": "magento2-module",
+    "license": [
+        "proprietary"
+    ],
+    "require": {
+        "php": "~8.1.0||~8.2.0||~8.3.0||~8.4.0",
+        "magento/framework": "*",
+        "magento/module-cms": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Carpient\\Theme\\": ""
+        }
+    }
+}

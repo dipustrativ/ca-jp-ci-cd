@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_B2B
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="CarpetAvenue_B2B::config"
+             title="B2B Settings"
+             module="CarpetAvenue_B2B"
+             sortOrder="20"
+             parent="CarpetAvenue_Core::carpetavenue"
+             action="adminhtml/system_config/edit/section/carpetavenue_b2b"
+             resource="CarpetAvenue_B2B::config"/>
+        <!-- Parent "Reseller" (no action → expandable) with the applications list beneath it -->
+        <add id="CarpetAvenue_B2B::reseller"
+             title="Reseller"
+             module="CarpetAvenue_B2B"
+             sortOrder="10"
+             parent="CarpetAvenue_Core::carpetavenue"
+             resource="CarpetAvenue_B2B::reseller"/>
+        <add id="CarpetAvenue_B2B::reseller_applications"
+             title="Reseller Applications"
+             module="CarpetAvenue_B2B"
+             sortOrder="10"
+             parent="CarpetAvenue_B2B::reseller"
+             action="carpetavenue_b2b/reseller/index"
+             resource="CarpetAvenue_B2B::reseller_applications"/>
+    </menu>
+</config>

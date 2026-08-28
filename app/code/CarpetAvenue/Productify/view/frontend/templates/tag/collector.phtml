@@ -1,0 +1,19 @@
+<?php
+/**
+ * Collectors badge for a product tile.
+ *
+ * Styles live in CarpetAvenue_Productify::css/source/_module.less — this
+ * template renders once per product tile, so an inline <style> here would be
+ * repeated for every tile on the page.
+ *
+ * @var Magento\Framework\View\Element\Template $block
+ */
+$product = $block->getData('product');
+$helper = $this->helper(\CarpetAvenue\Productify\Helper\CollectorTag::class);
+?>
+<?php if ($product && $helper->isCollectorProduct((int)$product->getId())): ?>
+<div class="carpient-tag collector_tags">
+    <span class="noselect"></span>
+    <span class="collector-text"><?= $block->escapeHtml(__('COLLECTORS')) ?></span>
+</div>
+<?php endif; ?>

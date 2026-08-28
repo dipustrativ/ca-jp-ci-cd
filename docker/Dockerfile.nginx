@@ -1,0 +1,29 @@
+# syntax=docker/dockerfile:1
+# CarpetAvenue nginx — config baked in (no host bind-mounts).
+# Rebuild only when nginx config changes. Build context = repo `src/`.
+#
+#   docker buildx build -f docker/Dockerfile.nginx \
+#     -t registry.carpetavenue.net/carpient-nginx:latest --push .
+#
+# Bump to 1.30-alpine when the tag ships (2.4.9 certified).
+FROM nginx:1.29-alpine
+
+# Main config + server template (envsubst runs at start via the base entrypoint;
+# server_name is catch-all so no DOMAIN needed) + the Magento location sample.
+# Drop the stock default server (server_name localhost, /usr/share/nginx/html)
+# so our catch-all vhost is the only one — no shadowing, no bogus health server.
+RUN rm -f /etc/nginx/conf.d/default.conf
+
+COPY docker/nginx/nginx.conf                       /etc/nginx/nginx.conf
+COPY docker/nginx/templates/carpetavenue.conf.template /etc/nginx/templates/carpetavenue.conf.template
+# nginx.conf, not nginx.conf.sample: the sample is a Magento skeleton file that
+# upgrades replace, so it is kept pristine and all customisation lives in
+# nginx.conf. Multistore needs nothing here — see docs/multistore.md.
+COPY nginx.conf                                    /etc/nginx/magento.conf
+# Location-level fastcgi params (MAGE_RUN_TYPE/CODE for per-domain websites).
+# magento.conf includes /etc/nginx/fastcgi_extra/*.conf; the local dev stack has
+# no such directory, and a wildcard include matching nothing is not an error.
+COPY docker/nginx/fastcgi_extra/                   /etc/nginx/fastcgi_extra/
+
+# Static + media are served from named volumes mounted at runtime (read-only).
+EXPOSE 80

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\CatalogImportExport\Model\Import\Uploader" type="CarpetAvenue\Core\Model\Import\Uploader"/>
+    <!-- OSC InitializeColumns performs DDL; run it outside the patch transaction (MySQL 8 fix) -->
+    <preference for="Mageplaza\Osc\Setup\Patch\Data\InitializeColumns" type="CarpetAvenue\Core\Override\Mageplaza\Osc\InitializeColumns"/>
+</config>

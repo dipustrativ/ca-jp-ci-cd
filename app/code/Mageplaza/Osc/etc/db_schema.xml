@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_Osc
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+-->
+
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="sales_order">
+        <column xsi:type="text" name="osc_order_comment" nullable="true"
+                comment="Osc Order Commnent"/>
+        <column xsi:type="text" name="osc_gift_wrap_amount" nullable="true"
+                comment="Osc Gift Wrap Amount"/>
+        <column xsi:type="decimal" name="base_osc_gift_wrap_amount" nullable="true"
+                comment="Base Osc Gift Wrap Amount"/>
+        <column xsi:type="smallint" name="gift_wrap_type" nullable="true"
+                comment="Gift Wrap Type"/>
+        <column xsi:type="text" name="osc_delivery_time" nullable="true"
+                comment="Osc Survey Question"/>
+        <column xsi:type="text" name="osc_survey_question" nullable="true"
+                comment=""/>
+        <column xsi:type="text" name="osc_survey_answers" nullable="true"
+                comment="Osc Survey Answers"/>
+        <column xsi:type="text" name="osc_order_house_security_code" nullable="true"
+                comment="Osc Order House Security Code"/>
+    </table>
+
+    <table name="sales_order_address">
+        <column xsi:type="text" name="mposc_field_1" nullable="true"
+                comment="Mposc Field 1"/>
+        <column xsi:type="text" name="mposc_field_2" nullable="true"
+                comment="Mposc Field 2"/>
+        <column xsi:type="text" name="mposc_field_3" nullable="true"
+                comment="Mposc Field 3"/>
+    </table>
+
+    <table name="sales_order_item">
+        <column xsi:type="decimal" name="osc_gift_wrap_amount" nullable="true"
+                comment="Osc Gift Wrap Amount"/>
+        <column xsi:type="decimal" name="base_osc_gift_wrap_amount" nullable="true"
+                comment="Base Osc Gift Wrap Amount"/>
+    </table>
+    <table name="sales_invoice">
+        <column xsi:type="decimal" name="osc_gift_wrap_amount" nullable="true"
+                comment="Osc Gift Wrap Amount"/>
+        <column xsi:type="decimal" name="base_osc_gift_wrap_amount" nullable="true"
+                comment="Base Osc Gift Wrap Amount"/>
+    </table>
+    <table name="sales_creditmemo">
+        <column xsi:type="decimal" name="osc_gift_wrap_amount" nullable="true"
+                comment="Osc Gift Wrap Amount"/>
+        <column xsi:type="decimal" name="base_osc_gift_wrap_amount" nullable="true"
+                comment="Base Osc Gift Wrap Amount"/>
+    </table>
+    <table name="quote_address" resource="sales" comment="Sales Flat Order">
+        <column xsi:type="boolean" name="osc_gift_wrap_amount" nullable="true"
+                comment="Osc Gift Wrap Amount"/>
+        <column xsi:type="decimal" name="base_osc_gift_wrap_amount" nullable="true"
+                comment="Base Osc Gift Wrap Amount"/>
+        <column xsi:type="decimal" name="used_gift_wrap" nullable="true"
+                comment="Used Gift Wrap"/>
+        <column xsi:type="smallint" name="gift_wrap_type" nullable="true"
+                comment="Gift Wrap Type"/>
+        <column xsi:type="text" name="mposc_field_1" nullable="true"
+                comment="Mposc Field 1"/>
+        <column xsi:type="text" name="mposc_field_2" nullable="true"
+                comment="Mposc Field 2"/>
+        <column xsi:type="text" name="mposc_field_3" nullable="true"
+                comment="Mposc Field 3"/>
+    </table>
+    <table name="quote_item">
+        <column xsi:type="text" name="osc_gift_wrap_amount" nullable="true"
+                comment="Osc Gift Wrap Amount"/>
+        <column xsi:type="decimal" name="base_osc_gift_wrap_amount" nullable="true"
+                comment="Base Osc Gift Wrap Amount"/>
+    </table>
+</schema>

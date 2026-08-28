@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Developify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<!--
+    Read-only view of cron_schedule. No massactions and no actions column on
+    purpose — this page must not be able to change anything.
+
+    cron_schedule carries a single index, (job_code, status, scheduled_at), and no
+    entity_id. Hence: schedule_id everywhere a primary field is named, the default
+    sort on schedule_id (PK order, free), and no filter on `messages` — a
+    LIKE '%...%' over that unindexed TEXT column is a full scan.
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">developify_cron_listing.developify_cron_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>developify_cron_listing.developify_cron_listing_data_source</dep>
+        </deps>
+        <spinner>developify_cron_columns</spinner>
+    </settings>
+
+    <dataSource name="developify_cron_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">schedule_id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>CarpetAvenue_Developify::cron</aclResource>
+        <dataProvider name="developify_cron_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>schedule_id</requestFieldName>
+                <primaryFieldName>schedule_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="developify_cron_columns">
+        <column name="schedule_id" sortOrder="10">
+            <settings>
+                <label translate="true">ID</label>
+                <filter>textRange</filter>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+
+        <column name="job_code" sortOrder="20">
+            <settings>
+                <label translate="true">Job Code</label>
+                <filter>text</filter>
+                <dataScope>job_code</dataScope>
+            </settings>
+        </column>
+
+        <column name="status"
+                class="CarpetAvenue\Developify\Ui\Component\Listing\Column\CronStatus"
+                sortOrder="30">
+            <settings>
+                <options class="CarpetAvenue\Developify\Model\Config\Source\CronStatus"/>
+                <label translate="true">Status</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <dataScope>status</dataScope>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+
+        <column name="messages"
+                class="CarpetAvenue\Developify\Ui\Component\Listing\Column\Message"
+                sortOrder="40">
+            <settings>
+                <label translate="true">Messages</label>
+                <dataScope>messages</dataScope>
+                <sortable>false</sortable>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date" sortOrder="50">
+            <settings>
+                <label translate="true">Created At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>created_at</dataScope>
+            </settings>
+        </column>
+
+        <column name="scheduled_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date" sortOrder="60">
+            <settings>
+                <label translate="true">Scheduled At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>scheduled_at</dataScope>
+            </settings>
+        </column>
+
+        <column name="executed_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date" sortOrder="70">
+            <settings>
+                <label translate="true">Executed At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>executed_at</dataScope>
+            </settings>
+        </column>
+
+        <column name="finished_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date" sortOrder="80">
+            <settings>
+                <label translate="true">Finished At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>finished_at</dataScope>
+            </settings>
+        </column>
+    </columns>
+</listing>

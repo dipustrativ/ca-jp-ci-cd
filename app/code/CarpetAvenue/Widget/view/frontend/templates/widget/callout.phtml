@@ -1,0 +1,136 @@
+<?php
+// @codingStandardsIgnoreFile
+date_default_timezone_set("Europe/Stockholm");
+?>
+
+<?php $_fontsize = $block->getFontSize(); ?>
+<?php $_textcolor = $block->getTextColor(); ?>
+<?php $_bgcolor = $block->getBgColor(); ?>
+<?php $_showBtn = $block->getData("closebtn"); ?>
+<?php $_countdown = date_format(date_create($block->getCountdown()),"Y/m/d H:i"); ?>
+<?php $_showDaysBefore = $block->getShowDaysBefore(); ?>
+<?php $date = date("Y/m/d H:i"); ?>
+<?php $_daysLabel = __("Days"); ?>
+<?php $_dayLabel = __("Day"); ?>
+<?php $_hoursLeftLabel = __("hours"); ?>
+<?php $_minutesLeftLabel = __("minutes"); ?>
+<?php $_daysLeft = strtotime($date) - strtotime($_countdown); ?>
+<?php $_diff = ceil(abs($_daysLeft / 86400)); ?>
+<?php $_hiddenCountdown = ($_showDaysBefore > 0 && $_diff > $_showDaysBefore); ?>
+<?php $_showLastDay = $block->getData("show_lastday"); ?>
+<?php $_showMoreInfo = $block->getData("more_btn"); ?>
+<?php $_showMoreInfoLabel = __($block->getData("moreinfo_label")); ?>
+<?php $_moreInfoContent = $block->getData("moreinfo_content"); ?>
+
+<?php if($_countdown < $date && !empty($_countdown)) : else: ?>
+<div class="callout-widget" style="background: <?php if($_bgcolor): echo $_bgcolor; endif; ?>;">
+    <div class="callout-widget__content <?= $_hiddenCountdown ? 'hide-countdown' : '' ?>" style="font-size: <?= $_fontsize ?>; color: <?= $_textcolor ?>;">
+        <?php if($_message = $block->getMessage()): ?>
+            <span class="callout-widget__msg">
+                <?= $_hiddenCountdown ? substr($_message, 0, strrpos( $_message, '-')) : $_message; ?>
+            </span>
+
+            <?php if($_showMoreInfo && $_showMoreInfoLabel): ?>
+                <span>
+                    <a href="#" class="callout-widget__showmore-link"><?= $_showMoreInfoLabel ?></a>
+                </span>
+            <?php endif; ?>
+
+        <?php endif; ?>
+
+        <?php if($_showBtn): ?>
+            <a href="#" title="<?= __("Close") ?>" class="close-btn">
+                <span><?= __("X") ?></span>
+            </a>
+        <?php endif; ?>
+
+    </div>
+</div>
+
+    <?php if($_showMoreInfo && $_moreInfoContent): ?>
+        <div id="callout-widget--more-content" style="display: none;">
+            <?= $_moreInfoContent ?>
+        </div>
+
+        <script type="text/x-magento-init">
+            {
+                "*": {
+                    "moreinfo_popup":{}
+                 }
+            }
+        </script>
+    <?php endif; ?>
+
+<script>
+    require(
+        [
+            'jquery',
+            'countdown',
+            "mage/translate"
+        ],
+        function($) {
+
+            if(!$('body').hasClass('callout-widget-active')) {
+                $('body').addClass('callout-widget-active');
+            }
+
+            <?php if($_showBtn): ?>
+            if($('.callout-widget .close-btn').length) {
+                $('.callout-widget .close-btn').on('click', function (e) {
+                    $(this).closest('.callout-widget').hide();
+                    $('body').removeClass('callout-widget-active');
+                    e.preventDefault()
+                });
+            }
+            <?php endif; ?>
+
+            <?php if($_countdown && !$_hiddenCountdown): ?>
+
+            $(".callout-widget__msg")
+                .countdown(<?= strtotime($_countdown . " +1 minutes") * 1000 ?>, function (event) {
+
+                    let _daysLeft = parseInt(event.strftime('%-D'), 10);
+                    let _hoursLeft = parseInt(event.strftime('%-H'), 10);
+                    let _text = "<?= $block->getMessage(); ?>";
+
+                    if (_daysLeft > 0) {
+
+                        $(this).html(
+                            event.strftime(
+                                $.mage.__(_text)
+                                    .replace('%countdown', '%-D')
+                                    .replace('%days', _daysLeft > 1 ? "<?= $_daysLabel ?>" : "<?= $_dayLabel ?>")
+                            )
+                        );
+
+                    } else if (_hoursLeft > 0) {
+
+                        $(this).html(
+                            event.strftime(
+                                $.mage.__(_text)
+                                    .replace('%countdown', '%-H')
+                                    .replace('%days', "<?= $_hoursLeftLabel ?>")
+                            )
+                        );
+
+                    } else {
+
+                        $(this).html(
+                            event.strftime(
+                                $.mage.__(_text)
+                                    .replace('%countdown', '%-M')
+                                    .replace('%days', "<?= $_minutesLeftLabel ?>")
+                            )
+                        );
+                    }
+
+                }).on('finish.countdown', function() {
+                    $(".callout-widget").hide();
+                    $('body').removeClass('callout-widget-active');
+                });
+
+            <?php endif; ?>
+        }
+    );
+</script>
+<?php endif; ?>

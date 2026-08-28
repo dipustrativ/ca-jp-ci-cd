@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<update handle="styles"/>
+	<body>
+		<referenceBlock name="page.actions.toolbar" template="Evalent_AdminActivityLog::no_button_pageactions.phtml"/>
+		<referenceContainer name="content">
+			<uiComponent name="evalent_adminactivitylog_cmsactivity_index"/>
+		</referenceContainer>
+	</body>
+</page>

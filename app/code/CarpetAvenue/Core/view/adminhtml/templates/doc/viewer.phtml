@@ -1,0 +1,455 @@
+<?php
+/**
+ * Generic Documentation Viewer — two-tab layout (Manual | Developer).
+ * Reads README.md, renders via inline pure-JS Markdown parser. Zero external deps.
+ *
+ * URL: carpetavenue/doc/view?module=CarpetAvenue_Core[&tab=developer]
+ *
+ * @package  CarpetAvenue_Core
+ * @author   Strativ Magento Team
+ * @var CarpetAvenue\Core\Block\Adminhtml\Doc\View $block
+ */
+
+$manual     = $block->getManualContent();
+$developer  = $block->getDeveloperContent();
+$nativePath = $block->getNativePath();
+$hubUrl     = $block->getHubUrl();
+$activeTab  = $block->getActiveTab();
+$hasContent = ($manual !== null || $developer !== null);
+?>
+<style>
+/* ── Hide admin chrome (this page only) ──────────────────────── */
+.page-wrapper > .notices-wrapper,
+.page-header { display: none !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   CarpetAvenue Documentation Viewer  (ca-doc-*)
+   ═══════════════════════════════════════════════════════════════ */
+.ca-doc-wrap {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 14px; line-height: 1.7; color: #1f2733;
+    max-width: 980px; margin: 50px auto 0; padding: 0 0 60px;
+}
+
+/* toolbar */
+.ca-doc-toolbar {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 14px; background:#f6f8fa;
+    border:1px solid #e0e6ec; border-bottom:none; border-radius:6px 6px 0 0;
+}
+.ca-doc-back-btn {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:6px 14px; background:#fff; border:1px solid #d0d7de;
+    border-radius:5px; font-size:12.5px; font-weight:600;
+    color:#1c5e8e; text-decoration:none; transition:background .15s;
+}
+.ca-doc-back-btn:hover { background:#e8f0f8; text-decoration:none; }
+.ca-doc-native-path {
+    margin-left:auto; font-size:11px; color:#aaa;
+    font-family:'SFMono-Regular',Consolas,monospace;
+    background:#eef2f7; padding:3px 8px; border-radius:4px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:360px;
+}
+
+/* tabs */
+.ca-doc-tabs {
+    display:flex; border-bottom:2px solid #e0e6ec; background:#f6f8fa;
+    border-left:1px solid #e0e6ec; border-right:1px solid #e0e6ec;
+    padding:0 14px; gap:2px;
+}
+.ca-doc-tab-btn {
+    padding:10px 20px; border:none; border-bottom:3px solid transparent;
+    background:transparent; font-size:13px; font-weight:600; color:#666;
+    cursor:pointer; transition:color .15s,border-color .15s;
+    outline:none; position:relative; bottom:-2px;
+}
+.ca-doc-tab-btn:hover { color:#1c5e8e; }
+.ca-doc-tab-btn.active { color:#1c5e8e; border-bottom-color:#1c5e8e; }
+.ca-tab-icon { margin-right:5px; }
+
+/* panels */
+.ca-doc-panel {
+    display:none; background:#fff; border:1px solid #e0e6ec; border-top:none;
+    border-radius:0 0 6px 6px; padding:36px 44px; box-shadow:0 1px 4px rgba(0,0,0,.05);
+}
+.ca-doc-panel.active { display:block; }
+
+/* rendered markdown */
+.ca-doc-panel h1 { font-size:20px;font-weight:700;color:#1c2e45;margin:0 0 18px;padding-bottom:10px;border-bottom:3px solid #e5eff7; }
+.ca-doc-panel h2 { font-size:16px;font-weight:600;color:#1c5e8e;margin:32px 0 10px;padding-bottom:5px;border-bottom:2px solid #e5eff7; }
+.ca-doc-panel h3 { font-size:14px;font-weight:600;color:#333;margin:22px 0 8px; }
+.ca-doc-panel h4 { font-size:13px;font-weight:600;color:#555;margin:14px 0 5px; }
+.ca-doc-panel p  { margin:0 0 12px; }
+.ca-doc-panel a  { color:#1c5e8e; }
+.ca-doc-panel a:hover { text-decoration:underline; }
+.ca-doc-panel ul,.ca-doc-panel ol { padding-left:22px;margin:0 0 12px; }
+.ca-doc-panel li { margin-bottom:3px; }
+.ca-doc-panel strong { font-weight:700; }
+.ca-doc-panel em    { font-style:italic; }
+.ca-doc-panel blockquote {
+    border-left:4px solid #2575a8; background:#e8f4fd; color:#174a72;
+    margin:12px 0; padding:8px 14px; border-radius:0 4px 4px 0;
+}
+.ca-doc-panel blockquote p { margin:0; }
+.ca-doc-panel table { width:100%;border-collapse:collapse;margin:12px 0 18px;font-size:12.5px; }
+.ca-doc-panel th { background:#f0f4f8;color:#1c2e45;font-weight:600;padding:8px 11px;border:1px solid #dde4ec;text-align:left; }
+.ca-doc-panel td { padding:7px 11px;border:1px solid #e8edf3;vertical-align:top; }
+.ca-doc-panel tr:nth-child(even) td { background:#fafbfc; }
+.ca-doc-panel hr { border:none;border-top:2px solid #e5eff7;margin:24px 0; }
+
+/* inline code */
+.ca-doc-panel code {
+    background:#e8f0f8; color:#1c5e8e; border-radius:3px;
+    padding:1px 5px; font-family:'SFMono-Regular',Consolas,monospace; font-size:12px;
+}
+
+/* fenced code block wrapper */
+.ca-doc-panel .ca-pre-wrap {
+    position:relative; margin:8px 0 16px;
+}
+.ca-doc-panel pre {
+    background:#1e2530; border-radius:6px;
+    padding:14px 16px; margin:0; overflow-x:auto;
+}
+.ca-doc-panel pre code {
+    background:transparent; color:#c9d1d9;
+    font-family:'SFMono-Regular',Consolas,monospace;
+    font-size:12px; line-height:1.7; padding:0; border-radius:0;
+    white-space:pre;
+}
+/* syntax colours */
+.ca-doc-panel pre .ca-k { color:#569cd6; }
+.ca-doc-panel pre .ca-s { color:#ce9178; }
+.ca-doc-panel pre .ca-c { color:#6a9955; font-style:italic; }
+.ca-doc-panel pre .ca-v { color:#9cdcfe; }
+.ca-doc-panel pre .ca-n { color:#dcdcaa; }
+
+/* copy button */
+.ca-copy-btn {
+    position:absolute; top:8px; right:8px;
+    background:rgba(255,255,255,.1); color:#c9d1d9;
+    border:1px solid rgba(255,255,255,.2); border-radius:4px;
+    padding:3px 10px; font-size:11px; font-family:inherit;
+    cursor:pointer; transition:background .15s; z-index:1;
+    user-select:none;
+}
+.ca-copy-btn:hover  { background:rgba(255,255,255,.22); }
+.ca-copy-btn.copied { color:#4caf50; border-color:#4caf50; }
+
+/* footer */
+.ca-doc-footer { margin-top:16px;font-size:11px;color:#bbb;display:flex;align-items:center;gap:6px;padding:0 2px; }
+.ca-doc-footer code { background:#f0f3f7;color:#999;border-radius:3px;padding:2px 7px;font-size:11px; }
+
+/* not-found */
+.ca-doc-not-found {
+    background:#fdecea;
+    color:#721c24;
+    padding:16px 20px;
+    border:1px solid #e0e6ec;
+    border-top:none;
+    border-radius:0 0 6px 6px;
+}
+</style>
+
+<div class="ca-doc-wrap">
+
+    <div class="ca-doc-toolbar">
+        <a class="ca-doc-back-btn" href="<?= $block->escapeUrl($hubUrl) ?>">← Hub</a>
+        <span style="font-size:12px;color:#888;">📄 Documentation</span>
+        <span class="ca-doc-native-path" title="<?= $block->escapeHtmlAttr($nativePath) ?>">
+            <?= $block->escapeHtml($nativePath) ?>
+        </span>
+    </div>
+
+    <?php if (!$hasContent): ?>
+        <div class="ca-doc-not-found">
+            <strong>⚠️ README.md not found.</strong><br>
+            Expected: <code><?= $block->escapeHtml($nativePath) ?></code><br>
+            Create the file with a <code>## Manual</code> and <code>## Developer</code> section.
+        </div>
+    <?php else: ?>
+
+        <div class="ca-doc-tabs">
+            <button class="ca-doc-tab-btn <?= $activeTab === 'manual'    ? 'active' : '' ?>"
+                    data-tab="manual" onclick="caDocTab('manual')">
+                <span class="ca-tab-icon">📖</span>Manual
+            </button>
+            <button class="ca-doc-tab-btn <?= $activeTab === 'developer' ? 'active' : '' ?>"
+                    data-tab="developer" onclick="caDocTab('developer')">
+                <span class="ca-tab-icon">⚙️</span>Developer
+            </button>
+        </div>
+
+        <div id="ca-panel-manual"    class="ca-doc-panel <?= $activeTab === 'manual'    ? 'active' : '' ?>">
+            <div id="ca-rendered-manual"></div>
+        </div>
+        <div id="ca-panel-developer" class="ca-doc-panel <?= $activeTab === 'developer' ? 'active' : '' ?>">
+            <div id="ca-rendered-developer"></div>
+        </div>
+
+        <div class="ca-doc-footer">
+            📁 Source: <code><?= $block->escapeHtml($nativePath) ?></code>
+        </div>
+
+    <?php endif; ?>
+</div>
+
+<?php if ($hasContent): ?>
+<script>
+/* ─────────────────────────────────────────────────────────────────
+   caDocMd  —  Inline Markdown → HTML parser  (zero dependencies)
+   Handles: headings, fenced code, tables, blockquotes, ul/ol,
+            hr, bold, italic, inline-code, links, paragraphs.
+   ───────────────────────────────────────────────────────────────── */
+const caDocMd = (function () {
+
+    /* HTML-escape a raw string */
+    function esc(s) {
+        return String(s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /* Minimal syntax colouring — operates on ALREADY html-escaped text.
+       Uses a token-replace approach so spans are never double-processed. */
+    function highlight(code) {
+        /* Step 1: escape raw code to safe HTML text */
+        var s = esc(code);
+
+        /* Step 2: tokenise — pull out all patterns in ONE pass using a
+           single replace so earlier replacements cannot match later ones.
+           Order: block-comments → line-comments → double-quoted strings →
+                  single-quoted strings → variables → keywords */
+        s = s.replace(
+            /(\/\*[\s\S]*?\*\/)|(\/\/[^\n]*)|(#[^\n]*)|(&quot;[^&\n]*&quot;)|('[^'\n]*')|(\$[a-zA-Z_]\w*)/g,
+            function(m, blk, lc, sh, dq, sq, va) {
+                if (blk || lc || sh) return '<span class="ca-c">'+m+'</span>';
+                if (dq  || sq)       return '<span class="ca-s">'+m+'</span>';
+                if (va)              return '<span class="ca-v">'+m+'</span>';
+                return m;
+            }
+        );
+
+        /* Step 3: keyword pass — only on plain text nodes (not inside spans).
+           We process segment-by-segment to avoid touching span contents. */
+        var kw = /\b(function|return|class|new|use|namespace|public|private|protected|static|readonly|declare|if|else|foreach|while|true|false|null|bin\/magento|composer)\b/g;
+        s = s.replace(/(<[^>]+>)|([^<]+)/g, function(m, tag, txt) {
+            if (tag) return tag;                          // inside tag → unchanged
+            return txt.replace(kw, '<span class="ca-k">$1</span>');
+        });
+
+        return s;
+    }
+
+    /* Inline formatting: code spans, bold, italic, links */
+    function inline(raw) {
+        /* 1. protect inline code spans */
+        const saved = [];
+        let s = raw.replace(/`([^`\n]+)`/g, function (_, c) {
+            saved.push('<code>' + esc(c) + '</code>');
+            return '\x02' + (saved.length - 1) + '\x03';
+        });
+        /* 2. escape remaining HTML */
+        s = esc(s);
+        /* 3. formatting */
+        s = s.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+        s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        s = s.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+        s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,
+            '<a href="$2" target="_blank" rel="noopener">$1</a>');
+        /* 4. restore code spans */
+        s = s.replace(/\x02(\d+)\x03/g, function (_, i) {
+            return saved[+i];
+        });
+        return s;
+    }
+
+    /* Parse a GFM pipe table */
+    function parseTable(rows) {
+        const heads = rows[0].split('|').map(function (c) {
+            return c.trim();
+        }).filter(Boolean);
+        let html = '<table><thead><tr>';
+        heads.forEach(function (h) {
+            html += '<th>' + inline(h) + '</th>';
+        });
+        html += '</tr></thead><tbody>';
+        for (let r = 2; r < rows.length; r++) {
+            var cells = rows[r].split('|').map(function (c) {
+                return c.trim();
+            }).filter(Boolean);
+            html += '<tr>';
+            cells.forEach(function (c) {
+                html += '<td>' + inline(c) + '</td>';
+            });
+            html += '</tr>';
+        }
+        return html + '</tbody></table>';
+    }
+
+    /* Main block parser */
+    function parse(md) {
+        var lines = md.split('\n');
+        var html = '';
+        var i = 0;
+
+        while (i < lines.length) {
+            var line = lines[i];
+
+            /* fenced code block */
+            if (/^```/.test(line)) {
+                var lang = line.replace(/^```/, '').trim() || 'text';
+                var code = [];
+                i++;
+                while (i < lines.length && !/^```\s*$/.test(lines[i])) {
+                    code.push(lines[i]);
+                    i++;
+                }
+                var rawCode = code.join('\n');
+                html += '<div class="ca-pre-wrap">'
+                      + '<button class="ca-copy-btn" onclick="caDocCopy(this)">Copy</button>'
+                      + '<pre><code>' + highlight(rawCode) + '</code></pre>'
+                      + '</div>\n';
+                i++;
+                continue;
+            }
+
+            /* headings */
+            var hm = line.match(/^(#{1,4})\s+(.+)/);
+            if (hm) {
+                var lvl = hm[1].length;
+                html += '<h' + lvl + '>' + inline(hm[2]) + '</h' + lvl + '>\n';
+                i++;
+                continue;
+            }
+
+            /* horizontal rule */
+            if (/^-{3,}\s*$/.test(line) || /^\*{3,}\s*$/.test(line)) {
+                html += '<hr>\n';
+                i++;
+                continue;
+            }
+
+            /* blockquote */
+            if (/^>\s?/.test(line)) {
+                var bq = [];
+                while (i < lines.length && /^>\s?/.test(lines[i])) {
+                    bq.push(lines[i].replace(/^>\s?/, ''));
+                    i++;
+                }
+                html += '<blockquote>' + parse(bq.join('\n')) + '</blockquote>\n';
+                continue;
+            }
+
+            /* GFM table (row | … followed by separator |---|…) */
+            if (/^\|/.test(line) && i + 1 < lines.length && /^\|[\s\-:|]+\|/.test(lines[i + 1])) {
+                var tbl = [line];
+                i++;
+                while (i < lines.length && /^\|/.test(lines[i])) {
+                    tbl.push(lines[i]);
+                    i++;
+                }
+                html += parseTable(tbl) + '\n';
+                continue;
+            }
+
+            /* unordered list */
+            if (/^[\-\*\+]\s/.test(line)) {
+                html += '<ul>\n';
+                while (i < lines.length && /^[\-\*\+]\s/.test(lines[i])) {
+                    html += '<li>' + inline(lines[i].replace(/^[\-\*\+]\s/, '')) + '</li>\n';
+                    i++;
+                }
+                html += '</ul>\n';
+                continue;
+            }
+
+            /* ordered list */
+            if (/^\d+\.\s/.test(line)) {
+                html += '<ol>\n';
+                while (i < lines.length && /^\d+\.\s/.test(lines[i])) {
+                    html += '<li>' + inline(lines[i].replace(/^\d+\.\s/, '')) + '</li>\n';
+                    i++;
+                }
+                html += '</ol>\n';
+                continue;
+            }
+
+            /* blank line */
+            if (line.trim() === '') {
+                i++;
+                continue;
+            }
+
+            /* paragraph — collect until a block-level element or blank line */
+            var pLines = [];
+            while (i < lines.length) {
+                var l = lines[i];
+                if (l.trim() === '') break;
+                /* NOTE: backtick (`) intentionally NOT in this break — it is inline, not block-level.
+                   Only break on actual block starters: #headings, >blockquote, fenced ```, hr, lists, tables */
+                if (/^#{1,4}\s/.test(l) || /^>/.test(l) || /^```/.test(l)) break;
+                if (/^[\-\*\+]\s/.test(l) || /^\d+\.\s/.test(l)) break;
+                if (/^-{3,}\s*$/.test(l) || /^\*{3,}\s*$/.test(l)) break;
+                if (/^\|/.test(l)) break;
+                pLines.push(l);
+                i++;
+            }
+            /* Safety: if nothing was collected and i didn't move, force-advance to prevent infinite loop */
+            if (!pLines.length) { i++; continue; }
+            html += '<p>' + inline(pLines.join(' ').trim()) + '</p>\n';
+        }
+        return html;
+    }
+
+    return {parse: parse};
+})();
+
+/* ── Render sections ─────────────────────────────────────────── */
+<?php if ($manual !== null): ?>
+    (function(){ var el=document.getElementById('ca-rendered-manual');    if(el) el.innerHTML=caDocMd.parse(<?= json_encode($manual) ?>); })();
+    <?php endif; ?>
+    <?php if ($developer !== null): ?>
+    (function(){ var el=document.getElementById('ca-rendered-developer'); if(el) el.innerHTML=caDocMd.parse(<?= json_encode($developer) ?>); })();
+<?php endif; ?>
+
+/* ── Copy button ─────────────────────────────────────────────── */
+function caDocCopy(btn) {
+    /* textContent gives plain text regardless of inner span tags */
+    var text = btn.closest('.ca-pre-wrap').querySelector('code').textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(function(){ btn.textContent='Copy'; btn.classList.remove('copied'); }, 2000);
+        });
+    } else {
+        /* Fallback for older browsers */
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function(){ btn.textContent='Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+}
+
+/* ── Tab switcher ────────────────────────────────────────────── */
+function caDocTab(tab) {
+    document.querySelectorAll('.ca-doc-tab-btn').forEach(function(b){
+        b.classList.toggle('active', b.dataset.tab === tab);
+    });
+    document.querySelectorAll('.ca-doc-panel').forEach(function(p){
+        p.classList.toggle('active', p.id === 'ca-panel-' + tab);
+    });
+    var url = new URL(window.location.href);
+    url.searchParams.set('tab', tab);
+    history.replaceState(null, '', url.toString());
+}
+</script>
+<?php endif; ?>
+

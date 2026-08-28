@@ -1,0 +1,646 @@
+<?php
+/**
+ * Evalent_MagicGallery
+ * @author Hampus Ershagen <hampus.ershagen@evalent.com>
+ */
+?>
+<?php
+$_product     = $block->getProduct();
+$_customVideo = $_product->getData('custom_youtube_video');
+$_galleryJson = $block->getGalleryImagesJson();
+?>
+<div class="mz-gallery-container">
+    <div class="mz-gallery-placeholder gallery-placeholder _block-content-loading" data-gallery-role="gallery-placeholder">
+    </div>
+    <?= $block->getChildHtml('magicgallery_inner'); ?>
+    <div data-role="loader" class="loading-mask">
+        <div class="loader">
+            <img src="<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('Evalent_MagicGallery::img/ajax-loader.gif'); ?>" alt="<?php /* @escapeNotVerified */ echo __('Loading...') ?>">
+        </div>
+    </div>
+    <div class="mz-gallery-thumbs-wrap"></div>
+    <div class="mz-gallery-thumbs--expand">
+        <button class="mz-gallery-thumbs--expand__btn"><?= __("Show more") ?></button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    /* expose gallery JSON so our aivz script can read _aivz images */
+    window.mzGalleryData = <?php echo $_galleryJson; ?>;
+
+    var config = {
+            'width':  <?php /* @escapeNotVerified */ echo $block->getImageAttribute('product_page_image_medium', 'width'); ?>,
+            'height': <?php /* @escapeNotVerified */ echo $block->getImageAttribute('product_page_image_medium', 'height'); ?>
+        },
+        loader = document.querySelectorAll('.mz-gallery-container [data-role="loader"]')[0];
+    loader.style.paddingBottom = (config.height / config.width * 100) + '%';
+</script>
+
+<script>
+    (function() {
+        var isMobile = window.matchMedia('(max-width: 800px)').matches;
+        var thumbsAxis = isMobile ? 'x' : 'y';
+
+        var config = {
+            "[data-gallery-role=gallery-placeholder]": {
+                "Evalent_MagicGallery/js/gallery": {
+                    "data": <?php echo $_galleryJson; ?>,
+                    "image_width":  <?php echo $block->getImageAttribute('product_page_image_medium', 'width'); ?>,
+                    "image_height": <?php echo $block->getImageAttribute('product_page_image_medium', 'height'); ?>,
+                    "sliderSettings": {
+                        "options": {
+                            "autoplay": false,
+                            "autoplaySpeed": 1000,
+                            "slidesToShow": 1,
+                            "slidesToScroll": 1,
+                            "dots": false,
+                            "arrows": true,
+                            "infinite": false,
+                            "fade": false,
+                            "vertical": false,
+                            "draggable": true,
+                            "swipeToSlide": true
+                        }
+                    },
+                    "imagePopup": {
+                        "imagePopupStatus": true,
+                        "options": {
+                            "slideShow": true,
+                            "fullScreen": true,
+                            "type": "image",
+                            "thumbs": {
+                                "autoStart": true,
+                                "axis": thumbsAxis
+                            }
+                        }
+                    },
+                    "thumbsSettings": {
+                        "options": {
+                            "slidesToShow": 6,
+                            "slidesToScroll": 1,
+                            "autoplay": false,
+                            "focusOnSelect": false,
+                            "dots": false,
+                            "arrows": true,
+                            "infinite": false,
+                            "draggable": true,
+                            "swipeToSlide": true,
+                            "vertical": false,
+                            "responsive": [{
+                                "breakpoint": 800,
+                                "settings": {
+                                    "vertical": false,
+                                    "arrows": false,
+                                    "dots": false,
+                                    "swipeToSlide": true,
+                                    "slidesToScroll": 1,
+                                    "slidesToShow": 4
+                                }
+                            }]
+                        }
+                    },
+                    "videoSettings": {
+                        "showRelated": false,
+                        "videoAutoRestart": false
+                    }
+                    <?php if (!empty($_customVideo)): ?>,
+                    "videoCustom": {
+                        "videoUrl": "<?= $_customVideo; ?>"
+                    }
+                    <?php endif; ?>
+                }
+            }
+        };
+
+        var script = document.createElement('script');
+        script.type = 'text/x-magento-init';
+        script.textContent = JSON.stringify(config);
+        document.body.appendChild(script);
+    })();
+</script>
+
+<style>
+    /* ══════════════════════════════════════════
+       DESKTOP (769px+)
+    ══════════════════════════════════════════ */
+    @media (min-width: 769px) {
+
+        .mz-aivz-wrap { display: none !important; }
+
+        .fancybox-thumbs {
+            top: 0; width: 110px; bottom: 0;
+            right: auto; left: 0; height: 100%;
+            background: #fff !important;
+        }
+        .fancybox-thumbs__list {
+            flex-direction: column; height: 100%;
+            overflow-y: auto; overflow-x: hidden;
+            padding: 0; margin: 0;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .fancybox-thumbs__list::-webkit-scrollbar { display: none; }
+        .fancybox-thumbs__list a {
+            width: 90px;
+            height: 90px;
+            max-width: 90px;
+            max-height: 90px;
+            flex: 0 0 85px;
+            margin: 2px auto;
+            background-size: cover;
+            background-position: center;
+        }
+        .fancybox-show-thumbs .fancybox-inner {
+            left: 110px; right: 0; bottom: 0; top: 0;
+            transition: left 0.3s, right 0.3s;
+        }
+        .fancybox-has-aivz-thumbs .fancybox-inner { right: 110px; }
+        .fancybox-show-thumbs.fancybox-has-aivz-thumbs .fancybox-inner { left: 110px; right: 125px; }
+        .fancybox-navigation .fancybox-button--arrow_left { left: 50px; }
+
+    }
+
+    /* ══════════════════════════════════════════
+       MOBILE (768px-) — horizontal thumbs
+    ══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+        .fancybox-thumbs {
+            top: auto; bottom: 0; left: 0; right: 0;
+            width: 100%; height: 95px;
+        }
+        .fancybox-thumbs__list {
+            flex-direction: row;
+            overflow-x: auto; overflow-y: hidden;
+        }
+        .fancybox-show-thumbs .fancybox-inner {
+            top: 0; left: 0; right: 0; bottom: 95px;
+        }
+    }
+</style>
+
+<!-- Right side Y-axis _aivz image -->
+<style>
+    /* ══════════════════════════════════════════
+       RIGHT-SIDE THUMBNAILS (mirror of left)
+    ══════════════════════════════════════════ */
+    /*@media (min-width: 769px) {*/
+    /*    .fancybox-aivz-thumbs {*/
+    /*        position: absolute;*/
+    /*        top: 0;*/
+    /*        right: 3px;*/
+    /*        bottom: 0;*/
+    /*        background: #fff;*/
+    /*        z-index: 99995;*/
+    /*        margin: 0; padding: 0;*/
+    /*    }*/
+    /*    .fancybox-aivz-thumbs__list {*/
+    /*        display: flex;*/
+    /*        flex-direction: column;*/
+    /*        height: 100%;*/
+    /*        overflow-y: auto;*/
+    /*        overflow-x: hidden;*/
+    /*        margin: 0; padding: 0;*/
+    /*        list-style: none;*/
+    /*        scrollbar-width: none;*/
+    /*        -ms-overflow-style: none;*/
+    /*    }*/
+    /*    .fancybox-aivz-thumbs__list::-webkit-scrollbar { display: none; }*/
+    /*    .fancybox-aivz-thumbs__list a {*/
+    /*        display: block;*/
+    /*        width: 160px;*/
+    /*        height: 160px;*/
+    /*        margin: 2px auto;*/
+    /*        background-size: cover;*/
+    /*        background-position: center;*/
+    /*        cursor: pointer;*/
+    /*        outline: 2px solid transparent;*/
+    /*        outline-offset: -2px;*/
+    /*        transition: opacity .2s, outline-color .2s;*/
+    /*    }*/
+    /*    .fancybox-aivz-thumbs__list a:hover { opacity: 1; }*/
+    /*    .fancybox-aivz-thumbs__list a.fancybox-thumbs-active {*/
+    /*        opacity: 1;*/
+    /*        outline-color: #ff0066;*/
+    /*    }*/
+    /*    !* push the right arrow inward so it doesn't collide with the rail *!*/
+    /*    .fancybox-has-aivz-thumbs .fancybox-navigation .fancybox-button--arrow_right { right: 50px; }*/
+    /*}*/
+
+    /*!* Hide on mobile — bottom strip is already the thumb UI there *!*/
+    /*@media (max-width: 768px) {*/
+    /*    .fancybox-aivz-thumbs { display: none !important; }*/
+    /*}*/
+</style>
+
+<script>
+    require(['jquery'], function ($) {
+        'use strict';
+
+        var $aivz = null;
+        var $aivzStyle = null; // track injected <style>
+
+        function injectStyles() {
+            if ($aivzStyle) return; // already injected
+            $aivzStyle = $('<style id="fancybox-aivz-style">\
+            @media (min-width: 769px) {\
+                .fancybox-aivz-thumbs {\
+                    position: absolute;\
+                    top: 0;\
+                    right: 3px;\
+                    bottom: 0;\
+                    background: #fff;\
+                    z-index: 99995;\
+                    margin: 0; padding: 0;\
+                }\
+                .fancybox-aivz-thumbs__list {\
+                    display: flex;\
+                    flex-direction: column;\
+                    height: 100%;\
+                    overflow-y: auto;\
+                    overflow-x: hidden;\
+                    margin: 0; padding: 0;\
+                    list-style: none;\
+                    scrollbar-width: none;\
+                    -ms-overflow-style: none;\
+                }\
+                .fancybox-aivz-thumbs__list::-webkit-scrollbar { display: none; }\
+                .fancybox-aivz-thumbs__list a {\
+                    display: block;\
+                    width: 160px;\
+                    height: 160px;\
+                    margin: 5px auto;\
+                    background-size: cover;\
+                    background-position: center;\
+                    cursor: pointer;\
+                    outline: 2px solid transparent;\
+                    outline-offset: -2px;\
+                    transition: opacity .2s, outline-color .2s;\
+                }\
+                .fancybox-aivz-thumbs__list a:hover { opacity: 1; }\
+                .fancybox-aivz-thumbs__list a.fancybox-thumbs-active {\
+                    opacity: 1;\
+                    outline-color: #ff0066;\
+                }\
+                .fancybox-toolbar {\
+                    right: 55px;\
+                }\
+                .fancybox-has-aivz-thumbs .fancybox-navigation .fancybox-button--arrow_right { right: 50px; }\
+            }\
+            @media (max-width: 768px) {\
+                .fancybox-aivz-thumbs { display: none !important; }\
+            }\
+        </style>').appendTo('head');
+        }
+        function removeStyles() {
+            if ($aivzStyle) { $aivzStyle.remove(); $aivzStyle = null; }
+        }
+
+        function getImages() {
+            var data = window.mzGalleryData;
+            if (!data || !data.length) return [];
+            return $.map(data, function (item) {
+                return { thumb: item.thumb || item.img || item.full };
+            });
+        }
+
+        function build(instance) {
+            if ($aivz || !instance) return;
+            var images = getImages();
+            if (!images.length) return;
+
+            var $container = instance.$refs && instance.$refs.container;
+            if (!$container || !$container.length) return;
+
+            $aivz = $('<div class="fancybox-aivz-thumbs"><ul class="fancybox-aivz-thumbs__list"></ul></div>');
+            var $list = $aivz.find('ul');
+
+            $.each(images, function (i, img) {
+                // check if thumb contains "_aivz"
+                if (img.thumb && img.thumb.indexOf('_aivz') !== -1) {
+                    $('<a href="javascript:;"></a>')
+                        .attr('data-index', i)
+                        .css('background-image', 'url("' + img.thumb + '")')
+                        .appendTo($list);
+                }
+            });
+
+            // ← NEW: if no _aivz thumbs exist, abort — don't mount the rail at all
+            if (!$list.children().length) {
+                $aivz = null;
+                return;
+            }
+
+            // Only inject CSS when we know we actually need the rail
+            injectStyles();
+
+            $aivz.on('click', 'a', function () {
+                var idx = parseInt($(this).attr('data-index'), 10);
+                var inst = $.fancybox.getInstance();
+                if (inst) inst.jumpTo(idx);
+            });
+
+            $container.append($aivz).addClass('fancybox-has-aivz-thumbs');
+        }
+
+        function setActive(index) {
+            if (!$aivz) return;
+            var $links = $aivz.find('a').removeClass('fancybox-thumbs-active');
+            var $active = $links.filter('[data-index="' + index + '"]').addClass('fancybox-thumbs-active');
+            if (!$active.length) return;
+
+            var $list  = $aivz.find('ul');
+            var listH  = $list.height();
+            var itemTop = $active.position().top;
+            var itemH  = $active.outerHeight();
+            $list.stop().animate({
+                scrollTop: $list.scrollTop() + itemTop - (listH / 2) + (itemH / 2)
+            }, 200);
+        }
+
+        function destroy() {
+            if ($aivz) { $aivz.remove(); $aivz = null; }
+            $('.fancybox-container').removeClass('fancybox-has-aivz-thumbs');
+            removeStyles(); // ← also pull the <style> out of <head>
+        }
+
+        $(document)
+            .on('afterShow.fb', function (e, instance, current) {
+                build(instance);
+                setActive(current.index);
+            })
+            .on('beforeClose.fb', function () {
+                destroy();
+            });
+    });
+</script>
+<!-- end Right side Y-axis _aivz image -->
+
+
+<style>
+    @media (max-width: 768px) {
+        /* Limit main gallery height so product title stays above fold */
+        .mz-gallery-container .mz-gallery-placeholder {
+            max-height: 100vw;
+            overflow: hidden;
+        }
+
+        .mz-gallery-container .slick-slide-wrap img {
+            max-height: 100vw;
+            object-fit: contain;
+        }
+
+        /* CSS chevron arrows — override sprite */
+        .mz-gallery-container .slick-prev,
+        .mz-gallery-container .slick-next {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 36px !important;
+            height: 36px !important;
+            background: rgba(0, 0, 0, 0.25) !important;
+            padding: 0 !important;
+            z-index: 10;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .mz-gallery-container .slick-prev::before,
+        .mz-gallery-container .slick-next::before {
+            content: '' !important;
+            display: block !important;
+            width: 7px !important;
+            height: 10px !important;
+            border-top: 2px solid #fff !important;
+            border-right: 2px solid #fff !important;
+            background: none !important;
+        }
+
+        .mz-gallery-container .slick-prev::before {
+            transform: rotate(-135deg) translate(-2px, 2px);
+        }
+
+        .mz-gallery-container .slick-next::before {
+            transform: rotate(45deg) translate(-2px, 2px);
+        }
+
+        /* Disabled: grayed, still visible */
+        .mz-gallery-container .slick-prev.slick-disabled,
+        .mz-gallery-container .slick-next.slick-disabled {
+            display: flex !important;
+            opacity: 0.3 !important;
+            cursor: default !important;
+            pointer-events: none !important;
+        }
+
+        .mz-gallery-container {
+            position: relative;
+        }
+
+        .product-info-main {
+            margin-top: 15px;
+        }
+    }
+</style>
+
+<!-- Slide counter "n / total" overlay on the main image (all breakpoints) -->
+<style>
+    .mz-gallery-container .mz-main-slider {
+        position: relative;
+    }
+    .mz-gallery-container .mz-slide-counter {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        z-index: 9;
+        background: rgba(255, 255, 255, 0.9);
+        color: #222;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1;
+        padding: 5px 12px;
+        border-radius: 5px;
+        pointer-events: none;
+        white-space: nowrap;
+        line-height: 2.4rem;
+        border: 1px solid rgb(12 12 12 / 15%);
+    }
+</style>
+
+<script>
+    require(['jquery'], function ($) {
+        'use strict';
+
+        function initMobileCounter() {
+            var $slider = $('.mz-gallery-container .slick-initialized').first();
+            if (!$slider.length) return false;
+            if ($slider.data('mob-counter-init')) return true;
+            $slider.data('mob-counter-init', true);
+
+            var total = $slider.find('.slick-slide:not(.slick-cloned)').length;
+            if (total <= 1) return true;
+
+            var $counter = $('<div class="mz-slide-counter">1 / ' + total + '</div>');
+            // Overlay on the main image itself (not below the thumb strip).
+            $slider.append($counter);
+
+            $slider.on('afterChange.mobcounter', function (e, slick, current) {
+                $counter.text((current + 1) + ' / ' + total);
+            });
+
+            return true;
+        }
+
+        $(function () {
+            var tries = 0;
+            var t = setInterval(function () {
+                if (initMobileCounter() || tries++ > 40) clearInterval(t);
+            }, 200);
+        });
+    });
+</script>
+
+
+<style>
+    @media (max-width: 768px) {
+        .catalog-product-view .product-info-main .trustpilot-widget {
+            display: none !important;
+        }
+    }
+</style>
+
+<!-- Thumbnail strip below the main image (matches carpient.com) -->
+<style>
+    /* Stack the main image on top, thumbnail strip directly below it. */
+    .mz-gallery-container {
+        display: flex;
+        flex-direction: column;
+    }
+    .mz-gallery-container .mz-gallery-placeholder,
+    .mz-gallery-container .loading-mask {
+        order: 1;
+        width: 100%;
+    }
+    .mz-gallery-container .mz-gallery-thumbs-wrap {
+        order: 2;
+        width: 100%;
+        margin-top: 12px;
+        /* Override the module's mobile rule that hides the strip. */
+        display: block !important;
+    }
+
+    /* The old slick "Show more" toggle is unused with the scrollable strip. */
+    .mz-gallery-container .mz-gallery-thumbs--expand {
+        display: none !important;
+    }
+
+    /* Horizontal, scrollable thumbnail strip */
+    .mz-gallery-container .mz-gallery-thumbs {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 10px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 2px;
+        scrollbar-width: thin;
+        scrollbar-color: #121212 transparent;
+        scroll-behavior: smooth;
+        line-height: 0;
+    }
+
+    .mz-gallery-container .mz-gallery-thumbs .thumb {
+        display: block;
+        flex: 0 0 auto;
+        width: 88px;
+        box-sizing: border-box;
+        border: 1px solid #eeeeee;
+        border-radius: 4px;
+        overflow: hidden;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s, border-color 0.2s;
+    }
+
+    .mz-gallery-container .mz-gallery-thumbs .thumb img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .mz-gallery-container .mz-gallery-thumbs .thumb:hover {
+        opacity: 1;
+    }
+
+    .mz-gallery-container .mz-gallery-thumbs .thumb.thumb--active {
+        opacity: 1;
+        border-color: #666666;
+    }
+
+    @media (max-width: 768px) {
+        .mz-gallery-container .mz-gallery-thumbs .thumb {
+            width: 64px;
+        }
+    }
+
+    /* ══════════════════════════════════════════
+       DESKTOP — main image single, with arrows
+    ══════════════════════════════════════════ */
+    @media (min-width: 769px) {
+        .mz-gallery-container { position: relative; }
+
+        .mz-gallery-container .mz-main-slider .slick-slide-wrap {
+            cursor: zoom-in;
+            text-align: center;
+        }
+        /* Full-res image, but capped so the gallery stays a sensible size. */
+        .mz-gallery-container .mz-main-slider .slick-slide-wrap img {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 620px;
+            margin: 0 auto;
+            display: inline-block;
+        }
+
+        /* CSS chevron arrows on the main image */
+        .mz-gallery-container .mz-main-slider > .slick-prev,
+        .mz-gallery-container .mz-main-slider > .slick-next {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.9) !important;
+            border-radius: 5px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .mz-gallery-container .mz-main-slider > .slick-prev { left: 15px; }
+        .mz-gallery-container .mz-main-slider > .slick-next { right: 15px; }
+
+        .mz-gallery-container .mz-main-slider > .slick-prev::before,
+        .mz-gallery-container .mz-main-slider > .slick-next::before {
+            content: '' !important;
+            display: block;
+            width: 7px;
+            height: 12px;
+            border-top: 2px solid #222;
+            border-right: 2px solid #222;
+            background: none !important;
+            opacity: 1;
+        }
+        .mz-gallery-container .mz-main-slider > .slick-prev::before {
+            transform: rotate(-135deg) translate(-2px, 2px);
+        }
+        .mz-gallery-container .mz-main-slider > .slick-next::before {
+            transform: rotate(45deg) translate(-2px, 2px);
+        }
+
+        .mz-gallery-container .mz-main-slider > .slick-prev.slick-disabled,
+        .mz-gallery-container .mz-main-slider > .slick-next.slick-disabled {
+            opacity: 0.35 !important;
+            cursor: default;
+            pointer-events: none;
+        }
+    }
+</style>

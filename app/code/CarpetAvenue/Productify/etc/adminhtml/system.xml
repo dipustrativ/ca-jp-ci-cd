@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Product
+ * @package   CarpetAvenue_Productify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="productify" translate="label" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Productify</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_Productify::productify</resource>
+            <group id="general" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Setting</label>
+                <comment><![CDATA[<span style="color:red;">Only modify these settings if you understand their impact.</span>]]></comment>
+                <field id="enabled_full_reindex" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Full Reindex</label>
+                    <comment>Allow or disable full reindex</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="cronjob" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Cron Job</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Product Cron Job</label>
+                    <comment>Enable/disable the automated product indexer cron job</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>productify/cronjob/enabled</config_path>
+                </field>
+            </group>
+            <group id="group_products" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Group Products</label>
+                <field id="primary_shape_option_id" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Primary Shape Option ID</label>
+                    <comment>Attribute option id of the default ("rectangular") shape. Its sizes are listed first in the PDP size drawer and get no shape heading. Defaults to 19 if empty.</comment>
+                    <config_path>productify/general/primary_shape_option_id</config_path>
+                </field>
+                <field id="round_shape_option_id" translate="label comment" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Round Shape Option ID</label>
+                    <comment>Attribute option id of the "round" shape. Sizes render as "∅ W cm" when a product's shape matches this id and width == length. Defaults to 20 if empty.</comment>
+                    <config_path>productify/general/round_shape_option_id</config_path>
+                </field>
+                <field id="csv_upload" translate="label comment" type="file" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Upload CSV File</label>
+                    <comment><![CDATA[Select a CSV file to upload for group products processing. <a href="https://drive.google.com/file/d/1jMmOV4LsZ5U99aW5hDEHfQ2cqpAVz16X/view?usp=sharing" target="_blank">Sample file</a>]]></comment>
+                    <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\System\Config\GroupProducts\CsvUpload</frontend_model>
+                </field>
+                <field id="overwrite_with_csv_design_id" translate="label comment" type="select" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Overwrite Design ID</label>
+                    <comment>Yes will overwrite design_id</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="overwrite_with_csv_design_id_group" translate="label comment" type="select" sortOrder="12" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Overwrite Design ID Group</label>
+                    <comment>Yes will overwrite design_id_group</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="overwrite_with_csv_size" translate="label comment" type="select" sortOrder="13" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Overwrite Size</label>
+                    <comment>Yes will overwrite configurable_size</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="overwrite_with_csv_color" translate="label comment" type="select" sortOrder="14" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Overwrite Color</label>
+                    <comment>Yes will overwrite config_color</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="upload_button" translate="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Process CSV</label>
+                    <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\System\Config\GroupProducts\UploadButton</frontend_model>
+                    <comment>CSV may contain new attribute values (size, color, etc.). New attributes are created automatically. Click Process CSV twice to ensure changes are reflected.</comment>
+                </field>
+                <group id="cache" translate="label" sortOrder="20" showInDefault="1">
+                    <label>Cache Management</label>
+                    <field id="auto_sync_enabled" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Enable Auto Sync</label>
+                        <comment>Automatically rebuild variant cache when products are changed via SQL or other external methods</comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>productify/cache/auto_sync_enabled</config_path>
+                    </field>
+                    <field id="build_variant" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Build Variant Cache</label>
+                        <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\System\Config\GroupProducts\BuildVariant</frontend_model>
+                    </field>
+                </group>
+            </group>
+            <group id="url_rewrite" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>URL Rewrite</label>
+                <group id="csv_fixed" translate="label" sortOrder="10" showInDefault="1">
+                    <label>URL Issued Reported by Google</label>
+                    <field id="url_rewrite_csv_upload" translate="label comment" type="file" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Upload CSV File</label>
+                        <comment><![CDATA[Select a CSV file to upload that reported by google must have issue regrading URL. <a href="https://drive.google.com/file/d/10ESkS5M715mGXOjbVzJMwT8104y7JWik/view?usp=sharing" target="_blank">Sample file</a>]]></comment>
+                        <frontend_model>CarpetAvenue\Core\Block\Config\CsvUpload</frontend_model>
+                    </field>
+                    <field id="upload_button" translate="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Process CSV</label>
+                        <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\System\Config\RewriteURL\UploadButton</frontend_model>
+                    </field>
+                </group>
+                <group id="missing_url" translate="label" sortOrder="10" showInDefault="1">
+                    <label>Missing URL's</label>
+                    <field id="check_missing_url" translate="label" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Check Miss Mass URL</label>
+                        <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\System\Config\RewriteURL\CheckMissingURLRewrite</frontend_model>
+                        <comment>Check if any Missing URL Rewrite</comment>
+                    </field>
+                    <field id="generate_missing_url" translate="label" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Generate Missing URL</label>
+                        <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\System\Config\RewriteURL\GenerateMissingURLRewrite</frontend_model>
+                        <comment>Generate Missing URL Rewrite</comment>
+                    </field>
+                </group>
+                <group id="update_url" translate="label" sortOrder="10" showInDefault="1">
+                    <label>Updated URL Rewrite</label>
+                    <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Enable Product Update URL Rewrite</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                </group>
+            </group>
+            <group id="product_schema_json_ld" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Product Schema JSON-LD</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="product_details" translate="label" sortOrder="100" showInDefault="1">
+                <label>Product Details Page Settings</label>
+                <group id="custom_add_to_cart" translate="label" sortOrder="10" showInDefault="1">
+                    <label>Custom Add to Cart Button</label>
+                    <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="1">
+                        <label>Enabled</label>
+                        <comment>Enable custom add to cart button</comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="button_background_color" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Button Background Color</label>
+                        <comment>Select background color for the custom add to cart button</comment>
+                        <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\System\Config\Form\Field\Color</frontend_model>
+                        <depends>
+                            <field id="enabled">1</field>
+                        </depends>
+                    </field>
+                    <field id="button_color" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Button Color</label>
+                        <comment>Select text color for the custom add to cart button</comment>
+                        <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\System\Config\Form\Field\Color</frontend_model>
+                        <depends>
+                            <field id="enabled">1</field>
+                        </depends>
+                    </field>
+                    <field id="category_choose" translate="label comment" type="multiselect" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Category Choose</label>
+                        <comment>Select categories to apply custom add to cart button</comment>
+                        <source_model>CarpetAvenue\Productify\Model\Config\Source\CategoryTree</source_model>
+                        <depends>
+                            <field id="enabled">1</field>
+                        </depends>
+                    </field>
+                </group>
+            </group>
+            <group id="catalog_price" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Catalog Pricing</label>
+                <field id="hide_zeros" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Hide zeros</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Hide decimal zeros when they are not needed (75.00 kr shows as 75 kr)</comment>
+                </field>
+                <group id="jpy_currency_ceil" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>JPY: Ceil currency converted price to zeroes</label>
+                    <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="1">
+                        <label>Enable</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="thresholds" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="1">
+                        <label>Currency Converted Price Thresholds</label>
+                        <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\System\Config\JpCurrencyConvert\Thresholds</frontend_model>
+                        <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    </field>
+                </group>
+            </group>
+            <group id="search_suggest" translate="label" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Search Suggestions</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Live product/category/page dropdown under the search field. Off falls back to a plain search form.</comment>
+                </field>
+                <field id="min_chars" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Minimum Characters</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment>Characters typed before the dropdown opens.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="product_limit" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Products Shown</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment>Products listed in the dropdown. The "View all" link always reflects the full result count.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="cache_ttl" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Cache Lifetime (seconds)</label>
+                    <validate>validate-digits</validate>
+                    <comment>How long a rendered dropdown is cached per store/customer group/currency. 0 disables caching.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+            <group id="similar_product" translate="label" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Similar Product</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Catalog Search for Similar Products</label>
+                    <comment>When set to "Yes", similar product recommendations will load via the native Catalog Search API. When set to "No", a custom API will be used instead.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+
+            <!-- Carpet Avenue Product Image Settings -->
+            <group id="smart_thumbnail" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Product Listing Thumbnail Behavior</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable AI Smart Thumbnails</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[<strong>ON:</strong> Grid positions 5, 6, 15, 16, 25, 26... show the AI/_aivz image by default. Hover on those positions shows the main image.<br/><strong>OFF:</strong> All positions show the main image (hover behavior controlled by setting below).]]></comment>
+                </field>
+                <field id="hover_enabled" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Hover Image (2nd Image)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[<strong>ON:</strong> Hovering a product thumbnail shows the 2nd gallery image (applies to normal positions, or all positions when AI thumbnails are OFF).<br/><strong>OFF:</strong> No hover image swap. Thumbnails are static.]]></comment>
+                </field>
+            </group>
+
+            <!-- ===============================================================
+                 Merged CarpetAvenue_EnhanceCategory
+                 was: catalog/frontend/product_category_link_position
+                 =============================================================== -->
+            <group id="enhance_category" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Category Enhancements</label>
+                <field id="product_category_link_position" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInStore="0" showInWebsite="0" canRestore="1">
+                    <label>Default position on Products in Category</label>
+                    <comment>When products are added to a category they get position 0 by default, this will override that.</comment>
+                </field>
+            </group>
+
+            <!-- ===============================================================
+                 Merged CarpetAvenue_ProductStatus
+                 was: catalog/advanced_product_status/*
+                 =============================================================== -->
+            <group id="product_status" translate="label" type="text" sortOrder="410" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Advanced Product Status</label>
+                <field id="online_enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInStore="0" showInWebsite="0" canRestore="1">
+                    <label>Product can be set offline/online</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Enable additional product status control: Approved, online/offline etc.]]></comment>
+                </field>
+                <field id="approve_enabled" translate="label" type="select" sortOrder="20" showInDefault="1" showInStore="0" showInWebsite="0" canRestore="1">
+                    <label>Products must be approved</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Products must be approved before they are visible in the frontend.]]></comment>
+                </field>
+                <field id="weight_enabled" translate="label" type="select" sortOrder="30" showInDefault="1" showInStore="0" showInWebsite="0" canRestore="1">
+                    <label>Products must have weight</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Products must have a weight to be visible in the frontend.]]></comment>
+                </field>
+            </group>
+
+            <!-- ===============================================================
+                 Merged CarpetAvenue_LayeredNavigation
+                 was: section carpetavenue_layerednav/*
+                 =============================================================== -->
+            <group id="layerednav" translate="label" type="text" sortOrder="420" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Layered Navigation</label>
+                <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>General</label>
+                    <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Enable Enhanced Layered Navigation</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="multiselect_enabled" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Allow Multiple Values Per Attribute</label>
+                        <comment>Options within one attribute combine with OR, attributes combine with AND.</comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                    <field id="batch_apply" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Batch Apply (Show Results Button)</label>
+                        <comment>When Yes, clicking a filter only stages the selection and updates the live result count; filters apply when the shopper clicks "Show". Requires AJAX enabled.</comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                </group>
+                <group id="ajax" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>AJAX</label>
+                    <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Update Results Without Page Reload</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                </group>
+                <group id="slider" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Price Slider</label>
+                    <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Show Price Filter As Slider</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="step" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Slider Step</label>
+                        <comment>Minimum increment when dragging the slider handles.</comment>
+                        <validate>validate-number validate-greater-than-zero</validate>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                </group>
+                <group id="seo" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SEO Friendly URLs</label>
+                    <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Enable SEO Filter URLs</label>
+                        <comment>Filter values become URL path segments, e.g. /rugs/color-red_blue.</comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="allow_index_single_filter" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Allow Indexing Of Single-Filter Pages</label>
+                        <comment>When No, every filtered page gets NOINDEX,FOLLOW.</comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                    <field id="multi_value_separator" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Multi-Value Separator In URL</label>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                </group>
+            </group>
+
+            <!-- ===============================================================
+                 Merged Lof_AjaxScroll (infinite scroll)
+                 was: section lofajaxscroll/*, tab landofcoder,
+                      resource Lof_All::config
+                 =============================================================== -->
+            <group id="ajaxscroll" translate="label" type="text" sortOrder="430" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Infinite Scroll</label>
+                <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>General Settings</label>
+                    <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                </group>
+                <group id="instances" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Instances</label>
+                    <field id="enabled_grid" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Use in Categories (Grid/List mode)</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[Applies to every category page.]]></comment>
+                    </field>
+                    <field id="enabled_layer" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Use in Layer mode</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="enabled_search" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Use in Search</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="enabled_advanced" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Use in Advanced Search</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="enable_parameter" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable Parameter</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="delay" translate="label comment" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Delay</label>
+                        <comment><![CDATA[Scroll-down delay in milliseconds. Default: 600]]></comment>
+                    </field>
+                </group>
+                <group id="selectors" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Selectors</label>
+                    <field id="content" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Content</label>
+                        <comment><![CDATA[Selector for the element that surrounds the items you will be loading more of.]]></comment>
+                    </field>
+                    <field id="pagination" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Pagination</label>
+                        <comment><![CDATA[Selector for pagination]]></comment>
+                    </field>
+                    <field id="toolbar" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Toolbar</label>
+                        <comment><![CDATA[Selector for the toolbar (normally pagination, sort-by and display type are inside here)]]></comment>
+                    </field>
+                    <field id="next" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Next</label>
+                        <comment><![CDATA[Selector for the link to the next page.]]></comment>
+                    </field>
+                    <field id="grid_mode" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Items (grid mode)</label>
+                        <comment><![CDATA[Selector for all items you'll retrieve.]]></comment>
+                    </field>
+                    <field id="list_mode" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Items (list mode)</label>
+                        <comment><![CDATA[Selector for the element that surrounds the items you will be loading more of.]]></comment>
+                    </field>
+                </group>
+                <group id="design" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Design</label>
+                    <field id="loading_image" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Loading Image</label>
+                        <comment><![CDATA[Use absolute URL or relative path to skin path. Leave empty for default.]]></comment>
+                    </field>
+                    <field id="loading_text" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Loading Text</label>
+                    </field>
+                    <field id="done_text" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Done Text</label>
+                    </field>
+                    <field id="hide_toolbar" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Hide Toolbar</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[Make sure you have the right css selector for the toolbar]]></comment>
+                    </field>
+                    <field id="local_mode" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Local Mode</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[Instead of watching the entire window scrolling, watch only the element this plugin was called on (set in Selectors -> Content).]]></comment>
+                    </field>
+                    <field id="buffer" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Buffer (px)</label>
+                        <comment><![CDATA[Offset before page end at which content starts loading. A high number loads the next page well before the user reaches the bottom.]]></comment>
+                    </field>
+                    <field id="load_more" translate="label comment" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Load More threshold</label>
+                        <comment><![CDATA[When this page number is reached, a "load more" button is shown instead of loading automatically on scroll (helps users reach the footer). Use a high number to disable.]]></comment>
+                    </field>
+                    <field id="load_more_text" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Load More button text</label>
+                    </field>
+                    <field id="load_prev_text" translate="label comment" type="text" sortOrder="85" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Load Previous button text</label>
+                    </field>
+                    <field id="show_progressbar" translate="label comment" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Show Progress Bar</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                </group>
+            </group>
+
+        </section>
+
+        <section id="campaign" translate="label" sortOrder="301" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Campaign</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_Productify::productify_campaign</resource>
+            <group id="dynamic_campaign" translate="label" type="text" sortOrder="40" showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
+                <label>Dynamic Campaign Import</label>
+
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Feature</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Select "Yes" to enable the dynamic campaign import.</comment>
+                </field>
+
+                <!--<field id="file_url" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Google Sheet URL</label>
+                    <comment>Please provide a publicly accessible Google Sheet URL.</comment>
+                </field>-->
+
+                <field id="sheet_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Google Sheet ID</label>
+                    <comment>Please provide a publicly accessible Google Sheet URL ID.</comment>
+                </field>
+
+                <field id="grid_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Google Sheet Grid ID</label>
+                    <comment>Please provide a publicly accessible Google Sheet URL Grid ID.</comment>
+                </field>
+
+                <field id="create_coupon" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Create/Update Dynamic Coupon</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>When enabled, a Cart Price Rule coupon is automatically created or updated on each campaign import.</comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+
+                <field id="import_button" translate="label" type="button" sortOrder="30" showInDefault="1">
+                    <label>Import Campaigns</label>
+                    <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\Button\Campaign\Import</frontend_model>
+                    <comment><![CDATA[Click to import campaigns from the provided Google Sheet URL]]></comment>
+                </field>
+
+<!--                 <field id="import_button" translate="label" type="button" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">-->
+<!--                    <label>Import Campaigns</label>-->
+<!--                    <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\Button\Campaign\Import</frontend_model>-->
+<!--                    <comment><![CDATA[Click to import campaigns from the provided Google Sheet URL]]></comment>-->
+<!--                </field>-->
+
+            </group>
+
+            <group id="cache_clean" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Campaign Auto Cache Clean</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <!--<field id="end_date" type="datetime" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Campaign End Datetime</label>
+                    <comment>Automatically cleans cache after the campaign ends.</comment>
+                     <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\System\Config\Date\DateTimeFormat</frontend_model>
+                </field>-->
+                <field id="manual_job_runner" translate="label" type="button" sortOrder="40" showInDefault="1">
+                    <label>Active Campaigns</label>
+                    <frontend_model>CarpetAvenue\Productify\Block\Adminhtml\Button\Campaign\Campaign</frontend_model>
+                    <comment><![CDATA[Click to view the all active campaign list]]></comment>
+                </field>
+            </group>
+
+        </section>
+
+        <section id="bfcache" translate="label" sortOrder="301" showInDefault="1">
+            <label>BF Cache</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_Productify::productify_bf_cache</resource>
+            <group id="general" translate="label" sortOrder="10" showInDefault="1">
+                <label>General Settings</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1">
+                    <label>Enable PLP Snapshot Restore</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="max_age" translate="label comment" type="text" sortOrder="20" showInDefault="1">
+                    <label>Snapshot Max Age (seconds)</label>
+                    <comment>How long a snapshot stays valid in sessionStorage. Default: 600</comment>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
+            </group>
+        </section>
+
+        <!-- Related products carousel — merged from Evalent_RelatedCarouselProducts -->
+        <section id="catalog">
+            <group id="related_carousel_products" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label">
+                <label>Related Carousel Products</label>
+                <field id="enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <comment>Show carousel related product</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enabled_request_param" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="select">
+                    <label>Use Request Param</label>
+                    <comment>Use request parameter to display block</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="request_param_name" showInDefault="1" showInStore="1" showInWebsite="1" canRestore="1" sortOrder="30" translate="label" type="text">
+                    <label>Request Parameter Name</label>
+                </field>
+                <field id="request_param_value" showInDefault="1" showInStore="1" showInWebsite="1" canRestore="1" sortOrder="40" translate="label" type="text">
+                    <label>Request Parameter Value</label>
+                </field>
+                <field id="list_size" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+                    <label>List size</label>
+                    <comment>Amount of products which will be displayed in carousel</comment>
+                </field>
+                <field id="attribute_1" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="select">
+                    <label>Main attribute</label>
+                    <comment>The main attribute which will be in the sorting</comment>
+                    <source_model>CarpetAvenue\Productify\Model\Source\Product\Attribute</source_model>
+                </field>
+                <field id="attribute_2" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label" type="select">
+                    <label>Secondary Attribute</label>
+                    <comment>The secondary attribute which will be in the sorting</comment>
+                    <source_model>CarpetAvenue\Productify\Model\Source\Product\Attribute</source_model>
+                </field>
+                <field id="underline_color" showInDefault="1" showInStore="1" showInWebsite="1" canRestore="1" sortOrder="80" translate="label" type="text">
+                    <label>Underline color</label>
+                    <comment>Underline color under products</comment>
+                </field>
+                <field id="price_color" showInDefault="1" showInStore="1" showInWebsite="1" canRestore="1" sortOrder="90" translate="label" type="text">
+                    <label>Price color</label>
+                </field>
+                <field id="product_name_color" showInDefault="1" showInStore="1" showInWebsite="1" canRestore="1" sortOrder="100" translate="label" type="text">
+                    <label>Product name color</label>
+                </field>
+            </group>
+        </section>
+
+        <section id="tax">
+            <group id="display">
+                <field id="vat_text" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Incl Vat. Text</label>
+                    <comment>Write here a text which will be displayed after price</comment>
+                </field>
+                <field id="excl_vat_text" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Excl Vat. Text</label>
+                    <comment>Write here a text which will be displayed after price</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

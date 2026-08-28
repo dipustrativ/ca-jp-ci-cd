@@ -1,0 +1,80 @@
+<?php
+/**
+ * @var $block CarpetAvenue\Productify\Block\Product\List\SimilarProductBlock
+ */
+
+$_product = $block->getProduct();
+$_enableCatalogSearchApi = $block->getEnableSimilarProductCatalogSearchApi();
+?>
+
+<?php if ($_enableCatalogSearchApi): ?>
+    <?php
+    $width = $_product->getData('width2');
+    $height = $_product->getData('height2');
+    $productionType = $_product->getData('production_type');
+    $color = $_product->getData('color');
+
+    $searchWidthHigh = 1 + (15 / 100);
+    $searchWidthLow = 1 - (15 / 100);
+
+    $searchWidthHigh = $block->getSearchWidthHigh() ?: $searchWidthHigh;
+    $searchWidthLow = $block->getSearchWidthLow() ?: $searchWidthLow;
+
+    $width2Range = $width ? round($width * $searchWidthLow) . '-' . round($width * $searchWidthHigh) : '';
+    $height2Range = $height ? round($height * $searchWidthLow) . '-' . round($height * $searchWidthHigh) : '';
+    ?>
+
+    <div class="catalog-product-similar-ajax"
+         data-mage-init='{
+        "CarpetAvenue_Productify/js/similar-products-ajax": {
+            "similarProductTitle": <?= json_encode(__('You might also like')) ?>,
+            "showAllTax": <?= json_encode(__('Show All')) ?>,
+            "productId": <?= (int) $_product->getId() ?>,
+            "productName": <?= json_encode($_product->getName()) ?>,
+            "width2": <?= json_encode($width2Range) ?>,
+            "height2": <?= json_encode($height2Range) ?>,
+            "productionType": <?= json_encode($productionType) ?>,
+            "sortColor": <?= json_encode($color) ?>,
+            "listSize": <?= (int) $block->getListSize() ?>
+        }
+     }'>
+    </div>
+
+<?php else: ?>
+<div class="catalog-product-similar-ajax"
+     data-mage-init='{"CarpetAvenue_Productify/js/similar-products-ajax-custom":{"productId":"<?php echo $_product->getId(); ?>","ajaxUrl":<?= /* @noEscape */ json_encode($block->getUrl('productify/similarto/ajax', ['product' => (int) $_product->getId()])) ?>}}'>
+</div>
+
+<?php endif; ?>
+
+<style>
+    .widget_category-btn-holder--mobile {
+        display: none;
+    }
+    @media (max-width: 768px) {
+        .catalog-product-similar-ajax .block-content {
+            margin-bottom: 0;
+        }
+        .catalog-product-similar-ajax .block-title.title {
+            width: 100% !important;
+        }
+        .catalog-product-similar-ajax .widget_category-btn-holder {
+            display: none;
+        }
+        .catalog-product-similar-ajax + .widget_category-btn-holder--mobile {
+            display: block;
+            text-align: center;
+        }
+        .catalog-product-similar-ajax + .widget_category-btn-holder--mobile .action.similar {
+            font-size: 17px;
+            font-weight: 400;
+            width: calc(100% - 50px);
+            max-width: 300px;
+            display: inline-block;
+            text-align: center;
+            margin-bottom: 20px;
+            margin-top: -50px;
+        }
+    }
+</style>
+

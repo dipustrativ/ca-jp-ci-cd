@@ -1,0 +1,256 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+
+/**
+ * Product view template
+ *
+ * @var $block \Magento\Catalog\Block\Product\View\Description
+ */
+?>
+<?php
+$_helper = $this->helper(Magento\Catalog\Helper\Output::class);
+$_productionTypeHelper = $this->helper(CarpetAvenue\Productify\Helper\ProductionType::class);
+$_product = $block->getProduct();
+
+if (!$_product instanceof \Magento\Catalog\Model\Product) {
+    return;
+}
+
+$_call = $block->getAtCall();
+$_code = $block->getAtCode();
+
+$_className = $block->getCssClass();
+$_attributeLabel = $block->getAtLabel();
+$_attributeType = $block->getAtType();
+$_attributeAddAttribute = $block->getAddAttribute();
+
+$renderLabel = true;
+// if defined as 'none' in layout, do not render
+if ($_attributeLabel == 'none') {
+    $renderLabel = false;
+}
+
+if ($_attributeLabel && $_attributeLabel == 'default') {
+    $_attributeLabel = $_product->getResource()->getAttribute($_code)->getStoreLabel();
+}
+if ($_attributeType && $_attributeType == 'text') {
+    $_attributeValue = ($_helper->productAttribute($_product, $_product->$_call(), $_code))
+        ? $_product->getAttributeText($_code)
+        : '';
+} else {
+    $_attributeValue = $_helper->productAttribute($_product, $_product->$_call(), $_code);
+}
+if ($_code == 'description') {
+    $_attributeValue = $_product->getData('description');
+}
+?>
+
+<?php if ($_attributeValue) : ?>
+    <?php if ($_code == 'production_type'):
+        $productHelper = $this->helper('CarpetAvenue\Productify\Helper\ProductHelper');
+        ?>
+
+
+            <?php
+            $data = explode(',', $_product->getData('production_type'));
+            $productionType_base = $productHelper->getProductProductionType($_product);
+
+            foreach ($data as $value):
+                ?>
+                <?php
+                $attr = $_product->getResource()->getAttribute('production_type');
+
+                if ($attr->usesSource()): ?>
+                    <?php
+                    $option_value = $attr->getSource()->getOptionText($value);
+
+                    // Don't show "Machine knotted" / "Hand & Machine"
+                    if ($productionType_base === "Machine knotted" || $productionType_base === "Hand & Machine"): continue; endif;
+                    ?>
+                <div>
+                    <?php echo $option_value; ?>
+                </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+
+        <?php
+        if ($_productionTypeHelper->isProductUnique($_product)):
+            echo "<div>" . __('Unique') . "</div>";
+        endif;
+        ?>
+    <?php elseif($_code == "carpient_description"): ?>
+
+        <div class="collapsible-block" id="collapsible-carpient-desc" style="margin-bottom: 20px">
+            <div class="attributes-collapse-trigger" data-role="trigger">
+                <h3><?= __("Description"); ?></h3>
+                <span class="collapse-arrow"></span>
+            </div>
+            <div data-role="content">
+                <div class="product-short_description carpient" <?= /* @noEscape */
+                $_attributeAddAttribute ?>>
+                    <?= /* @noEscape */ $_attributeValue ?>
+                </div>
+            </div>
+        </div>
+
+    <?php else: ?>
+
+    <?php if($_code == "description"): ?>
+        <div class="collapsible-block" id="collapsible-description">
+            <div class="attributes-collapse-trigger" data-role="trigger">
+                <h3><?= __("Description"); ?></h3>
+                <span class="collapse-arrow"></span>
+            </div>
+            <div data-role="content">
+        <?php endif; ?>
+
+        <div class="product attribute <?= $block->escapeHtmlAttr($_className) ?>">
+            <?php if ($renderLabel) : ?>
+                <strong class="type"><?= $block->escapeHtml($_attributeLabel) ?></strong>
+            <?php endif; ?>
+            <div class="value" <?= /* @noEscape */
+            $_attributeAddAttribute ?>><?= /* @noEscape */
+                $_attributeValue ?></div>
+        </div>
+
+        <?php if($_code == "description"): ?>
+            </div>
+        </div>
+        <?php endif; ?>
+    <?php endif; ?>
+<?php endif; ?>
+
+<script>
+    require(['jquery', 'domReady!'], function ($) {
+        if (window._collapsibleBlockInitialized) return;
+        window._collapsibleBlockInitialized = true;
+
+        var MORE = <?= /* @noEscape */ json_encode(__('Read more')->render()) ?>;
+        var LESS = <?= /* @noEscape */ json_encode(__('Read less')->render()) ?>;
+
+        // Wrap description text into read-more structure (JS only, no PHP markup).
+        // Collapsed state shows the first complete sentence as plain text;
+        // expanded state restores the full original HTML.
+        // Works for both #collapsible-description (.value) and
+        // #collapsible-carpient-desc (.product-short_description).
+        function buildReadmore($block) {
+            var $value = $block.find('.value, .product-short_description').first();
+            if (!$value.length || $value.data('readmoreReady')) return;
+            $value.data('readmoreReady', true);
+
+            var fullHtml = $value.html();
+            var fullText = $.trim($value.text());
+            // First two sentences: each ends with . ! or ? followed by whitespace/end
+            // (lookahead keeps decimals like "1.5 mm" intact)
+            var match = fullText.match(/^(?:[\s\S]*?[.!?](?=\s|$)\s*){1,2}/);
+            var firstSentence = $.trim(match ? match[0] : fullText);
+
+            // Nothing beyond the first sentence — no toggle needed
+            if ($.trim(fullText.slice(firstSentence.length)) === '') return;
+
+            $value.addClass('description-readmore')
+                .data('fullHtml', fullHtml)
+                .data('firstSentence', firstSentence)
+                .empty()
+                .append($('<div class="description-readmore__text"></div>').text(firstSentence))
+                .append(
+                    '<a href="#" class="description-readmore__toggle" data-role="readmore-toggle">' +
+                    MORE + '</a>'
+                );
+        }
+
+        $(document).on('click', '.collapsible-block [data-role="trigger"]', function () {
+            var $wrapper = $(this).closest('.collapsible-block');
+            var willOpen = !$wrapper.hasClass('_active');
+            $wrapper.toggleClass('_active');
+            if (willOpen) {
+                buildReadmore($wrapper);
+            }
+            $wrapper.find('[data-role="content"]').slideToggle(300);
+        });
+
+        $(document).on('click', '[data-role="readmore-toggle"]', function (e) {
+            e.preventDefault();
+            var $toggle = $(this);
+            var $value = $toggle.closest('.description-readmore');
+            var $text = $value.find('.description-readmore__text');
+            var expand = !$value.hasClass('is-expanded');
+            $value.toggleClass('is-expanded', expand);
+            if (expand) {
+                $text.html($value.data('fullHtml'));
+                $toggle.text(LESS);
+            } else {
+                $text.text($value.data('firstSentence'));
+                $toggle.text(MORE);
+            }
+        });
+
+        $('.collapsible-block [data-role="content"]').hide();
+
+        // Description tabs open by default, collapsed to first sentence
+        $('#collapsible-description, #collapsible-carpient-desc').each(function () {
+            var $wrapper = $(this).addClass('_active');
+            buildReadmore($wrapper);
+            $wrapper.find('[data-role="content"]').show();
+        });
+    });
+</script>
+<style>
+    #collapsible-description {
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+    }
+    .collapsible-block .attributes-collapse-trigger {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        padding: 12px 16px;
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-bottom: 0;
+        user-select: none;
+    }
+    .collapsible-block .attributes-collapse-trigger h3 {
+        margin: 0;
+        font-size: 1.1em;
+    }
+    .collapsible-block .attributes-collapse-trigger .collapse-arrow {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #333;
+        border-bottom: 2px solid #333;
+        transform: rotate(45deg);
+        transition: transform 0.3s ease;
+        margin-left: 10px;
+        left: -3px !important;
+        position: relative;
+    }
+    .collapsible-block._active .attributes-collapse-trigger .collapse-arrow {
+        transform: rotate(-135deg);
+    }
+    .collapsible-block._active .attributes-collapse-trigger {
+        border-radius: 4px 4px 0 0;
+        border-bottom: none;
+    }
+    .collapsible-block [data-role="content"] {
+        display: none;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        padding: 16px;
+    }
+    .description-readmore__toggle {
+        display: inline-block;
+        margin-top: 6px;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+</style>

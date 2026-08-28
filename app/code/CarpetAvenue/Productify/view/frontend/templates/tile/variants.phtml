@@ -1,0 +1,113 @@
+<?php
+
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Product
+ * @package   CarpetAvenue_Productify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/**
+ * @var $block Magento\Framework\View\Element\Template
+ * @var Magento\Catalog\Model\Product $product
+ * @var CarpetAvenue\Productify\ViewModel\VariantCacheView $variantCache
+ */
+
+use CarpetAvenue\Productify\Helper\Data;
+
+$product = $block->getData('product');
+$variantCache = $block->getData('variantCache');
+
+$designId = $product->getData(Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE);
+$isGroup = $product->getData(Data::IS_GROUP_ATTRIBUTE_CODE);
+
+if (empty($designId) || !$isGroup) {
+    return;
+}
+
+// Resolved through the view model, not Product::getAttributeText(): that one
+// re-queries the option table on every call, i.e. once per tile.
+$currentColor = $variantCache->getColorLabel($product);
+
+$variants = $variantCache->getVariantsByDesignId($designId) ?? [];
+
+$colors = array_unique(array_column($variants, Data::COLOR_ATTRIBUTE_CODE));
+$sizes = array_unique(array_column($variants, Data::SIZE_ATTRIBUTE_CODE));
+
+$colorsCount = count($colors);
+$sizeCount = count($sizes);
+
+$width = $product->getData('width');
+$length = $product->getData('length');
+$shape = $product->getData('shape');
+
+// ∅ for round (shape 20) or square (w == l), else W x L cm — see Data::formatSize
+$sizeValue = $block->escapeHtml($this->helper(Data::class)->formatSize($width, $length, $shape));
+?>
+
+<div class="productify-group-meta">
+    <div class="size">
+        <?= /* @noEscape */ $sizeValue ?>
+        <?php if ($sizeCount > 0) : ?>
+            (<?= $block->escapeHtml($sizeCount) ?> <?= /* @noEscape */ ($sizeCount === 1) ? __('size') : __('sizes') ?>)
+        <?php endif; ?>
+    </div>
+
+    <?php if (!empty($variants) && $colorsCount > 1) : ?>
+        <div>
+            <div class="swatches" style="margin-top: 5px;">
+                <?php
+                $uniqueColorVariants = [];
+                $seenColors = [];
+
+                foreach ($variants as $variant) {
+                    if ($variant['config_color'] === $currentColor) {
+                        $uniqueColorVariants[] = $variant;
+                        $seenColors[] = $currentColor;
+                        break;
+                    }
+                }
+
+                // Get one variant per other unique color
+                foreach ($variants as $variant) {
+                    $variantColor = $variant['config_color'];
+                    if ($variantColor !== $currentColor && !in_array($variantColor, $seenColors)) {
+                        $uniqueColorVariants[] = $variant;
+                        $seenColors[] = $variantColor;
+                    }
+                }
+
+                $rendered = 0;
+                foreach ($uniqueColorVariants as $variant) :
+                    if (++$rendered > 3) {
+                        break;
+                    }
+                    ?>
+                    <span class="swatch-image-wrap">
+                    <a href="<?= $block->escapeUrl($variant['url']) ?>">
+                        <?php /* width/height match the CSS (120px, clipped to a 30px
+                                 circle) — they only reserve the box before CSS lands. */ ?>
+                        <img src="<?= $block->escapeUrl($variant['swatch_image']) ?>"
+                             alt="<?= $block->escapeHtmlAttr($variant['config_color'] ?? '') ?>"
+                             width="120" height="120"
+                             loading="lazy" decoding="async">
+                    </a>
+                </span>
+                <?php endforeach; ?>
+
+                <?php
+                $uniqueColorsCount = count($seenColors);
+                if ($uniqueColorsCount > 0) : ?>
+                    <span style="color:#777;">
+                    <?= $block->escapeHtml($uniqueColorsCount) ?> <?= /* @noEscape */ ($uniqueColorsCount === 1) ? __('colour') : __('colours') ?>
+                </span>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Developify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <!-- Cron Manager — status badges and summary tiles -->
+        <css src="CarpetAvenue_Developify::css/cron.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="CarpetAvenue\Developify\Block\Adminhtml\Cron\Summary"
+                   name="developify_cron_summary"
+                   template="CarpetAvenue_Developify::cron/summary.phtml"/>
+            <uiComponent name="developify_cron_listing"/>
+        </referenceContainer>
+    </body>
+</page>

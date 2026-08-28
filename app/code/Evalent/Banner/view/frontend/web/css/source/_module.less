@@ -1,0 +1,858 @@
+@banner__content-padding: 20px;
+@banner__theme-dark-color: #000;
+@banner__theme-light-color: #fff;
+/*
+ * Heading sizes are passed to lib-font-size
+ */
+@banner__heading-size-large: 38;
+@banner__heading-size-medium: 30;
+@banner__heading-size-small: 25;
+@banner__heading-size-xl: 40;
+@banner__heading-size-xxl: 41;
+@banner__heading-size-xxxl: 42;
+
+@banner__heading-desktop-size-small: 40;
+@banner__heading-desktop-size-medium: 50;
+@banner__heading-desktop-size-large: 60;
+@banner__heading-desktop-size-xl: 70;
+@banner__heading-desktop-size-xxl: 80;
+@banner__heading-desktop-size-xxxl: 90;
+
+@banner__heading-margin-xl: 0;
+@banner__heading-margin-large: 0;
+@banner__heading-margin-medium: 0 0 .5rem;
+@banner__heading-margin-small: 0 0 rem;
+
+@banner__heading2-margin-xl: 0 0 .5rem;
+@banner__heading2-margin-large: 0 0 .5rem;
+@banner__heading2-margin-medium: 0 0 .5rem;
+@banner__heading2-margin-small: 0 0 .5rem;
+
+@banner__heading-desktop-margin-xl: 0 0 1rem;
+@banner__heading-desktop-margin-large: 0 0 2rem;
+@banner__heading-desktop-margin-medium: 0 0 2rem;
+@banner__heading-desktop-margin-small: 0 0 1rem;
+
+@layout-page__max-width: 2440px;
+
+@import "_cta_widget";
+
+//
+//  Banner lib namespace
+//  ---------------------------------------------
+#banner-lib {
+
+  // Alignment mixin - pass the desktop/mobile classname as parent
+  .align-mixin(@mode) {
+    .@{mode} {
+      &--center-center {
+        .inner-wrapper {
+          justify-content: center;
+        }
+        .ev-banners__content {
+          -webkit-align-self: center;
+          align-self: center;
+          justify-self: center;
+          bottom: auto;
+          top: auto;
+          left: auto;
+          right: auto;
+
+          .ie11 & {
+            bottom: 25%;
+            top: 25%;
+            left: 25%;
+            right: 25%;
+          }
+        }
+
+        .ie11 & {
+          picture {
+            overflow: hidden;
+          }
+        }
+      }
+      &--center-left {
+        .ev-banners__content {
+          left: 0;
+          right: auto;
+          bottom: auto;
+          top: auto;
+          align-self: center;
+        }
+      }
+      &--center-right {
+        .ev-banners__content {
+          left: auto;
+          right: 0;
+          bottom: auto;
+          top: auto;
+          align-self: center;
+        }
+      }
+      &--bottom-left {
+        .ev-banners__content {
+          left: 0;
+          bottom: 0;
+          top: auto;
+          right: auto;
+        }
+      }
+      &--bottom-right {
+        .ev-banners__content {
+          left: auto;
+          bottom: 0;
+          top: auto;
+          right: 0;
+        }
+      }
+      &--bottom-center {
+        .inner-wrapper {
+          justify-content: center;
+        }
+        .ev-banners__content {
+          justify-self: center;
+          left: auto;
+          bottom: 0;
+          top: auto;
+          right: auto;
+
+          .ie11 & {
+            bottom: 0px;
+            top: auto;
+            left: 25%;
+            right: 25%;
+          }
+        }
+      }
+      &--top-left {
+        .ev-banners__content {
+          left: 0;
+          bottom: auto;
+          top: 0;
+          right: auto;
+        }
+      }
+      &--top-right {
+        .ev-banners__content {
+          left: auto;
+          bottom: auto;
+          top: 0;
+          right: 0;
+        }
+      }
+      &--top-center {
+        .ev-banners__content {
+          justify-self: center;
+          left: auto;
+          bottom: auto;
+          top: 0;
+          right: auto;
+        }
+      }
+    }
+  }
+
+  // Margins mixin - pass the desktop/mobile classname as parent and margin direction
+  .margins-mixin(@mode, @direction) {
+    .ev-banners.@{mode} {
+      &--none {
+        margin-@{direction}: 0;
+      }
+      &--thinest {
+        margin-@{direction}: 5px;
+      }
+      &--thin {
+        margin-@{direction}: 10px;
+      }
+      &--medium {
+        margin-@{direction}: 15px;
+      }
+      &--wide {
+        margin-@{direction}: 20px;
+      }
+      &--xwide {
+        margin-@{direction}: 30px;
+      }
+    }
+  }
+
+  // Padding mixin  - pass the desktop/mobile classname as parent
+  .gutters-mixin(@mode) {
+    .@{mode} {
+      &--none {
+        &.ev-banners--multiple__banner {
+          padding-left: 0;
+          padding-right: 0;
+        }
+      }
+      &--small {
+        &.ev-banners--multiple__banner {
+          padding-left: 5px;
+          padding-right: 5px;
+        }
+      }
+      &--medium {
+        &.ev-banners--multiple__banner {
+          padding-left: 10px;
+          padding-right: 10px;
+        }
+      }
+        &--large {
+            &.ev-banners--multiple__banner {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+        &--xlarge {
+            &.ev-banners--multiple__banner {
+                padding-left: 3%;
+                padding-right: 3%;
+            }
+        }
+        &--xxlarge {
+            &.ev-banners--multiple__banner {
+                padding-left: 4%;
+                padding-right: 4%;
+            }
+        }
+    }
+  }
+
+  // Gutter row margins - pass the desktop/mobile classname as parent
+  .row-gutters-mixin(@mode) {
+    .ev-banners.@{mode} {
+      &--none {
+        margin-left: 0;
+        margin-right: 0;
+      }
+      &--small {
+        margin-left: -5px;
+        margin-right: -5px;
+      }
+      &--medium {
+        margin-left: -10px;
+        margin-right: -10px;
+      }
+    }
+  }
+
+  // Text align for banner content - pass the desktop/mobile classname as parent
+  .text-align-mixin(@mode) {
+    .@{mode}  {
+      &--left {
+        .ev-banners__content {
+          text-align: left;
+        }
+      }
+      &--right {
+        .ev-banners__content {
+          text-align: right;
+        }
+      }
+      &--center {
+        .ev-banners__content {
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+& when (@media-common = true) {
+  .ev-banners {
+
+    //
+    //  Layout content
+    //  ---------------------------------------------
+    &--multiple, &--single {
+      &__banner {
+        position: relative;
+        .lib-vendor-prefix-display(flex);
+        overflow: hidden;
+      }
+    }
+    .inner-wrapper {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      .lib-vendor-prefix-display(flex);
+    }
+    &__content {
+      position: absolute;
+      padding: @banner__content-padding;
+      bottom: 0;
+      z-index: 2;
+    }
+    &__link {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    picture {
+      .lib-vendor-prefix-display(inline-flex);
+      .lib-vendor-prefix-flex-direction(column);
+    }
+    picture, img {
+      object-fit: cover; // Make the image fill the container
+    }
+    .ie11 & {
+      picture {
+        display: block;
+      }
+    }
+
+    //
+    //  Themes (general content)
+    //  ---------------------------------------------
+    .content-theme {
+      &--light {
+        .ev-banners {
+          &__content {
+            .lib-css(color, @banner__theme-light-color);
+
+            &__heading {
+              .lib-css(color, @banner__theme-light-color);
+            }
+          }
+        }
+      }
+      &--dark {
+        .ev-banners {
+          &__content {
+            .lib-css(color, @banner__theme-dark-color);
+
+            &__heading {
+              .lib-css(color, @banner__theme-dark-color);
+            }
+          }
+        }
+      }
+
+
+        &--gold, &--silver {
+            .ev-banners__content__heading {
+                background: radial-gradient(ellipse farthest-corner at right bottom, #FEDB37 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%), radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #FFFFAC 8%, #D1B464 25%, #5d4a1f 62.5%, #5d4a1f 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-shadow: none !important;
+                line-height: 1;
+            }
+            .ev-banners__content {
+                &__button {
+                    background: radial-gradient(ellipse farthest-corner at right bottom, #FEDB37 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%),
+                    radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #FFFFAC 8%, #D1B464 25%, #5d4a1f 62.5%, #5d4a1f 100%);
+                    box-shadow: -5px 5px 10px #000000;
+                    color: #000000;
+                }
+                &__description,
+                &__heading--secondary {
+                    background: linear-gradient(-45deg, #efbb4e, #fffbd4, #efbb4e, #fffbd4, #AA771C);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    color: #fff;
+                    text-shadow: none !important;
+                    position: relative;
+                }
+
+                &__heading,
+                &__description,
+                &__heading--secondary {
+                    &:after {
+                        background: none;
+                        content: attr(data-heading) / "";
+                        left: 0;
+                        right: 0;
+                        top: 0;
+                        z-index: -1;
+                        position: absolute;
+                        text-shadow: -3px 3px 3px #000000;
+                    }
+                }
+            }
+        }
+        &--silver {
+            .ev-banners__content__heading {
+                background: linear-gradient(0deg, #e8e8e8 0%, #6b6b6b 33%, #d1d1d1 66%, #7d7d7d 90%, #ffffff 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            .ev-banners__content {
+                &__button {
+                    background: linear-gradient(320deg, #e8e8e8 0%, #6b6b6b 33%, #d1d1d1 66%, #7d7d7d 90%, #ffffff 100%);
+                }
+                &__description,
+                &__heading--secondary {
+                    background: linear-gradient(0deg, #e8e8e8 0%, #6b6b6b 33%, #d1d1d1 66%, #7d7d7d 90%, #ffffff 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    text-shadow: none !important;
+                }
+            }
+        }
+
+
+        &--custom {
+            .ev-banners {
+                &__content {
+                    color: var(--content-custom-color);
+                }
+            }
+        }
+    }
+
+    //
+    //  Themes (button)
+    //  ---------------------------------------------
+    &__content__button {
+      padding: 5px 10px 5px 0px;
+      border: 0;
+      -o-transition: background-color 0.25s, color 0.25s;
+      -moz-transition: background-color 0.25s, color 0.25s;
+      -webkit-transition: background-color 0.25s, color 0.25s;
+      transition: background-color 0.25s, color 0.25s;
+
+      // Outlined button
+      .ev-banners .button-style--outlined & {
+        border: 2px solid;
+
+        &:not(:hover) {
+          .lib-css(background-color, transparent);
+        }
+      }
+
+      // Light theme
+      .ev-banners .content-theme--light & {
+        border-color: @banner__theme-light-color;
+        .lib-css(background-color, @banner__theme-light-color);
+        .lib-css(color, @banner__theme-dark-color);
+      }
+
+      .ev-banners .content-theme--light.button-style--outlined & {
+        .lib-css(color, @banner__theme-light-color);
+
+        &:not(:hover) {
+          .lib-css(background-color, transparent);
+        }
+      }
+
+      // Dark theme
+      .ev-banners .content-theme--dark & {
+        border-color: @banner__theme-dark-color;
+
+        &:not(:hover) {
+          .lib-css(background-color, @banner__theme-dark-color);
+          .lib-css(color, @banner__theme-light-color);
+        }
+      }
+
+      .ev-banners .content-theme--dark.button-style--outlined & {
+        .lib-css(color, @banner__theme-dark-color);
+
+        &:not(:hover) {
+          .lib-css(background-color, transparent);
+        }
+      }
+
+        .ev-banners .content-theme--custom & {
+            .lib-css(color, @banner__theme-dark-color);
+            .lib-css(color, var(--buttontext-custom-color));
+            .lib-css(background-color, var(--content-custom-color));
+        }
+
+      // Hover effect
+      &:hover {
+        text-decoration: none;
+
+        .ev-banners .content-theme--light.button-style--outlined & {
+          background-color: @banner__theme-light-color;
+          .lib-css(color, @banner__theme-dark-color);
+        }
+        .ev-banners .content-theme--dark.button-style--outlined & {
+          background-color: @banner__theme-dark-color;
+          .lib-css(color, @banner__theme-light-color);
+        }
+      }
+    }
+
+    //
+    //  Animations
+    //  ---------------------------------------------
+    .animation--zoom {
+      picture {
+        transition: transform 0.5s;
+      }
+
+      &:hover {
+        picture {
+          transform: scale(1.5);
+        }
+      }
+    }
+
+    //
+    //  Fullscreen (width) banners
+    //  ---------------------------------------------
+    &-display--fullscreen {
+      // Stretch container outside bounds of parent
+        max-width: @layout-page__max-width;
+
+      & > div {
+        width: 100%;
+      }
+
+      picture, img {
+        margin: auto;
+        width: 100%;
+      }
+    }
+  }
+}
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__s) {
+  .ev-banners {
+    // Set top/bottom gutter padding on S mobile
+    .gutter--mobile {
+      &--small {
+        &.ev-banners--multiple__banner {
+          padding-top: 5px;
+          padding-bottom: 5px;
+        }
+      }
+      &--medium {
+        &.ev-banners--multiple__banner {
+          padding-top: 10px;
+          padding-bottom: 10px;
+        }
+      }
+    }
+  }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+  .ev-banners {
+    //
+    //  Alignment (mobile)
+    //  ---------------------------------------------
+    #banner-lib.align-mixin(align--mobile);
+    //
+    //  Paddings (mobile)
+    //  ---------------------------------------------
+    #banner-lib.gutters-mixin(gutter--mobile);
+    //
+    //  Text align (mobile)
+    //  ---------------------------------------------
+    #banner-lib.text-align-mixin(text-align--mobile);
+    //
+    //  Heading size (mobile)
+    //  ---------------------------------------------
+    &__content__heading {
+        &.size--mobile--xs {
+            .lib-font-size(18);
+            margin: @banner__heading-margin-small;
+        }
+
+      &.size--mobile--small {
+        .lib-font-size(@banner__heading-size-small);
+        margin: @banner__heading-margin-small;
+      }
+      &.size--mobile--medium {
+        .lib-font-size(@banner__heading-size-medium);
+        margin: @banner__heading-margin-medium;
+      }
+      &.size--mobile--large {
+        .lib-font-size(@banner__heading-size-large);
+        margin: @banner__heading-margin-large;
+      }
+        &.size--mobile--xl {
+            .lib-font-size(@banner__heading-size-xl);
+            margin: @banner__heading-margin-large;
+        }
+        &.size--mobile--xxl {
+            .lib-font-size(@banner__heading-size-xxl);
+            margin: @banner__heading-margin-large;
+        }
+        &.size--mobile--xxxl {
+            .lib-font-size(@banner__heading-size-xxxl);
+            margin: @banner__heading-margin-large;
+        }
+
+        &--secondary {
+
+            &.size--mobile--xs {
+                .lib-font-size(15);
+                margin: @banner__heading2-margin-small;
+            }
+            &.size--mobile--small {
+                .lib-font-size(18);
+                margin: @banner__heading2-margin-small;
+            }
+            &.size--mobile--medium {
+                .lib-font-size(20);
+                margin: @banner__heading2-margin-medium;
+            }
+            &.size--mobile--large {
+                .lib-font-size(22);
+                margin: @banner__heading2-margin-large;
+            }
+            &.size--mobile--xl {
+                .lib-font-size(25);
+                margin: @banner__heading2-margin-xl;
+            }
+            &.size--mobile--xxl {
+                .lib-font-size(28);
+                margin: @banner__heading2-margin-xl;
+            }
+            &.size--mobile--xxxl {
+                .lib-font-size(30);
+                margin: @banner__heading2-margin-xl;
+            }
+
+        }
+    }
+
+      &__content__button {
+          margin-top: 1rem;
+          display: inline-block;
+
+          &.size--mobile--xxxl {
+              .lib-font-size(30);
+          }
+          &.size--mobile--xxl {
+              .lib-font-size(28);
+          }
+          &.size--mobile--xl {
+              .lib-font-size(26);
+          }
+          &.size--mobile--large {
+              .lib-font-size(25);
+          }
+          &.size--mobile--medium {
+              .lib-font-size(22);
+          }
+          &.size--mobile--small {
+              .lib-font-size(18);
+          }
+          &.size--mobile--xs {
+              .lib-font-size(15);
+          }
+      }
+
+      &__content__description {
+          &.size--mobile--xs {
+              .lib-font-size(15);
+          }
+          &.size--mobile--small {
+              .lib-font-size(18);
+              margin: 1rem 0 0;
+          }
+          &.size--mobile--medium {
+              .lib-font-size(20);
+              margin: 1rem 0 0;
+          }
+          &.size--mobile--large {
+              .lib-font-size(22);
+              margin: 1rem 0 0;
+          }
+          &.size--mobile--xl {
+              .lib-font-size(25);
+              margin: 1rem 0 0;
+          }
+          &.size--mobile--xxl {
+              .lib-font-size(28);
+              margin: 1rem 0 0;
+          }
+          &.size--mobile--xxxl {
+              .lib-font-size(30);
+              margin: 1rem 0 0;
+          }
+      }
+    //
+    //  Hidden (mobile)
+    //  ---------------------------------------------
+    .hidden-xs {
+      display: none;
+    }
+  }
+  //
+  //  Flex row negative margins (mobile)
+  //  ---------------------------------------------
+  #banner-lib.row-gutters-mixin(row-gutter--mobile);
+  //
+  //  Margins (mobile)
+  //  ---------------------------------------------
+  #banner-lib.margins-mixin(margin-top--mobile, top);
+  #banner-lib.margins-mixin(margin-bottom--mobile, bottom);
+}
+
+//
+//  Desktop
+//  ---------------------------------------------
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+  .ev-banners {
+    //
+    //  Alignment (desktop)
+    //  ---------------------------------------------
+    #banner-lib.align-mixin(align--desktop);
+    //
+    //  Paddings (desktop)
+    //  ---------------------------------------------
+    #banner-lib.gutters-mixin(gutter--desktop);
+    //
+    //  Text align (desktop)
+    //  ---------------------------------------------
+    #banner-lib.text-align-mixin(text-align--desktop);
+
+      .ev-banners__content {
+          .size--desktop--extra_large {
+            font-size: 122px;
+          }
+          .ev-banners {
+              &__content__button {
+                  margin-top: 1rem;
+                  display: inline-block;
+
+                  &.size--desktop--xxxl {
+                      .lib-font-size(50);
+                  }
+                  &.size--desktop--xxl {
+                      .lib-font-size(45);
+                  }
+                  &.size--desktop--xl {
+                      .lib-font-size(40);
+                  }
+                  &.size--desktop--large {
+                      .lib-font-size(35);
+                  }
+                  &.size--desktop--medium {
+                      .lib-font-size(30);
+                  }
+                  &.size--desktop--small {
+                      .lib-font-size(25);
+                  }
+                  &.size--desktop--xs {
+                      .lib-font-size(20);
+                  }
+              }
+
+              &__content__description {
+                  margin: 2rem 0 0;
+
+                  &.size--desktop--xxxl {
+                      .lib-font-size(70);
+                  }&.size--desktop--extra_large {
+                      .lib-font-size(122);
+                  }
+                  &.size--desktop--xxl {
+                      .lib-font-size(60);
+                  }
+                  &.size--desktop--xl {
+                      .lib-font-size(50);
+                  }
+                  &.size--desktop--large {
+                      .lib-font-size(40);
+                  }
+                  &.size--desktop--medium {
+                      .lib-font-size(30);
+                  }
+                  &.size--desktop--small {
+                      .lib-font-size(25);
+                  }
+                  &.size--desktop--xs {
+                      .lib-font-size(20);
+                  }
+
+                  & + .ev-banners__content__button {
+                      margin-top: 2rem;
+                  }
+              }
+
+              //
+              //  Heading size (desktop)
+              //  ---------------------------------------------
+              &__content__heading {
+                  margin-bottom: 1.5rem;
+
+                  &.size--desktop--xs {
+                      .lib-font-size(18);
+                      margin: @banner__heading-desktop-margin-small;
+                  }
+                  &.size--desktop--small {
+                      .lib-font-size(@banner__heading-desktop-size-small);
+                      margin: @banner__heading-desktop-margin-small;
+                  }
+                  &.size--desktop--medium {
+                      .lib-font-size(@banner__heading-desktop-size-medium);
+                      margin: @banner__heading-desktop-margin-medium;
+                  }
+                  &.size--desktop--large {
+                      .lib-font-size(@banner__heading-desktop-size-large);
+                      margin: @banner__heading-desktop-margin-large;
+                  }
+                  &.size--desktop--xl {
+                      .lib-font-size(@banner__heading-desktop-size-xl);
+                      margin: @banner__heading-desktop-margin-xl;
+                  }
+                  &.size--desktop--xxl {
+                      .lib-font-size(@banner__heading-desktop-size-xxl);
+                      margin: @banner__heading-desktop-margin-xl;
+                  }
+                  &.size--desktop--xxxl {
+                      .lib-font-size(@banner__heading-desktop-size-xxxl);
+                      margin: @banner__heading-desktop-margin-xl;
+                  }
+
+                  &--secondary {
+                      margin-bottom: 1.5rem;
+
+                      &.size--desktop--xxxl {
+                          font-size: 7rem;
+                      }
+                      &.size--desktop--xxl {
+                          font-size: 6rem;
+                      }
+                      &.size--desktop--xl {
+                          font-size: 5rem;
+                      }
+                      &.size--desktop--large {
+                          font-size: 4rem;
+                      }
+                      &.size--desktop--medium {
+                          font-size: 3rem;
+                      }
+                      &.size--desktop--small {
+                          font-size: 2.5rem;
+                      }
+                      &.size--desktop--xs {
+                          font-size: 2rem;
+                      }
+                  }
+
+              }
+          }
+      }
+
+    //
+    //  Hidden (desktop)
+    //  ---------------------------------------------
+    .hidden-m {
+      display: none;
+    }
+  }
+  //
+  //  Flex row negative margins (desktop)
+  //  ---------------------------------------------
+  #banner-lib.row-gutters-mixin(row-gutter--desktop);
+  //
+  //  Margins (desktop)
+  //  ---------------------------------------------
+  #banner-lib.margins-mixin(margin-top--desktop, top);
+  #banner-lib.margins-mixin(margin-bottom--desktop, bottom);
+}

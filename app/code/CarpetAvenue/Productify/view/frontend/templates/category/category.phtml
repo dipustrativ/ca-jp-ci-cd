@@ -1,0 +1,90 @@
+<?php
+/**
+ * @var $block CarpetAvenue\Productify\Block\Product\Category\CategoryList
+ */
+$currentCategory = $block->getCurrentCategory();
+if ($currentCategory->getData('level') != 3) return;
+?>
+
+<div class="container collection-subcategories">
+    <?php foreach ($block->getSubcategories() as $category): ?>
+        <?php $categoryUrl = !empty($category->getCustomUrl()) ? $category->getCustomUrl() : $category->getUrl(); ?>
+        <a href="<?= $categoryUrl; ?>" class="subcategory-card">
+            <?php if ($category->getThumbnail()): ?>
+                <img src="<?= $block->getImageUrl($category->getThumbnail(), 200, 200) ?>"
+                     alt="<?= $category->getName(); ?>" />
+            <?php else: ?>
+                <img src="" alt="<?= $category->getName(); ?>" />
+            <?php endif;?>
+            <span><?= $category->getName() ?></span>
+        </a>
+    <?php endforeach; ?>
+</div>
+
+<style>
+    .collection-subcategories {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 2rem;
+        margin-bottom: 20px;
+    }
+    .subcategory-card {
+        text-align: center;
+        text-decoration: none;
+        color: inherit;
+        padding: 3px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .subcategory-card img,
+    .subcategory-card .placeholder-image {
+        width: 100%;
+        aspect-ratio: 2 / 1;
+        object-fit: cover;
+        background: #eee;
+        transition: transform 0.3s ease;
+    }
+    .subcategory-card span {
+        display: block;
+        margin-top: 0.5rem;
+        font-weight: 600;
+    }
+    .subcategory-card:hover {
+        transform: translateY(4px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    .subcategory-card:hover img {
+        transform: scale(1.03);
+    }
+    @media (max-width: 768px) {
+        .collection-subcategories {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scroll-snap-type: x proximity;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 0.5rem;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .collection-subcategories::-webkit-scrollbar {
+            display: none;
+        }
+        .subcategory-card {
+            flex: 0 0 auto;
+            width: 38vw;
+            max-width: 160px;
+            scroll-snap-align: start;
+            padding: 0;
+        }
+        .subcategory-card span {
+            margin-top: 0.35rem;
+            font-size: 13px;
+        }
+        .collection-subcategories::after {
+            content: '';
+            flex: 0 0 1rem;
+        }
+    }
+</style>

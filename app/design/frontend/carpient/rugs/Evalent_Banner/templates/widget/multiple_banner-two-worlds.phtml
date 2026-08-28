@@ -1,0 +1,70 @@
+<?php
+/**
+ * Carpient "Two Worlds of Rugs" gallery layout for the Banner group widget.
+ * Renders N image tiles in a responsive grid (N = number of banners added):
+ * 3 banners => 3 columns, 2 => 2 columns. Design mirrors carpient.com cc-gallery.
+ *
+ * @var \Evalent\Banner\Block\Widget\MultipleBanner $block
+ */
+
+use Evalent\Banner\Api\Data\BannerInterface;
+
+$bannerItems = $block->getBanners();
+$count = (is_array($bannerItems) || $bannerItems instanceof \Countable) ? count($bannerItems) : 0;
+
+$mtD = $block->getData('margin_top_desktop');
+$mbD = $block->getData('margin_bottom_desktop');
+$mtM = $block->getData('margin_top_mobile');
+$mbM = $block->getData('margin_bottom_mobile');
+?>
+<?php if ($count): ?>
+<div class="carpient-gallery margin-top--desktop--<?= $block->escapeHtmlAttr($mtD) ?> margin-bottom--desktop--<?= $block->escapeHtmlAttr($mbD) ?> margin-top--mobile--<?= $block->escapeHtmlAttr($mtM) ?> margin-bottom--mobile--<?= $block->escapeHtmlAttr($mbM) ?>"
+     style="--cw-cols: <?= (int) $count ?>;">
+    <?php foreach ($bannerItems as $bannerItem): ?>
+        <?php
+        /** @var \Evalent\Banner\Model\Data\Banner $banner */
+        $banner    = $bannerItem->getBanner();
+        $heading   = $banner->getHeading();
+        $desc      = $banner->getDescription();
+        $btnText   = $banner->getButtonText();
+        $linkUrl   = $banner->getBannerLinkUrl();
+        $newWindow = $banner->getBannerLinkUrlNewWindow();
+        $imgD      = $banner->getImageUrl(BannerInterface::DESKTOP_IMAGE);
+        $imgM      = $banner->getImageUrl(BannerInterface::MOBILE_IMAGE);
+        $tag       = $banner->getHeadingTag() ?: 'h3';
+        ?>
+        <a class="carpient-gallery__tile"
+           href="<?= $linkUrl ? $block->escapeUrl($linkUrl) : '#' ?>"
+           target="<?= $newWindow === '1' ? '_blank' : '_self' ?>">
+            <div class="carpient-gallery__media">
+                <?php if ($imgD): ?>
+                    <img class="lazy-load"
+                         src="<?= $this->getViewFileUrl('Evalent_Banner::images/lazyload_banner.png') ?>"
+                         data-original="<?= $block->escapeUrl($imgD) ?>"
+                         <?php if ($imgM): ?>data-original-srcset="<?= $block->escapeUrl($imgM) ?> 768w, <?= $block->escapeUrl($imgD) ?>"<?php endif; ?>
+                         alt="<?= $block->escapeHtmlAttr(strip_tags((string) $heading)) ?>">
+                <?php endif; ?>
+                <span class="carpient-gallery__overlay"></span>
+            </div>
+            <div class="carpient-gallery__content">
+                <div class="carpient-gallery__title-row">
+                    <?php if ($heading): ?>
+                        <<?= $tag ?> class="carpient-gallery__heading"><?= /* @noEscape */ $heading ?></<?= $tag ?>>
+                    <?php endif; ?>
+                    <span class="carpient-gallery__arrow" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24" width="24" fill="currentColor" class="svg-arrow-collection" style="display: inline-block; vertical-align: middle;">
+                            <path fill-rule="evenodd" d="M12.454 4.281 20.439 12l-7.985 7.719-1.39-1.438L16.527 13H5v-2h11.527l-5.463-5.281z" clip-rule="evenodd"></path>
+                        </svg>
+                    </span>
+                </div>
+                <?php if ($desc): ?>
+                    <p class="carpient-gallery__desc"><?= /* @noEscape */ $desc ?></p>
+                <?php endif; ?>
+                <?php if ($btnText): ?>
+                    <span class="carpient-gallery__button"><?= $block->escapeHtml($btnText) ?></span>
+                <?php endif; ?>
+            </div>
+        </a>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>

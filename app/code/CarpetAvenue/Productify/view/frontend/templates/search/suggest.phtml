@@ -1,0 +1,109 @@
+<?php
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Search suggestion dropdown fragment, returned by
+ * CarpetAvenue\Productify\Controller\Search\Suggest and injected into the
+ * dropdown host by CarpetAvenue_Productify/js/search-suggest.
+ *
+ * @var \CarpetAvenue\Productify\Block\Search\Suggest $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$query = (string) $block->getQuery();
+$categories = $block->getCategories();
+$pages = $block->getPages();
+$products = $block->getProducts();
+$total = (int) $block->getTotal();
+$hasSide = $categories || $pages;
+$hasMain = $block->getProductCount() > 0;
+?>
+<?php if (!$block->hasResults()) : ?>
+    <div class="productify-suggest__empty">
+        <?= /* @noEscape */ __(
+            'Sorry, nothing found for "%1".',
+            '<b>' . $escaper->escapeHtml($query) . '</b>'
+        ) ?>
+    </div>
+<?php else : ?>
+    <div class="productify-suggest__inner<?= $hasSide && $hasMain ? '' : ' productify-suggest__inner--single' ?>">
+        <?php if ($hasSide) : ?>
+            <div class="productify-suggest__side">
+                <?php
+                $groups = [
+                    ['label' => __('Collections'), 'items' => $categories],
+                    ['label' => __('Pages'), 'items' => $pages],
+                ];
+                ?>
+                <?php foreach ($groups as $group) : ?>
+                    <?php if (!$group['items']) : ?>
+                        <?php continue; ?>
+                    <?php endif; ?>
+                    <div class="productify-suggest__group">
+                        <p class="productify-suggest__heading"><?= $escaper->escapeHtml($group['label']) ?></p>
+                        <ul class="productify-suggest__list">
+                            <?php foreach ($group['items'] as $item) : ?>
+                                <?php [$match, $rest] = $block->splitMatch($item['label']); ?>
+                                <li>
+                                    <a class="productify-suggest__link" data-suggest-item
+                                       href="<?= $escaper->escapeUrl($item['url']) ?>">
+                                        <?= $escaper->escapeHtml($block->matchPrefix($item['label'])) ?><?php if ($match) : ?><b><?= $escaper->escapeHtml($match) ?></b><?php endif; ?><?= $escaper->escapeHtml($rest) ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($hasMain) : ?>
+            <div class="productify-suggest__main">
+                <p class="productify-suggest__heading"><?= $escaper->escapeHtml(__('Products')) ?></p>
+                <ul class="productify-suggest__grid">
+                    <?php foreach ($products as $product) : ?>
+                        <?php $size = $block->getSize($product); ?>
+                        <?php $oldPrice = $block->getOldPrice($product); ?>
+                        <li class="productify-suggest__cell">
+                            <a class="productify-suggest__product" data-suggest-item
+                               href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>">
+                                <span class="productify-suggest__thumb">
+                                    <img src="<?= $escaper->escapeUrl($block->getImageUrl($product)) ?>"
+                                         alt="<?= $escaper->escapeHtmlAttr($product->getName()) ?>"
+                                         width="80" height="80"/>
+                                </span>
+                                <span class="productify-suggest__info">
+                                    <span class="productify-suggest__name">
+                                        <?= $escaper->escapeHtml($product->getName()) ?>
+                                    </span>
+                                    <?php if ($size) : ?>
+                                        <span class="productify-suggest__size"><?= $escaper->escapeHtml($size) ?></span>
+                                    <?php endif; ?>
+                                    <span class="productify-suggest__price">
+                                        <span class="productify-suggest__price-label">
+                                            <?= $escaper->escapeHtml(__('Rec. price:')) ?>
+                                        </span>
+                                        <?php if ($oldPrice) : ?>
+                                            <span class="productify-suggest__price-old">
+                                                <?= $escaper->escapeHtml($oldPrice) ?>
+                                            </span>
+                                        <?php endif; ?>
+                                        <span class="productify-suggest__price-value">
+                                            <?= $escaper->escapeHtml($block->getFinalPrice($product)) ?>
+                                        </span>
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+                <?php if ($block->canShowAll()) : ?>
+                    <a class="productify-suggest__all" data-suggest-item
+                       href="<?= $escaper->escapeUrl($block->getResultsUrl()) ?>">
+                        <?= $escaper->escapeHtml(__('View all %1 products', $total)) ?>
+                        <span aria-hidden="true">&#8594;</span>
+                    </a>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>

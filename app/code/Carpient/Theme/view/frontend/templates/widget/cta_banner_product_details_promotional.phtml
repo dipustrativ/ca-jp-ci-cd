@@ -1,0 +1,213 @@
+<?php
+/**
+ * Product Details Promotional CTA — reference carpient.com PDP promo section:
+ * a full-width padded "media with text" band — image on one side, heading +
+ * reading-width intro + button on the other.
+ *
+ *   .section.section--full-width.section--padded
+ *     .container > .media-with-text
+ *       .media-with-text__media   (banner image)
+ *       .media-with-text__content
+ *         .section__block.section__block--heading > h3   (banner heading)
+ *         .section__block.reading-width.rte.enlarge-text (banner secondary heading)
+ *         .section__block.section__block--button > a.btn (button)
+ *
+ * @var \Evalent\Banner\Block\Widget\CtaWidget $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+use Evalent\Banner\Api\Data\BannerInterface;
+
+$banner = $block->getBanner();
+if (!$banner) {
+    return;
+}
+
+$timeZone   = new \DateTimeZone('Europe/Stockholm');
+$dateStart  = $banner->getDateStart();
+$dateEnd    = $banner->getDateEnd();
+$_dateStart = !empty($dateStart) ? date_format(date_create($dateStart . '+ 1 hour', $timeZone), 'Y/m/d H:i') : '';
+$_dateEnd   = !empty($dateEnd) ? date_format(date_create($dateEnd . '+ 1 hour', $timeZone), 'Y/m/d H:i') : '';
+$dateNow    = date('Y/m/d H:i');
+
+if (!empty($_dateStart) && !empty($_dateEnd) && ($_dateEnd < $dateNow || $_dateStart > $dateNow)) {
+    return;
+}
+if (empty($_dateStart) && !empty($_dateEnd) && $_dateEnd < $dateNow) {
+    return;
+}
+if (!empty($_dateStart) && empty($_dateEnd) && $_dateStart > $dateNow) {
+    return;
+}
+
+$imageDesktop = (string) $banner->getImageUrl(BannerInterface::DESKTOP_IMAGE);
+$imageMobile  = (string) $banner->getImageUrl(BannerInterface::MOBILE_IMAGE);
+$heading      = (string) $banner->getHeading();
+$secondary    = (string) $banner->getHeadingSecondary();
+$buttonText   = (string) $banner->getButtonText();
+$buttonUrl    = (string) $banner->getBannerLinkUrl();
+$newWindow    = $banner->getBannerLinkUrlNewWindow();
+$headingColor = $block->getData('textcolor') ?: '#0c0c0c';
+$textColor    = $banner->getDescriptionTextColor() ?: '#0c0c0c';
+$buttonBg     = $banner->getButtonBackgroundColor() ?: '#2e2e2e';
+$buttonColor  = $banner->getButtonTextColor() ?: '#ffffff';
+$sectionBg    = $banner->getContentCustomColor() ?: '';
+
+if ($heading === '' && $secondary === '' && $buttonText === '' && $imageDesktop === '') {
+    return;
+}
+if ($buttonUrl === '') {
+    $buttonUrl = '#';
+}
+?>
+<div class="section section--full-width section--padded ev-pdp-promo"
+     <?php if ($sectionBg): ?>style="background: <?= $escaper->escapeHtmlAttr($sectionBg) ?>"<?php endif; ?>>
+    <div class="container ev-pdp-promo__inner">
+        <div class="media-with-text ev-pdp-promo__grid<?= $imageDesktop === '' ? ' ev-pdp-promo__grid--no-media' : '' ?>">
+            <?php if ($imageDesktop !== ''): ?>
+                <div class="media-with-text__media ev-pdp-promo__media">
+                    <picture>
+                        <?php if ($imageMobile !== ''): ?>
+                            <source media="(max-width: 767px)" srcset="<?= $escaper->escapeUrl($imageMobile) ?>">
+                        <?php endif; ?>
+                        <img src="<?= $escaper->escapeUrl($imageDesktop) ?>"
+                             alt="<?= $escaper->escapeHtmlAttr($heading) ?>"
+                             class="ev-pdp-promo__img" loading="lazy">
+                    </picture>
+                </div>
+            <?php endif; ?>
+
+            <div class="media-with-text__content ev-pdp-promo__content">
+                <?php if ($heading !== ''): ?>
+                    <div class="section__block section__block--heading">
+                        <h3 class="h3" style="color: <?= $escaper->escapeHtmlAttr($headingColor) ?>">
+                            <?= /* @noEscape */ $heading ?>
+                        </h3>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($secondary !== ''): ?>
+                    <div class="section__block reading-width rte enlarge-text" style="color: <?= $escaper->escapeHtmlAttr($textColor) ?>">
+                        <?= /* @noEscape */ $secondary ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($buttonText !== ''): ?>
+                    <div class="section__block section__block--button">
+                        <a class="btn btn--primary ev-pdp-promo__btn"
+                           href="<?= $escaper->escapeUrl($buttonUrl) ?>"
+                           <?= $newWindow ? 'target="_blank" rel="noopener"' : '' ?>
+                           style="background: <?= $escaper->escapeHtmlAttr($buttonBg) ?>; color: <?= $escaper->escapeHtmlAttr($buttonColor) ?>;">
+                            <?= $escaper->escapeHtml($buttonText) ?>
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ev-pdp-promo {
+        padding: 48px 0;
+    }
+    .ev-pdp-promo__inner {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+    .ev-pdp-promo__grid {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+    }
+    .ev-pdp-promo__media {
+        flex: 0 0 60%;
+        max-width: 60%;
+        /* Fixed image box (matches reference proportions), image cover-cropped. */
+        aspect-ratio: 653 / 339;
+    }
+    .ev-pdp-promo__media picture {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .ev-pdp-promo__img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .ev-pdp-promo__content {
+        flex: 1 1 auto;
+    }
+    .ev-pdp-promo__grid--no-media {
+        justify-content: center;
+        text-align: center;
+    }
+    .ev-pdp-promo__grid--no-media .reading-width {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .ev-pdp-promo .section__block {
+        margin: 0 0 22px;
+    }
+    .ev-pdp-promo .section__block:last-child {
+        margin-bottom: 0;
+    }
+    .ev-pdp-promo .section__block--heading .h3 {
+        margin: 0;
+        font-weight: 600;
+        line-height: 1.3;
+        font-size: clamp(2rem, 0.83vw + 1.69rem, 2.96rem);
+    }
+    .ev-pdp-promo .reading-width {
+        max-width: 48em;
+    }
+    .ev-pdp-promo .enlarge-text {
+        font-size: 2.25rem;
+        font-weight: 500;
+        line-height: 1.5;
+    }
+    .ev-pdp-promo .reading-width p:last-child {
+        margin-bottom: 0;
+    }
+    .ev-pdp-promo__btn {
+        display: inline-block;
+        margin: 0;
+        padding: 12px 26px;
+        border: 1px solid #000;
+        border-radius: 5px;
+        font-size: 1.4rem;
+        font-weight: 700;
+        line-height: 1.2;
+        text-decoration: none;
+        transition: opacity 0.15s ease;
+    }
+    .ev-pdp-promo__btn:hover {
+        opacity: 0.88;
+        text-decoration: none;
+    }
+    @media (max-width: 768px) {
+        .ev-pdp-promo {
+            padding: 32px 0;
+        }
+        .ev-pdp-promo__grid {
+            flex-direction: column;
+            gap: 28px;
+        }
+        .ev-pdp-promo__media,
+        .ev-pdp-promo__content {
+            flex: 1 1 auto;
+            max-width: 100%;
+            width: 100%;
+        }
+        .ev-pdp-promo__media {
+            aspect-ratio: 16 / 10;
+        }
+        .ev-pdp-promo .enlarge-text {
+            font-size: 1.7rem;
+        }
+    }
+</style>

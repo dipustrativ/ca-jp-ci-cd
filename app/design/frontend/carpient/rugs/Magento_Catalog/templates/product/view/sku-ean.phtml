@@ -1,0 +1,19 @@
+<?php
+/** @var Magento\Catalog\Block\Product\View $block */
+$_product = $block->getProduct();
+$sku      = $_product->getSku();
+$ean      = $_product->getData('ean_barcode');
+?>
+<div class="product-sku-ean">
+    <span class="product-sku-ean__sku">
+        <?= $block->escapeHtml(__('SKU:')) ?>
+        <span class="product-sku-ean__value"><?= $block->escapeHtml($sku) ?></span>
+    </span>
+    <?php if (!empty($ean)) : ?>
+        <span class="product-sku-ean__sep">|</span>
+        <span class="product-sku-ean__ean">
+            <?= $block->escapeHtml(__('EAN:')) ?>
+            <span class="product-sku-ean__value"><?= $block->escapeHtml($ean) ?></span>
+        </span>
+    <?php endif; ?>
+</div>

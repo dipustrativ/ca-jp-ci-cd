@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="product.info.price">
+<!--            <block class="Evalent\CatalogPriceHistory\Block\Product\View" name="product.price.history" template="Evalent_CatalogPriceHistory::product/view/pricehistory.phtml" ifconfig="sales/omnibus/frontend_enabled"/>-->
+            <block class="Evalent\CatalogPriceHistory\Block\Product\Ajax\View" name="product.price.history" template="Evalent_CatalogPriceHistory::product/view/ajax/pricehistory.phtml" ifconfig="sales/omnibus/frontend_enabled"/>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,377 @@
+<?php
+use CarpetAvenue\Productify\Helper\Data;
+
+/**
+ * @var Magento\Catalog\Block\Product\View $block
+ * @var CarpetAvenue\Productify\ViewModel\VariantCacheView $viewModel
+ */
+
+$product       = $block->getProduct();
+$viewModel     = $block->getViewModel();
+$designId      = $product->getData(Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE);
+$currentId     = $product->getId();
+$currentColor  = $product->getAttributeText(Data::COLOR_ATTRIBUTE_CODE);
+$currentSize   = $product->getAttributeText(Data::SIZE_ATTRIBUTE_CODE);
+$currentShape  = $product->getData(Data::SHAPE_ATTRIBUTE_CODE);
+
+$isGroup = $product->getData(Data::IS_GROUP_ATTRIBUTE_CODE);
+
+if (empty($designId) || !$isGroup) {
+    return;
+}
+
+$variants = $viewModel->getVariantsByDesignId($designId);
+if (!$variants) return;
+
+// Shape option ids are store data, not constants — read once per render.
+$helper       = $this->helper(Data::class);
+$primaryShape = $helper->getPrimaryShapeOptionId();
+
+// Group variants by color
+$groupedByColor = [];
+foreach ($variants as $variant) {
+    $groupedByColor[$variant[Data::COLOR_ATTRIBUTE_CODE]][] = $variant;
+}
+$currentGroup = $groupedByColor[$currentColor] ?? [];
+
+// Group current color variants by shape and sort by size value
+$groupedByShape = [];
+$currentImageUrl = '';
+foreach ($currentGroup as $variant) {
+    // Match both size and shape to get the correct image
+    // Use 'shape_key' for comparison since $currentShape contains the shape ID
+    if ($variant[Data::SIZE_ATTRIBUTE_CODE] === $currentSize
+        && $variant['shape_key'] == $currentShape) {
+        $currentImageUrl = $variant['image'];
+    }
+    $shape = $variant[Data::SHAPE_ATTRIBUTE_CODE] ?? 'Other';
+    $groupedByShape[$shape][] = $variant;
+}
+// Sort each shape group by size value
+foreach ($groupedByShape as &$items) {
+    usort($items, function($a, $b) {
+        $sizeA = $a[Data::SIZE_ATTRIBUTE_CODE];
+        $sizeB = $b[Data::SIZE_ATTRIBUTE_CODE];
+
+        // Extract first number from each size string
+        preg_match('/(\d+)/', $sizeA, $matchesA);
+        preg_match('/(\d+)/', $sizeB, $matchesB);
+
+        $numA = isset($matchesA[1]) ? (int)$matchesA[1] : 0;
+        $numB = isset($matchesB[1]) ? (int)$matchesB[1] : 0;
+
+        return $numA <=> $numB;
+    });
+}
+unset($items);
+
+// Helper: Find variant by color and size, fallback to first in color group
+function getVariantByColorAndSize($group, $size) {
+    foreach ($group as $v) {
+        if ($v[Data::SIZE_ATTRIBUTE_CODE] === $size) {
+            return $v;
+        }
+    }
+    return $group[0];
+}
+
+// Helper: Find variant by size, color, and shape, fallback to first with that size and shape
+function getVariantBySizeAndColorAndShape($variants, $color, $size, $shapeKey) {
+    // First try: exact match with color, size, and shape
+    foreach ($variants as $v) {
+        if ($v[Data::COLOR_ATTRIBUTE_CODE] === $color
+            && $v[Data::SIZE_ATTRIBUTE_CODE] === $size
+            && $v['shape_key'] == $shapeKey) {
+            return $v;
+        }
+    }
+    // Second fallback: match size and shape (ignore color)
+    foreach ($variants as $v) {
+        if ($v[Data::SIZE_ATTRIBUTE_CODE] === $size && $v['shape_key'] == $shapeKey) {
+            return $v;
+        }
+    }
+    return null;
+}
+?>
+
+<style>
+    body.drawer-open {
+        overflow: hidden;
+    }
+    .size-title {
+        font-size: 20px;
+    }
+    #productify-size-drawer {
+        position: fixed;
+        top: 0; right: -100%;
+        width: 100%;
+        max-width: 320px;
+        height: 100%;
+        background: #fff;
+        z-index: 9999;
+        transition: right 0.3s ease-in-out;
+        box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+        overflow-y: auto;
+        padding: 20px;
+    }
+    #productify-size-drawer.open {
+        right: 0;
+    }
+    #productify-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 9998;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+        pointer-events: none;
+    }
+    #productify-overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .group-products-wrap {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .color-swatches {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+    .color-swatches a {
+        width: 67px;
+        height: auto;
+        padding: 9px 0px;
+        overflow: hidden;
+        margin: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+    }
+
+    .color-swatches a:first-child {
+        margin-left: 0;
+    }
+    .color-swatches a:last-child {
+        margin-right: 0;
+    }
+
+    .color-swatches img {
+        width: 100%;
+        height: 100%;
+        box-shadow: none;
+        transition: 0.2s;
+        object-fit: contain;
+        object-position: center;
+        transform: scale(1);
+    }
+
+    .color-swatches a.selected {
+        border: 1px solid black;
+    }
+    @media (min-width: 769px) {
+        .group-products-wrap>div{
+            display: block !important;
+            overflow: hidden;
+            width: 100%;
+        }
+        .color-swatches {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            max-width: 100%;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: thin;
+            scrollbar-color: #121212 transparent;
+            scroll-behavior: smooth;
+        }
+
+        .color-swatches a {
+            flex-shrink: 0;
+            scroll-snap-align: start;
+        }
+        .color-swatches::-webkit-scrollbar {
+            height: 6px;
+        }
+        .color-swatches::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 3px;
+        }
+        .color-swatches::-webkit-scrollbar-thumb {
+            background: #000;
+            border-radius: 3px;
+        }
+    }
+
+    .size-dropdown-container {
+        margin: 8px 0 18px;
+        width: 100%;
+    }
+    .size-dropdown {
+        width: 100%;
+        max-width: 284px;
+        padding: 6px 8px;
+        border: 1px solid #666666;
+        display: flex;
+        gap: 13px;
+        align-items: center;
+        cursor: pointer;
+        font-size: 15px;
+    }
+    .size-dropdown img {
+        width: 35px;
+        height: auto;
+    }
+    .size-overlay-wrap li {
+        border-bottom: 1px solid rgb(229, 229, 229);
+        padding: 5px 0;
+        margin: 0;
+    }
+    .size-overlay-wrap li.selected-variant {
+        background-color: rgb(241, 241, 241);
+    }
+    .size-overlay-wrap a {
+        margin: 5px;
+    }
+    .size-overlay-wrap li:hover {
+        background-color: rgb(241, 241, 241);
+    }
+</style>
+
+<!-- 🧱 MAIN WRAPPER -->
+<div class="group-products-wrap">
+    <!-- 🎨 COLOR SELECTOR -->
+    <div>
+        <div style="font-size: 14px; color: #777;"><?= count($groupedByColor) ?> <?= count($groupedByColor) === 1 ? __("colour") : __("colours") ?></div>
+        <div class="color-swatches">
+            <?php foreach ($groupedByColor as $color => $group):
+                $variant = getVariantByColorAndSize($group, $currentSize);
+                $img = $variant['image'];
+                $url = $variant['url'];
+                $isSelected = $color === $currentColor;
+                ?>
+                <a href="<?= $url ?>" class="<?= $isSelected ? 'selected' : '' ?>">
+                    <img src="<?= $img ?>" class="<?= $isSelected ? 'selected' : '' ?>">
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <!-- 📦 SIZE DROPDOWN TRIGGER -->
+    <div class="size-dropdown-container">
+        <div class="size-dropdown" onclick="openSizeDrawer()">
+            <img src="<?= $currentImageUrl ?>" />
+            <span style="flex: 1;"><?= $block->escapeHtml($helper->formatSizeLabel((string)$currentSize, $currentShape)) ?></span>
+            <span style="font-size: 22px;margin-right: 5px;">▸</span>
+        </div>
+    </div>
+</div>
+
+<!-- 🔒 SIZE DRAWER & OVERLAY -->
+<div id="productify-overlay" onclick="closeSizeDrawer()"></div>
+<div id="productify-size-drawer">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 class="size-title"><?= __('Sizes') ?></h3>
+        <button onclick="closeSizeDrawer()" style="font-size: 18px;padding: 12px;">✕</button>
+    </div>
+
+    <?php
+        // Dynamically find and prioritize the primary shape (config: Productify >
+        // Group Products > Primary Shape Option ID) using its actual name.
+        $rectangularText = null;
+        foreach ($groupedByShape as $shape => $items) {
+            if ($items[0]['shape_key'] == $primaryShape) {
+                $rectangularText = $shape;
+                break;
+            }
+        }
+
+        // from the array $groupedByShape make sure if array key Rectangular it will show first
+        if ($rectangularText && isset($groupedByShape[$rectangularText])) {
+            $rectangular = $groupedByShape[$rectangularText];
+            unset($groupedByShape[$rectangularText]);
+            $groupedByShape = array_merge([$rectangularText => $rectangular], $groupedByShape);
+        }
+    ?>
+
+    <?php foreach ($groupedByShape as $shape => $items): ?>
+        <?php if ($items[0]['shape_key'] != $primaryShape) :?>
+            <div style="font-weight: bold; margin: 10px 0;"><?= $shape ?></div>
+        <?php endif;?>
+        <ul class="size-overlay-wrap" style="list-style: none; padding: 0;">
+            <?php foreach ($items as $variant):
+                $id = $variant['id'];
+                $sku = $variant['sku'];
+                $saleableStatus = $variant['is_salable'];
+                $isCurrent = $variant['id'] == $currentId;
+                // Find variant in current color with this size and shape, fallback to first with that size and shape
+                $variantShapeKey = $variant['shape_key'] ?? '';
+                $targetVariant = getVariantBySizeAndColorAndShape($variants, $currentColor, $variant[Data::SIZE_ATTRIBUTE_CODE], $variantShapeKey);
+                $url = $saleableStatus && $targetVariant ? $targetVariant['url'] : 'javascript:void(0)';
+                $img = $variant['image'];
+                $size = $helper->formatSizeLabel((string)$variant[Data::SIZE_ATTRIBUTE_CODE], $variantShapeKey);
+                $price = $variant['price'];
+                $special = $variant['special_price'];
+                $finalPrice = $variant['final_price_formatted'];
+                ?>
+                <li class="<?= ($isCurrent)? 'selected-variant':''?>">
+                    <a href="<?= $url ?>" style="display: flex; align-items: center; gap: 10px; text-decoration: none;
+                    color: <?= $isCurrent ? '#050505' : '#333333' ?>;
+                    <?= !$saleableStatus ? 'text-decoration: line-through; color: #aaa;' : '' ?>
+                    <?= $isCurrent ? 'font-weight: bold;' : '' ?>">
+                        <img src="<?= $img ?>" width="30" height="30">
+                        <span><?= $block->escapeHtml($size) ?></span>
+                        <span style="margin-left: auto;">
+                            <?php if ($saleableStatus) : ?>
+                                <span><?= $finalPrice ?></span>
+                            <?php else :?>
+                                <?= __("Sold") ?>
+                            <?php endif;?>
+                        </span>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endforeach; ?>
+</div>
+
+<!-- ✅ JS BEHAVIOR -->
+<script>
+    function openSizeDrawer() {
+        document.getElementById('productify-size-drawer').classList.add('open');
+        document.getElementById('productify-overlay').classList.add('show');
+        document.body.classList.add('drawer-open');
+    }
+
+    function closeSizeDrawer() {
+        document.getElementById('productify-size-drawer').classList.remove('open');
+        document.getElementById('productify-overlay').classList.remove('show');
+        document.body.classList.remove('drawer-open');
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === "Escape") {
+            closeSizeDrawer();
+        }
+    });
+
+    require(['jquery'], function ($) {
+        $(document).ready(function () {
+            const drawer = $('#productify-size-drawer');
+            const overlay = $('#productify-overlay');
+            const pageWrapper = '.page-wrapper';
+
+            if ($(pageWrapper).length) {
+                $(pageWrapper).after(drawer);
+                $(pageWrapper).after(overlay);
+            }
+        });
+    });
+</script>

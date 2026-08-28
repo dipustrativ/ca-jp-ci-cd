@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <table name="carpetavenue_order_black_list" resource="default" engine="innodb" comment="Order Black List">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="blacklist_type" nullable="false" length="255" comment="blacklist type"/>
+        <column xsi:type="varchar" name="blacklist_value" nullable="false" length="255" comment="blacklist value"/>
+        <column xsi:type="text" name="note" nullable="true" comment="comment"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="Creation Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="sales_order" resource="sales" engine="innodb">
+        <column xsi:type="smallint" name="is_pos_order" default="0" nullable="false" comment="Is POS Order"/>
+        <column xsi:type="decimal" name="store_to_eur_rate" scale="4" precision="12" nullable="true" comment="Store To EUR Rate"/>
+    </table>
+
+    <table name="sales_order_grid" resource="sales" engine="innodb">
+        <column xsi:type="smallint" name="is_pos_order" default="0" nullable="false" comment="Is POS Order"/>
+    </table>
+</schema>

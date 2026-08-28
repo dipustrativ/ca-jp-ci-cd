@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Evalent_AdminActivityLog::css/admin_activity.css"/>
+    </head>
+    <body>
+        <referenceContainer name="admin.scope.col.wrap" htmlClass="admin__old" /> <!-- ToDo UI: remove this wrapper with old styles removal. The class name "admin__old" is for tests only, we shouldn't use it in any way -->
+
+        <referenceContainer name="content">
+            <block class="Evalent\AdminActivityLog\Block\Adminhtml\ModelActivity\View" name="evalent_adminactivity_model_view"/>
+            <block class="Evalent\AdminActivityLog\Block\Adminhtml\ModelActivity\View\Info" name="evalent_adminactivity_model_info" template="Evalent_AdminActivityLog::modelactivity/view/info.phtml" />
+        </referenceContainer>
+    </body>
+</page>

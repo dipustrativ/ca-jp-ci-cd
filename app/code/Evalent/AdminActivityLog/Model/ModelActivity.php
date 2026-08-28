@@ -1,0 +1,243 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Evalent\AdminActivityLog\Model;
+
+use Evalent\AdminActivityLog\Api\Data\ModelActivityInterface;
+
+class ModelActivity extends \Magento\Framework\Model\AbstractModel implements
+    ModelActivityInterface
+{
+
+    const ACTION_TYPE_NEW = "New";
+
+    const ACTION_TYPE_DELETE = "Delete";
+
+    const ACTION_TYPE_SAVE = "Save";
+
+    const ACTION_TYPES = [
+        self::ACTION_TYPE_NEW,
+        self::ACTION_TYPE_DELETE,
+        self::ACTION_TYPE_SAVE,
+    ];
+
+    protected $_eventPrefix = 'evalent_adminactivitylog_modelactivity';
+
+    /**
+     * @return void
+     */
+    protected function _construct()
+    {
+        $this->_init('Evalent\AdminActivityLog\Model\ResourceModel\ModelActivity');
+    }
+
+    /**
+     * Get modelactivity_id
+     *
+     * @return string
+     */
+    public function getModelactivityId()
+    {
+        return $this->getData(self::MODELACTIVITY_ID);
+    }
+
+    /**
+     * Set modelactivity_id
+     *
+     * @param string $modelactivityId
+     *
+     * @return \Evalent\AdminActivityLog\Api\Data\ModelActivityInterface
+     */
+    public function setModelactivityId($modelactivityId)
+    {
+        return $this->setData(self::MODELACTIVITY_ID, $modelactivityId);
+    }
+
+    /**
+     * Get username
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->getData(self::USERNAME);
+    }
+
+    /**
+     * Set username
+     *
+     * @param string $username
+     *
+     * @return \Evalent\AdminActivityLog\Api\Data\ModelActivityInterface
+     */
+    public function setUsername($username)
+    {
+        return $this->setData(self::USERNAME, $username);
+    }
+
+    /**
+     * Get full_name
+     *
+     * @return string
+     */
+    public function getFullName()
+    {
+        return $this->getData(self::FULL_NAME);
+    }
+
+    /**
+     * Set full_name
+     *
+     * @param string $fullName
+     *
+     * @return \Evalent\AdminActivityLog\Api\Data\ModelActivityInterface
+     */
+    public function setFullName($fullName)
+    {
+        return $this->setData(self::FULL_NAME, $fullName);
+    }
+
+    /**
+     * Get datetime
+     *
+     * @return string
+     */
+    public function getDatetime()
+    {
+        return $this->getData(self::DATETIME);
+    }
+
+    /**
+     * Set datetime
+     *
+     * @param string $datetime
+     *
+     * @return \Evalent\AdminActivityLog\Api\Data\ModelActivityInterface
+     */
+    public function setDatetime($datetime)
+    {
+        return $this->setData(self::DATETIME, $datetime);
+    }
+
+    /**
+     * Get controller
+     *
+     * @return string
+     */
+    public function getModelEntityId()
+    {
+        return $this->getData(self::MODEL_ENTITY_ID);
+    }
+
+    /**
+     * Set controller
+     *
+     * @param string $modelEntityId
+     *
+     * @return \Evalent\AdminActivityLog\Api\Data\ModelActivityInterface
+     */
+    public function setModelEntityId($modelEntityId)
+    {
+        return $this->setData(self::MODEL_ENTITY_ID, $modelEntityId);
+    }
+
+    /**
+     * Get action_type
+     *
+     * @return string
+     */
+    public function getActionType()
+    {
+        return $this->getData(self::ACTION_TYPE);
+    }
+
+    /**
+     * Set action_type
+     *
+     * @param string $actionType
+     *
+     * @return \Evalent\AdminActivityLog\Api\Data\ModelActivityInterface
+     */
+    public function setActionType($actionType)
+    {
+        return $this->setData(self::ACTION_TYPE, $actionType);
+    }
+
+    /**
+     * Get storeview
+     *
+     * @return string
+     */
+    public function getStoreview()
+    {
+        return $this->getData(self::STOREVIEW);
+    }
+
+    /**
+     * Set storeview
+     *
+     * @param string $storeview
+     *
+     * @return \Evalent\AdminActivityLog\Api\Data\ModelActivityInterface
+     */
+    public function setStoreview($storeview)
+    {
+        return $this->setData(self::STOREVIEW, $storeview);
+    }
+
+    /**
+     * Get edited_attributes
+     *
+     * @return string
+     */
+    public function getEditedAttributes()
+    {
+        return $this->getData(self::EDITED_ATTRIBUTES);
+    }
+
+    /**
+     * Set edited_attributes
+     *
+     * @param string $editedAttributes
+     *
+     * @return \Evalent\AdminActivityLog\Api\Data\ModelActivityInterface
+     */
+    public function setEditedAttributes($editedAttributes)
+    {
+        return $this->setData(self::EDITED_ATTRIBUTES, $editedAttributes);
+    }
+
+    /**
+     * Get model_type
+     *
+     * @return string
+     */
+    public function getModelType()
+    {
+        return $this->getData(self::MODEL_TYPE);
+    }
+
+    /**
+     * Set model_type
+     *
+     * @param string $modelType
+     *
+     * @return \Evalent\AdminActivityLog\Api\Data\ModelActivityInterface
+     */
+    public function setModelType($modelType)
+    {
+        return $this->setData(self::MODEL_TYPE, $modelType);
+    }
+
+    public function afterSave()
+    {
+        //        return parent::afterSave(); // TODO: Change the autogenerated stub
+    }
+
+    public function save()
+    {
+        $this->_getResource()->save($this);
+        return $this;
+    }
+}

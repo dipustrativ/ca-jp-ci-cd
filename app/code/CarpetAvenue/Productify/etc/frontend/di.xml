@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Product
+ * @package   CarpetAvenue_Productify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Catalog\Block\Product\AbstractProduct">
+        <plugin name="productify_product_tile_variants" type="CarpetAvenue\Productify\Plugin\ProductTilePlugin" sortOrder="10"/>
+        <plugin name="productify_product_collector_tag" type="CarpetAvenue\Productify\Plugin\CollectorTagPlugin" sortOrder="11"/>
+    </type>
+    <!-- Hide ".00" decimals on even prices (ported from Evalent_PriceFormat) -->
+    <type name="Magento\Framework\CurrencyInterface">
+        <plugin name="productify_price_hide_zero_decimals" type="CarpetAvenue\Productify\Plugin\Currency\HideZeroDecimals"/>
+    </type>
+    <type name="Magento\Directory\Model\Currency">
+        <plugin name="productify_price_hide_zero_decimals_format_txt" type="CarpetAvenue\Productify\Plugin\Currency\HideZeroDecimals"/>
+    </type>
+    <!-- Force priceBox (JS) price format to whole numbers to match HideZeroDecimals -->
+    <type name="Magento\Framework\Locale\FormatInterface">
+        <plugin name="productify_price_whole_number_format" type="CarpetAvenue\Productify\Plugin\Currency\WholePriceFormat"/>
+    </type>
+    <!-- Let the core wishlist helper build URLs for BelVG guest-wishlist items -->
+    <type name="Magento\Wishlist\Helper\Data">
+        <plugin name="productify_guest_wishlist_product_url" type="CarpetAvenue\Productify\Plugin\Wishlist\GuestItemProductUrl"/>
+    </type>
+
+    <preference for="Magento\Framework\Pricing\Render\Amount" type="CarpetAvenue\Productify\Block\Pricing\Render\Amount" />
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Merged CarpetAvenue_ProductStatus — frontend visibility gating
+         ═══════════════════════════════════════════════════════════════════ -->
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="carpetavenue_product_status_model_product" type="CarpetAvenue\Productify\ProductStatus\Plugin\Model\Product"/>
+    </type>
+    <type name="Magento\Catalog\Model\Category">
+        <plugin name="carpetavenue_product_status_model_category" type="CarpetAvenue\Productify\ProductStatus\Plugin\Model\Category"/>
+    </type>
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
+        <plugin name="carpetavenue_product_status_sitemap_resourcemodel_produc_collection" type="CarpetAvenue\Productify\ProductStatus\Plugin\Model\ResourceModel\Product\Collection"/>
+    </type>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Merged CarpetAvenue_LayeredNavigation
+
+         NOTE: these area-level virtualType arguments REPLACE the global array
+         (they do not merge per item), so the stock CatalogSearch decimal and
+         category entries must be repeated here or FilterList silently falls
+         back to its non-search Catalog defaults.
+         ═══════════════════════════════════════════════════════════════════ -->
+    <virtualType name="categoryFilterList">
+        <arguments>
+            <argument name="filters" xsi:type="array">
+                <item name="attribute" xsi:type="string">CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\Attribute</item>
+                <item name="price" xsi:type="string">CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\Price</item>
+                <item name="decimal" xsi:type="string">CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\Decimal</item>
+                <item name="category" xsi:type="string">Magento\CatalogSearch\Model\Layer\Filter\Category</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="searchFilterList">
+        <arguments>
+            <argument name="filters" xsi:type="array">
+                <item name="attribute" xsi:type="string">CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\Attribute</item>
+                <item name="price" xsi:type="string">CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\Price</item>
+                <item name="decimal" xsi:type="string">CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\Decimal</item>
+                <item name="category" xsi:type="string">Magento\CatalogSearch\Model\Layer\Filter\Category</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Filter items with add/remove toggle URLs, only for our filter classes -->
+    <virtualType name="CarpetAvenueLayeredNavigationItemFactory" type="Magento\Catalog\Model\Layer\Filter\ItemFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\Item</argument>
+        </arguments>
+    </virtualType>
+    <type name="CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\Attribute">
+        <arguments>
+            <argument name="filterItemFactory" xsi:type="object">CarpetAvenueLayeredNavigationItemFactory</argument>
+        </arguments>
+    </type>
+    <type name="CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\Price">
+        <arguments>
+            <argument name="filterItemFactory" xsi:type="object">CarpetAvenueLayeredNavigationItemFactory</argument>
+        </arguments>
+    </type>
+    <!-- Decimal (width2/height2 dimensions) rendered as a cm range slider -->
+    <type name="CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\Decimal">
+        <arguments>
+            <argument name="filterItemFactory" xsi:type="object">CarpetAvenueLayeredNavigationItemFactory</argument>
+            <argument name="unitsLabel" xsi:type="string">cm</argument>
+        </arguments>
+    </type>
+    <!-- Stock category filter gets our items too so its chip URLs keep SEO
+         path segments intact -->
+    <type name="Magento\CatalogSearch\Model\Layer\Filter\Category">
+        <arguments>
+            <argument name="filterItemFactory" xsi:type="object">CarpetAvenueLayeredNavigationItemFactory</argument>
+        </arguments>
+    </type>
+
+    <!-- SEO filter URL router: runs before the core urlrewrite router (20) -->
+    <type name="Magento\Framework\App\RouterList">
+        <arguments>
+            <argument name="routerList" xsi:type="array">
+                <item name="carpetavenue_layerednav" xsi:type="array">
+                    <item name="class" xsi:type="string">CarpetAvenue\Productify\LayeredNavigation\Controller\Router</item>
+                    <item name="disable" xsi:type="boolean">false</item>
+                    <item name="sortOrder" xsi:type="string">15</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Catalog\Controller\Category\View">
+        <plugin name="carpetavenue_layerednav_seo_meta" type="CarpetAvenue\Productify\LayeredNavigation\Plugin\CategoryViewSeoMeta"/>
+    </type>
+    <type name="Magento\LayeredNavigation\Block\Navigation\State">
+        <plugin name="carpetavenue_layerednav_clear_url" type="CarpetAvenue\Productify\LayeredNavigation\Plugin\StateClearUrl"/>
+    </type>
+
+    <type name="Magento\Search\Model\ResourceModel\Query\Collection">
+        <plugin name="carpetavenue_productify_filter_spam_queries"
+                type="CarpetAvenue\Productify\Plugin\Search\FilterSpamQueries"/>
+    </type>
+
+    <!-- catalog_view_container collection for category pages, quick_search_container for search -->
+    <type name="CarpetAvenue\Productify\LayeredNavigation\Model\Search\FacetProvider">
+        <arguments>
+            <argument name="categoryCollectionFactory" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\CollectionFactory</argument>
+            <argument name="searchCollectionFactory" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory</argument>
+        </arguments>
+    </type>
+</config>

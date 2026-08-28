@@ -1,0 +1,1168 @@
+//
+//  Cart page ONLY styling (scoped port from base Evalent/carpet).
+//  Deliberately excludes all header / minicart / checkout-step chrome.
+//  _____________________________________________
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+
+    // Empty-cart "Continue Shopping" button (cart page)
+    .cart-empty {
+        a.action.button.primary.continue-shopping {
+            background: #fff;
+            color: #333;
+            position: relative;
+            padding: 10px 40px 10px 30px;
+
+            &:after {
+                right: 20px;
+                left: auto;
+                top: 50%;
+                bottom: 50%;
+                width: 8px;
+                height: 8px;
+                content: "";
+                border-top: 1px solid #333;
+                border-right: 1px solid #333;
+                position: absolute;
+                transform: rotate(45deg) translateY(-50%);
+            }
+        }
+
+        .block-page-section--border {
+            border-bottom: 0;
+            border-top: 0;
+            margin-top: 80px;
+        }
+
+        &:before {
+            height: 200px;
+            content: "";
+            width: 100%;
+            display: block;
+            position: absolute;
+            top: -20px;
+            left: 0;
+            background: #f5f5f5;
+            z-index: -1;
+        }
+    }
+
+    // Checkout cart page
+    .checkout-cart-index {
+        background: #f5f5f5;
+
+        .page-main {
+            position: relative;
+        }
+
+        &.empty-cart {
+            background: #fff;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: @font-weight__bold;
+
+            &-wrapper {
+                margin-top: 3rem;
+            }
+        }
+
+        #block-summary {
+            .widget.block.block-static-block {
+                float: none;
+            }
+        }
+
+        #shopping-cart-table {
+
+            // Pretending table doesn't exist
+            thead {
+                display: none;
+            }
+            tbody,
+            tr,
+            td {
+                display: block;
+            }
+        }
+
+        .cart.items.table {
+            .cart.item {
+                background: @color-white;
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                position: relative;
+
+                .item-actions {
+                    text-align: right;
+
+                    .action-edit {
+                        display: none;
+                    }
+
+                    // Delete = icon only, pinned top-right of the card (blank
+                    // parent has none of Luma's built-in cart action styling).
+                    .action-delete {
+                        position: absolute;
+                        top: 15px;
+                        right: 15px;
+                        display: inline-block;
+                        line-height: 1;
+                        color: #333;
+                        // Kill button chrome — icon only.
+                        border: 0;
+                        background: #fff;
+                        padding: 0;
+
+                        span {
+                            display: none;
+                        }
+
+                        &:before {
+                            font-family: 'Pe-icon-7-stroke';
+                            content: "\e609";
+                            line-height: 1;
+                            font-size: 25px;
+                        }
+
+                        &:hover {
+                            color: #000;
+                        }
+                    }
+                }
+            }
+        }
+
+        .cart.table-wrapper {
+            .item {
+                .col.item {
+                    padding: 0;
+                }
+            }
+
+            .col.price,
+            .col.qty,
+            .col.subtotal {
+                padding: 0;
+            }
+
+            // Photo
+            .item {
+                .product-item-photo {
+                    display: block;
+                    width: 100%;
+                }
+            }
+
+            .nested-table-row {
+                height: 100%;
+            }
+
+            // Product name (Luma default — blank parent lacks it)
+            .product-item-name {
+                font-size: 1.8rem;
+                font-weight: 700;
+                display: block;
+                margin: -3px 0 5px;
+            }
+
+            .product-item-details {
+                display: block;
+                padding: 0;
+                vertical-align: unset;
+                width: unset;
+            }
+
+            .item {
+                .use-ajax.towishlist {
+                    display: none;
+                }
+            }
+
+            // Price and qty fixes
+            .col.price,
+            .qty.container {
+                text-align: left;
+                height: 100%;
+                .lib-vendor-prefix-display(flex);
+                .lib-vendor-prefix-flex-direction(column);
+                justify-content: flex-end;
+            }
+
+            .col.price {
+                // .cart-price wraps the price in both incl- and excl-tax
+                // branches of Magento_Weee item/price/unit.phtml (overridden).
+                .cart-price {
+
+                    .price {
+                        font-weight: 700;
+                        color: @price-color;
+                    }
+                    .old-price {
+                        .lib-font-size(16);
+                        margin-right: 5px;
+
+                        .price {
+                            color: #666;
+                            font-weight: 400;
+                        }
+                    }
+                }
+            }
+
+            // qty
+            .input-text.qty {
+                width: 35px;
+                height: 35px;
+                margin-left: 10px;
+                text-align: center;
+                &[disabled] {
+                    opacity: 1;
+                    border: none;
+                }
+            }
+            .qty.container {
+                .control.qty {
+                    text-align: right;
+                    margin-bottom: -7px;
+
+                    .label {
+                        font-weight: @font-weight__bold;
+                        font-size: 1.6rem;
+                    }
+                }
+            }
+            .sale-percentage {
+                color: #2c8f3b;
+                font-weight: 700;
+                .lib-font-size(16);
+            }
+        }
+
+        // Summary
+        .cart-summary {
+            background: @color-white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+
+            & > .title {
+                font-size: 2.2rem;
+                font-weight: @font-weight__bold;
+            }
+
+            .block.shipping {
+                strong {
+                    color: @color-black;
+                }
+            }
+
+            .checkout-methods-items {
+                .action.primary.checkout {
+                    font-size: 1.6rem;
+                    font-weight: @font-weight__heavier;
+                }
+            }
+        }
+        .cart-totals {
+            .grand {
+                strong {
+                    font-weight: @font-weight__bold;
+                }
+            }
+        }
+        .checkout-payment-logos-container {
+            text-align: center;
+            margin: 2rem 0 0;
+            p {
+                margin-bottom: 0;
+            }
+        }
+
+        // Discount
+        .cart-discount {
+            .block {
+                & > .title {
+                    strong {
+                        font-weight: @font-weight__bold;
+                    }
+                }
+            }
+
+            .fieldset.coupon {
+                margin-top: 15px;
+
+                .control {
+                    margin-right: 10px;
+                }
+            }
+
+            .actions-toolbar {
+                .action.primary {
+                    border-bottom-left-radius: 5px;
+                    border-top-left-radius: 5px;
+                }
+            }
+        }
+
+        .checkout-methods-items {
+
+            .item {
+                margin-bottom: 15px;
+            }
+
+            .action.primary {
+                position: relative;
+                text-align: left;
+                border: none;
+
+                span {
+                    font-size: 1.3rem;
+                    line-height: 1.2;
+                    display: inline-block;
+
+                    &:after {
+                        content: "";
+                        position: absolute;
+                        right: 10px;
+                        top: 45%;
+                        transform: translateY(-50%);
+                        display: inline-block;
+                        background-repeat: no-repeat;
+                        background-size: contain;
+                        background-position: right center;
+                    }
+                }
+
+                &.klarna {
+                    background: #ffb3c7;
+
+                    &:hover {
+                        background: darken(#ffb3c7, 10%);
+                    }
+
+                    span {
+                        color: @color-black;
+                        max-width: 45%;
+
+                        &:after {
+                            background-image: url('@{baseDir}images/klarna-visa-mastercard.png');
+                            width: 140px;
+                            max-width: 50%;
+                            height: 40px;
+                        }
+                    }
+                }
+
+                &.banktransfer {
+                    background: #0037a8;
+                    color: @color-white;
+
+                    &:hover {
+                        background: darken(#0037a8, 10%);
+                    }
+
+                    span {
+                        max-width: ~"calc(100% - 70px)";
+                        &:after {
+                            background-image: url('@{baseDir}images/BankTransferIc.png');
+                            width: 60px;
+                            height: 50px;
+                        }
+                    }
+
+                    &.other-methods {
+                        background: #000;
+                        box-sizing: border-box;
+                        padding: 9px 17px 10px;
+
+                        span {
+                            // Non-JP: no in-button payment icons; text centered.
+                            width: 100%;
+                            max-width: 100%;
+                            text-align: center;
+
+                            &:after {
+                                content: none;
+                            }
+
+                            // JP (store 17 / lang=ja): keep the accepted-card icons beside the text.
+                            html[lang="ja"] & {
+                                width: 50%;
+                                max-width: 50%;
+                                text-align: left;
+
+                                &:after {
+                                    content: "";
+                                    background: url('@{baseDir}images/visa-mc-jcb.png') ~'100% 50% / 80% no-repeat';
+                                    width: 162px;
+                                    max-width: 55%;
+                                    height: 40px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Checkout cart page (bottom)
+        &__bottom {
+            background: @color-white;
+        }
+
+        .block.crosssell {
+            padding-right: 0;
+
+            .title {
+                text-align: center;
+            }
+        }
+
+        html[lang="sv"] &,
+        html[lang="dk"] &,
+        html[lang="da"] & {
+
+            ul.checkout.methods.items.checkout-methods-items {
+                display: flex;
+                flex-direction: column-reverse;
+                justify-content: space-between;
+
+                .item {
+                    margin-top: 15px;
+                    margin-bottom: 0;
+
+                    & + .item {
+                        margin-top: 0;
+                    }
+                }
+            }
+
+        }
+
+        html[lang="nb"] & {
+            ul.checkout.methods.items.checkout-methods-items {
+                display: flex;
+                flex-direction: column-reverse;
+
+                .item:last-child {
+                    order: -1;
+                }
+            }
+        }
+    }
+
+    // Icon USPs strip (cart page only)
+    .checkout-cart-index {
+        .icon-usps__wrapper {
+            .lib-vendor-prefix-display(flex);
+        }
+        .icon-usps__container {
+            .lib-vendor-prefix-display(flex);
+            line-height: 1.2;
+            max-height: 130px;
+            background: #ededed;
+            border-radius: 5px;
+            color: #3b3b3b;
+            font-weight: 700;
+
+            img, p {
+                margin: auto;
+            }
+
+            img {
+                max-width: 20%;
+            }
+            p {
+                max-width: 60%;
+            }
+        }
+    }
+
+    // Hide the "Clear" / "Update" cart action buttons (cart page)
+    .checkout-cart-index {
+        .cart-container {
+            .form-cart {
+                .actions.main {
+                    .clear,
+                    .action.update {
+                        display: none;
+                    }
+                }
+            }
+        }
+
+        // Delete-confirm modal on the cart page
+        .modal-popup {
+            .modal-inner-wrap {
+                max-width: 50rem;
+            }
+        }
+    }
+
+    //
+    //  Minicart dropdown (ported from base Evalent/carpet)
+    //  _____________________________________________
+
+    .block-minicart .block-content > .actions {
+        display: none;
+
+        & ~ .actions {
+            display: block;
+        }
+
+        a {
+            background: #eee;
+            padding: 14px;
+        }
+    }
+
+    .minicart-wrapper {
+
+        #minicart-content-wrapper {
+            .lib-vendor-prefix-display(flex);
+            .lib-vendor-prefix-flex-direction(column);
+        }
+
+        .block-minicart {
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            right: 0;
+            top: 120%;
+            overflow: hidden;
+
+            .subtitle.empty {
+                padding: 10px 0 50px;
+            }
+
+            .block-content {
+                position: static;
+
+                & > .actions {
+                    margin: 0 -25px;
+
+                    & > .primary,
+                    & > .secondary {
+                        margin: 0 0 15px;
+                        padding: 20px;
+
+                        .action.primary {
+                            font-size: 1.5rem;
+                        }
+
+                        .action.primary.viewcart {
+                            margin-top: 25px;
+                            background-color: #2c8e3b !important;
+                            color: #fff;
+                        }
+                    }
+                }
+
+                // View and edit cart
+                & > .actions:last-of-type {
+                    a {
+                        display: block;
+                        padding: 1.2em;
+                        font-weight: @font-weight__bold;
+                    }
+                }
+            }
+
+            .items-total {
+                margin: 0;
+            }
+
+            .subtotal {
+                display: inline-block;
+                float: right;
+                margin: 0;
+
+                .label {
+                    float: left;
+                }
+
+                .amount.price-container {
+                    float: left;
+                    margin-left: 10px;
+
+                    .price {
+                        font-size: inherit;
+                    }
+                }
+            }
+        }
+    }
+
+    .minicart-items-wrapper {
+        padding: 0;
+        border: 0;
+    }
+
+    .minicart-items {
+        .product-item {
+            border-bottom: 1px solid #dedede;
+            border-top: none;
+
+            &:first-of-type {
+                border-top: 1px solid #dedede;
+            }
+            &:not(:first-child) {
+                border-top: none;
+            }
+
+            .product {
+                padding: 10px 0;
+                .lib-vendor-prefix-display(flex);
+
+                &.options {
+                    padding-top: 10px;
+                    display: block;
+                    padding-left: 0;
+                    margin-right: auto;
+                }
+            }
+        }
+
+        .product-item-name {
+            text-align: left;
+            margin: 0 0 4px;
+
+            a {
+                font-weight: @font-weight__bold;
+            }
+        }
+
+        .product-item-size {
+            text-align: left;
+            font-size: 1.1rem;
+        }
+
+        .product-item-details {
+            position: relative;
+            .lib-vendor-prefix-flex-basis(~"calc(100% - 90px)");
+            margin-left: auto;
+            padding-left: 0;
+            .lib-vendor-prefix-display(flex);
+            .lib-vendor-prefix-flex-direction(column);
+            justify-content: space-between;
+
+            .product.actions {
+                position: absolute;
+                right: 0;
+
+                .action.edit {
+                    display: none;
+                }
+            }
+        }
+
+        .product-item-pricing {
+            .lib-vendor-prefix-display(flex);
+            align-items: baseline;
+            justify-content: space-between;
+        }
+
+        .item-qty {
+            margin-right: 5px;
+            margin-left: 6px;
+            max-width: 40px;
+            height: 30px;
+            padding: 5px;
+        }
+
+        .action.edit,
+        .action.delete {
+            margin-top: 10px;
+        }
+
+        // Unique products — non-editable qty
+        input[type="number"]:disabled {
+            &.cart-item-qty--unique {
+                opacity: 1;
+                border: none;
+                text-align: right;
+            }
+        }
+
+        .update-cart-item {
+            vertical-align: unset;
+            height: 30px;
+            padding: 5px 10px;
+        }
+    }
+}
+
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__xs) {
+
+    // Minicart dropdown near-full-width on small screens (matches base)
+    .minicart-wrapper {
+        .block-minicart {
+            width: 85vw;
+        }
+    }
+
+    // Checkout cart page
+    .checkout-cart-index {
+        .icon-usps {
+            &__container {
+                background: #ededed;
+                padding: 15px 5px;
+                text-align: center;
+                font-weight: 700;
+                color: #3b3b3b;
+                border-radius: 5px;
+                font-size: 11px;
+
+                & > div {
+                    margin-bottom: 1rem;
+
+                    &:before {
+                        font-size: 3rem;
+                    }
+                }
+
+                p {
+                    font-size: 1.2rem;
+                    margin-bottom: 0;
+                }
+            }
+        }
+
+        .cart-container {
+            .products-grid.grid.products-crosssell .product-items {
+                margin-bottom: 0 !important;
+            }
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+
+    .cart-empty {
+        text-align: center;
+    }
+
+    // Checkout cart page
+    .checkout-cart-index {
+
+        .icon-usps {
+            &__wrapper {
+                .lib-vendor-prefix-order(4);
+                .lib-vendor-prefix-flex-direction(column);
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            &__container {
+                padding: 10px 15px;
+                // Each stacked USP item spaced 5px top/bottom on small device.
+                margin: 5px 0;
+            }
+        }
+
+        // Title
+        .page-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        // Summary
+        .cart-summary {
+            .block.shipping {
+                & > .title {
+                    border-top: none;
+                }
+            }
+        }
+
+        .cart-container {
+            padding: 0 15px;
+            .lib-vendor-prefix-display(flex);
+            .lib-vendor-prefix-flex-direction(column);
+
+            .form-cart {
+                .lib-vendor-prefix-order(1);
+            }
+
+            .cart-discount {
+                .lib-vendor-prefix-order(2);
+                margin-bottom: 5px;
+            }
+
+            .block.crosssell {
+                .lib-vendor-prefix-order(2);
+            }
+
+            .cart-summary {
+                .lib-vendor-prefix-order(3);
+
+                & > .title {
+                    display: block;
+                    margin: 25px 15px;
+                }
+            }
+        }
+
+        .block.crosssell {
+            width: auto;
+        }
+
+        &__bottom {
+            .page-main {
+                .block.crosssell,
+                .block.block-new-products {
+                    padding: 0 15px;
+                }
+
+                .block {
+                    .title {
+                        strong {
+                            font-size: 2.5rem;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Override grid padding
+        .col-product-image {
+            padding: 0;
+        }
+
+        // Cart
+        .cart.table-wrapper {
+            border-top: none;
+
+            // Image
+            .product-item-photo {
+                position: static;
+                max-width: unset;
+            }
+
+            // Price
+            .col.price[data-th] {
+                &:before {
+                    display: none;
+                }
+            }
+        }
+        .cart-container {
+            .form-cart {
+                margin-bottom: 35px;
+            }
+        }
+
+        .cart.items.table {
+            .cart.item {
+                width: 100%;
+                padding: 0 15px;
+
+                // Kill grid negative gutters so left/right spacing is symmetric
+                // (image col has padding:0, was pulling the row off-centre).
+                .item-info,
+                .nested-table-row {
+                    margin-left: 0;
+                    margin-right: 0;
+                }
+
+                .item-info {
+                    padding: 15px 5px;
+                }
+            }
+        }
+
+        // Discount
+        .cart-discount {
+            .block {
+                .title {
+                    padding-top: 15px;
+                    padding-bottom: 20px;
+
+                    &:after {
+                        line-height: 2;
+                    }
+                }
+
+                .content {
+                    padding: 0 15px;
+                }
+            }
+        }
+
+        .page-main {
+            .page-title-wrapper {
+                margin-top: 1em;
+            }
+            .page-title {
+                margin-bottom: 1em;
+            }
+        }
+    }
+}
+
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+
+    .cart-empty {
+
+        &:before {
+            height: 250px;
+        }
+    }
+
+    // Checkout cart page
+    .checkout-cart-index {
+
+        // Crosssell
+        .block.crosssell {
+            width: 100%;
+        }
+
+        // Summary
+        .cart-summary {
+            padding: 25px;
+            width: 34%;
+        }
+
+        // Items
+        .cart-container {
+            .form-cart {
+                width: 65%;
+            }
+        }
+        .cart.items.table {
+            .cart.item {
+                .item-info {
+                    padding: 20px 15px 25px;
+                }
+            }
+        }
+
+        // Discount
+        .cart-discount {
+            width: 50%;
+            position: relative;
+            top: -25px;
+        }
+
+        .icon-usps {
+            &__container {
+                padding: 10px 15px;
+                height: 100%;
+            }
+
+            &__wrapper {
+                .lib-vendor-prefix-display(flex);
+                width: 63%;
+            }
+        }
+    }
+
+    .checkout-cart-index {
+        .column.main {
+            .cart-container {
+                .cart-discount {
+                    padding-left: @layout-indent__width;
+
+                    /* Crosssell right below discount field */
+                    & + .block.crosssell {
+                        width: 66%;
+                        position: relative;
+                        display: block;
+                        float: left;
+                        padding-right: @layout-indent__width;
+                        padding-left: @layout-indent__width;
+
+                        .title {
+                            text-align: left;
+                            margin-top: 0;
+                            margin-bottom: 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+
+    // Checkout cart page
+    .checkout-cart-index {
+        .cart-container {
+            .form-cart {
+                padding-right: 0;
+            }
+        }
+    }
+}
+
+
+//  Cart as slide-out drawer (Carpient config: carpient/cart/enable_drawer = Yes).
+//  When off, the .minicart-drawer class is absent and the normal dropdown shows.
+//  _____________________________________________
+& when (@media-common = true) {
+    .minicart-wrapper.minicart-drawer {
+
+        //  Dimmed overlay behind the panel (open state), fades in
+        &.active:before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+            animation: ev-drawer-fade 0.3s ease both;
+        }
+
+        //  Slide-in motion when the drawer opens
+        &.active .ui-dialog {
+            animation: ev-drawer-in 0.3s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+        }
+
+        //  The minicart is a jQuery-UI dialog — style the dialog wrapper as a
+        //  right-docked drawer (!important beats the widget's inline sizing).
+        .ui-dialog {
+            position: fixed !important;
+            top: 0 !important;
+            right: 0 !important;
+            left: auto !important;
+            bottom: 0 !important;
+            width: 400px !important;
+            max-width: 90vw !important;
+            height: 100vh !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.15);
+            z-index: 1000 !important;
+        }
+
+        .block-minicart {
+            position: static !important;
+            width: 100% !important;
+            max-width: none !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 35px !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-sizing: border-box;
+            overflow-y: auto;
+
+            //  No dropdown arrow in drawer mode
+            &:before,
+            &:after {
+                display: none !important;
+            }
+        }
+
+        //  Column layout so items scroll and the actions pin to the bottom
+        .block-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        #minicart-content-wrapper {
+            flex: 1 1 auto;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .minicart-items-wrapper {
+            flex: 1 1 auto;
+            max-height: none;
+        }
+
+        //  Drop only the top "View and Edit Cart" primary link in drawer mode
+        //  (the bottom drawer bar carries the actions instead).
+        .block-content > .actions:not(.minicart-drawer-actions) .action.primary.viewcart {
+            display: none !important;
+        }
+
+        //  Drawer-only bottom actions bar (Proceed to Checkout + View/Edit Cart)
+        .minicart-drawer-actions {
+            display: block;
+            position: sticky;
+            bottom: 0;
+            z-index: 999;
+            margin: auto -35px -35px;
+            padding: 18px 35px;
+            background: #fff;
+            border-top: 1px solid #e6e6e6;
+
+            .action.primary.checkout {
+                display: block;
+                width: 100%;
+                margin: 0 0 12px;
+                padding: 14px;
+                background: #0c0c0c;
+                border: 1px solid #0c0c0c;
+                border-radius: 4px;
+                color: #fff;
+                font-weight: @font-weight__bold;
+                text-align: center;
+
+                &:hover {
+                    background: #000;
+                }
+            }
+
+            //  Checkout only in the bottom bar — no View/Edit Cart here
+            .secondary .action.viewcart {
+                display: none;
+            }
+        }
+    }
+}
+
+//  Bottom actions (Proceed to Checkout) belong to the drawer only —
+//  hidden in the normal dropdown minicart.
+.minicart-drawer-actions {
+    display: none;
+}
+
+.minicart-wrapper:not(.minicart-drawer) .minicart-drawer-actions {
+    display: none !important;
+}
+
+@keyframes ev-drawer-in {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes ev-drawer-fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .minicart-wrapper.minicart-drawer .block-minicart {
+        width: 88vw;
+    }
+}

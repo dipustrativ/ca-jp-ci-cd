@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Merged from Evalent_InvoicePaymentMethod: validate email in checkout session -->
+    <type name="Magento\Customer\Model\AccountManagement">
+        <plugin name="evinvoicepayment_email_plugin" type="Evalent\InvoicePaymentMods\Plugin\PluginCheckEmail" sortOrder="10"/>
+    </type>
+
+    <type name="Evalent\InvoicePaymentMods\Helper\Data">
+        <plugin name="evalent_invoicepaymentmods_helper_data_plugin" type="Evalent\InvoicePaymentMods\Plugin\Helper\Data"/>
+    </type>
+    <type name="Magento\Sales\Model\Order\Email\Container\InvoiceIdentity">
+        <plugin name="evalent_invoicepaymentmods_set_template_it" type="Evalent\InvoicePaymentMods\Plugin\Model\Order\Email\Container\InvoiceIdentity"/>
+    </type>
+
+    <type name="Magento\Sales\Block\Adminhtml\Order\Invoice\View">
+        <plugin name="evalent_add_recipt_button" type="Evalent\InvoicePaymentMods\Plugin\Block\Adminhtml\Order\View"/>
+    </type>
+
+    <!-- Invoice PDF renderer (merged Method base Plugin\Invoice -> Mods Overwrite child) -->
+    <preference for="Magento\Sales\Model\Order\Pdf\Invoice" type="Evalent\InvoicePaymentMods\Overwrite\Plugin\Invoice" />
+
+    <type name="\Magento\Framework\Locale\ResolverInterface">
+        <plugin name="mage_localeresolver_reload" type="Magento\Framework\Translate\Locale\Resolver\Plugin" sortOrder="1" disabled="false"/>
+    </type>
+
+     <preference for="Magento\Sales\Model\Order\Pdf\Items\Invoice\DefaultInvoice" type="Evalent\InvoicePaymentMods\Overwrite\Plugin\DefaultInvoice" />
+     <preference for="Magento\Tax\Model\Sales\Pdf\Grandtotal" type="Evalent\InvoicePaymentMods\Overwrite\Tax\Model\Sales\Pdf\Grandtotal" />
+</config>

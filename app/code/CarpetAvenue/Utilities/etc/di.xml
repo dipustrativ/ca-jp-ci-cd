@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Virtual collection for the region listing grid backed by directory_country_region -->
+    <virtualType name="CarpetAvenue\Utilities\Model\ResourceModel\Region\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">directory_country_region</argument>
+            <argument name="resourceModel" xsi:type="string">Magento\Directory\Model\ResourceModel\Region</argument>
+        </arguments>
+    </virtualType>
+
+    <!--
+        Register the virtual collections under their listing data-source names.
+        Keep every data source in this ONE <type> block — di.xml's XSD declares a
+        unique constraint on <type name>, so a second block for the same class is
+        invalid and fails config validation in developer mode.
+    -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="utilities_region_listing_data_source"
+                      xsi:type="string">CarpetAvenue\Utilities\Model\ResourceModel\Region\Grid\Collection</item>
+                <item name="utilities_attributeoverride_value_listing_data_source"
+                      xsi:type="string">CarpetAvenue\Utilities\Model\ResourceModel\AttributeOverrideValue\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Media Cleanup & Backup — Console Commands
+         ═══════════════════════════════════════════════════════════════════ -->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="carpetavenueMediaCleanupDisabledCache"
+                      xsi:type="object">CarpetAvenue\Utilities\Console\Command\Media\CleanupDisabledCacheCommand</item>
+                <item name="carpetavenueMediaCleanupOrphanCache"
+                      xsi:type="object">CarpetAvenue\Utilities\Console\Command\Media\CleanupOrphanCacheCommand</item>
+                <item name="carpetavenueMediaResizeDisabled"
+                      xsi:type="object">CarpetAvenue\Utilities\Console\Command\Media\ResizeDisabledCommand</item>
+                <item name="carpetavenueMediaRestoreFromGcs"
+                      xsi:type="object">CarpetAvenue\Utilities\Console\Command\Media\RestoreFromGcsCommand</item>
+                <item name="carpetavenueMediaRetrieveOriginals"
+                      xsi:type="object">CarpetAvenue\Utilities\Console\Command\Media\RetrieveOriginalsCommand</item>
+                <item name="carpetavenueMediaManualBackup"
+                      xsi:type="object">CarpetAvenue\Utilities\Console\Command\Media\ManualBackupCommand</item>
+                <!-- Attribute Override -->
+                <item name="carpetavenueAttributeOverrideDetect"
+                      xsi:type="object">CarpetAvenue\Utilities\Console\Command\AttributeOverride\DetectCommand</item>
+                <item name="carpetavenueAttributeOverrideFix"
+                      xsi:type="object">CarpetAvenue\Utilities\Console\Command\AttributeOverride\FixCommand</item>
+                <item name="carpetavenueAttributeOverrideSnapshot"
+                      xsi:type="object">CarpetAvenue\Utilities\Console\Command\AttributeOverride\SnapshotCommand</item>
+                <item name="carpetavenueAttributeOverrideImport"
+                      xsi:type="object">CarpetAvenue\Utilities\Console\Command\AttributeOverride\ImportCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Web Images — SVG / WebP upload support
+         Merged from MagestyApps_WebImages (see README → Web Images).
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <!-- Allow svg/webp through the media-storage and validation whitelists -->
+    <type name="Magento\Cms\Model\Wysiwyg\Images\Storage">
+        <arguments>
+            <argument name="extensions" xsi:type="array">
+                <item name="allowed" xsi:type="array">
+                    <item name="svg" xsi:type="string">image/svg</item>
+                    <item name="svg-xml" xsi:type="string">image/svg+xml</item>
+                    <item name="webp" xsi:type="string">image/webp</item>
+                </item>
+                <item name="image_allowed" xsi:type="array">
+                    <item name="svg" xsi:type="string">image/svg</item>
+                    <item name="svg-xml" xsi:type="string">image/svg+xml</item>
+                    <item name="webp" xsi:type="string">image/webp</item>
+                </item>
+            </argument>
+        </arguments>
+        <plugin name="carpetavenue_utilities_webimages_wysiwyg_storage"
+                type="CarpetAvenue\Utilities\WebImages\Plugin\Wysiwyg\Images\StoragePlugin"/>
+    </type>
+
+    <virtualType name="Magento\Catalog\CategoryImageUpload" type="Magento\Catalog\Model\ImageUploader">
+        <arguments>
+            <argument name="allowedExtensions" xsi:type="array">
+                <item name="svg" xsi:type="string">svg</item>
+                <item name="webp" xsi:type="string">webp</item>
+            </argument>
+            <argument name="allowedMimeTypes" xsi:type="array">
+                <item name="svg" xsi:type="string">image/svg</item>
+                <item name="svg-xml" xsi:type="string">image/svg+xml</item>
+                <item name="webp" xsi:type="string">image/webp</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\MediaGallerySynchronization\Model\FetchMediaStorageFileBatches">
+        <arguments>
+            <argument name="fileExtensions" xsi:type="array">
+                <item name="svg" xsi:type="string">svg</item>
+                <item name="webp" xsi:type="string">webp</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\Api\ImageContentValidator">
+        <arguments>
+            <argument name="allowedMimeTypes" xsi:type="array">
+                <item name="svg" xsi:type="string">image/svg</item>
+                <item name="svg-xml" xsi:type="string">image/svg+xml</item>
+                <item name="webp" xsi:type="string">image/webp</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\MediaGalleryIntegration\Plugin\SaveImageInformation">
+        <arguments>
+            <argument name="imageExtensions" xsi:type="array">
+                <item name="svg" xsi:type="string">svg</item>
+                <item name="webp" xsi:type="string">webp</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\MediaGallerySynchronization\Model\CreateAssetFromFile">
+        <arguments>
+            <argument name="assetFactory" xsi:type="object">CarpetAvenue\Utilities\WebImages\Model\AssetFactory</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PageBuilder\Controller\Adminhtml\ContentType\Image\Upload">
+        <arguments>
+            <argument name="uploaderFactory" xsi:type="object">CarpetAvenue\Utilities\WebImages\Model\File\UploaderFactory</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Catalog\Model\Product\Gallery\Processor">
+        <plugin name="carpetavenue_utilities_webimages_gallery_processor"
+                type="CarpetAvenue\Utilities\WebImages\Plugin\Product\Gallery\ProcessorPlugin"/>
+    </type>
+    <type name="Magento\MediaStorage\App\Media">
+        <plugin name="carpetavenue_utilities_webimages_media"
+                type="CarpetAvenue\Utilities\WebImages\Plugin\App\MediaPlugin"/>
+    </type>
+    <type name="Magento\MediaStorage\Model\File\Uploader">
+        <plugin name="carpetavenue_utilities_webimages_uploader"
+                type="CarpetAvenue\Utilities\WebImages\Plugin\File\UploaderPlugin"/>
+    </type>
+    <type name="Magento\MediaStorage\Model\File\Validator\NotProtectedExtension">
+        <plugin name="carpetavenue_utilities_webimages_not_protected_extension"
+                type="CarpetAvenue\Utilities\WebImages\Plugin\File\Validator\NotProtectedExtensionPlugin"/>
+    </type>
+    <type name="Magento\Cms\Controller\Adminhtml\Wysiwyg\Images\Thumbnail">
+        <plugin name="carpetavenue_utilities_webimages_wysiwyg_thumbnail"
+                type="CarpetAvenue\Utilities\WebImages\Plugin\Controller\Adminhtml\Wysiwyg\Images\ThumbnailPlugin"/>
+    </type>
+    <type name="Magento\Cms\Controller\Adminhtml\Wysiwyg\Directive">
+        <plugin name="carpetavenue_utilities_webimages_wysiwyg_directive"
+                type="CarpetAvenue\Utilities\WebImages\Plugin\Controller\Adminhtml\Wysiwyg\DirectivePlugin"/>
+    </type>
+    <type name="Magento\Theme\Model\Design\Backend\Logo">
+        <plugin name="carpetavenue_utilities_webimages_design_logo"
+                type="CarpetAvenue\Utilities\WebImages\Plugin\Design\Backend\ImagePlugin"/>
+    </type>
+    <type name="Magento\Theme\Model\Design\Backend\Favicon">
+        <plugin name="carpetavenue_utilities_webimages_design_favicon"
+                type="CarpetAvenue\Utilities\WebImages\Plugin\Design\Backend\ImagePlugin"/>
+    </type>
+    <type name="Magento\Theme\Model\Design\Backend\Image">
+        <plugin name="carpetavenue_utilities_webimages_design_image"
+                type="CarpetAvenue\Utilities\WebImages\Plugin\Design\Backend\ImagePlugin"/>
+    </type>
+    <type name="Magento\Swatches\Helper\Media">
+        <plugin name="carpetavenue_utilities_webimages_swatches_media"
+                type="CarpetAvenue\Utilities\WebImages\Plugin\Swatches\Helper\MediaPlugin"/>
+    </type>
+
+</config>

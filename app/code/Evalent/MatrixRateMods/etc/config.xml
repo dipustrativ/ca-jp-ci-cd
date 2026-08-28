@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carriers>
+            <matrixrate>
+                <force_weight>0</force_weight>
+            </matrixrate>
+        </carriers>
+        <shipping>
+            <shipping_label_options>
+                <sender_name>Carpet Avenue</sender_name>
+                <sender_company>Carpet Avenue Gmbh</sender_company>
+            </shipping_label_options>
+        </shipping>
+    </default>
+</config>

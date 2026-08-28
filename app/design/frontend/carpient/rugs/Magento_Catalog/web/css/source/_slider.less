@@ -1,0 +1,187 @@
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .slider-container, .elastyslider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .slider, .elastyslider__slider {
+        width: 100%;
+        margin: 10px 20px 10px;
+        text-align: center;
+        position: relative;
+
+        &.use-arrows {
+            &:before,
+            &:after {
+                content: '';
+                z-index: 1;
+                background: none;
+                pointer-events: none;
+            }
+        }
+    }
+
+    .elastyslider__slides {
+        display: flex;
+        overflow-x: scroll;
+        position: relative;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        flex-wrap: nowrap !important;
+        //scroll-padding-left: 15px;
+        margin: 0 0 10px !important;
+
+        &.items {
+            & > .scroll-element {
+                &.scroll-x {
+                    height: 6px;
+                }
+                .scroll-element_outer {
+                    border-radius: 0;
+                }
+                .scroll-bar {
+                    opacity: 1;
+                    background-color: #333;
+                }
+                .scroll-element_track {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    .slide, .elastyslider__slide {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        width: 40% !important;
+        max-width: 40% !important;
+        margin-right: 0px;
+        box-sizing: border-box;
+        transform-origin: left center;
+        transform: scale(1);
+        scroll-snap-align: start;
+
+        a {
+            background: none;
+            border: none;
+        }
+
+        .cart-container & {
+            width: 50% !important;
+            max-width: 50% !important;
+        }
+    }
+
+
+    a.slide__prev,
+    a.elastyslider__slide__prev,
+    .slider:before,
+    .elastyslider__slider:before {
+        transform: rotate(135deg);
+        -webkit-transform: rotate(135deg);
+        left: 1%;
+    }
+
+    a.slide__next,
+    a.elastyslider__slide__next,
+    .slider:after,
+    .elastyslider__slider:after {
+        transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+        right: 0;
+    }
+
+    .slider:before,
+    .slider:after,
+    .elastyslider__slider:before,
+    .elastyslider__slider:after,
+    .slide__prev,
+    .slide__next,
+    .elastyslider__slide__next,
+    .elastyslider__slide__prev {
+        position: absolute;
+        top: 40%;
+        width: 20px;
+        height: 20px;
+        border: 1px solid #757575;
+        border-width: 0 2px 2px 0;
+        padding: 3px;
+        box-sizing: border-box;
+    }
+
+    .elastyslider__slide__prev {
+        left: 5%;
+        top: 37%;
+        pointer-events: none;
+    }
+    .elastyslider__slide__next {
+        right: -27%;
+        top: 37%;
+        pointer-events: none;
+    }
+
+
+    .slider__nav, .elastyslider__slider__nav {
+        box-sizing: border-box;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 200px;
+        margin-left: -100px;
+        text-align: center;
+
+    }
+
+    .slider__navlink, .elastyslider__slider__navlink {
+        display: inline-block;
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+        background-color: #888;
+        margin: 0 10px 0 10px;
+    }
+
+    // Similar products: 2-column static grid instead of horizontal slider
+    .catalog-product-similar-ajax {
+        .elastyslider__slides {
+            flex-wrap: wrap !important;
+            overflow-x: hidden !important;
+            scroll-snap-type: none;
+        }
+        .elastyslider__slide {
+            width: 50% !important;
+            max-width: 50% !important;
+            flex-shrink: 1;
+            scroll-snap-align: none;
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .elastyslider__slides {
+
+        &.items {
+            & > .scroll-element {
+                &.scroll-x {
+                    display: none !important;
+                }
+            }
+        }
+
+        &.scroll-wrapper {
+            overflow: initial !important;
+
+            & > .elastyslider__slides.scroll-content {
+                width: 100% !important;
+                overflow: initial !important;
+            }
+        }
+    }
+}

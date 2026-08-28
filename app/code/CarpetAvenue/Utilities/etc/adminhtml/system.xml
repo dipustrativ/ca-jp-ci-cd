@@ -1,0 +1,415 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @package   CarpetAvenue_Utilities
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <!--
+            Section: Utilities
+            Tab: carpetavenue (defined in CarpetAvenue_Core system.xml)
+
+            Group layout:
+              general                              — Master enable, GCS bucket & credentials
+              media_cleanup                        — Media Cleanup & Backup sub-groups
+              media_cleanup/disabled_cache         — Disabled product cache cleanup options
+              media_cleanup/orphan_cache           — Orphan cache cleanup options
+              media_cleanup/disabled_resize        — Disabled product image resize options
+
+            Add new feature groups here as siblings to media_cleanup (sortOrder 200+).
+        -->
+        <section id="carpetavenue_utilities" translate="label" type="text" sortOrder="200" showInDefault="1">
+            <class>separator-top</class>
+            <label>Utilities</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_Utilities::media_cleanup</resource>
+
+            <!-- ── General / Global settings ──────────────────────────── -->
+            <group id="general" translate="label" type="text" sortOrder="5" showInDefault="1">
+                <label>General</label>
+                <comment><![CDATA[Global enable switch and shared GCS credentials used by all Media Cleanup &amp; Backup commands. CLI options always take priority.]]></comment>
+
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1">
+                    <label>Master Enable</label>
+                    <comment><![CDATA[Enable or disable all Media Cleanup & Backup commands globally. Each operation also has its own enable toggle below.]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="gcs_bucket" translate="label comment" type="text" sortOrder="20" showInDefault="1">
+                    <label>GCS Bucket Name</label>
+                    <comment><![CDATA[Google Cloud Storage bucket name (without gs:// prefix). Used by all commands unless overridden via --bucket CLI option.]]></comment>
+                </field>
+
+                <field id="gcs_credentials" translate="label comment" type="file" sortOrder="30" showInDefault="1">
+                    <label>GCS Credentials JSON</label>
+                    <comment><![CDATA[Upload your GCP service-account key JSON file. Stored securely under <code>var/carpetavenue/gcs/</code>. Leave empty to use Application Default Credentials (ADC). Can be overridden with --credentials CLI option.]]></comment>
+                    <backend_model>CarpetAvenue\Utilities\Model\Config\Backend\GcsCredentials</backend_model>
+                </field>
+            </group>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 MEDIA CLEANUP & BACKUP
+                 Commands: bin/magento carpetavenue:media:cleanup:disabled-cache
+                           bin/magento carpetavenue:media:cleanup:orphan-cache
+                           bin/magento carpetavenue:media:resize:disabled
+                 CLI options always override these values.
+                 ══════════════════════════════════════════════════════════ -->
+
+            <group id="media_cleanup" translate="label" type="text" sortOrder="10" showInDefault="1">
+                <label>Media Cleanup &amp; Backup</label>
+                <comment><![CDATA[Per-command settings. GCS bucket and credentials are configured in the General group above.]]></comment>
+
+                <!-- ── Disabled Product Cache Images Cleanup ───────────────── -->
+                <group id="disabled_cache" translate="label" type="text" sortOrder="20" showInDefault="1">
+                    <label>Disabled Cache Cleanup</label>
+                    <comment><![CDATA[Command: <code>bin/magento carpetavenue:media:cleanup:disabled-cache</code><br/>Deletes cache images for disabled products (non-role gallery images only). Originals are NEVER touched.]]></comment>
+
+                    <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1">
+                        <label>Enable</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="id_from" translate="label comment" type="text" sortOrder="20" showInDefault="1">
+                        <label>Min Product ID (id-from)</label>
+                        <comment><![CDATA[Process products with entity_id ≥ this value. CLI --id-from takes priority.]]></comment>
+                    </field>
+
+                    <field id="id_to" translate="label comment" type="text" sortOrder="30" showInDefault="1">
+                        <label>Max Product ID (id-to)</label>
+                        <comment><![CDATA[Process products with entity_id ≤ this value. CLI --id-to takes priority.]]></comment>
+                    </field>
+
+                    <field id="limit" translate="label comment" type="text" sortOrder="40" showInDefault="1">
+                        <label>Max Files Per Run</label>
+                        <comment><![CDATA[Maximum cache files to delete per run. 0 = unlimited. CLI --limit takes priority.]]></comment>
+                    </field>
+
+                    <field id="enable_zip" translate="label comment" type="select" sortOrder="50" showInDefault="1">
+                        <label>Enable ZIP Backup</label>
+                        <comment><![CDATA[Create a ZIP of staged files and upload to GCS before deletion. CLI --zip takes priority.]]></comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="staging_dir" translate="label comment" type="text" sortOrder="60" showInDefault="1">
+                        <label>Custom Staging Directory</label>
+                        <comment><![CDATA[Absolute path. Leave empty for default: <code>var/log/carpetavenue/disabled_product_cache_cleanup/staging</code>. CLI --staging-dir takes priority.]]></comment>
+                    </field>
+                </group>
+
+                <!-- ── Orphan Cache Images Cleanup ────────────────────────── -->
+                <group id="orphan_cache" translate="label" type="text" sortOrder="30" showInDefault="1">
+                    <label>Orphan Cache Cleanup</label>
+                    <comment><![CDATA[Command: <code>bin/magento carpetavenue:media:cleanup:orphan-cache</code><br/>Deletes cache images with no corresponding original in the product media gallery.]]></comment>
+
+                    <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1">
+                        <label>Enable</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="limit" translate="label comment" type="text" sortOrder="20" showInDefault="1">
+                        <label>Max Files Per Run</label>
+                        <comment><![CDATA[Maximum orphan files to delete per run. 0 = unlimited. CLI --limit takes priority.]]></comment>
+                    </field>
+
+                    <field id="enable_zip" translate="label comment" type="select" sortOrder="30" showInDefault="1">
+                        <label>Enable ZIP Backup</label>
+                        <comment><![CDATA[ZIP orphan files before deletion and upload to GCS. CLI --zip takes priority.]]></comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                </group>
+
+                <!-- ── Disabled Product Image Resize ──────────────────────── -->
+                <group id="disabled_resize" translate="label" type="text" sortOrder="40" showInDefault="1">
+                    <label>Disabled Image Resize</label>
+                    <comment><![CDATA[Command: <code>bin/magento carpetavenue:media:resize:disabled</code><br/>Resizes original images for disabled products in-place. Originals are backed up to staging BEFORE any resize.]]></comment>
+
+                    <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1">
+                        <label>Enable</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="id_from" translate="label comment" type="text" sortOrder="20" showInDefault="1">
+                        <label>Min Product ID (id-from)</label>
+                        <comment><![CDATA[CLI --id-from takes priority.]]></comment>
+                    </field>
+
+                    <field id="id_to" translate="label comment" type="text" sortOrder="30" showInDefault="1">
+                        <label>Max Product ID (id-to)</label>
+                        <comment><![CDATA[CLI --id-to takes priority.]]></comment>
+                    </field>
+
+                    <field id="limit" translate="label comment" type="text" sortOrder="40" showInDefault="1">
+                        <label>Max Images Per Run</label>
+                        <comment><![CDATA[0 = unlimited. CLI --limit takes priority.]]></comment>
+                    </field>
+
+                    <field id="max_width" translate="label comment" type="text" sortOrder="50" showInDefault="1">
+                        <label>Max Width (px)</label>
+                        <comment><![CDATA[Target maximum width. Default: 1200. CLI --max-width takes priority.]]></comment>
+                    </field>
+
+                    <field id="max_height" translate="label comment" type="text" sortOrder="60" showInDefault="1">
+                        <label>Max Height (px)</label>
+                        <comment><![CDATA[Target maximum height. Default: 1200. CLI --max-height takes priority.]]></comment>
+                    </field>
+
+                    <field id="quality" translate="label comment" type="text" sortOrder="70" showInDefault="1">
+                        <label>JPEG Quality (1–100)</label>
+                        <comment><![CDATA[Compression quality for JPEG/WebP. Default: 82. CLI --quality takes priority.]]></comment>
+                    </field>
+
+                    <field id="driver" translate="label comment" type="select" sortOrder="80" showInDefault="1">
+                        <label>Image Driver</label>
+                        <comment><![CDATA[PHP image library. auto = prefer Imagick, fallback to GD. CLI --driver takes priority.]]></comment>
+                        <source_model>CarpetAvenue\Utilities\Model\Config\Source\ImageDriver</source_model>
+                    </field>
+
+                    <field id="enable_zip" translate="label comment" type="select" sortOrder="90" showInDefault="1">
+                        <label>Enable ZIP Backup</label>
+                        <comment><![CDATA[ZIP originals before resize and upload to GCS. CLI --zip takes priority.]]></comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="staging_dir" translate="label comment" type="text" sortOrder="100" showInDefault="1">
+                        <label>Custom Staging Directory</label>
+                        <comment><![CDATA[Absolute path. Leave empty for default. CLI --staging-dir takes priority.]]></comment>
+                    </field>
+
+                    <field id="requalify_small" translate="label comment" type="select" sortOrder="110" showInDefault="1">
+                        <label>Re-quantify Small Images</label>
+                        <comment><![CDATA[When enabled, images that are already within the max dimensions are re-saved at the configured JPEG Quality instead of being skipped. Useful to reduce file size of large JPEGs that do not need dimension reduction. CLI <code>--requalify</code> takes priority.]]></comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="sold_before" translate="label comment" type="date" sortOrder="115" showInDefault="1">
+                        <label>Last Sold Before</label>
+                        <comment><![CDATA[Only process unique products whose last sale was <strong>before</strong> this date. Stored as <code>YYYY-MM-DD</code>. Products with no sales history are excluded. Leave empty to skip this filter. CLI <code>--sold-before</code> takes priority.]]></comment>
+                        <frontend_model>CarpetAvenue\Utilities\Block\Adminhtml\System\Config\DateField</frontend_model>
+                    </field>
+
+                    <field id="retrieve_originals_link" translate="label" type="button" sortOrder="120" showInDefault="1">
+                        <label>Retrieve Originals</label>
+                        <comment><![CDATA[Download GCS-backed originals by SKU as a ZIP file (max 20 SKUs per request).]]></comment>
+                        <frontend_model>CarpetAvenue\Utilities\Block\Adminhtml\System\Config\RetrieveLink</frontend_model>
+                    </field>
+                </group>
+
+                <!-- ── Manual Media Backup ────────────────────────────── -->
+                <group id="manual_backup" translate="label" type="text" sortOrder="50" showInDefault="1">
+                    <label>Manual Media Backup</label>
+                    <comment><![CDATA[Back up arbitrary product images to GCS via CSV. GCS bucket is taken from General above. Use the admin page for up to 50 paths; use CLI for unlimited.]]></comment>
+
+                    <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1">
+                        <label>Enable</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="gcs_prefix" translate="label comment" type="text" sortOrder="20" showInDefault="1">
+                        <label>GCS Path Prefix</label>
+                        <comment><![CDATA[Object path prefix inside the GCS bucket. Can be nested (e.g. <code>manual_backup/2024-jan</code>). Files stored as <code>gs://bucket/prefix/a/i/image.jpg</code>. Default: <code>manual_backup</code>.]]></comment>
+                    </field>
+
+                    <field id="cli_csv_upload" translate="label comment" type="file" sortOrder="30" showInDefault="1">
+                        <label>Upload CLI CSV</label>
+                        <comment><![CDATA[Upload a CSV here to save it persistently for CLI use. Saved as <code>cli_input_{timestamp}.csv</code> under <code>var/carpetavenue/manual_backup/</code>. The stored path is shown after save — copy it and use with:<br/><code>bin/magento carpetavenue:media:manual-backup --csv={path} --bucket=...</code><br/>No row limit via CLI.]]></comment>
+                        <backend_model>CarpetAvenue\Utilities\Model\Config\Backend\ManualBackupCsv</backend_model>
+                    </field>
+
+                    <field id="download_result_link" translate="label" type="button" sortOrder="40" showInDefault="1">
+                        <label>Last Backup Result</label>
+                        <comment><![CDATA[Result CSV from the most recent backup run (UI or CLI). Columns: <code>image_path</code>, <code>bucket_full_path</code>.]]></comment>
+                        <frontend_model>CarpetAvenue\Utilities\Block\Adminhtml\System\Config\ManualBackupDownloadLink</frontend_model>
+                    </field>
+
+                    <field id="open_page_link" translate="label" type="button" sortOrder="50" showInDefault="1">
+                        <label>Manual Backup Page</label>
+                        <comment><![CDATA[Open the admin page to upload a CSV (max 50 paths) and back up images to GCS immediately.]]></comment>
+                        <frontend_model>CarpetAvenue\Utilities\Block\Adminhtml\System\Config\ManualBackupLink</frontend_model>
+                    </field>
+                </group>
+
+            </group>
+
+
+            <!-- ══════════════════════════════════════════════════════════
+                 ATTRIBUTE OVERRIDE
+                 Commands: bin/magento carpetavenue:attribute-override:detect
+                           bin/magento carpetavenue:attribute-override:fix
+                 CLI options always override these values.
+                 ══════════════════════════════════════════════════════════ -->
+
+            <group id="attribute_override" translate="label" type="text" sortOrder="300" showInDefault="1">
+                <label>Attribute Override</label>
+                <comment><![CDATA[Detect and restore website-scope attribute values (price, image, custom) that were overwritten across store views. Detection and fix are CLI-driven — no PHP observer.]]></comment>
+
+                <!-- ── Quick links ───────────────────────────────────────── -->
+                <field id="manual_fix_link" translate="label" type="button" sortOrder="1" showInDefault="1">
+                    <label>Manual Fix</label>
+                    <comment><![CDATA[Apply override fixes per type/attribute/store with dry-run preview.]]></comment>
+                    <frontend_model>CarpetAvenue\Utilities\Block\Adminhtml\System\Config\AttributeOverride\ManualFixLink</frontend_model>
+                </field>
+
+                <field id="intended_values_link" translate="label" type="button" sortOrder="2" showInDefault="1">
+                    <label>Intended Values</label>
+                    <comment><![CDATA[View and delete intended value records in <code>carpetavenue_attribute_override_value</code>. Populate via CLI: <code>carpetavenue:attribute-override:snapshot</code> or <code>carpetavenue:attribute-override:import</code>.]]></comment>
+                    <frontend_model>CarpetAvenue\Utilities\Block\Adminhtml\System\Config\AttributeOverride\IntendedValuesLink</frontend_model>
+                </field>
+
+                <!-- ── Protected Stores ──────────────────────────────────────── -->
+                <field id="protected_stores" translate="label comment" type="multiselect" sortOrder="5" showInDefault="1">
+                    <label>Protected Store Views</label>
+                    <comment><![CDATA[Store views selected here are <strong>never</strong> modified by detect, fix, or snapshot. Useful for stores with intentionally different values (e.g. Japanese store).]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Store</source_model>
+                </field>
+
+                <!-- ── Override: Price ────────────────────────────────────── -->
+                <group id="price" translate="label" type="text" sortOrder="10" showInDefault="1">
+                    <label>Override — Price</label>
+                    <comment><![CDATA[Protect per-store-view price values from being overwritten by website-scope propagation.]]></comment>
+
+                    <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1">
+                        <label>Enable Price Override</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="attributes" translate="label comment" type="multiselect" sortOrder="20" showInDefault="1">
+                        <label>Price Attributes to Protect</label>
+                        <comment><![CDATA[Select which website-scope decimal/price attributes to monitor. <strong>price</strong>, <strong>special_price</strong>, and <strong>cost</strong> are always included when available.]]></comment>
+                        <source_model>CarpetAvenue\Utilities\Model\Config\Source\WebsiteScopePriceAttributes</source_model>
+                    </field>
+                </group>
+
+                <!-- ── Override: Image ────────────────────────────────────── -->
+                <group id="image" translate="label" type="text" sortOrder="20" showInDefault="1">
+                    <label>Override — Image</label>
+                    <comment><![CDATA[Protect per-store-view image roles and gallery positions from website-scope propagation.]]></comment>
+
+                    <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1">
+                        <label>Enable Image Override</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="override_roles" translate="label comment" type="select" sortOrder="20" showInDefault="1">
+                        <label>Override Image Roles</label>
+                        <comment><![CDATA[Protect <code>image</code>, <code>small_image</code>, <code>thumbnail</code>, <code>swatch_image</code> per store view.]]></comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="override_position" translate="label comment" type="select" sortOrder="30" showInDefault="1">
+                        <label>Override Gallery Position</label>
+                        <comment><![CDATA[Protect gallery image sort order per store view (<code>catalog_product_entity_media_gallery_value.position</code>).]]></comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                </group>
+
+                <!-- ── Override: Custom ───────────────────────────────────── -->
+                <group id="custom" translate="label" type="text" sortOrder="30" showInDefault="1">
+                    <label>Override — Custom Attributes</label>
+                    <comment><![CDATA[Protect per-store-view values for any website-scope EAV attribute (excluding price and image types).]]></comment>
+
+                    <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1">
+                        <label>Enable Custom Attribute Override</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="attributes" translate="label comment" type="multiselect" sortOrder="20" showInDefault="1">
+                        <label>Custom Attributes to Protect</label>
+                        <comment><![CDATA[All website-scope product EAV attributes, excluding price/decimal and image types.]]></comment>
+                        <source_model>CarpetAvenue\Utilities\Model\Config\Source\WebsiteScopeCustomAttributes</source_model>
+                    </field>
+                </group>
+
+                <!-- ── Detect Settings ────────────────────────────────────── -->
+                <group id="detect" translate="label" type="text" sortOrder="40" showInDefault="1">
+                    <label>Detect Settings</label>
+                    <comment><![CDATA[Independent attribute selection for the detect CLI scan. You may want to fix all fields but scan only a subset.]]></comment>
+
+                    <field id="price_enabled" translate="label" type="select" sortOrder="10" showInDefault="1">
+                        <label>Detect Price Violations</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="price_attributes" translate="label comment" type="multiselect" sortOrder="20" showInDefault="1">
+                        <label>Price Attributes to Detect</label>
+                        <source_model>CarpetAvenue\Utilities\Model\Config\Source\WebsiteScopePriceAttributes</source_model>
+                    </field>
+
+                    <field id="image_enabled" translate="label" type="select" sortOrder="30" showInDefault="1">
+                        <label>Detect Image Violations</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="image_roles" translate="label comment" type="select" sortOrder="40" showInDefault="1">
+                        <label>Detect Image Role Violations</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="image_position" translate="label comment" type="select" sortOrder="50" showInDefault="1">
+                        <label>Detect Gallery Position Violations</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="custom_enabled" translate="label" type="select" sortOrder="60" showInDefault="1">
+                        <label>Detect Custom Attribute Violations</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="custom_attributes" translate="label comment" type="multiselect" sortOrder="70" showInDefault="1">
+                        <label>Custom Attributes to Detect</label>
+                        <source_model>CarpetAvenue\Utilities\Model\Config\Source\WebsiteScopeCustomAttributes</source_model>
+                    </field>
+                </group>
+
+                <!-- ── Auto Fix ───────────────────────────────────────────── -->
+                <group id="auto_fix" translate="label" type="text" sortOrder="50" showInDefault="1">
+                    <label>Auto Fix</label>
+                    <comment><![CDATA[When enabled, the detect CLI automatically applies fixes for all violations found in the same run.]]></comment>
+
+                    <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1">
+                        <label>Enable Auto Fix</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="log_only_when_disabled" translate="label comment" type="select" sortOrder="20" showInDefault="1">
+                        <label>Log Violations When Auto Fix Disabled</label>
+                        <comment><![CDATA[When Auto Fix is off, still write violations to the event log table for review.]]></comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                </group>
+
+                <!-- ── Notification ───────────────────────────────────────── -->
+                <group id="notification" translate="label" type="text" sortOrder="60" showInDefault="1">
+                    <label>Notification</label>
+                    <comment><![CDATA[Report sent after each detect CLI run. Slack uses the <strong>Watcher</strong> channel configured in <em>Carpet Avenue → Notification → Slack Communication → Watcher Channel</em>.]]></comment>
+
+                    <field id="email_enabled" translate="label" type="select" sortOrder="10" showInDefault="1">
+                        <label>Enable Email Notification</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="email_to" translate="label comment" type="text" sortOrder="20" showInDefault="1">
+                        <label>Recipient Email(s)</label>
+                        <comment><![CDATA[Comma-separated list of recipient addresses.]]></comment>
+                    </field>
+
+                    <field id="email_from" translate="label comment" type="text" sortOrder="30" showInDefault="1">
+                        <label>Sender Email</label>
+                        <comment><![CDATA[Leave empty to use the store's default sender address.]]></comment>
+                    </field>
+
+                    <field id="slack_enabled" translate="label comment" type="select" sortOrder="40" showInDefault="1">
+                        <label>Enable Slack Notification</label>
+                        <comment><![CDATA[Send detect run summary to the Watcher channel. Webhook URL and channel name are configured in <strong>Carpet Avenue → Notification → Slack Communication → Watcher Channel</strong>.]]></comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                </group>
+
+            </group>
+
+        </section>
+    </system>
+</config>

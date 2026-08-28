@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<!--    This fixes so only products from the selected source will popup when adding products to package when creating shipment-->
+    <preference for="Magento\Shipping\Controller\Adminhtml\Order\Shipment\GetShippingItemsGrid" type="\Evalent\MatrixRateMods\OverWrite\Controller\Adminhtml\Order\Shipment\GetShippingItemsGrid" />
+
+
+<!--    This plugin sets the method to ups_11 which is "UPS Standard" for all matrixrate order. This so the correct values are loaded when creating an shipment-->
+    <type name="Magento\Shipping\Controller\Adminhtml\Order\Shipment\NewAction">
+        <plugin name="evalent_set_ups_method" type="Evalent\MatrixRateMods\Plugin\Shipping\SetUpsBeforeCreate"/>
+    </type>
+
+<!--    This sets different sender name and company on shipping labels-->
+    <preference for="Magento\Shipping\Model\Shipping\Labels" type="\Evalent\MatrixRateMods\OverWrite\Model\Shipping\Labels" />
+
+
+</config>

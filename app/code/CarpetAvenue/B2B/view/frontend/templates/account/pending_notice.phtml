@@ -1,0 +1,13 @@
+<?php
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @var \CarpetAvenue\B2B\Block\Account\PendingNotice $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<?php if ($block->shouldShow()): ?>
+    <div class="message warning carpetavenue-b2b-pending" role="alert">
+        <span><?= $escaper->escapeHtml($block->getMessage()) ?></span>
+    </div>
+<?php endif; ?>

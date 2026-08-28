@@ -1,0 +1,25 @@
+# NO static `upstream` block: with one, nginx resolves carpient-fpm AT STARTUP
+# and EXITS if the app container isn't up yet ("host not found in upstream").
+# Instead resolve fpm dynamically via Docker's embedded DNS (127.0.0.11) at
+# request time — nginx always starts, and survives app restarts.
+
+# SSL + domain routing handled upstream by Traefik (Dokploy Domain tab).
+# Catch-all server_name — nginx serves whatever Host Traefik forwards.
+server {
+    listen 80 default_server;
+    server_name _;
+
+    resolver 127.0.0.11 valid=30s ipv6=off;
+    set $fastcgi_backend "carpient-fpm:9000";
+
+    client_max_body_size        100m;
+    client_body_buffer_size     128k;
+    client_header_buffer_size   1k;
+    large_client_header_buffers 4 16k;
+
+    set $MAGE_ROOT /var/www/html;
+    set $MAGE_MODE production;
+
+    # Magento sample already sets `root $MAGE_ROOT/pub;` (document_root_is_pub=true)
+    include /etc/nginx/magento.conf;
+}

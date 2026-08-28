@@ -1,0 +1,59 @@
+<?php
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_Osc
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+/** @var \Mageplaza\Osc\Block\Adminhtml\Config\Backend\SocialLogin $block */
+
+$checkInstall = $block->checkModuleSocialLogin();
+?>
+<div class="mp_social_login">
+    <?php if ($checkInstall && $block->checkEnableModuleSocialLogin()): ?>
+        <style type="text/css">
+            #row_osc_display_configuration_social_login {
+                display: none;
+            }
+        </style>
+    <?php elseif ($checkInstall && !$block->checkEnableModuleSocialLogin()): ?>
+        <span style="color:red;"><?= /** @noEscape */ __('Disable') ?></span>
+        <p class="note">
+            <span>Please enable the <a href="https://www.mageplaza.com/magento-2-social-login-extension/" target="_blank">Mageplaza Social Login</a>
+                to allow customers signing in via their social networks.
+            </span>
+        </p>
+        <style type="text/css">
+            #row_osc_display_configuration_is_enabled_social_login {
+                display: none;
+            }
+        </style>
+    <?php else: ?>
+        <span style="color:red;"><?= /** @noEscape */ __('Not installed') ?></span>
+        <p class="note">
+            <span>
+                Allow customers signing in via their social networks. Only available if
+                 <a href="https://www.mageplaza.com/magento-2-social-login-extension/" target="_blank">Mageplaza Social Login</a>
+                  is installed and enabled.
+            </span>
+        </p>
+    <?php endif; ?>
+</div>
+<style type="text/css">
+    #osc_loading_speed_optimization  .multiselect{
+        height: 100px;
+    }
+</style>

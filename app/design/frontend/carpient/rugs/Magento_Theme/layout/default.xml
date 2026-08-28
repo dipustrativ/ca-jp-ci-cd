@@ -1,0 +1,226 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpient. All rights reserved.
+ * HEADER: identical to carpetavenue/rugs. FOOTER: Carpient custom.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+
+        <!-- ============ HEADER (same as carpetavenue/rugs) ============ -->
+
+        <!-- Drop the blank "panel header" row (welcome / account / switcher) -->
+        <referenceContainer name="header.panel" remove="true"/>
+
+        <!-- USP plum bar, placed after the panel wrapper -->
+        <referenceContainer name="header.container">
+            <container name="header-usps-wrapper" htmlTag="div" htmlClass="carpient-usp-bar" after="header.panel.wrapper">
+                <block class="Magento\Cms\Block\Block" name="header.usps">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">carpient_header_usp</argument>
+                    </arguments>
+                </block>
+            </container>
+        </referenceContainer>
+
+        <!-- Full-width content container (Productify similar-products target) -->
+        <referenceContainer name="page.wrapper">
+            <container name="main.full"
+                       label="Full Width Content"
+                       htmlTag="div"
+                       htmlClass="content--full-width"
+                       after="main.content"/>
+        </referenceContainer>
+
+        <!--
+            Menu-bar extras. carpient.header.contact -> "Contact us" pill, right
+            of the menu row; rendered by the theme's topmenu.phtml.
+        -->
+        <referenceBlock name="catalog.topnav">
+            <block class="Magento\Framework\View\Element\Template" name="carpient.header.contact"
+                   template="Magento_Theme::html/header/link.phtml">
+                <arguments>
+                    <argument name="label" xsi:type="string" translate="true">Contact Us</argument>
+                    <argument name="path" xsi:type="string">contact</argument>
+                    <argument name="css_class" xsi:type="string">carpient-contact-cta</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+
+        <!--
+            Utility row under the menu (carpient.com "announcement" row): About us,
+            currency, language switcher.
+
+            It sits NEXT TO catalog.topnav, never inside it. catalog.topnav is
+            block_html-cached for an hour with a store-scoped key (ttl="3600" in
+            Magento_Theme's default.xml, and Topmenu::getCacheLifetime() hardcodes
+            the hour so layout XML cannot switch it off). The language and currency
+            links carry a uenc of the current page, so anything cached store-wide
+            would serve one page's links on every page — the switcher would send
+            visitors to whatever URL happened to warm the cache.
+
+            The currency switcher stays silent until a second currency is allowed
+            (Stores > Config > Currency Setup > Allowed Currencies) — currency.phtml
+            renders nothing while getCurrencyCount() is 1.
+        -->
+        <referenceBlock name="store.menu">
+            <container name="carpient.nav.utils" htmlTag="div" htmlClass="carpient-nav-utils"
+                       after="catalog.topnav">
+                <block class="Magento\Framework\View\Element\Template" name="carpient.header.about"
+                       template="Magento_Theme::html/header/link.phtml">
+                    <arguments>
+                        <argument name="label" xsi:type="string" translate="true">About us</argument>
+                        <argument name="path" xsi:type="string">about-us</argument>
+                        <argument name="css_class" xsi:type="string">carpient-about-link</argument>
+                    </arguments>
+                </block>
+                <block class="Magento\Directory\Block\Currency" name="carpient.header.currency"
+                       template="Magento_Directory::currency.phtml"/>
+            </container>
+        </referenceBlock>
+        <move element="store_language" destination="carpient.nav.utils" after="-"/>
+
+        <!--
+            Mobile drawer tabs. "Account" (store.links) is empty in this theme —
+            the account links were moved into the header's person icon — so the CSS
+            hides that tab; the remaining one holds nothing but the language list,
+            so name it for what it is.
+        -->
+        <referenceBlock name="store.settings">
+            <arguments>
+                <argument name="title" xsi:type="string" translate="true">Language</argument>
+            </arguments>
+        </referenceBlock>
+
+        <!-- Centered header wrapper: logo + search -->
+        <referenceContainer name="header-wrapper">
+            <container name="header-wrapper-center" htmlClass="header-wrapper__centered" htmlTag="div" before="-"/>
+        </referenceContainer>
+
+        <container name="logo.container" htmlTag="div" htmlClass="logo__container"/>
+        <move element="logo" destination="logo.container"/>
+        <move element="logo.container" destination="header-wrapper-center" before="-"/>
+
+        <!-- Search sits far left (icon toggle) -->
+        <move element="top.search" destination="header-wrapper" before="-"/>
+
+        <!-- Reset blank logo width so CSS controls it -->
+        <referenceBlock name="logo">
+            <arguments>
+                <argument name="logo_file" xsi:type="string">images/carpient_logo.svg</argument>
+                <argument name="logo_width" xsi:type="null"/>
+            </arguments>
+        </referenceBlock>
+
+        <!-- Mobile nav toggle in its own container -->
+        <container name="nav.toggle.container" htmlTag="div" htmlClass="toggle-nav__container">
+            <block name="nav.toggle" class="Magento\Framework\View\Element\Template"
+                   template="Magento_Theme::html/header/nav-toggle.phtml"/>
+        </container>
+        <move element="nav.toggle.container" destination="header-wrapper" before="header-wrapper-center"/>
+
+        <!-- Right-side actions group (account + wishlist + cart) -->
+        <referenceContainer name="header-wrapper">
+            <container name="header.actions" htmlTag="div" htmlClass="header-actions" after="header-wrapper-center">
+                <container name="header-customer-account" htmlTag="div" htmlClass="customer-account-header"/>
+            </container>
+        </referenceContainer>
+        <move element="top.links" destination="header-customer-account"/>
+        <move element="minicart" destination="header.actions" after="header-customer-account"/>
+
+        <!-- Sticky wrapper around header + navigation -->
+        <referenceContainer name="header.container">
+            <container name="sticky-wrapper" label="Header Sticky Wrapper" htmlTag="div" htmlClass="sticky wrapper"/>
+        </referenceContainer>
+        <move element="header-wrapper" destination="sticky-wrapper" after="-"/>
+        <move element="navigation.sections" destination="sticky-wrapper" after="-"/>
+
+        <!-- Inset divider line between the header content and the menu -->
+        <referenceContainer name="sticky-wrapper">
+            <block class="Magento\Framework\View\Element\Text" name="carpient.menu.divider">
+                <arguments>
+                    <argument name="text" xsi:type="string"><![CDATA[<hr class="carpient-menu-divider" />]]></argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <move element="carpient.menu.divider" destination="sticky-wrapper" after="header-wrapper"/>
+
+        <!-- ============ FOOTER (Carpient custom) ============ -->
+
+        <referenceContainer name="footer">
+            <container name="carpient.footer.inner" htmlTag="div" htmlClass="carpient-footer-inner">
+                <container name="carpient.footer.grid" htmlTag="div" htmlClass="carpient-footer-grid">
+                    <container name="carpient.footer.col.contact" htmlTag="div" htmlClass="carpient-footer-col">
+                        <block class="Magento\Cms\Block\Block" name="carpient.footer.contact">
+                            <arguments>
+                                <argument name="block_id" xsi:type="string">carpient_footer_contact</argument>
+                            </arguments>
+                        </block>
+                    </container>
+                    <container name="carpient.footer.col.service" htmlTag="div" htmlClass="carpient-footer-col">
+                        <block class="Magento\Cms\Block\Block" name="carpient.footer.service">
+                            <arguments>
+                                <argument name="block_id" xsi:type="string">carpient_footer_service</argument>
+                            </arguments>
+                        </block>
+                    </container>
+                    <container name="carpient.footer.col.company" htmlTag="div" htmlClass="carpient-footer-col">
+                        <block class="Magento\Cms\Block\Block" name="carpient.footer.company">
+                            <arguments>
+                                <argument name="block_id" xsi:type="string">carpient_footer_company</argument>
+                            </arguments>
+                        </block>
+                    </container>
+                    <container name="carpient.footer.col.locale" htmlTag="div" htmlClass="carpient-footer-col carpient-footer-locale"/>
+                </container>
+                <container name="carpient.footer.bottom" htmlTag="div" htmlClass="carpient-footer-bottom">
+                    <block class="Magento\Cms\Block\Block" name="carpient.footer.copyright">
+                        <arguments>
+                            <argument name="block_id" xsi:type="string">carpient_footer_copyright</argument>
+                        </arguments>
+                    </block>
+                </container>
+            </container>
+        </referenceContainer>
+
+        <!-- White logo strip, edge to edge under the copyright. Sits in
+             footer-container (not footer), because .footer.content is capped at
+             @layout__max-width and would inset the white band. -->
+        <referenceContainer name="footer-container">
+            <container name="carpient.footer.logobar" htmlTag="div" htmlClass="carpient-footer-logobar" after="footer">
+                <block class="Magento\Theme\Block\Html\Header\Logo" name="carpient.footer.logo">
+                    <arguments>
+                        <argument name="logo_file" xsi:type="string">images/carpient_logo.svg</argument>
+                        <argument name="logo_alt" xsi:type="string">Carpient</argument>
+                        <argument name="logo_width" xsi:type="null"/>
+                        <argument name="logo_height" xsi:type="null"/>
+                    </arguments>
+                </block>
+            </container>
+        </referenceContainer>
+
+        <!-- Strip blank-theme default footer links + report block + newsletter -->
+        <referenceBlock name="footer_links" remove="true"/>
+        <referenceBlock name="report.bugs" remove="true"/>
+        <referenceBlock name="form.subscribe" remove="true"/>
+
+        <!-- Remove product compare (matches carpetavenue) -->
+        <referenceBlock name="catalog.compare.link" remove="true"/>
+        <referenceBlock name="catalog.compare.sidebar" remove="true"/>
+        <referenceBlock name="category.product.addto.compare" remove="true"/>
+        <referenceBlock name="catalogsearch.product.addto.compare" remove="true"/>
+        <referenceBlock name="crosssell.product.addto.compare" remove="true"/>
+        <referenceBlock name="related.product.addto.compare" remove="true"/>
+        <referenceBlock name="upsell.product.addto.compare" remove="true"/>
+        <referenceBlock name="view.addto.compare" remove="true"/>
+
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template"
+                   template="Magento_Theme::lazyload.phtml"
+                   after="-"
+                   name="lazyload.init" />
+        </referenceContainer>
+
+    </body>
+</page>

@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+	<acl>
+		<resources>
+			<resource id="Magento_Backend::admin">
+				<resource id="Evalent_AdminActivityLog::ModelActivity" sortOrder="10" title="ModelActivity">
+					<resource id="Evalent_AdminActivityLog::ModelActivity_save" sortOrder="10" title="Save ModelActivity"/>
+					<resource id="Evalent_AdminActivityLog::ModelActivity_delete" sortOrder="20" title="Delete ModelActivity"/>
+					<resource id="Evalent_AdminActivityLog::ModelActivity_update" sortOrder="30" title="Update ModelActivity"/>
+					<resource id="Evalent_AdminActivityLog::ModelActivity_view" sortOrder="40" title="View ModelActivity"/>
+				</resource>
+				<resource id="Evalent_AdminActivityLog::LoginActivity" sortOrder="10" title="LoginActivity">
+					<resource id="Evalent_AdminActivityLog::LoginActivity_save" sortOrder="10" title="Save LoginActivity"/>
+					<resource id="Evalent_AdminActivityLog::LoginActivity_delete" sortOrder="20" title="Delete LoginActivity"/>
+					<resource id="Evalent_AdminActivityLog::LoginActivity_update" sortOrder="30" title="Update LoginActivity"/>
+					<resource id="Evalent_AdminActivityLog::LoginActivity_view" sortOrder="40" title="View LoginActivity"/>
+				</resource>
+			</resource>
+		</resources>
+	</acl>
+</config>

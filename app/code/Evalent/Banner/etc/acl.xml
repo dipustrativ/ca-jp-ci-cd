@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+	<acl>
+		<resources>
+			<resource id="Magento_Backend::admin">
+				<resource id="Evalent_Banner::Banner" sortOrder="10" title="Banner">
+					<resource id="Evalent_Banner::Banner_create" sortOrder="10" title="Create Banner"/>
+					<resource id="Evalent_Banner::Banner_delete" sortOrder="20" title="Delete Banner"/>
+					<resource id="Evalent_Banner::Banner_update" sortOrder="30" title="Update Banner"/>
+					<resource id="Evalent_Banner::Banner_view" sortOrder="40" title="View Banner"/>
+				</resource>
+			</resource>
+		</resources>
+	</acl>
+</config>

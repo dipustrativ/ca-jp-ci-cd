@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_B2B
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="carpetavenue_b2b" translate="label" type="text" sortOrder="310" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>B2B</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_B2B::config</resource>
+            <group id="catalog" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Catalog Sales Mode</label>
+                <comment>Controls how product pages sell. Set per store view for multi-store catalogs.</comment>
+                <field id="sales_mode" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Catalog Sales Mode</label>
+                    <source_model>CarpetAvenue\B2B\Model\Source\CatalogSalesMode</source_model>
+                    <comment>B2C: normal Add to Cart. B2B: hide Add to Cart on product pages and show a "Become a Reseller" button linking to the reseller application page.</comment>
+                </field>
+            </group>
+            <group id="general" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Account Approval</label>
+                <comment>Nothing is gated unless "Require Account Approval" is Yes.</comment>
+                <field id="require_approval" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Require Account Approval</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>New customers cannot place orders until an administrator approves them.</comment>
+                </field>
+                <field id="default_to_business" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Register New Customers As Business</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Assign the Business customer group to accounts created on the storefront.</comment>
+                </field>
+                <field id="pending_message" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Pending Approval Message</label>
+                    <depends><field id="require_approval">1</field></depends>
+                </field>
+                <field id="send_approval_email" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Email On Approval</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="email_identity" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Approval Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                    <depends><field id="send_approval_email">1</field></depends>
+                </field>
+                <field id="email_template" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Approval Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <depends><field id="send_approval_email">1</field></depends>
+                </field>
+            </group>
+            <group id="reseller" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Reseller Applications</label>
+                <comment>Notification sent to the admin when a "Become a Reseller" form is submitted. Applications are always stored regardless of this setting.</comment>
+                <field id="notify_enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Admin Notification Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="recipient" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Notification Recipient</label>
+                    <comment>Admin email that receives new applications. Leave blank to use the General Contact email.</comment>
+                    <validate>validate-email</validate>
+                    <depends><field id="notify_enabled">1</field></depends>
+                </field>
+                <field id="email_identity" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Notification Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                    <depends><field id="notify_enabled">1</field></depends>
+                </field>
+                <field id="email_template" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Notification Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <depends><field id="notify_enabled">1</field></depends>
+                </field>
+                <field id="intro_block" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Intro CMS Block Identifier</label>
+                    <comment>CMS block whose content renders as the description above the form on /become-a-carpient-reseller. Edit it under Content → Blocks. Default: become_a_carpient_reseller_intro.</comment>
+                </field>
+                <field id="recaptcha_enabled" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable reCAPTCHA Verification</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Protect the form with Google reCAPTCHA v3 (frontend token + backend verification). Default: Yes. Requires the storefront reCAPTCHA keys under Stores → Configuration → Security → Google reCAPTCHA Storefront; if the keys are missing, verification is skipped automatically.</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,71 @@
+<?php
+/**
+ * Search results header band (carpient.com reference boost-sd__search-form-wrapper):
+ * grey band with a centered "Search results for ..." title and a grouped search
+ * field (input + clear + submit as one bordered pill) with live autocomplete —
+ * reuses Magento's quickSearch widget (same as the header mini search).
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+/** @var \CarpetAvenue\Productify\ViewModel\SuggestOptions|null $suggestOptions */
+$suggestOptions = $block->getData('suggest_options');
+
+$query      = (string) $block->getRequest()->getParam('q', '');
+$actionUrl  = $block->getUrl('catalogsearch/result');
+$formId     = 'carpient_search_band_form';
+$inputId    = 'carpient-search-band-input';
+$acId       = 'carpient-search-band-autocomplete';
+$useSuggest = $suggestOptions && $suggestOptions->isEnabled();
+?>
+<div class="carpient-search-band">
+    <div class="carpient-search-band__inner">
+        <h1 class="carpient-search-band__title">
+            <?= $escaper->escapeHtml(__('Search results for "%1"', $query)) ?>
+        </h1>
+        <form class="carpient-search-band__form" id="<?= /* @noEscape */ $formId ?>"
+              action="<?= $escaper->escapeUrl($actionUrl) ?>" method="get" role="search">
+            <div class="carpient-search-band__group">
+                <input type="text"
+                       id="<?= /* @noEscape */ $inputId ?>"
+                       name="q"
+                       value="<?= $escaper->escapeHtmlAttr($query) ?>"
+                       placeholder="<?= $escaper->escapeHtmlAttr(__('Search')) ?>"
+                       class="carpient-search-band__input"
+                       maxlength="150"
+                       autocomplete="off"
+                       role="combobox"
+                       aria-haspopup="false"
+                       aria-autocomplete="both"
+                       aria-expanded="false"
+                       aria-label="<?= $escaper->escapeHtmlAttr(__('Search')) ?>"
+                       <?php if ($useSuggest) : ?>
+                           data-mage-init="<?= $escaper->escapeHtmlAttr(
+                               $suggestOptions->getJsonConfig('#' . $acId, '#' . $formId)
+                           ) ?>"
+                       <?php endif; ?>/>
+                <button type="button" class="carpient-search-band__clear" data-role="suggest-clear" aria-label="<?= $escaper->escapeHtmlAttr(__('Clear')) ?>">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                        <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <button type="submit" class="carpient-search-band__submit" aria-label="<?= $escaper->escapeHtmlAttr(__('Search')) ?>">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                        <circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.7"/>
+                        <path d="M14 14l4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="<?= /* @noEscape */ $acId ?>"
+                 class="carpient-search-band__autocomplete productify-suggest"></div>
+        </form>
+    </div>
+</div>
+<script>
+    require(['jquery'], function ($) {
+        var $band = $('.carpient-search-band');
+        $band.on('click', '.carpient-search-band__clear', function () {
+            $band.find('.carpient-search-band__input').val('').trigger('focus');
+        });
+    });
+</script>

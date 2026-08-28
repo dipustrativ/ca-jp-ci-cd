@@ -1,0 +1,18 @@
+{
+  "catalog_product_index_price_history": {
+    "column": {
+      "entity_id": true,
+      "customer_group_id": true,
+      "website_id": true,
+      "tax_class_id": true,
+      "price": true,
+      "final_price": true,
+      "min_price": true,
+      "max_price": true,
+      "tier_price": true
+    },
+    "index": {
+      "CATALOG_PRODUCT_INDEX_PRICE_HISTORY_CREATED_AT": true
+    }
+  }
+}

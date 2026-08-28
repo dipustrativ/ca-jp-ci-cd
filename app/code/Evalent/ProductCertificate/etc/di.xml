@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Sales\Block\Adminhtml\Order\View">
+        <plugin name="addGenerateCertificatesButton" type="Evalent\ProductCertificate\Plugin\Block\Adminhtml\Order\View"/>
+    </type>
+    <preference for="Evalent\ProductCertificate\Api\CertificateGenerationInterface"
+                type="Evalent\ProductCertificate\Model\Service\CertificateService" />
+
+    <type name="\Evalent\ProductCertificate\Observer\AbstractSendOrderObserver">
+        <arguments>
+            <argument name="pdfRenderer" xsi:type="object">\Evalent\ProductCertificate\Model\PdfRenderer</argument>
+        </arguments>
+    </type>
+    <type name="\Evalent\ProductCertificate\Observer\AbstractSendShipmentObserver">
+        <arguments>
+            <argument name="pdfRenderer" xsi:type="object">\Evalent\ProductCertificate\Model\PdfRenderer</argument>
+        </arguments>
+    </type>
+
+    <preference for="Evalent\ProductCertificate\Api\ConfigInterface"
+                type="Evalent\ProductCertificate\Model\Config" />
+
+</config>

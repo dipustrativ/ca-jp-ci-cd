@@ -1,0 +1,17 @@
+<?php
+/** @var $block \CarpetAvenue\Productify\Block\Category\BottomBlock */
+$blockContent = $block->getBottomBlockHtml();
+?>
+
+<?php if ($block->isBottomCategoryDescriptionHide()): ?>
+    <style>
+        .category-view-holder {
+            display: none !important;
+        }
+    </style>
+<?php endif; ?>
+
+
+<?php
+    echo $blockContent;
+?>

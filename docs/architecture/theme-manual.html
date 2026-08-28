@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carpient Theme Manual</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font: 16px/1.6 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0 auto; max-width: 900px; padding: 2rem 1.25rem 5rem;
+  }
+  h1 { font-size: 1.9rem; margin: 0 0 .25rem; }
+  h2 { border-bottom: 1px solid #8884; margin-top: 2.5rem; padding-bottom: .3rem; }
+  h3 { margin-top: 1.6rem; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .875em; }
+  code { background: #8882; border-radius: 3px; padding: .1em .35em; }
+  pre { background: #8881; border-radius: 6px; overflow-x: auto; padding: .8rem 1rem; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+  th, td { border: 1px solid #8884; padding: .4rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #8881; }
+  .note { background: #f5a5; border-left: 4px solid #d90; border-radius: 0 6px 6px 0; padding: .7rem 1rem; }
+  .lede { color: #8889; }
+  li { margin: .25rem 0; }
+</style>
+</head>
+<body>
+
+<h1>Carpient Theme Manual</h1>
+<p class="lede">Theme <code>carpient/rugs</code> — layout, build commands, and the 404 page.</p>
+
+<h2>1. Theme</h2>
+<ul>
+  <li><code>src/app/design/frontend/carpient/rugs/</code>, parent <code>Magento/blank</code>.</li>
+  <li>Set at <strong>default scope only</strong>, so it applies to all 12 store views across all
+      three websites — <code>base</code> (en, de, es, fr, it, hu, nl, pl, pt, fi),
+      <code>ca_dk</code> (dk) and <code>ca_se</code> (se).</li>
+  <li><code>carpetavenue/rugs</code> is a leftover DB row from an older sibling theme. It has no
+      files on disk and is assigned nowhere. Do not confuse the two.</li>
+</ul>
+<pre><code>&lt;Module_Name&gt;/layout/&lt;handle&gt;.xml   layout overrides
+&lt;Module_Name&gt;/templates/*.phtml     template overrides
+web/css/source/_extend.less         styles
+web/css/source/_theme.less          LESS variables (fonts, colors)
+i18n/&lt;locale&gt;.csv                   translations</code></pre>
+
+<h2>2. Build &amp; cache</h2>
+<pre><code># after LESS / JS changes
+docker exec carpient-phpfpm-1 sh -c "cd /var/www/html &amp;&amp; \
+  php bin/magento setup:static-content:deploy -f --area frontend --theme carpient/rugs en_US"
+
+# LESS watch loop with source maps
+docker exec -it carpient-phpfpm-1 sh -c "cd /var/www/html &amp;&amp; npx grunt watch:rugs"</code></pre>
+<p><code>.phtml</code> and layout XML need no deploy, only a cache clear. PHP classes need
+<code>docker restart carpient-phpfpm-1 carpient-phpfpm-xdebug-1</code> (opcache).</p>
+
+<div class="note">
+<p><strong>Two dev-stack traps.</strong> <code>carpient-redis-1</code> is not on the
+<code>carpient_default</code> network, so Magento degrades to a file cache and
+<code>bin/magento cache:flush</code> clears nothing — use
+<code>rm -rf var/cache/* var/page_cache/*</code> inside the container. And
+<code>static-content:deploy -f</code> skips CSS whose file is newer than the source; delete
+<code>pub/static/frontend/carpient/rugs/&lt;locale&gt;/css</code> first to force a recompile.</p>
+</div>
+
+<h2>3. 404 page</h2>
+
+<h3>3.1 Files and records</h3>
+<table>
+  <tr><th>Where</th><th>What</th></tr>
+  <tr><td><code>Magento_Cms/layout/cms_noroute_index.xml</code></td>
+      <td>1 column, drops page title + breadcrumbs, adds the template and the content slot.</td></tr>
+  <tr><td><code>Magento_Cms/layout/cms_index_defaultnoroute.xml</code></td>
+      <td>One <code>&lt;update&gt;</code> pulling in the handle above, for the fallback case.</td></tr>
+  <tr><td><code>Magento_Cms/templates/notfound.phtml</code></td>
+      <td>Markup: 404, heading, sentence, button. Strings go through <code>__()</code>.</td></tr>
+  <tr><td><code>web/css/source/_extend.less</code></td>
+      <td><code>.carpient-notfound</code> styles, end of file.</td></tr>
+  <tr><td><code>i18n/&lt;locale&gt;.csv</code></td><td>Three translated rows per locale.</td></tr>
+  <tr><td>CMS page <code>no-route</code></td>
+      <td>One page, All Store Views, <strong>Content empty</strong>. Supplies the browser-tab title only.</td></tr>
+  <tr><td>CMS block <code>notfound_bottom</code></td>
+      <td>Optional admin content below the message — currently a Catalog Products List widget.</td></tr>
+</table>
+
+<div class="note">
+<p><strong>Handle name.</strong> A normal 404 renders <code>cms_noroute_index</code>
+(<code>cms/noroute/index</code>). <code>cms_index_defaultnoroute</code> is the fallback action Magento
+forwards to only when the no-route CMS page is missing, disabled, or not assigned to the current store
+view — that is the page printing "There was no 404 CMS page configured or found." A layout file placed
+only under that second name never loads on a normal 404.</p>
+<p><strong>Keep the <code>cms_page</code> block.</strong> It sets <code>&lt;title&gt;</code> from the CMS
+page; removing it renders an empty title tag. Harmless to keep, since the page's Content is empty.</p>
+</div>
+
+<h3>3.2 Changing the text</h3>
+<p>English is in the template; other languages in <code>i18n/&lt;locale&gt;.csv</code>:</p>
+<pre><code>"Page not found","Seite nicht gefunden"
+"Sorry, the page you requested does not exist.","Die angeforderte Seite existiert nicht."
+"Back to home","Zurück zur Startseite"</code></pre>
+<p>Translations need <strong>Locale</strong> set at store-view scope
+(<code>general/locale/code</code>); all eleven store views are set. Without it a store view falls back to
+<code>en_US</code> and shows English.</p>
+<p>The tab title comes from the CMS page and is <code>404 Not Found</code> in every language. To translate
+it, swap the single page for one page per store view — same identifier <code>no-route</code>, each assigned
+to one store view, each with its own title. Nothing else changes.</p>
+
+<h3>3.3 Copy</h3>
+<table>
+  <tr><th>View</th><th>Heading</th><th>Sentence</th><th>Button</th></tr>
+  <tr><td>en</td><td>Page not found</td><td>Sorry, the page you requested does not exist.</td><td>Back to home</td></tr>
+  <tr><td>de</td><td>Seite nicht gefunden</td><td>Die angeforderte Seite existiert nicht.</td><td>Zurück zur Startseite</td></tr>
+  <tr><td>es</td><td>Página no encontrada</td><td>¡Lo sentimos! La página que ha solicitado no existe.</td><td>Volver al inicio</td></tr>
+  <tr><td>fr</td><td>Page non trouvée</td><td>La page que vous avez demandée n'existe pas.</td><td>Retour à l'accueil</td></tr>
+  <tr><td>it</td><td>Pagina non trovata</td><td>Spiacenti, la pagina richiesta non esiste.</td><td>Torna alla pagina principale</td></tr>
+  <tr><td>hu</td><td>Az oldal nem található</td><td>Sajnáljuk, a keresett oldal nem létezik.</td><td>Vissza a főoldalra</td></tr>
+  <tr><td>nl</td><td>Pagina niet gevonden</td><td>Sorry, de door u opgevraagde pagina bestaat niet.</td><td>Terug naar homepagina</td></tr>
+  <tr><td>pl</td><td>Strona nie znaleziona</td><td>Przepraszamy, żądana strona nie istnieje.</td><td>Powrót do strony głównej</td></tr>
+  <tr><td>pt</td><td>Página não encontrada</td><td>Lamentamos, mas a página que procura não existe.</td><td>Regressar à página inicial</td></tr>
+  <tr><td>fi</td><td>Sivua ei löydetty</td><td>Valitettavasti pyytämääsi sivua ei ole olemassa.</td><td>Takaisin kotiin</td></tr>
+  <tr><td>se</td><td>Sidan hittades inte</td><td>Tyvärr, sidan du begärde finns inte.</td><td>Tillbaka till hemmet</td></tr>
+</table>
+<p>Source: carpient.com (checked 2026-08-16). Four strings were corrected against it — the German button
+said "continue shopping", Polish was a literal "Wrócić do domu", the Swedish heading was lowercase, and the
+Italian title mixed languages. <code>da_DK.csv</code> is filled in for a future Danish store view.</p>
+
+<h3>3.4 Content slot below the message</h3>
+<pre><code>&lt;block class="Magento\Cms\Block\Block" name="carpient.notfound.bottom" after="carpient.notfound"&gt;
+    &lt;arguments&gt;&lt;argument name="block_id" xsi:type="string"&gt;notfound_bottom&lt;/argument&gt;&lt;/arguments&gt;
+&lt;/block&gt;</code></pre>
+<p>Missing or disabled block renders nothing. It currently holds a heading and a Catalog Products List
+widget matching all products, added in the admin with <strong>Insert Widget</strong>. Placeholder for
+testing — decide before go-live what production shows. The block is All Store Views, so its heading is
+English everywhere; one block per store view translates it.</p>
+
+<h3>3.5 Production rollout</h3>
+<ol>
+  <li>Deploy the theme files, run a static-content deploy, clear the cache.</li>
+  <li>Set <strong>Locale</strong> per store view if not already set.</li>
+  <li>Create the CMS page: URL Key <code>no-route</code>, Content empty, Layout 1 column, All Store Views.</li>
+  <li>Optionally create the <code>notfound_bottom</code> block.</li>
+  <li>Verify a nonsense URL per store view returns HTTP 404 with that language's copy.</li>
+</ol>
+<p>Leave the <strong>CMS No Route Page</strong> config on its system value.</p>
+
+<h3>3.6 Known</h3>
+<ul>
+  <li>Store-view locales affect the whole storefront, not just this page: all translations plus date and
+      number formatting.</li>
+</ul>
+
+<h2>4. Language switcher</h2>
+<p>Expected behaviour when switching store view:</p>
+<ul>
+  <li>Product, category, CMS page → the same entity on the target store view, using its own URL key
+      (<code>/it/tappeti-…-epr1006</code> → <code>/en/oriental-carpets-…-epr1006</code>). Core
+      <code>Magento\UrlRewrite\Model\StoreSwitcher\RewriteUrl</code> does the mapping.</li>
+  <li>404 → the target store view's <strong>home page</strong>, since the requested path exists nowhere.</li>
+</ul>
+<table>
+  <tr><th>Where</th><th>What</th></tr>
+  <tr><td><code>Magento_Theme/layout/default.xml</code></td>
+      <td>Container <code>carpient.nav.utils</code> in <code>store.menu</code>, <em>after</em>
+          <code>catalog.topnav</code>; holds About us, currency and <code>store_language</code>.</td></tr>
+  <tr><td><code>Evalent_MegaMenu/templates/html/topmenu.phtml</code></td>
+      <td>Renders the menu and the "Contact us" pill only — no utility row.</td></tr>
+  <tr><td><code>Carpient\Theme\ViewModel\HomeSwitcherUrlProvider</code></td>
+      <td>Switcher links that point at the target store view's home page.</td></tr>
+  <tr><td><code>Magento_Cms/layout/cms_noroute_index.xml</code></td>
+      <td>Swaps that view model onto <code>store_language</code> / <code>store.settings.language</code>.</td></tr>
+</table>
+
+<div class="note">
+<p><strong>Never put the switcher inside <code>catalog.topnav</code>.</strong> That block is cached in
+<code>block_html</code> for an hour with a store-scoped key (<code>ttl="3600"</code> in Magento_Theme's
+<code>default.xml</code>, and <code>Topmenu::getCacheLifetime()</code> hardcodes the hour, so layout XML
+cannot switch it off). Switcher links carry a <code>uenc</code> of the current page, so a switcher inside
+that block serves one page's links on every page of the store view — whichever page warmed the cache. That
+was a live bug: every page offered to switch to some unrelated URL.</p>
+<p>Adding the request URI to the block's cache key also fixes it, but the entry is ~214&nbsp;KB, so the
+cache would then hold one copy per URL per store view instead of one per store view. Keeping the utility
+row outside the cached block costs nothing and was the fix taken. The desktop CSS keys off
+<code>.carpient-nav-utils</code> with no ancestor selector, so the row renders identically as the next
+sibling of <code>&lt;nav&gt;</code>.</p>
+</div>
+
+</body>
+</html>

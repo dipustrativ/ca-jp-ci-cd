@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @package   CarpetAvenue_Utilities
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carpetavenue_utilities>
+            <general>
+                <enabled>0</enabled>
+                <gcs_bucket></gcs_bucket>
+                <gcs_credentials></gcs_credentials>
+            </general>
+            <media_cleanup>
+                <disabled_cache>
+                    <enabled>0</enabled>
+                    <id_from>1</id_from>
+                    <id_to>170000</id_to>
+                    <limit>0</limit>
+                    <enable_zip>0</enable_zip>
+                    <staging_dir></staging_dir>
+                </disabled_cache>
+                <orphan_cache>
+                    <enabled>0</enabled>
+                    <limit>0</limit>
+                    <enable_zip>0</enable_zip>
+                </orphan_cache>
+                <manual_backup>
+                    <enabled>0</enabled>
+                    <gcs_prefix>manual_backup</gcs_prefix>
+                </manual_backup>
+                <disabled_resize>
+                    <enabled>0</enabled>
+                    <id_from>1</id_from>
+                    <id_to>170000</id_to>
+                    <limit>0</limit>
+                    <max_width>1200</max_width>
+                    <max_height>1200</max_height>
+                    <quality>82</quality>
+                    <driver>auto</driver>
+                    <enable_zip>0</enable_zip>
+                    <staging_dir></staging_dir>
+                </disabled_resize>
+            </media_cleanup>
+            <attribute_override>
+                <price>
+                    <enabled>0</enabled>
+                    <attributes></attributes>
+                </price>
+                <image>
+                    <enabled>0</enabled>
+                    <override_roles>0</override_roles>
+                    <override_position>0</override_position>
+                </image>
+                <custom>
+                    <enabled>0</enabled>
+                    <attributes></attributes>
+                </custom>
+                <detect>
+                    <price_enabled>0</price_enabled>
+                    <price_attributes></price_attributes>
+                    <image_enabled>0</image_enabled>
+                    <image_roles>0</image_roles>
+                    <image_position>0</image_position>
+                    <custom_enabled>0</custom_enabled>
+                    <custom_attributes></custom_attributes>
+                </detect>
+                <auto_fix>
+                    <enabled>0</enabled>
+                    <log_only_when_disabled>1</log_only_when_disabled>
+                </auto_fix>
+                <protected_stores></protected_stores>
+                <notification>
+                    <email_enabled>0</email_enabled>
+                    <email_to></email_to>
+                    <email_from></email_from>
+                    <slack_enabled>0</slack_enabled>
+                </notification>
+            </attribute_override>
+            <!-- Web Images (merged from MagestyApps_WebImages).
+                 Extension lists consumed by WebImages\Helper\ImageHelper. -->
+            <webimages>
+                <extensions>
+                    <vector>
+                        <svg>svg</svg>
+                        <svg_xml>svg+xml</svg_xml>
+                    </vector>
+                    <web_image>
+                        <webp>webp</webp>
+                    </web_image>
+                </extensions>
+            </webimages>
+        </carpetavenue_utilities>
+        <payment>
+            <poscash>
+                <active>0</active>
+            </poscash>
+        </payment>
+        <!-- Web Images: swap the GD2 adapter for the SVG/WebP-aware subclass.
+             Core config path — must stay dev/image/adapters/GD2/class. -->
+        <dev>
+            <image>
+                <adapters>
+                    <GD2>
+                        <class>CarpetAvenue\Utilities\WebImages\Model\Image\Adapter\Gd2</class>
+                    </GD2>
+                </adapters>
+            </image>
+        </dev>
+    </default>
+</config>

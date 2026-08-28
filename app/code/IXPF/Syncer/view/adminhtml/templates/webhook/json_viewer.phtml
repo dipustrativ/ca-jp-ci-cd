@@ -1,0 +1,38 @@
+<?php
+/** @var IXPF\Syncer\Block\Adminhtml\JsonViewer $block */
+
+?>
+
+<div id="json-viewer" style="background:#fff;padding:15px;border-radius:8px;"></div>
+
+<script type="text/javascript">
+    require(['jquery'], function ($) {
+        const jsonData = <?php echo json_encode($block->getJsonData()); ?>;
+
+        function renderTree(obj, container) {
+            const ul = $('<ul style="list-style:none; margin-left:20px;">');
+            $.each(obj, function (key, value) {
+                const li = $('<li>');
+                if (typeof value === 'object' && value !== null) {
+                    const toggle = $('<span style="cursor:pointer;font-weight:bold;">▼ ' + key + '</span>');
+                    const childContainer = $('<div style="display:block;">');
+                    renderTree(value, childContainer);
+                    toggle.on('click', function () {
+                        const isOpen = childContainer.is(':visible');
+                        $(this).text((isOpen ? '▶ ' : '▼ ') + key);
+                        childContainer.toggle();
+                    });
+                    li.append(toggle).append(childContainer);
+                } else {
+                    li.html('<strong>' + key + ':</strong> ' + value);
+                }
+                ul.append(li);
+            });
+            container.append(ul);
+        }
+
+        $(document).ready(function () {
+            renderTree(jsonData, $('#json-viewer'));
+        });
+    });
+</script>

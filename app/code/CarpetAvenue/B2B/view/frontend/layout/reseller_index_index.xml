@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @package CarpetAvenue_B2B
+ * @author  Strativ Magento Team
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>Become a Carpient® Reseller</title>
+    </head>
+    <body>
+        <referenceBlock name="page.main.title" remove="true"/>
+        <!-- No cart on the reseller application page -->
+        <referenceBlock name="minicart" remove="true"/>
+        <referenceContainer name="content">
+            <block class="CarpetAvenue\B2B\Block\Reseller\Form"
+                   name="carpetavenue.b2b.reseller.form"
+                   template="CarpetAvenue_B2B::reseller/form.phtml"
+                   cacheable="false">
+                <block class="Magento\ReCaptchaUi\Block\ReCaptcha"
+                       name="carpetavenue.b2b.reseller.recaptcha"
+                       as="recaptcha"
+                       after="-"
+                       template="Magento_ReCaptchaFrontendUi::recaptcha.phtml"
+                       ifconfig="recaptcha_frontend/type_for/carpetavenue_b2b_reseller">
+                    <arguments>
+                        <argument name="recaptcha_for" xsi:type="string">carpetavenue_b2b_reseller</argument>
+                        <argument name="jsLayout" xsi:type="array">
+                            <item name="components" xsi:type="array">
+                                <item name="recaptcha" xsi:type="array">
+                                    <item name="component" xsi:type="string">Magento_ReCaptchaFrontendUi/js/reCaptcha</item>
+                                </item>
+                            </item>
+                        </argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

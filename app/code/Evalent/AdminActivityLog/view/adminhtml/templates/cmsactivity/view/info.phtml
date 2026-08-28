@@ -1,0 +1,101 @@
+<?php
+
+/** @var \Evalent\AdminActivityLog\Block\Adminhtml\CmsActivity\View\Info $block */
+
+/** @var \Evalent\AdminActivityLog\Api\Data\CmsActivityInterface $activity */
+$activity = $block->getActivity();
+
+$activityDate = $block->formatDate(
+    $activity->getDatetime(),
+    \IntlDateFormatter::MEDIUM,
+    true
+);
+?>
+
+<section class="admin__page-section order-view-account-information">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Order & Account Information')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item order-information">
+            <?php /* Order Information */ ?>
+            <div class="admin__page-section-item-title">
+                <span class="title">
+                    <?= $block->escapeHtml(__('Activity #%1', $activity->getCmsactivityId())) ?>
+                </span>
+            </div>
+            <div class="admin__page-section-item-content">
+                <table class="admin__table-secondary order-information-table">
+                    <tr>
+                        <th><?= $block->escapeHtml(__('Activity Date')) ?></th>
+                        <td><?= $block->escapeHtml($activityDate) ?></td>
+                    </tr>
+                    <tr>
+                        <th><?= $block->escapeHtml(__('CMS page title')) ?></th>
+                        <td><span id="order_status"><?= $block->escapeHtml($activity->getTitle()) ?></span></td>
+                    </tr>
+                    <tr>
+                        <th><?= $block->escapeHtml(__('Action type')) ?></th>
+                        <td><span id="order_status"><?= $block->escapeHtml($activity->getActionType()) ?></span></td>
+                    </tr>
+                    <tr>
+                        <th><?= $block->escapeHtml(__('Old Values')) ?></th>
+                        <td><?= $block->escapeHtml($block->getOldValues(), ['br', 'b']) ?></td>
+                    </tr>
+                    <tr>
+                        <th><?= $block->escapeHtml(__('New Values')) ?></th>
+                        <td><?= $block->escapeHtml($block->getNewValues(), ['br', 'b']) ?></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="admin__page-section-item order-account-information">
+            <?php /* Account Information */ ?>
+            <div class="admin__page-section-item-title">
+                <span class="title"><?= $block->escapeHtml(__('Account Information')) ?></span>
+            </div>
+            <div class="admin__page-section-item-content">
+                <table class="admin__table-secondary order-account-information-table">
+                    <tr>
+                        <th><?= $block->escapeHtml(__('Username')) ?></th>
+                        <td>
+                            <?= $block->escapeHtml($activity->getUsername()) ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><?= $block->escapeHtml(__('Full name')) ?></th>
+                        <td>
+                            <?= $block->escapeHtml($activity->getFullName()) ?>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="admin__page-section order-view-account-information">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Content change')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item order-information">
+            <div class="admin__page-section-item-title">
+                <span class="title"><?= $block->escapeHtml(__('Old Content')) ?></span>
+            </div>
+            <div class="admin__page-section-item-content">
+                <?= $block->escapeHtml($activity->getOldContent()) ?>
+            </div>
+        </div>
+        <div class="admin__page-section-item order-account-information">
+            <div class="admin__page-section-item-title">
+                <span class="title"><?= $block->escapeHtml(__('New content')) ?></span>
+            </div>
+            <div class="admin__page-section-item-content">
+                 <?= $block->escapeHtml($activity->getNewContent()) ?>
+            </div>
+        </div>
+    </div>
+</section>

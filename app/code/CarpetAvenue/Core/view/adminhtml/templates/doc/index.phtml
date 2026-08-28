@@ -1,0 +1,331 @@
+<?php
+/**
+ * CarpetAvenue Documentation Hub — Central Index
+ *
+ * @package   CarpetAvenue_Core
+ * @author    Strativ Magento Team
+ *
+ * HOW TO ADD A CHAPTER:
+ *   1. Create your .md file at:  app/code/{Vendor}/{Module}/docs/{doc-name}.md
+ *   2. Follow the standard template (_template.md) with the 4 required sections.
+ *   3. Append an entry to the $chapters array below — that's it.
+ *
+ * Uses the ca-doc-* CSS class system (inline, portable).
+ */
+
+/** @var \CarpetAvenue\Core\Block\Adminhtml\Doc\Index $block */
+
+/**
+ * ──────────────────────────────────────────────────────────────
+ * CHAPTER REGISTRY
+ * Each entry renders as a card on this hub page.
+ *
+ * Keys:
+ *   chapter – sequential number
+ *   module  – Magento module name  (e.g. CarpetAvenue_Core)
+ *   title   – displayed chapter title
+ *   desc    – short description shown on the card
+ *   icon    – emoji icon
+ *   badge   – short module label shown on the card
+ *   color   – accent color (CSS hex)
+ *
+ * Viewer URL (auto-built):  carpetavenue/doc/view?module={module}
+ * Deep-link tabs:           …&tab=manual  |  …&tab=developer
+ * Source file:              app/code/{Vendor}/{Module}/README.md
+ * ──────────────────────────────────────────────────────────────
+ */
+$chapters = [
+    [
+        'chapter' => 1,
+        'module'  => 'CarpetAvenue_Core',
+        'title'   => 'Core Module',
+        'desc'    => 'Foundation module — shared admin tab, ACL resources, reusable helpers '
+                   . '(Slack, URL, SysConfig, Product, UpsertBulk, Performance), and Slack Notification integration.',
+        'icon'    => '🧱',
+        'badge'   => 'Core',
+        'color'   => '#1c2e45',
+    ],
+    [
+        'chapter' => 2,
+        'module'  => 'CarpetAvenue_Utilities',
+        'title'   => 'Utilities Module',
+        'desc'    => 'Region Manager admin CRUD and Media Cleanup & Backup CLI tools — '
+                   . 'scan, archive, and remove orphaned/disabled product image cache files.',
+        'icon'    => '🛠️',
+        'badge'   => 'Utilities',
+        'color'   => '#1c5e8e',
+    ],
+    [
+        'chapter' => 3,
+        'module'  => 'CarpetAvenue_Orderify',
+        'title'   => 'Orderify Module',
+        'desc'    => 'Order fraud prevention and regional address management — refund statistics, '
+                   . 'customer blacklist (email/address/IP), and configurable state/region field behaviour for checkout.',
+        'icon'    => '🛡️',
+        'badge'   => 'Orderify',
+        'color'   => '#5e3b1c',
+    ],
+    [
+        'chapter' => 4,
+        'module'  => 'Magegadgets_Renameimage',
+        'title'   => 'Renameimage Module',
+        'desc'    => 'Automatically renames product gallery images on upload and CSV import using configurable '
+                   . 'product attribute combinations — supports prefix/postfix, collision handling, and skip flag (_aivz).',
+        'icon'    => '🖼️',
+        'badge'   => 'Renameimage',
+        'color'   => '#3b5e1c',
+    ],
+];
+
+// Build viewer URLs
+foreach ($chapters as &$ch) {
+    $modPath        = str_replace('_', '/', $ch['module']);
+    $ch['filepath'] = 'app/code/' . $modPath . '/README.md';
+    $ch['url']      = $block->getUrl('carpetavenue/doc/view', ['module' => $ch['module']]);
+    $ch['urlDev']   = $block->getUrl('carpetavenue/doc/view', ['module' => $ch['module'], 'tab' => 'developer']);
+}
+unset($ch);
+?>
+<style>
+/* ── Hide admin chrome for this page only ────────────────────── */
+.page-wrapper > .notices-wrapper,
+.page-header { display: none !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   CarpetAvenue Documentation Style System (ca-doc-*)
+   Inline styles — portable across all admin pages.
+   ═══════════════════════════════════════════════════════════════ */
+
+.ca-doc-wrap {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+    max-width: 90%;
+    margin: 50px auto 0;
+    padding: 0 0 40px;
+}
+
+/* ── Page header ─────────────────────────────────────────────── */
+.ca-doc-page-header {
+    background: linear-gradient(135deg, #1c2e45 0%, #1c5e8e 100%);
+    color: #fff;
+    padding: 32px 36px;
+    border-radius: 8px;
+    margin-bottom: 36px;
+    position: relative;
+    overflow: hidden;
+}
+.ca-doc-page-header::after {
+    content: '📚';
+    position: absolute;
+    right: 32px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 64px;
+    opacity: .18;
+}
+.ca-doc-page-header h1 {
+    margin: 0 0 6px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+}
+.ca-doc-page-header p {
+    margin: 0;
+    opacity: .85;
+    font-size: 13.5px;
+    max-width: 680px;
+}
+.ca-doc-page-header .ca-doc-badge {
+    display: inline-block;
+    background: rgba(255,255,255,.18);
+    border-radius: 3px;
+    padding: 2px 9px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    margin-right: 6px;
+    margin-bottom: 10px;
+}
+
+/* ── Section heading ─────────────────────────────────────────── */
+.ca-doc-h2 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1c5e8e;
+    margin: 0 0 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e5eff7;
+}
+
+/* ── Chapter grid ────────────────────────────────────────────── */
+.ca-doc-hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 8px;
+}
+
+.ca-doc-hub-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    display: flex;
+    flex-direction: column;
+}
+
+.ca-doc-hub-card-accent { height: 5px; width: 100%; }
+
+.ca-doc-hub-card-body {
+    padding: 20px 22px 14px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ca-doc-hub-card-chapter {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 6px;
+}
+
+.ca-doc-hub-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1c2e45;
+    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ca-doc-hub-card-desc {
+    font-size: 12.5px;
+    color: #666;
+    line-height: 1.55;
+    flex: 1;
+    margin: 0 0 14px;
+}
+
+.ca-doc-hub-card-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.ca-doc-hub-card-filepath {
+    font-size: 10.5px;
+    color: #bbb;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ca-doc-hub-card-actions { display: flex; gap: 8px; }
+
+.ca-doc-hub-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 0;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity .15s;
+}
+.ca-doc-hub-btn:hover { opacity: .85; text-decoration: none; }
+.ca-doc-hub-btn.manual    { background: #1c5e8e; color: #fff; }
+.ca-doc-hub-btn.developer { background: #f0f4f8; color: #1c2e45; border: 1px solid #dde4ec; }
+
+.ca-doc-hub-badge {
+    display: inline-block;
+    border-radius: 3px;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: #fff;
+}
+
+/* ── Info box ────────────────────────────────────────────────── */
+.ca-doc-alert {
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin: 24px 0 0;
+    font-size: 13px;
+    border-left: 4px solid;
+}
+.ca-doc-alert.info { background: #e8f4fd; border-color: #2575a8; color: #174a72; }
+.ca-doc-alert strong { font-weight: 700; }
+</style>
+
+<div class="ca-doc-wrap">
+
+    <!-- ── Page Header ─────────────────────────────────────────── -->
+    <div class="ca-doc-page-header">
+        <span class="ca-doc-badge">CarpetAvenue</span>
+        <span class="ca-doc-badge">v1.x</span>
+        <h1>Documentation Hub</h1>
+        <p>
+            Central index of all CarpetAvenue module manuals.
+            Each chapter covers a specific feature area — click a card to open the full manual.
+        </p>
+    </div>
+
+    <!-- ── Chapter Index ───────────────────────────────────────── -->
+    <h2 class="ca-doc-h2">📖 Chapters</h2>
+
+    <div class="ca-doc-hub-grid">
+        <?php foreach ($chapters as $ch): ?>
+        <div class="ca-doc-hub-card">
+            <div class="ca-doc-hub-card-accent" style="background:<?= $block->escapeHtmlAttr($ch['color']) ?>"></div>
+            <div class="ca-doc-hub-card-body">
+                <div class="ca-doc-hub-card-chapter">
+                    Chapter <?= (int)$ch['chapter'] ?>&nbsp;
+                    <span class="ca-doc-hub-badge" style="background:<?= $block->escapeHtmlAttr($ch['color']) ?>">
+                        <?= $block->escapeHtml($ch['badge']) ?>
+                    </span>
+                </div>
+                <div class="ca-doc-hub-card-title">
+                    <span><?= $block->escapeHtml($ch['icon']) ?></span>
+                    <span><?= $block->escapeHtml($ch['title']) ?></span>
+                </div>
+                <p class="ca-doc-hub-card-desc"><?= $block->escapeHtml($ch['desc']) ?></p>
+                <div class="ca-doc-hub-card-footer">
+                    <div class="ca-doc-hub-card-filepath">📄 <?= $block->escapeHtml($ch['filepath']) ?></div>
+                    <div class="ca-doc-hub-card-actions">
+                        <a class="ca-doc-hub-btn manual"    href="<?= $block->escapeUrl($ch['url']) ?>">📖 Manual</a>
+                        <a class="ca-doc-hub-btn developer" href="<?= $block->escapeUrl($ch['urlDev']) ?>">⚙️ Developer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- ── Tip ─────────────────────────────────────────────────── -->
+    <div class="ca-doc-alert info">
+        <strong>💡 Adding a new chapter:</strong>
+        <ol style="margin:8px 0 0 16px;padding:0;">
+            <li>Create <code>app/code/{Vendor}/{Module}/README.md</code> using the standard template.</li>
+            <li>Add a new entry to the <code>$chapters</code> array at the top of <code>CarpetAvenue_Core::doc/index.phtml</code>.</li>
+            <li>The viewer page is generated automatically — no new controller, block, or layout needed.</li>
+        </ol>
+    </div>
+
+</div>
+

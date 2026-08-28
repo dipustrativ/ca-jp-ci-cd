@@ -1,0 +1,19 @@
+<?php
+/**
+ * "Only 1 in stock" badge for unique (one-off) carpets.
+ * Ported from the reference theme; uses the `unique` boolean attribute
+ * instead of Evalent_ProductionType / Evalent_CatalogMods helpers.
+ *
+ * @var $block \Magento\Catalog\Block\Product\View\Description
+ */
+$_product = $block->getProduct();
+
+if (!$_product->isSaleable()) {
+    return;
+}
+
+if ((int) $_product->getData('unique') === 1): ?>
+    <div class="availability only unique">
+        <?= /* @noEscape */ __('Only <span>1</span> in stock') ?>
+    </div>
+<?php endif; ?>

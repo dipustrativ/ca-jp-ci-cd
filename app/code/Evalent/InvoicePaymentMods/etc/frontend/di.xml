@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Merged from Evalent_InvoicePaymentMethod: register the checkout config provider -->
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="evinvoicepayment_model_config_provider" xsi:type="object">
+                    Evalent\InvoicePaymentMods\Model\EvInvoiceConfigProvider\EvInvoiceConfigProvider
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>

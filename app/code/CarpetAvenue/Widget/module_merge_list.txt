@@ -1,0 +1,5 @@
+1. Evalent_CategoryListWidget ✓
+2. Evalent_CategoryProductListWidget ✓
+3. Evalent_Callout ✓
+4. Evalent_ImageLink ✓
+5. Evalent_SectionBlock ✓

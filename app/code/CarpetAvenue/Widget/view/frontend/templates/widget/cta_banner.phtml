@@ -1,0 +1,70 @@
+<?php $_title = $block->getTitle(); ?>
+<?php $_description = $block->getDescription(); ?>
+<?php $_buttonText = $block->getButtonText(); ?>
+<?php $_buttonLink = $block->getButtonLink(); ?>
+<?php $_bgcolor = $block->getBgColor(); ?>
+<?php $_textcolor = $block->getTextColor(); ?>
+<?php $_buttonColor = $block->getButtonColor(); ?>
+<?php $_descColor = $block->getDescColor() ?? $_textcolor; ?>
+<?php $_buttonTextColor = $block->getButtonTextColor(); ?>
+<?php $_headlineSize = $block->getHeadlineSize(); ?>
+<?php $_descSize = $block->getDescSize(); ?>
+<?php $_buttonSize = $block->getButtonSize(); ?>
+<?php $_image = $block->getImage() ?>
+<?php $_fullwidth = $block->getFullwidth(); ?>
+<?php $_alignContent = $block->getAlignContent() ?? "left"; ?>
+<?php $_imageLayout = $block->getImageLayout() == "left" ? "first-md" : "last-md" ?>
+<?php $_imageLayoutMob = $block->getImageLayoutMobile() == "left" ? "first-xs" : "last-xs" ?>
+<?php $_margin = $block->getMargin(); ?>
+<?php $_marginMobile = $block->getMarginMobile(); ?>
+<?php $_padding = $block->getPadding(); ?>
+<?php $_paddingMobile = $block->getPaddingMobile(); ?>
+<?php $_sku = $block->getProductSku(); ?>
+<?php $_product = null; ?>
+<?php if($_sku): $_product = $block->getProductBySku($_sku); endif; ?>
+<?php $_dotX = $block->getDotX() ?? "50"; ?>
+<?php $_dotY = $block->getDotY() ?? "70"; ?>
+<?php $sizeValue = ""; ?>
+
+<div class="cta-banner cta-banner-wrapper <?= $_fullwidth ? '' : 'page-main ' ?>
+<?= 'mt'.$_marginMobile . '--xs ' . 'mt'.$_margin.'--md' ?> <?= 'mb'.$_marginMobile . '--xs ' . 'mb'.$_margin.'--md ' .
+'pl'.$_padding.'--md '  . 'pr'.$_padding.'--md '  . 'pl'.$_paddingMobile.'--xs ' . 'pr'.$_paddingMobile.'--xs ' ?>">
+
+    <a href="<?= $_buttonLink ?>" class="cta-banner__link"></a>
+
+    <div class="cta-banner__container row">
+        <div class="cta-banner__container__content <?= $_alignContent ?> col-xs-12 col-md-6" style="background-color: <?= $_bgcolor ?>">
+            <h2 class="cta-banner__content__heading <?= $_headlineSize ?>" style="color: <?= $_textcolor ?>;"><?= $_title ?></h2>
+            <div class="cta-banner__content__description <?= $_descSize ?>" style="color: <?= $_descColor ?>;">
+                <?= $_description ?>
+            </div>
+            <?php if($_buttonText): ?>
+                <span class="cta-banner__content__button <?= $_buttonSize ?>" style="color: <?= $_buttonTextColor ?>; background-color: <?= $_buttonColor ?>;"><?= $_buttonText ?></span>
+            <?php endif; ?>
+        </div>
+        <div class="cta-banner__container__image col-xs-12 col-md-6 <?= $_imageLayoutMob . ' ' . $_imageLayout ?>">
+            <img src="<?= $_image ?>" alt="<?= $_title ?>" />
+
+            <?php if($_product !== null): ?>
+
+            <?php $sizeValue = $this->helper(\CarpetAvenue\Productify\Helper\Data::class)->formatSize(
+                    $_product->getData('width'),
+                    $_product->getData('length'),
+                    $_product->getData('shape')
+                ); ?>
+                <ul class="product-highlighter">
+                    <li style="left: <?= $_dotX ?>%; top: <?= $_dotY ?>%;">
+                        <a class="product-highlighter__dot" href="<?= $block->escapeUrl($_product->getProductUrl()) ?>"></a>
+                        <div class="product-highlighter__sign">
+                            <a href="<?= $block->escapeUrl($_product->getProductUrl()) ?>">
+                            </a>
+                            <div class="product-highlighter__sign__name"><?= $_product->getName(); ?></div>
+                            <div class="product-highlighter__sign__size"><?= $sizeValue ?></div>
+                            <div class="product-highlighter__sign__price"><?= $block->getProductPrice($_product); ?></div>
+                        </div>
+                    </li>
+                </ul>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>

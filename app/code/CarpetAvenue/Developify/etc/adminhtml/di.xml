@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Developify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Config Scope Hints — flag store-config values overridden at a
+         narrower scope. Moved here from CarpetAvenue_Utilities.
+         Adminhtml-only: the store-config form is the sole consumer.
+         ═══════════════════════════════════════════════════════════════════ -->
+    <type name="Magento\Framework\Data\Form\Element\Fieldset">
+        <plugin name="carpetavenue_developify_config_scope_hints"
+                type="CarpetAvenue\Developify\ConfigScopeHints\Plugin\Framework\Data\Form\Element\Fieldset"
+                sortOrder="100"/>
+    </type>
+
+    <!-- Cron Manager data source lives in ../di.xml — see the note there. -->
+
+</config>

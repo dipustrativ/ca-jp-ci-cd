@@ -1,0 +1,71 @@
+<script type="text/javascript">
+    require(['jquery'], function ($) {
+        function updateProductifyMeta() {
+            const productifyMetaEle = '.columns .productify-group-meta';
+            if ($(productifyMetaEle).length) {
+                $(productifyMetaEle + ' .size').each(function () {
+                    let html = $(this).html();
+                    $(this).closest('.product-item').find('.product-item-details .size').html(html);
+                    $(this).remove();
+                });
+            }
+        }
+
+        // Exposed globally so Infinite Ajax Scroll can re-run it from its
+        // 'rendered' event (see ajaxscroll/init.phtml) — appended tiles carry
+        // both the theme .size and the group-meta .size until this dedupes them.
+        window.updateProductifyMeta = updateProductifyMeta;
+
+        jQuery(document).ready(function () {
+            updateProductifyMeta();
+
+            // Re-dedupe after any AJAX that adds/replaces tiles:
+            //   - layered-nav filter swap fires 'collectionUpdated'
+            //   - legacy Amasty content update fires 'contentUpdated'
+            // IAS appends are handled via its own 'rendered' hook (init.phtml),
+            // which is the only reliable post-append signal.
+            $(document).on('contentUpdated collectionUpdated', function () {
+                updateProductifyMeta();
+            });
+        });
+    });
+</script>
+
+<style>
+    .productify-group-meta {
+        font-size: 13px;
+        position: relative;
+        text-align: center;
+    }
+
+    .carpient-tag ~ .productify-group-meta {
+        margin-top: -20px;
+    }
+
+    .productify-group-meta .swatches {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-content: center;
+        justify-content: left;
+        align-items: center;
+        gap: 8px;
+    }
+    .swatch-image-wrap {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #ddd;
+    }
+    .swatch-image-wrap img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        object-position: center;
+        transform: scale(1);
+    }
+</style>

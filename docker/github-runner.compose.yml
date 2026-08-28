@@ -1,0 +1,39 @@
+# CarpetAvenue — GitHub Actions self-hosted runner, as a Dokploy container.
+#
+# Runs the CI runner on Server A (build/registry host) with NO OS-level install.
+# The host Docker socket is mounted so the runner builds + pushes images using
+# Server A's Docker daemon (and pushes to the LOCAL registry over localhost).
+#
+# Deploy in Dokploy:
+#   Create -> Compose -> paste this -> Environment: GH_PAT=<PAT, repo scope> -> Deploy
+# Then GitHub -> Settings -> Actions -> Runners shows "carpient-build-1" as Idle.
+#
+# GH_PAT = a GitHub Personal Access Token (classic) with `repo` scope. The image
+# uses it to fetch a registration token and (re)register automatically — so the
+# runner survives restarts without a human re-pasting a short-lived token.
+#
+# ⚠️ Mounting /var/run/docker.sock gives this container root-equivalent access to
+#    Server A's Docker. Fine on your own build host; never on a shared/untrusted one.
+
+services:
+  github-runner:
+    image: myoung34/github-runner:latest
+    restart: unless-stopped
+    environment:
+      REPO_URL:     https://github.com/indexon/carpient
+      ACCESS_TOKEN: ${GH_PAT}
+      RUNNER_NAME:  carpient-build-1
+      RUNNER_SCOPE: repo
+      LABELS:       carpient-build      # matches runs-on: [self-hosted, carpient-build]
+      RUNNER_WORKDIR: /tmp/runner/work
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - runner_work:/tmp/runner/work
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f Runner.Listener >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  runner_work:

@@ -1,0 +1,72 @@
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+    .ias-trigger {
+        a {
+            border-radius: 5px;
+            background: #2c8e3b;
+            color: #fff;
+            padding: 10px 20px;
+            position: relative;
+            margin: 0 auto;
+            display: inline-block;
+            width: auto;
+
+            &:hover {
+                text-decoration: none;
+            }
+        }
+
+        &.ias-trigger-prev {
+            & + .products.wrapper {
+                margin-top: 0;
+            }
+        }
+
+        &.ias-trigger-next {
+            margin-bottom: 40px;
+
+            .toolbar-amount {
+                display: block;
+                text-align: center;
+                float: none;
+                position: relative;
+                width: auto;
+                margin: 0 auto;
+            }
+            a:after {
+                font-size: 12px;
+                line-height: 20px;
+                color: inherit;
+                content: '\e622';
+                font-family: 'luma-icons';
+                vertical-align: middle;
+                display: inline-block;
+                font-weight: normal;
+                overflow: hidden;
+                speak: none;
+                text-align: center;
+                margin-left: 15px;
+            }
+
+            .progressbar {
+                background: #ccc;
+                height: 8px;
+                width: 25%;
+                margin: 0 auto 10px;
+
+                &__fill {
+                    background: #333;
+                    display: block;
+                    height: 100%;
+                }
+            }
+        }
+    }
+
+    .ias-spinner + .ias-spinner {
+        display: none;
+    }
+}

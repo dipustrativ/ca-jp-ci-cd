@@ -1,0 +1,102 @@
+<?php
+
+use \Evalent\Banner\Api\Data\BannerInterface;
+
+/** @var \Evalent\Banner\Block\Widget\MultipleBanner $block   */
+
+/** @var \Evalent\Banner\Api\Data\BannerItemInterface[] $bannerItems */
+$bannerItems = $block->getBanners();
+$_bannerDisplayMode = $block->getDisplayMode();
+$_bannerGutterDesktop = $block->getData('gutter_desktop');
+$_bannerGutterMobile = $block->getData('gutter_mobile');
+$_bannerMarginTopDesktop = $block->getData('margin_top_desktop');
+$_bannerMarginBottomDesktop = $block->getData('margin_bottom_desktop');
+$_bannerMarginTopMobile = $block->getData('margin_top_mobile');
+$_bannerMarginBottomMobile = $block->getData('margin_bottom_mobile');
+?>
+
+<div class="ev-banners ev-banners--multiple row ev-banners-display--<?= $_bannerDisplayMode ? $_bannerDisplayMode : 'default' ?> row-gutter--desktop--<?= $_bannerGutterDesktop ?> row-gutter--mobile--<?= $_bannerGutterMobile ?> margin-top--desktop--<?= $_bannerMarginTopDesktop ?> margin-bottom--desktop--<?= $_bannerMarginBottomDesktop ?> margin-top--mobile--<?= $_bannerMarginTopMobile ?> margin-bottom--mobile--<?= $_bannerMarginBottomMobile ?>">
+
+    <?php foreach ($bannerItems as $bannerItem): ?>
+    <?php
+        /**
+         * @var \Evalent\Banner\Api\Data\BannerItemInterface $bannerItem
+         * @var \Evalent\Banner\Model\Data\Banner $banner
+         */
+        $banner = $bannerItem->getBanner();
+        $_bannerButtonContentTheme = $banner->getButtonContentTheme();
+        $_bannerButtonStyle = $banner->getButtonStyle();
+        $_bannerHeading = $banner->getHeading();
+        $_bannerDescription = $banner->getDescription();
+        $_bannerButtonText = $banner->getButtonText();
+        $_bannerLinkUrl = $banner->getBannerLinkUrl();
+        $_bannerAnimation = $bannerItem->getAnimationEffect();
+        $_bannerAlignDesktop = $banner->getContentAlignDesktop();
+        $_bannerAlignMobile = $banner->getContentAlignMobile();
+        $_bannerTextAlignDesktop = $banner->getTextAlignDesktop();
+        $_bannerTextAlignMobile = $banner->getTextAlignMobile();
+        $_bannerImageDesktop = $banner->getImageUrl(BannerInterface::DESKTOP_IMAGE);
+        $_bannerImageMobile = $banner->getImageUrl(BannerInterface::MOBILE_IMAGE);
+        $_bannerLinkNewWindow = $banner->getBannerLinkUrlNewWindow();
+        $_bannerButtonEnabledDesktop = $banner->getButtonEnabledDesktop();
+        $_bannerButtonEnabledMobile = $banner->getButtonEnabledMobile();
+        $_bannerHeadingSizeDesktop = $banner->getHeadingSizeDesktop();
+        $_bannerHeadingSizeMobile = $banner->getHeadingSizeMobile();
+        $_bannerHeadingTag = $banner->getHeadingTag();
+        // Set default heading tag if empty
+        if(!isset($_bannerHeadingTag) || empty($_bannerHeadingTag)): $_bannerHeadingTag = "h2"; endif;
+        ?>
+        <div class="ev-banners--multiple__banner col-xs-12 col-sm-<?= $bannerItem->getColumn() . ' button-style--' . $_bannerButtonStyle . ' content-theme--' . $_bannerButtonContentTheme ?> animation--<?= $_bannerAnimation ?> align--desktop--<?= $_bannerAlignDesktop ?> align--mobile--<?= $_bannerAlignMobile ?> gutter--desktop--<?= $_bannerGutterDesktop ?> gutter--mobile--<?= $_bannerGutterMobile ?> text-align--desktop--<?= $_bannerTextAlignDesktop ?> text-align--mobile--<?= $_bannerTextAlignMobile ?>">
+            <div class="inner-wrapper">
+                <?php if($_bannerLinkUrl): ?>
+                    <a href="<?= $_bannerLinkUrl ?>" class="ev-banners__link" target="<?= $_bannerLinkNewWindow === '1' ? '_blank' : '_self' ?>"></a>
+                <?php endif; ?>
+
+                <?php /*
+                <picture>
+                    <?php if($_bannerImageMobile !== null): ?>
+                        <source media="(max-width: 768px)" srcset="<?= $_bannerImageMobile ?>">
+                    <?php endif; ?>
+
+                    <?php if($_bannerImageDesktop !== null): ?>
+                        <source media="(min-width: 769px)" srcset="<?= $_bannerImageDesktop ?>">
+                        <img src="<?= $_bannerImageDesktop ?>" alt="Banner image">
+                    <?php endif; ?>
+                </picture>
+                */ ?>
+
+                <?php if ($_bannerImageMobile !== null && $_bannerImageDesktop !== null) : ?>
+
+                    <img class="lazy-load" src="<?= $this->getViewFileUrl('Evalent_Banner::images/lazyload_banner.png') ?>" data-original="<?= $_bannerImageDesktop ?>" data-original-srcset="<?= $_bannerImageMobile . ' 768w, ' . $_bannerImageDesktop ?>" alt="Banner image">
+
+                <?php elseif ($_bannerImageMobile == null && $_bannerImageDesktop !== null): ?>
+
+                    <img class="lazy-load" src="<?= $this->getViewFileUrl('Evalent_Banner::images/lazyload_banner.png') ?>" data-original="<?= $_bannerImageDesktop ?>" alt="Banner image">
+
+                <?php endif; ?>
+
+                <div class="ev-banners__content">
+                    <?php if($_bannerHeading): ?>
+                        <<?= $_bannerHeadingTag ?> class="ev-banners__content__heading size--desktop--<?= $_bannerHeadingSizeDesktop ?> size--mobile--<?= $_bannerHeadingSizeMobile ?>">
+                            <?= $_bannerHeading ?>
+                        </<?= $_bannerHeadingTag ?>>
+                    <?php endif; ?>
+
+                    <?php if($_bannerDescription): ?>
+                        <p class="ev-banners__content__description">
+                            <?= $_bannerDescription ?>
+                        </p>
+                    <?php endif; ?>
+
+                    <?php if($_bannerButtonText): ?>
+                        <a class="ev-banners__content__button <?= !$_bannerButtonEnabledDesktop ? 'hidden-m' : '' ?> <?= !$_bannerButtonEnabledMobile ? 'hidden-xs' : '' ?>" href="<?= $_bannerLinkUrl ? $_bannerLinkUrl : '#' ?>" target="<?= $_bannerLinkNewWindow === '1' ? '_blank' : '_self' ?>">
+                            <span>
+                                <?= $_bannerButtonText ?>
+                            </span>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>

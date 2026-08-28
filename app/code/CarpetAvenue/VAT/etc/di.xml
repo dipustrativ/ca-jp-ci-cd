@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_VAT
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Store-country rate origin override (protected method, needs class override) -->
+    <preference for="Magento\Tax\Model\Calculation" type="CarpetAvenue\VAT\Model\Tax\Calculation"/>
+
+    <!-- VIES provider registry consumed by VatValidationService -->
+    <type name="CarpetAvenue\VAT\Service\VatValidationService">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="eu_soap" xsi:type="object">CarpetAvenue\VAT\Model\Vies\EuSoapValidator</item>
+                <item name="viesapi" xsi:type="object">CarpetAvenue\VAT\Model\Vies\ViesApiValidator</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Shipping-not-taxfree: force shipping to be taxed (gated by config) -->
+    <type name="Magento\Tax\Helper\Data">
+        <plugin name="carpetavenue_vat_shipping_taxfree_helper"
+                type="CarpetAvenue\VAT\Plugin\Tax\HelperDataPlugin"/>
+    </type>
+    <type name="Magento\Tax\Model\Config">
+        <plugin name="carpetavenue_vat_shipping_taxfree_config"
+                type="CarpetAvenue\VAT\Plugin\Tax\ConfigPlugin"/>
+    </type>
+
+    <!-- Custom tax calculation: CBT net pricing per group (gated by config) -->
+    <type name="Magento\Tax\Model\Calculation">
+        <plugin name="carpetavenue_vat_calculation"
+                type="CarpetAvenue\VAT\Plugin\Tax\CalculationPlugin"/>
+    </type>
+</config>

@@ -1,0 +1,606 @@
+<?xml version="1.0"?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+
+    <!-- ============================================================ -->
+    <!-- Callout Widget                                                -->
+    <!-- ============================================================ -->
+    <widget class="CarpetAvenue\Widget\Block\Widget\CalloutWidget" id="evalent_callout_widget">
+        <label>Callout widget</label>
+        <description>Display a message with selected colors</description>
+        <parameters>
+            <parameter name="message" required="true" sort_order="10" visible="true" xsi:type="text">
+                <label translate="true">Message</label>
+                <description>The message text. Use %countdown to show countdown days.</description>
+            </parameter>
+            <parameter name="bgcolor" required="false" xsi:type="block" visible="true" sort_order="20">
+                <label translate="true">Background Color</label>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Color"/>
+            </parameter>
+            <parameter name="fontsize" xsi:type="text" required="true" visible="true" sort_order="40">
+                <label translate="true">Font Size</label>
+                <description>E.g: 16px</description>
+            </parameter>
+            <parameter name="textcolor" required="false" xsi:type="block" visible="true" sort_order="30">
+                <label translate="true">Text Color</label>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Color"/>
+            </parameter>
+            <parameter name="closebtn" required="false" xsi:type="select" visible="true" sort_order="50">
+                <label translate="true">Show Close Button</label>
+                <options>
+                    <option name="yes" value="1"><label translate="true">Yes</label></option>
+                    <option name="no" value="0" selected="true"><label translate="true">No</label></option>
+                </options>
+            </parameter>
+            <parameter name="countdown" required="false" xsi:type="block" visible="true" sort_order="60">
+                <label translate="true">Countdown to date</label>
+                <description>If set, will show countdown to the given date</description>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\DatePicker"/>
+            </parameter>
+            <parameter name="countdown_days_before" xsi:type="text" required="false" visible="true" sort_order="61">
+                <label translate="true">Show Countdown X Days Before End</label>
+                <description>Timer will only show when countdown reaches this limit (1 or more days, 0 to always show)</description>
+                <value>0</value>
+            </parameter>
+            <parameter name="show_lastday" required="false" xsi:type="select" visible="true" sort_order="62">
+                <label translate="true">Replace message with "Last Day" on the last day of countdown</label>
+                <options>
+                    <option name="yes" value="1"><label translate="true">Yes</label></option>
+                    <option name="no" value="0" selected="true"><label translate="true">No</label></option>
+                </options>
+            </parameter>
+            <parameter name="more_btn" required="false" xsi:type="select" visible="true" sort_order="70">
+                <label translate="true">Show "More Information" Button</label>
+                <description>Opens up a popup window</description>
+                <options>
+                    <option name="yes" value="1"><label translate="true">Yes</label></option>
+                    <option name="no" value="0" selected="true"><label translate="true">No</label></option>
+                </options>
+            </parameter>
+            <parameter name="moreinfo_label" required="false" sort_order="75" visible="true" xsi:type="text">
+                <label translate="true">More Information Text</label>
+                <description>Custom "More Information" Button Text</description>
+                <depends>
+                    <parameter name="more_btn" value="1"/>
+                </depends>
+                <value>More information</value>
+            </parameter>
+            <parameter name="moreinfo_content" required="false" sort_order="80" visible="true" xsi:type="block">
+                <label translate="true">More Information Content</label>
+                <description>More information to show in the popup window</description>
+                <depends>
+                    <parameter name="more_btn" value="1"/>
+                </depends>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Editor"/>
+            </parameter>
+        </parameters>
+    </widget>
+
+    <!-- ============================================================ -->
+    <!-- Callout Subscribe Widget                                      -->
+    <!-- ============================================================ -->
+    <widget class="CarpetAvenue\Widget\Block\Widget\CalloutSubscribeWidget" id="evalent_callout_widget_subscribe">
+        <label>Callout Subscribe widget</label>
+        <description>Display a message and popup link with selected colors</description>
+        <parameters>
+            <parameter name="message" required="true" sort_order="10" visible="true" xsi:type="text">
+                <label translate="true">Message</label>
+                <description>The message text. Use %countdown to show countdown days.</description>
+            </parameter>
+            <parameter name="bgcolor" required="false" xsi:type="block" visible="true" sort_order="20">
+                <label translate="true">Background Color</label>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Color"/>
+            </parameter>
+            <parameter name="fontsize" xsi:type="text" required="true" visible="true" sort_order="40">
+                <label translate="true">Font Size</label>
+                <description>E.g: 16px</description>
+            </parameter>
+            <parameter name="textcolor" required="false" xsi:type="block" visible="true" sort_order="30">
+                <label translate="true">Text Color</label>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Color"/>
+            </parameter>
+            <parameter name="is_sticky" required="false" xsi:type="select" visible="true" sort_order="31">
+                <label translate="true">Is Sticky?</label>
+                <options>
+                    <option name="yes" value="1"><label translate="true">Yes</label></option>
+                    <option name="no" value="0" selected="true"><label translate="true">No</label></option>
+                </options>
+            </parameter>
+            <parameter name="countdown" required="false" xsi:type="block" visible="true" sort_order="60">
+                <label translate="true">Countdown to date</label>
+                <description>If set, will show countdown to the given date</description>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\DatePicker"/>
+            </parameter>
+            <parameter name="countdown_days_before" xsi:type="text" required="false" visible="true" sort_order="61">
+                <label translate="true">Show Countdown X Days Before End</label>
+                <description>Timer will only show when countdown reaches this limit (1 or more days, 0 to always show)</description>
+                <value>0</value>
+            </parameter>
+            <parameter name="show_lastday" required="false" xsi:type="select" visible="true" sort_order="62">
+                <label translate="true">Replace message with "Last Day" on the last day of countdown</label>
+                <options>
+                    <option name="yes" value="1"><label translate="true">Yes</label></option>
+                    <option name="no" value="0" selected="true"><label translate="true">No</label></option>
+                </options>
+            </parameter>
+            <parameter name="popup_button_text" required="false" sort_order="79" visible="true" xsi:type="text">
+                <label translate="true">Button text</label>
+            </parameter>
+            <parameter name="popup_id" required="false" sort_order="80" visible="true" xsi:type="text">
+                <label translate="true">Popup ID</label>
+            </parameter>
+        </parameters>
+    </widget>
+
+    <!-- ============================================================ -->
+    <!-- Callout Product Widget                                        -->
+    <!-- ============================================================ -->
+    <widget class="CarpetAvenue\Widget\Block\Widget\CalloutProductWidget" id="evalent_callout_product_widget">
+        <label>Callout Product widget</label>
+        <description>Display a message and countdown with selected colors</description>
+        <parameters>
+            <parameter name="message" required="true" sort_order="10" visible="true" xsi:type="text">
+                <label translate="true">Message</label>
+                <description>The message text.</description>
+            </parameter>
+            <parameter name="discount" xsi:type="text" visible="true" sort_order="15">
+                <label translate="true">Discount</label>
+                <description>E.g: 10,20,30</description>
+            </parameter>
+            <parameter name="bgcolor" required="true" xsi:type="block" visible="true" sort_order="20">
+                <label translate="true">Background Color</label>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Color"/>
+            </parameter>
+            <parameter name="fontsize" xsi:type="text" visible="true" sort_order="40">
+                <label translate="true">Font Size</label>
+                <description>E.g: 16px</description>
+            </parameter>
+            <parameter name="fontsize_timer" xsi:type="text" visible="true" sort_order="41">
+                <label translate="true">Font Size of Timer (days/hours/minutes)</label>
+                <description>E.g: 16px</description>
+            </parameter>
+            <parameter name="fontweight" xsi:type="text" visible="true" sort_order="45">
+                <label translate="true">Font Weight</label>
+                <description>E.g: 800 or bold</description>
+            </parameter>
+            <parameter name="textcolor" required="true" xsi:type="block" visible="true" sort_order="30">
+                <label translate="true">Text Color</label>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Color"/>
+            </parameter>
+            <parameter name="closebtn" xsi:type="select" visible="true" sort_order="50">
+                <label translate="true">Show Close Button</label>
+                <options>
+                    <option name="yes" value="1"><label translate="true">Yes</label></option>
+                    <option name="no" value="0" selected="true"><label translate="true">No</label></option>
+                </options>
+            </parameter>
+            <parameter name="countdown" required="true" xsi:type="block" visible="true" sort_order="60">
+                <label translate="true">Countdown To Date</label>
+                <description>If set, will show countdown to the given date</description>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\DatePicker"/>
+            </parameter>
+            <parameter name="countdown_days_before" xsi:type="text" required="false" visible="true" sort_order="61">
+                <label translate="true">Show Countdown X Days Before End</label>
+                <description>Timer will only show when countdown reaches this limit (1 or more days, 0 to always show)</description>
+                <value>0</value>
+            </parameter>
+            <parameter name="template" xsi:type="select" visible="true">
+                <label>Template</label>
+                <options>
+                    <option name="default" value="CarpetAvenue_Widget::widget/callout.phtml">
+                        <label>Default</label>
+                    </option>
+                    <option name="callout_product" value="CarpetAvenue_Widget::widget/callout_product.phtml">
+                        <label>Callout Product</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+
+    <!-- ============================================================ -->
+    <!-- Image Link Widget                                             -->
+    <!-- ============================================================ -->
+    <widget class="CarpetAvenue\Widget\Block\Widget\ImageLinkWidget" id="carpetavenue_imagelink_widget">
+        <label>Image Link widget</label>
+        <description>Display a linked image with specified url</description>
+        <parameters>
+            <parameter name="image" xsi:type="block" required="true" visible="true" sort_order="10">
+                <label translate="true">Image</label>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\ImageChooser">
+                    <data>
+                        <item name="button" xsi:type="array">
+                            <item name="open" xsi:type="string">Choose Image...</item>
+                        </item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="titleurl" xsi:type="text" required="true" visible="true" sort_order="20">
+                <label translate="true">Link URL</label>
+                <description>The link URL for the image</description>
+            </parameter>
+        </parameters>
+    </widget>
+
+    <!-- ============================================================ -->
+    <!-- Category List Widget                                         -->
+    <!-- ============================================================ -->
+    <widget class="CarpetAvenue\Widget\Block\Widget\CategoryList" id="carpetavenue_categorylist_widget">
+        <label>Category List</label>
+        <description>List Categories</description>
+        <parameters>
+            <parameter name="template" xsi:type="select" required="true" visible="true">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="default" value="CarpetAvenue_Widget::category/widget/grid.phtml" selected="true">
+                        <label translate="true">Category List</label>
+                    </option>
+                    <option name="with_description" value="CarpetAvenue_Widget::category/widget/grid_description.phtml" selected="false">
+                        <label translate="true">Category List with Description</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="cache_lifetime" xsi:type="text" visible="true">
+                <label translate="true">Cache Lifetime (Seconds)</label>
+                <description translate="true">
+                    <![CDATA[Time in seconds between the widget updates.
+                    <br/>If not set, equals to 86400 seconds (24 hours). To update widget instantly, go to Cache Management and clear Blocks HTML Output cache.
+                    <br/>Widget will not show products that begin to match the specified conditions until cache is refreshed.]]>
+                </description>
+            </parameter>
+            <parameter name="category_page_size" sort_order="10" visible="true" xsi:type="text" required="true">
+                <label>Amount of subcategories</label>
+            </parameter>
+            <parameter name="category_id" sort_order="20" source_model="CarpetAvenue\Widget\Model\Config\Source\Category" visible="true" xsi:type="select">
+                <label>Category Id which sub-categories will show</label>
+            </parameter>
+            <parameter name="category_depth" sort_order="30" visible="true" xsi:type="text" required="false">
+                <label>Category level depth</label>
+                <description translate="true">
+                    <![CDATA[Default 1 level of sub-categories.]]>
+                </description>
+            </parameter>
+        </parameters>
+    </widget>
+
+    <!-- ============================================================ -->
+    <!-- Call To Action Banner Widget                                  -->
+    <!-- ============================================================ -->
+    <widget class="CarpetAvenue\Widget\Block\Widget\CtaWidget" id="evalent_cta_widget">
+        <label>Call To Action Banner widget (OLD)</label>
+        <description>Display a CTA banner with an image and background color in a 2 column layout</description>
+        <parameters>
+            <parameter name="title" required="false" sort_order="10" visible="true" xsi:type="text">
+                <label translate="true">Title</label>
+                <description>The heading text.</description>
+            </parameter>
+            <parameter name="description" required="false" sort_order="20" visible="true" xsi:type="block">
+                <label translate="true">Description</label>
+                <description>The description content text.</description>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Editor"/>
+            </parameter>
+            <parameter name="button_text" required="false" sort_order="30" visible="true" xsi:type="text">
+                <label translate="true">Button text</label>
+                <description>The button text. Leave empty to not show the button.</description>
+            </parameter>
+            <parameter name="button_link" required="true" sort_order="40" visible="true" xsi:type="text">
+                <label translate="true">Button URL</label>
+                <description>The button link URL.</description>
+            </parameter>
+            <parameter name="product_sku" required="false" sort_order="41" visible="true" xsi:type="text">
+                <label translate="true">Highlight Product SKU</label>
+                <description>Optionally show a product by given SKU.</description>
+            </parameter>
+            <parameter name="dot_x" required="false" sort_order="42" visible="true" xsi:type="text">
+                <label translate="true">Highlight position X</label>
+                <description>The X position of the dot from the Left in percentage (0-100)</description>
+            </parameter>
+            <parameter name="dot_y" required="false" sort_order="43" visible="true" xsi:type="text">
+                <label translate="true">Highlight position Y</label>
+                <description>The Y position of the dot from the Top in percentage (0-100)</description>
+            </parameter>
+            <parameter name="bgcolor" required="true" xsi:type="block" visible="true" sort_order="50">
+                <label translate="true">Background Color</label>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Color"/>
+            </parameter>
+            <parameter name="buttoncolor" required="true" xsi:type="block" visible="true" sort_order="51">
+                <label translate="true">Button Color</label>
+                <description>Button background color</description>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Color">
+                    <data>
+                        <item name="value" xsi:type="string">#ffffff</item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="textcolor" required="true" xsi:type="block" visible="true" sort_order="55">
+                <label translate="true">Headline Color</label>
+                <description>Headline text color</description>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Color">
+                    <data>
+                        <item name="value" xsi:type="string">#ffffff</item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="textcolor_desc" required="true" xsi:type="block" visible="true" sort_order="56">
+                <label translate="true">Description Color</label>
+                <description>Description text color</description>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Color">
+                    <data>
+                        <item name="value" xsi:type="string">#ffffff</item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="textcolor_button" required="true" xsi:type="block" visible="true" sort_order="57">
+                <label translate="true">Button Text Color</label>
+                <description>Button text color</description>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\Color">
+                    <data>
+                        <item name="value" xsi:type="string">#000000</item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="headline_size" xsi:type="select" visible="true" required="false" sort_order="58">
+                <label translate="true">Headline Text Size</label>
+                <options>
+                    <option name="big" value="big" selected="true"><label translate="true">Big</label></option>
+                    <option name="medium" value="medium"><label translate="true">Medium</label></option>
+                    <option name="small" value="small"><label translate="true">Small</label></option>
+                </options>
+            </parameter>
+            <parameter name="description_size" xsi:type="select" visible="true" required="false" sort_order="59">
+                <label translate="true">Description Text Size</label>
+                <options>
+                    <option name="big" value="big"><label translate="true">Big</label></option>
+                    <option name="medium" value="medium" selected="true"><label translate="true">Medium</label></option>
+                    <option name="small" value="small"><label translate="true">Small</label></option>
+                </options>
+            </parameter>
+            <parameter name="button_size" xsi:type="select" visible="true" required="false" sort_order="60">
+                <label translate="true">Button Size</label>
+                <options>
+                    <option name="big" value="big"><label translate="true">Big</label></option>
+                    <option name="medium" value="medium" selected="true"><label translate="true">Medium</label></option>
+                    <option name="small" value="small"><label translate="true">Small</label></option>
+                </options>
+            </parameter>
+            <parameter name="banner_image" xsi:type="block" visible="true" required="true" sort_order="61">
+                <label translate="true">Banner Image</label>
+                <block class="CarpetAvenue\Widget\Block\Adminhtml\Widget\ImageChooser">
+                    <data>
+                        <item name="button" xsi:type="array">
+                            <item name="open" xsi:type="string">Choose Image...</item>
+                        </item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="is_fullwidth" required="false" xsi:type="select" visible="true" sort_order="70">
+                <label translate="true">Is full width?</label>
+                <description>Use Full Page Width</description>
+                <options>
+                    <option name="no" value="0" selected="true"><label translate="true">No</label></option>
+                    <option name="yes" value="1"><label translate="true">Yes</label></option>
+                </options>
+            </parameter>
+            <parameter name="image_layout" xsi:type="select" visible="true" required="false" sort_order="73">
+                <label translate="true">Image Layout Desktop</label>
+                <description>Position of the banner image on Desktop</description>
+                <options>
+                    <option name="right" value="right" selected="true"><label translate="true">Right side</label></option>
+                    <option name="left" value="left"><label translate="true">Left side</label></option>
+                </options>
+            </parameter>
+            <parameter name="image_layout_mobile" xsi:type="select" visible="true" required="false" sort_order="74">
+                <label translate="true">Image Layout Mobile</label>
+                <description>Position of the banner image on Mobile</description>
+                <options>
+                    <option name="right" value="right" selected="true"><label translate="true">Bottom</label></option>
+                    <option name="left" value="left"><label translate="true">Top</label></option>
+                </options>
+            </parameter>
+            <parameter name="align_content" xsi:type="select" visible="true" required="false" sort_order="75">
+                <label translate="true">Align Content</label>
+                <options>
+                    <option name="left" value="left" selected="true"><label translate="true">Left</label></option>
+                    <option name="center" value="center"><label translate="true">Center</label></option>
+                    <option name="right" value="right"><label translate="true">Right</label></option>
+                </options>
+            </parameter>
+            <parameter name="margin" xsi:type="select" visible="true" required="false" sort_order="76">
+                <label translate="true">Margin Desktop</label>
+                <description>Margin above and below the banner on Desktop</description>
+                <options>
+                    <option name="none" value="0" selected="true"><label translate="true">None</label></option>
+                    <option name="5" value="5"><label translate="true">5px</label></option>
+                    <option name="10" value="10"><label translate="true">10px</label></option>
+                    <option name="15" value="15"><label translate="true">15px</label></option>
+                    <option name="20" value="20"><label translate="true">20px</label></option>
+                    <option name="25" value="25"><label translate="true">25px</label></option>
+                    <option name="30" value="30"><label translate="true">30px</label></option>
+                    <option name="35" value="35"><label translate="true">35px</label></option>
+                    <option name="40" value="40"><label translate="true">40px</label></option>
+                    <option name="45" value="45"><label translate="true">45px</label></option>
+                    <option name="50" value="50"><label translate="true">50px</label></option>
+                </options>
+            </parameter>
+            <parameter name="margin_mobile" xsi:type="select" visible="true" required="false" sort_order="77">
+                <label translate="true">Margin Mobile</label>
+                <description>Margin above and below the banner on Mobile</description>
+                <options>
+                    <option name="none" value="0" selected="true"><label translate="true">None</label></option>
+                    <option name="5" value="5"><label translate="true">5px</label></option>
+                    <option name="10" value="10"><label translate="true">10px</label></option>
+                    <option name="15" value="15"><label translate="true">15px</label></option>
+                    <option name="20" value="20"><label translate="true">20px</label></option>
+                    <option name="25" value="25"><label translate="true">25px</label></option>
+                    <option name="30" value="30"><label translate="true">30px</label></option>
+                    <option name="35" value="35"><label translate="true">35px</label></option>
+                    <option name="40" value="40"><label translate="true">40px</label></option>
+                    <option name="45" value="45"><label translate="true">45px</label></option>
+                    <option name="50" value="50"><label translate="true">50px</label></option>
+                </options>
+            </parameter>
+            <parameter name="padding" xsi:type="select" visible="true" required="false" sort_order="78">
+                <label translate="true">Padding Desktop</label>
+                <description>Padding left and right of banner on Desktop</description>
+                <options>
+                    <option name="none" value="0"><label translate="true">Default</label></option>
+                    <option name="40" value="40" selected="true"><label translate="true">40px</label></option>
+                    <option name="60" value="60"><label translate="true">60px</label></option>
+                    <option name="80" value="80"><label translate="true">80px</label></option>
+                    <option name="100" value="100"><label translate="true">100px</label></option>
+                </options>
+            </parameter>
+            <parameter name="padding_mobile" xsi:type="select" visible="true" required="false" sort_order="79">
+                <label translate="true">Padding Mobile</label>
+                <description>Padding left and right of banner on Mobile</description>
+                <options>
+                    <option name="none" value="0"><label translate="true">Default</label></option>
+                    <option name="40" value="40" selected="true"><label translate="true">40px</label></option>
+                    <option name="60" value="60"><label translate="true">60px</label></option>
+                    <option name="80" value="80"><label translate="true">80px</label></option>
+                    <option name="100" value="100"><label translate="true">100px</label></option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+
+
+    <!-- ============================================================ -->
+    <!-- Category Product List Widget                                  -->
+    <!-- ============================================================ -->
+    <widget class="CarpetAvenue\Widget\Block\Widget\CategoryProductView" id="carpetavenue_categoryproductlist_widget">
+        <label>Product list from a category</label>
+        <description>List products from a selected category</description>
+        <parameters>
+            <parameter name="template" xsi:type="select" required="true" visible="true">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="default" value="CarpetAvenue_Widget::product/full.phtml" selected="true">
+                        <label translate="true">Full template, with title, product grid and show all button</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="cache_lifetime" xsi:type="text" visible="true">
+                <label translate="true">Cache Lifetime (Seconds)</label>
+                <description translate="true">
+                    <![CDATA[Time in seconds between the widget updates.
+                    <br/>If not set, equals to 86400 seconds (24 hours). To update widget instantly, go to Cache Management and clear Blocks HTML Output cache.
+                    <br/>Widget will not show products that begin to match the specified conditions until cache is refreshed.]]>
+                </description>
+            </parameter>
+            <parameter name="product_count" sort_order="10" visible="true" xsi:type="text" required="true">
+                <label>Amount of products</label>
+            </parameter>
+            <parameter name="category_id" sort_order="20" source_model="CarpetAvenue\Widget\Model\Config\Source\Category" visible="true" xsi:type="select">
+                <label>Category to get products from</label>
+            </parameter>
+        </parameters>
+    </widget>
+
+    <!-- ============================================================ -->
+    <!-- CMS Static Section Block (ported from Evalent_SectionBlock)  -->
+    <!-- ============================================================ -->
+    <widget id="cms_static_section" class="CarpetAvenue\Widget\Block\Widget\SectionBlock"
+            placeholder_image="Magento_Cms::images/widget_block.png">
+        <label translate="true">CMS Static Section Block</label>
+        <description translate="true">Contents of a Static Section Block</description>
+        <parameters>
+            <parameter name="background_color" xsi:type="select" visible="true" required="true" sort_order="10">
+                <label translate="true">Section Background Color</label>
+                <options>
+                    <option name="default" value="false" selected="true">
+                        <label translate="true">No color</label>
+                    </option>
+                    <option name="background_color" value="background_color">
+                        <label translate="true">Light color</label>
+                    </option>
+                    <option name="background_color_darker" value="background_color_darker">
+                        <label translate="true">Darker color</label>
+                    </option>
+                    <option name="pattern" value="pattern">
+                        <label translate="true">Use pattern</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="border" xsi:type="select" visible="true" required="true" sort_order="20">
+                <label translate="true">Section Border</label>
+                <options>
+                    <option name="default" value="false" selected="true">
+                        <label translate="true">None</label>
+                    </option>
+                    <option name="border" value="true">
+                        <label translate="true">Use Border</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="block_id" xsi:type="block" visible="true" required="true" sort_order="30">
+                <label translate="true">Block</label>
+                <block class="Magento\Cms\Block\Adminhtml\Block\Widget\Chooser">
+                    <data>
+                        <item name="button" xsi:type="array">
+                            <item name="open" xsi:type="string" translate="true">Select Block...</item>
+                        </item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="template" xsi:type="select" visible="true" required="true" sort_order="40">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="default" value="widget/static_block/default.phtml" selected="true">
+                        <label translate="true">CMS Static Block Section Default Template</label>
+                    </option>
+                    <option name="no_padding" value="widget/static_block/default_nopadding.phtml">
+                        <label translate="true">CMS Static Block Section (No padding) Template</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="mobile_hide" required="false" xsi:type="select" visible="true" sort_order="50">
+                <label translate="true">Hide on mobile</label>
+                <description>Hide this section on mobile</description>
+                <options>
+                    <option name="no" value="0" selected="true">
+                        <label translate="true">No</label>
+                    </option>
+                    <option name="yes" value="1">
+                        <label translate="true">Yes</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+
+    <!-- ============================================================ -->
+    <!-- Product SKU Slider Widget                                     -->
+    <!-- ============================================================ -->
+    <widget class="CarpetAvenue\Widget\Block\Widget\ProductSkuSlider" id="carpetavenue_product_sku_slider_widget">
+        <label>Product SKU Slider</label>
+        <description>Show hand-picked products (by comma-separated SKUs) as a slider.</description>
+        <parameters>
+            <parameter name="title" xsi:type="text" required="false" visible="true" sort_order="5">
+                <label translate="true">Title</label>
+                <description>Optional heading above the slider. Leave empty for no title. For a per-store title, either assign this widget to a single store view, or translate the text via the theme/module i18n CSV.</description>
+            </parameter>
+            <parameter name="view_all_url" xsi:type="text" required="false" visible="true" sort_order="7">
+                <label translate="true">"View all" link URL</label>
+                <description>Optional. If set, a translatable "View all" link shows on the right of the title. Absolute (https://...) or store-relative (e.g. all-carpets).</description>
+            </parameter>
+            <parameter name="skus" xsi:type="text" required="true" visible="true" sort_order="10">
+                <label translate="true">Product SKUs</label>
+                <description>Comma-separated SKUs, in the order they should appear. E.g: SKU-1, SKU-2, SKU-3</description>
+            </parameter>
+            <parameter name="slides_to_show" xsi:type="text" required="true" visible="true" sort_order="20">
+                <label translate="true">Products visible at once</label>
+                <description>How many products show at a time; the rest become slides. Default 5.</description>
+                <value>5</value>
+            </parameter>
+            <parameter name="cache_lifetime" xsi:type="text" visible="true" sort_order="30">
+                <label translate="true">Cache Lifetime (Seconds)</label>
+                <description translate="true">
+                    <![CDATA[Time in seconds between the widget updates.
+                    <br/>If not set, equals to 3600 seconds. To update widget instantly, go to Cache Management and clear Blocks HTML Output cache.]]>
+                </description>
+            </parameter>
+        </parameters>
+    </widget>
+
+</widgets>

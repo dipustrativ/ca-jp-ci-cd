@@ -1,0 +1,31 @@
+<?php
+/**
+ * Transparent centered category hero: category name + short description.
+ * Ported design from carpient.com collection "color-scheme--transparent" section.
+ *
+ * @var \Magento\Catalog\Block\Category\View $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$category = $block->getCurrentCategory();
+if (!$category) {
+    return '';
+}
+$name  = (string) $category->getName();
+$short = trim((string) $category->getData('short_description'));
+?>
+<div class="section category-hero-transparent">
+    <div class="container">
+        <div class="category-hero-transparent__inner">
+            <?php if ($name !== ''): ?>
+                <h1 class="category-hero-transparent__heading">
+                    <span class="contained-heading"><?= $escaper->escapeHtml($name) ?></span>
+                </h1>
+            <?php endif; ?>
+            <?php if ($short !== ''): ?>
+                <div class="category-hero-transparent__text rte">
+                    <?= /* @noEscape */ $short ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>

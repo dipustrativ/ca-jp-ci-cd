@@ -1,0 +1,145 @@
+//
+//  Search results header band — carpient.com reference
+//  (boost-sd__search-form-wrapper): grey band, centered title + search field.
+//  _____________________________________________
+@csb-bg:      #f6f6f8;
+@csb-dark:    #202123;
+@csb-border:  #dcdcdc;
+
+.carpient-search-band {
+    background: @csb-bg;
+    //  Full-bleed across the page width (breaks out of .columns padding).
+    margin: 0 0 8px;
+    padding: 48px 20px;
+    text-align: center;
+
+    &__inner {
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    &__title {
+        margin: 0 0 22px;
+        color: #0c0c0c;
+        font-weight: 600;
+        font-size: ~"clamp(2rem, 0.83vw + 1.69rem, 2.96rem)";
+        line-height: 1.3;
+    }
+
+    &__form {
+        position: relative;
+        max-width: 640px;
+        margin: 0 auto;
+    }
+
+    //  Input + clear + submit grouped in one bordered white pill
+    &__group {
+        display: flex;
+        align-items: center;
+        height: 56px;
+        padding: 4px 4px 4px 4px;
+        background: #fff;
+        border: 1px solid @csb-border;
+        border-radius: 50px;
+        box-sizing: border-box;
+
+        &:focus-within {
+            border-color: #b5b5b5;
+        }
+    }
+
+    //  Extra class weight so the theme's base input styling (border + radius)
+    //  can't paint a second box inside the pill.
+    &__group &__input {
+        flex: 1 1 auto;
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        margin: 0;
+        padding: 0 8px 0 18px;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        color: #1a1a1a;
+        .lib-font-size(15px);
+        box-sizing: border-box;
+
+        &:focus {
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            outline: 0;
+        }
+
+        &::-webkit-search-cancel-button {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+    }
+
+    &__clear {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        margin: 0 2px;
+        padding: 0;
+        background: none;
+        border: 0;
+        color: #6b6b6b;
+        cursor: pointer;
+
+        &:hover {
+            color: #111;
+        }
+    }
+
+    //  Submit — dark round button with its own border, inside the pill.
+    //  Extra class weight beats the theme's base button gradient.
+    &__group &__submit {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        margin: 0;
+        padding: 0;
+        background: @csb-dark;
+        border: 1px solid @csb-dark;
+        border-radius: 50px;
+        box-shadow: none;
+        color: #fff;
+        cursor: pointer;
+        transition: background 0.15s ease;
+
+        &:hover,
+        &:active,
+        &:focus {
+            background: #000;
+            border-color: #000;
+            color: #fff;
+            box-shadow: none;
+        }
+    }
+
+    //  Dropdown styling now lives in the theme _carpient_search.less
+}
+
+@media (max-width: 768px) {
+    .carpient-search-band {
+        padding: 32px 16px;
+
+        &__group {
+            height: 52px;
+        }
+
+        &__submit {
+            width: 44px;
+            height: 44px;
+        }
+    }
+}

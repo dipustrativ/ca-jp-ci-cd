@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+	<menu>
+		<add id="Evalent_AdminActivityLog::admin_activity" module="Evalent_AdminActivityLog" parent="Magento_Backend::system" resource="Magento_Backend::content_system" sortOrder="9999" title="Admin Activities"/>
+		<add action="evalent_adminactivitylog/modelactivity/index" id="Evalent_AdminActivityLog::evalent_adminactivitylog_modelactivity" module="Evalent_AdminActivityLog" parent="Evalent_AdminActivityLog::admin_activity" resource="Magento_Backend::content" sortOrder="9999" title="Model Activity"/>
+		<add action="evalent_adminactivitylog/configactivity/index" id="Evalent_AdminActivityLog::evalent_adminactivitylog_configactivity" module="Evalent_AdminActivityLog" parent="Evalent_AdminActivityLog::admin_activity" resource="Magento_Backend::content" sortOrder="9999" title="Config Activity"/>
+		<add action="evalent_adminactivitylog/loginactivity/index" id="Evalent_AdminActivityLog::evalent_adminactivitylog_loginactivity" module="Evalent_AdminActivityLog" parent="Evalent_AdminActivityLog::admin_activity" resource="Magento_Backend::content" sortOrder="9999" title="Login Activity"/>
+		<add action="evalent_adminactivitylog/cmsactivity/index" id="Evalent_AdminActivityLog::evalent_adminactivitylog_cmsactivity" module="Evalent_AdminActivityLog" parent="Evalent_AdminActivityLog::admin_activity" resource="Magento_Backend::content" sortOrder="9999" title="Cms Activity"/>
+		<add action="evalent_adminactivitylog/cacheactivity/index" id="Evalent_AdminActivityLog::evalent_adminactivitylog_cacheactivity" module="Evalent_AdminActivityLog" parent="Evalent_AdminActivityLog::admin_activity" resource="Magento_Backend::content" sortOrder="9999" title="Cache Activity"/>
+	</menu>
+</config>

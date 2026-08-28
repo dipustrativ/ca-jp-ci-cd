@@ -1,0 +1,147 @@
+<?php
+    /** @var \CarpetAvenue\Productify\Block\Widget\ShowroomBanner $block */
+
+use Evalent\Banner\Api\Data\BannerInterface;
+
+$banner = $block->getBanner();
+if (!$banner) {
+    return;
+}
+
+$timeZone = new \DateTimeZone("Europe/Stockholm");
+
+$dateStart = $banner->getDateStart();
+$dateEnd = $banner->getDateEnd();
+$_dateStart = !empty($dateStart) ? date_format(date_create($dateStart . '+ 1 hour', $timeZone),"Y/m/d H:i") : "";
+$_dateEnd = !empty($dateEnd) ? date_format(date_create($dateEnd . '+ 1 hour', $timeZone),"Y/m/d H:i") : "";
+$dateNow = date("Y/m/d H:i");
+$_daysLeft = 0;
+
+if(!empty($_dateStart) && !empty($_dateEnd) && ($_dateEnd < $dateNow || $_dateStart > $dateNow)):
+    return;
+endif;
+
+if(empty($_dateStart) && !empty($_dateEnd) && $_dateEnd < $dateNow):
+    return;
+endif;
+
+if(!empty($_dateStart) && empty($_dateEnd) && $_dateStart > $dateNow):
+    return;
+endif;
+
+$_bannerImageDesktop = $banner->getImageUrl(BannerInterface::DESKTOP_IMAGE);
+$_bannerImageMobile = $banner->getImageUrl(BannerInterface::MOBILE_IMAGE);
+$_bannerDescription = $banner->getDescription();
+
+
+?>
+
+<div class="showroom-banner-widget">
+    <img src="<?= $_bannerImageDesktop; ?>" alt="Luxury Showroom Interior" class="showroom-image">
+
+    <div class="showroom-overlay">
+        <?= $_bannerDescription; ?>
+    </div>
+</div>
+
+
+<style>
+    .showroom-banner-widget {
+        position: relative;
+        width: 100%;
+        max-width: 1450px;
+        overflow: hidden;
+        margin: auto;
+    }
+
+    .showroom-image {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .showroom-overlay {
+        position: absolute;
+        bottom: 40px;
+        left: 40px;
+        background-color: rgba(255, 255, 255, 0.85);
+        padding: 30px 40px;
+        border-radius: 4px;
+        max-width: 350px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+
+    .showroom-overlay h2 {
+        margin: 0 0 20px 0;
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .showroom-overlay p {
+        margin: 8px 0;
+        font-size: 17px;
+        color: #827a7a;
+        line-height: 1.5;
+    }
+
+    .address {
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+
+    @media  screen and (min-width: 768px) and (max-width:1024px) {
+        .showroom-overlay {
+            left: 20px;
+            bottom: 20px;
+            padding: 20px;
+            max-width: 80%;
+        }
+
+        .showroom-overlay h2 {
+            font-size: 24px;
+        }
+
+        .showroom-overlay p {
+            font-size: 16px;
+        }
+    }
+
+    @media screen and (max-width:767px){
+        .showroom-overlay {
+            padding: 20px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            height: max-content;
+            text-align: center;
+            max-width: 60%;
+            width: 100%;
+        }
+
+        .showroom-overlay h2 {
+            margin-bottom: 10px;
+            font-size: 5.2vw;
+        }
+
+        .showroom-overlay p:not(:last-child) {
+            margin: 0px !important;
+            margin-top: 5px !important;
+        }
+
+        .showroom-overlay p {
+            font-size: 14px;
+            margin-bottom: 0px !important;
+        }
+
+        .showroom-image {
+            height: 300px;
+            object-fit: cover;
+        }
+    }
+
+</style>

@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+	<group id="default">
+        <job name="evalent_catalog_price_history" instance="Evalent\CatalogPriceHistory\Cron\ProcessProducts" method="execute">
+            <schedule>10 */1 * * *</schedule>
+        </job>
+        <!-- ProcessProducts only appends; without this the table grows forever. -->
+        <job name="evalent_catalog_price_history_purge" instance="Evalent\CatalogPriceHistory\Cron\PurgeHistory" method="execute">
+            <schedule>40 3 * * *</schedule>
+        </job>
+	</group>
+</config>

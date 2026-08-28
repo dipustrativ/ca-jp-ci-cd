@@ -1,0 +1,81 @@
+<?php
+/**
+ * Copyright © Carpient. All rights reserved.
+ *
+ * Header mini search. Same ids as core (#search_mini_form, #search) so the rest
+ * of Magento keeps working, but restructured for the carpient.com layout: the
+ * magnifier sits inside the field, a clear X sits at its right edge, and the
+ * suggestion dropdown (CarpetAvenue_Productify) hangs off the bar rather than
+ * off the input.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+/** @var \Magento\Search\ViewModel\ConfigProvider $configProvider */
+$configProvider = $block->getData('configProvider');
+/** @var \Magento\Search\ViewModel\AdditionalSearchFormData $additionalSearchFormData */
+$additionalSearchFormData = $block->getData('additionalSearchFormData');
+/** @var \CarpetAvenue\Productify\ViewModel\SuggestOptions|null $suggestOptions */
+$suggestOptions = $block->getData('suggest_options');
+
+$helper = $configProvider->getSearchHelperData();
+$useSuggest = $suggestOptions && $suggestOptions->isEnabled();
+?>
+<div class="block block-search">
+    <div class="block block-title" role="button" tabindex="0"
+         aria-label="<?= $escaper->escapeHtmlAttr(__('Search')) ?>">
+        <strong><?= $escaper->escapeHtml(__('Search')) ?></strong>
+    </div>
+    <div class="block block-content">
+        <form class="form minisearch" id="search_mini_form"
+              action="<?= $escaper->escapeUrl($helper->getResultUrl()) ?>" method="get">
+            <?php if (!empty($queryParams = $additionalSearchFormData->getFormData())) : ?>
+                <?php foreach ($queryParams as $param) : ?>
+                    <input type="hidden" name="<?= $escaper->escapeHtmlAttr($param['name']) ?>"
+                           value="<?= $escaper->escapeHtmlAttr($param['value']) ?>"/>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            <div class="field search">
+                <label class="label" for="search" data-role="minisearch-label">
+                    <span><?= $escaper->escapeHtml(__('Search')) ?></span>
+                </label>
+                <div class="control">
+                    <input id="search"
+                           <?php if ($useSuggest) : ?>
+                               data-mage-init="<?= $escaper->escapeHtmlAttr(
+                                   $suggestOptions->getJsonConfig('#search_autocomplete', '#search_mini_form')
+                               ) ?>"
+                           <?php endif; ?>
+                           type="text"
+                           name="<?= $escaper->escapeHtmlAttr($helper->getQueryParamName()) ?>"
+                           value="<?= /* @noEscape */ $helper->getEscapedQueryText() ?>"
+                           placeholder="<?= $escaper->escapeHtmlAttr(__('Search entire store here...')) ?>"
+                           class="input-text"
+                           maxlength="<?= $escaper->escapeHtmlAttr($helper->getMaxQueryLength()) ?>"
+                           role="combobox"
+                           aria-haspopup="false"
+                           aria-autocomplete="both"
+                           autocomplete="off"
+                           aria-expanded="false"/>
+                    <button type="button" class="action clear" data-role="suggest-clear"
+                            aria-label="<?= $escaper->escapeHtmlAttr(__('Clear')) ?>">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor"
+                                  stroke-width="1.6" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <?= $block->getChildHtml() ?>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit"
+                        title="<?= $escaper->escapeHtmlAttr(__('Search')) ?>"
+                        class="action search"
+                        aria-label="<?= $escaper->escapeHtmlAttr(__('Search')) ?>">
+                    <span><?= $escaper->escapeHtml(__('Search')) ?></span>
+                </button>
+            </div>
+            <div id="search_autocomplete" class="productify-suggest"></div>
+        </form>
+    </div>
+</div>

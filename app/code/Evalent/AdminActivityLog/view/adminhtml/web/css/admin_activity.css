@@ -1,0 +1,18 @@
+.admin__table-activity-log-primary {
+    table-layout:fixed;
+    width: 100%;
+}
+
+.admin__table-activity-log-secondary {
+    table-layout:fixed;
+    width: 100%;
+}
+
+.admin__table-activity-log-secondary td {
+    word-wrap: break-word;
+    text-align: left;
+}
+.admin__table-activity-log-primary td {
+    word-wrap: break-word;
+    text-align: right;
+}

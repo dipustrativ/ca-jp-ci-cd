@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_VAT
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="carpetavenue_vat" translate="label" type="text" sortOrder="320" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>VAT / Tax</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_VAT::vat</resource>
+
+            <!-- VIES VAT number validation -->
+            <group id="vies" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>VIES VAT Validation</label>
+                <comment>Validate B2B customer VAT numbers. Nothing runs unless "Enabled" is set to Yes.</comment>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="provider" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Provider</label>
+                    <source_model>CarpetAvenue\VAT\Model\Config\Source\ViesProvider</source_model>
+                    <comment>EU VIES SOAP = free official EU service. viesapi.eu = paid service (requires ID/Key below).</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="test_mode" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>viesapi.eu Test Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Use viesapi.eu demo credentials (no ID/Key needed).</comment>
+                    <depends><field id="enabled">1</field><field id="provider">viesapi</field></depends>
+                </field>
+                <field id="viesapi_id" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>viesapi.eu ID</label>
+                    <depends><field id="enabled">1</field><field id="provider">viesapi</field><field id="test_mode">0</field></depends>
+                </field>
+                <field id="viesapi_key" translate="label" type="obscure" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>viesapi.eu Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends><field id="enabled">1</field><field id="provider">viesapi</field><field id="test_mode">0</field></depends>
+                </field>
+            </group>
+
+            <!-- Shipping VAT -->
+            <group id="shipping_vat" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Shipping VAT</label>
+                <comment>Force shipping to be taxed even when the order is otherwise tax free.</comment>
+                <field id="shipping_not_taxfree" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Force Shipping Not Tax-Free</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="target_group" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Target Customer Group</label>
+                    <source_model>Magento\Customer\Model\Config\Source\Group</source_model>
+                    <comment>Customers in this group always get taxed shipping. Others fall back to VAT-validity of the address.</comment>
+                    <depends><field id="shipping_not_taxfree">1</field></depends>
+                </field>
+            </group>
+
+            <!-- Custom tax calculation -->
+            <group id="tax_calc" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Custom Tax Calculation</label>
+                <comment>Cross-border-trade net pricing per customer group and store-country origin rate.</comment>
+                <field id="store_country_origin" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Use Store Country As Rate Origin</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Calculate origin tax rate from the store default country instead of the shipping origin (fixes tax deduction on tax-free orders).</comment>
+                </field>
+                <field id="disable_cbt_groups" translate="label comment" type="multiselect" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable Cross-Border-Trade For Groups</label>
+                    <source_model>Magento\Customer\Model\Config\Source\Group\Multiselect</source_model>
+                    <comment>Customers in these groups receive net prices (their tax class is switched to the "Net Price Tax Class" below).</comment>
+                </field>
+                <field id="excluding_tax_class" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Net Price Tax Class</label>
+                    <source_model>Magento\Tax\Model\TaxClass\Source\Customer</source_model>
+                    <comment>Customer tax class applied to the groups selected above.</comment>
+                </field>
+            </group>
+
+            <!-- EUR store pricing cleanup -->
+            <group id="eur_pricing" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>EUR Store Pricing</label>
+                <comment>Cron cleanup of non-default-store price overrides. Only enable if EUR store views exist.</comment>
+                <field id="null_pricing_in_eur_stores" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Null Pricing In EUR Stores</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

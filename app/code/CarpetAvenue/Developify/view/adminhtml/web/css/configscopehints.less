@@ -1,0 +1,169 @@
+//
+//  Config Scope Hints
+//  ---------------------------------------------
+//  The hint markup is injected into a store-config field comment, which the core field
+//  renderer prints inside `<p class="note"><span>…</span></p>`. Only inline elements are
+//  emitted there, so every block-level behaviour below is produced with CSS, not tags.
+//  Nothing here relies on the admin theme's `.accordion` rules.
+
+@csh-accent: #eb5202;
+@csh-panel-bg: #fdf7f3;
+@csh-panel-border: #f2ddcf;
+@csh-rule: #eee6df;
+@csh-text: #41362f;
+@csh-muted: #8f8579;
+@csh-chevron: #a8a8a8;
+@csh-value-bg: #fff;
+@csh-value-border: #e6e3df;
+@csh-link: #007bdb;
+
+.overridden-hint-wrapper {
+    background: @csh-panel-bg;
+    border: 1px solid @csh-panel-border;
+    border-left: 3px solid @csh-accent;
+    border-radius: 3px;
+    color: @csh-text;
+    display: block;
+    font-style: normal;
+    margin: 1rem 0 0;
+    max-width: 60rem;
+    padding: 1.1rem 1.4rem 1.2rem;
+
+    .lead-text {
+        display: block;
+        font-size: 1.2rem;
+        font-weight: 600;
+        letter-spacing: .01em;
+        margin-bottom: .3rem;
+        padding-left: 2.2rem;
+        position: relative;
+
+        &:before {
+            color: @csh-accent;
+            content: '\e623';
+            font-family: 'Admin Icons';
+            font-size: 1.6rem;
+            font-weight: normal;
+            left: 0;
+            line-height: 1;
+            position: absolute;
+            top: .1rem;
+        }
+    }
+
+    .overridden-hint-list {
+        display: block;
+    }
+
+    .override-scope {
+        border-top: 1px solid @csh-rule;
+        cursor: pointer;
+        display: block;
+        font-size: 1.3rem;
+        line-height: 1.8rem;
+        padding: .9rem 2.4rem .9rem 0;
+        position: relative;
+        transition: color .12s ease;
+
+        &:first-child {
+            border-top: 0;
+        }
+
+        // Chevron, drawn rather than iconfont — no circle, scales with the row.
+        &:after {
+            border-bottom: 2px solid @csh-chevron;
+            border-right: 2px solid @csh-chevron;
+            content: '';
+            height: .7rem;
+            position: absolute;
+            right: .5rem;
+            top: 50%;
+            transform: translateY(-70%) rotate(45deg);
+            transition: transform .15s ease, border-color .12s ease;
+            width: .7rem;
+        }
+
+        &:hover,
+        &:focus {
+            color: @csh-accent;
+
+            &:after {
+                border-color: @csh-accent;
+            }
+        }
+
+        &:focus {
+            outline: 1px dotted @csh-muted;
+            outline-offset: 2px;
+        }
+
+        &.open:after {
+            transform: translateY(-25%) rotate(-135deg);
+        }
+    }
+
+    .override-scope-kind {
+        color: @csh-muted;
+        display: inline-block;
+        font-size: 1.1rem;
+        letter-spacing: .04em;
+        margin-right: .7rem;
+        min-width: 8rem;
+        text-transform: uppercase;
+    }
+
+    a.override-scope-name {
+        color: @csh-link;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .override-value {
+        display: none;
+        padding: 0 0 .9rem;
+
+        &.visible {
+            display: block;
+        }
+
+        .override-value-hint-label {
+            background: @csh-value-bg;
+            border: 1px solid @csh-value-border;
+            border-radius: 2px;
+            color: @csh-text;
+            display: block;
+            font-size: 1.2rem;
+            line-height: 1.7rem;
+            // Long blobs (Global CSS, HTML head snippets) scroll instead of pushing the form apart.
+            max-height: 20rem;
+            overflow: auto;
+            overflow-wrap: anywhere;
+            padding: .7rem .9rem;
+
+            & + .override-value-hint-label {
+                border-top: 0;
+                border-radius: 0;
+            }
+        }
+
+        .override-value-hint-labels {
+            display: block;
+
+            .override-value-hint-label.list {
+                border-radius: 0;
+
+                &:first-child {
+                    border-radius: 2px 2px 0 0;
+                }
+
+                &:last-child {
+                    border-radius: 0 0 2px 2px;
+                }
+            }
+        }
+    }
+}

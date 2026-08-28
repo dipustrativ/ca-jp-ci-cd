@@ -1,0 +1,45 @@
+.ca-payment-icons {
+    margin: 10px 0;
+}
+.ca-payment-icons__heading {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.4rem;
+}
+.ca-payment-icons__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.ca-payment-icons--left .ca-payment-icons__list {
+    justify-content: flex-start;
+}
+.ca-payment-icons--center .ca-payment-icons__list {
+    justify-content: center;
+}
+.ca-payment-icons--right .ca-payment-icons__list {
+    justify-content: flex-end;
+}
+.ca-payment-icons__item {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    padding: 2px;
+}
+.ca-payment-icons__img {
+    display: block;
+    width: 48px;
+    height: auto;
+    object-fit: contain;
+}
+/* Host-tweak hook: pass css_class="footer" in the directive to apply this. */
+.ca-payment-icons.footer {
+    padding-top: 10px;
+}

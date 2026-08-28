@@ -1,0 +1,172 @@
+<?php
+/**
+ * @var $block CarpetAvenue\Productify\Block\Product\Category\CategoryList
+ */
+$currentCategory = $block->getCurrentCategory();
+$name = $currentCategory->getName();
+$customCategoryTitle = $currentCategory->getCustomTitle();
+$description = $currentCategory->getDescription();
+$customBottomBlock = $currentCategory->getData("custom_bottom_block");
+$isReadMoreEnabled = (bool) $currentCategory->getData('description_read_more');
+$readMoreChars = (int) $currentCategory->getData('description_read_more_chars');
+$showDescriptionTop = (bool) $currentCategory->getData('show_description_top');
+$categoryDescriptionShowOnTop = $showDescriptionTop || $customBottomBlock;
+$customCss = $currentCategory->getData('category_custom_css');
+$descriptionPlain = strip_tags($description ?? '');
+if ($readMoreChars > 0) {
+    $hasMoreContent = mb_strlen($descriptionPlain) > $readMoreChars;
+    $truncatedText  = $hasMoreContent
+        ? mb_substr($descriptionPlain, 0, $readMoreChars)
+        : $descriptionPlain;
+} else {
+    $sentenceLimit  = 2;
+    preg_match_all('/[^.!?]*[.!?]+/u', $descriptionPlain, $matches);
+    $sentences      = $matches[0] ?? [];
+    $hasMoreContent = count($sentences) > $sentenceLimit;
+    $truncatedText  = $hasMoreContent
+        ? trim(implode('', array_slice($sentences, 0, $sentenceLimit)))
+        : $descriptionPlain;
+}
+$showReadMore = $isReadMoreEnabled && $showDescriptionTop && $hasMoreContent;
+?>
+<?php if ($description && $categoryDescriptionShowOnTop): ?>
+<style>
+    .category-heading-with-description {
+        /*margin: 0 6%;*/
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+    .category-heading-with-description h1 {
+        font-size: 31px;
+        font-family: Inter, sans-serif !important;
+        color: #000000;
+        font-weight: 300 !important;
+    }
+    .category-heading-with-description .category-description {
+        font-size: 18px;
+        color: #000000;
+        margin-top: 10px;
+        font-family: Inter, sans-serif;
+        font-weight: 300;
+        text-align: left;
+    }
+    .read-more-toggle {
+        color: #c0392b;
+        text-decoration: none;
+        cursor: pointer;
+        font-size: inherit;
+        font-weight: inherit;
+        display: inline;
+    }
+    .read-more-toggle:hover {
+        opacity: 0.7;
+    }
+    .category-description-readmore .desc-truncated {
+        display: inline;
+    }
+    .toolbar-products
+    @media screen and (max-width:767px){
+        .category-heading-with-description {
+            margin: 0 0;
+        }
+        .category-heading-with-description .category-description {
+            font-size: 12px;
+        }
+        .category-heading>h1 {
+            font-size: 20px !important;
+            margin-top: 18px !important;
+            font-weight: 400 !important;
+        }
+    }
+</style>
+<div class="container category-heading category-heading-with-description">
+    <h1><?= !empty($customCategoryTitle) ? $customCategoryTitle : $name ?></h1>
+    <div class="category-description">
+        <?php if ($showReadMore): ?>
+            <div class="category-description-readmore" id="category-desc-readmore">
+                <span class="desc-truncated"><?= $escaper->escapeHtml($truncatedText) ?></span>
+                <span class="desc-full" style="display:none;"><?= $description ?></span>
+                <a href="javascript:void(0)" class="read-more-toggle" id="desc-read-more-btn"><?= $escaper->escapeHtml(__("Read more")) ?>...</a>
+            </div>
+        <?php else: ?>
+            <?= $description ?>
+        <?php endif; ?>
+    </div>
+</div>
+<?php else: ?>
+    <div class="container category-heading">
+        <h1><?= !empty($customCategoryTitle) ? $customCategoryTitle : $name ?></h1>
+    </div>
+<?php endif; ?>
+
+<?php if ($customBottomBlock): ?>
+<style>
+    .collection-subcategories {
+       display: none !important;
+    }
+</style>
+<?php endif;?>
+
+<style>
+    .category-heading>h1 {
+        font-size: 22px;
+        font-weight: 500 !important;
+        margin-bottom: 10px;
+    }
+    .category-view-holder .category-description #page-title-heading {
+        display: none;
+    }
+    .category-description-readmore {
+        font-size: 17px;
+        font-weight: 300 !important;
+    }
+    @media (max-width: 768px) {
+        .category-heading>h1 {
+            font-size: 19px;
+            margin-top: 10px;
+            /* text-decoration: underline; */
+            /* margin-bottom: 5px; */
+            /* line-height: 24px; */
+            margin-bottom: 0;
+        }
+        .sidebar.sidebar-main {
+            display: none;
+        }
+        #layered-filter-block.slidein .filter-state-bar {
+            margin-top: 0px;
+        }
+        #layered-filter-block.slidein .filter-state-bar .filter-actions {
+            padding-bottom: 10px;
+        }
+        .filter-actions .filter-clear {
+            text-decoration: underline !important;
+            color: #050505;
+        }
+        body.filter-not-at-top #layered-filter-block.slidein .filter-state-bar {
+            position: relative !important;
+        }
+    }
+</style>
+
+<?php if ($showReadMore): ?>
+<script>
+(function() {
+    var btn = document.getElementById('desc-read-more-btn');
+    var truncated = document.querySelector('.desc-truncated');
+    var full = document.querySelector('.desc-full');
+    var expanded = false;
+    if (btn && truncated && full) {
+        btn.addEventListener('click', function() {
+            expanded = !expanded;
+            truncated.style.display = expanded ? 'none' : '';
+            full.style.display = expanded ? '' : 'none';
+            btn.textContent = expanded ? '<?= $escaper->escapeJs(__('Read less'))."..." ?>' : '<?= $escaper->escapeJs(__('Read more'))."..." ?>';
+        });
+    }
+})();
+</script>
+<?php endif; ?>
+
+<?php if ($customCss): ?>
+<style><?= $customCss /* Admin-authored content, trusted */ ?></style>
+<?php endif; ?>

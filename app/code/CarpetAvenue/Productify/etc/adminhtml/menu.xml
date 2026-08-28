@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="CarpetAvenue_Productify::product_change_log" title="Product Log" module="CarpetAvenue_Productify" sortOrder="410" parent="Magento_Backend::system" resource="Magento_Backend::system"/>
+        <add id="CarpetAvenue_Productify::product_name_change_log" title="Name Change Log" module="CarpetAvenue_Productify" sortOrder="411" parent="CarpetAvenue_Productify::product_change_log" action="productify/product/namechangelog" resource="Magento_Backend::system"/>
+
+        <add id="CarpetAvenue_Productify::productify" title="Productify" module="CarpetAvenue_Productify" sortOrder="100" parent="Magento_Catalog::catalog" dependsOnModule="CarpetAvenue_Productify" resource="Magento_Catalog::catalog"/>
+        <add action="productify/japan/blacklist" id="CarpetAvenue_Productify::jp_product_blacklist" module="CarpetAvenue_Productify" parent="CarpetAvenue_Productify::productify" resource="Magento_Catalog::catalog" sortOrder="101" title="JP Blacklist"/>
+
+
+
+    </menu>
+</config>

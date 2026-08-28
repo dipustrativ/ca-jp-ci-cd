@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Carpient_Filter — reference-style horizontal filter bar with inline dropdown
+ * panels (carpient.com look). Presentation only: it reuses the layered
+ * navigation feature inside CarpetAvenue_Productify (was
+ * CarpetAvenue_LayeredNavigation) for the filter data, multiselect batch AJAX,
+ * price slider and per-filter option renderer.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Carpient_Filter">
+        <sequence>
+            <module name="Magento_LayeredNavigation"/>
+            <module name="CarpetAvenue_Productify"/>
+        </sequence>
+    </module>
+</config>

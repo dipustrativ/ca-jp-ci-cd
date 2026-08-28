@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Core
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="carpetavenue" translate="label" sortOrder="400" class="carpetavenue">
+            <label>Carpet Avenue</label>
+        </tab>
+
+        <!-- Carpet Avenue Custom CSS/JS Section -->
+        <section id="carpetavenue_custom_code" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Custom CSS/JS</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_Core::custom_code</resource>
+            <group id="head_includes" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Head Includes</label>
+                <comment><![CDATA[Add custom CSS and JavaScript code that will be included in the head section of your store. Style and script tags will be added automatically.]]></comment>
+
+                <field id="global_css" translate="label comment" type="textarea" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Global CSS</label>
+                    <comment><![CDATA[Custom CSS code that will run on all store views. Do not include &lt;style&gt; tags - they will be added automatically.]]></comment>
+                </field>
+
+                <field id="global_js" translate="label comment" type="textarea" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Global JavaScript</label>
+                    <comment><![CDATA[Custom JavaScript code that will run on all store views. Do not include &lt;script&gt; tags - they will be added automatically.]]></comment>
+                </field>
+
+                <field id="store_view_css" translate="label comment" type="textarea" sortOrder="30" showInDefault="0" showInWebsite="0" showInStore="1">
+                    <label>Store View Level CSS</label>
+                    <comment><![CDATA[Custom CSS code that will run on specific store views only. Do not include &lt;style&gt; tags - they will be added automatically.]]></comment>
+                </field>
+
+                <field id="store_view_js" translate="label comment" type="textarea" sortOrder="40" showInDefault="0" showInWebsite="0" showInStore="1">
+                    <label>Store View Level JavaScript</label>
+                    <comment><![CDATA[Custom JavaScript code that will run on specific store views only. Do not include &lt;script&gt; tags - they will be added automatically.]]></comment>
+                </field>
+            </group>
+        </section>
+
+        <!-- Carpet Avenue Custom Company Schema (json+ld format) Section -->
+        <section id="carpetavenue_company_schema" translate="label" type="text" sortOrder="101" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Company Schema</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_Core::custom_code</resource>
+            <group id="schema" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Company Schema (json+ld)</label>
+                <field id="code" translate="label comment" type="textarea" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Company Schema Code</label>
+                    <comment><![CDATA[Enter your Company Schema in JSON-LD format.]]></comment>
+                </field>
+            </group>
+        </section>
+
+        <!-- Carpet Avenue Notification Section -->
+        <section id="carpetavenue_notification" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Notification</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_Core::notification</resource>
+            <group id="slack_communication" translate="label" type="text" sortOrder="800" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Slack Communication</label>
+                <comment><![CDATA[Configure Slack Incoming Webhook channels used by all CarpetAvenue modules.]]></comment>
+
+                <field id="enabled" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Master switch – disabling this suppresses all Slack notifications site-wide.]]></comment>
+                </field>
+
+                <!-- Default Channel -->
+                <group id="default" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Channel</label>
+                    <comment><![CDATA[General-purpose channel. Used as a fallback by any module that does not specify its own channel.]]></comment>
+                    <field id="enabled" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="bot_username" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Bot Username</label>
+                        <comment><![CDATA[Display name shown in Slack as the message sender.]]></comment>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                    <field id="channel" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Channel Name</label>
+                        <comment><![CDATA[Target Slack channel name (e.g. <code>#general</code>). Leave empty to use the webhook's default channel.]]></comment>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                    <field id="webhook_url" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Webhook URL</label>
+                        <comment><![CDATA[Incoming Webhook URL from <a href="https://api.slack.com/apps" target="_blank">api.slack.com/apps</a>.]]></comment>
+                        <validate>required-entry validate-url</validate>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                    <field id="icon_url" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Icon URL</label>
+                        <comment><![CDATA[Public URL of the icon image shown next to bot messages. Leave empty to use the webhook app's default icon.]]></comment>
+                        <validate>validate-url</validate>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                </group>
+
+                <!-- Watcher Channel -->
+                <group id="watcher" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Watcher Channel</label>
+                    <comment><![CDATA[Dedicated monitoring channel for automated alerts, cron results, and system events.]]></comment>
+                    <field id="enabled" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="bot_username" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Bot Username</label>
+                        <comment><![CDATA[Display name shown in Slack as the message sender.]]></comment>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                    <field id="channel" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Channel Name</label>
+                        <comment><![CDATA[Target Slack channel name (e.g. <code>#watcher</code>). Leave empty to use the webhook's default channel.]]></comment>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                    <field id="webhook_url" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Webhook URL</label>
+                        <comment><![CDATA[Incoming Webhook URL from <a href="https://api.slack.com/apps" target="_blank">api.slack.com/apps</a>.]]></comment>
+                        <validate>required-entry validate-url</validate>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                    <field id="icon_url" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Icon URL</label>
+                        <comment><![CDATA[Public URL of the icon image shown next to bot messages. Leave empty to use the webhook app's default icon.]]></comment>
+                        <validate>validate-url</validate>
+                        <depends><field id="enabled">1</field></depends>
+                    </field>
+                </group>
+
+            </group>
+        </section>
+
+        <!-- Carpet Avenue Documentation Tab -->
+        <section id="carpetavenue_documentation" translate="label" type="text" sortOrder="999" showInDefault="1">
+            <class>separator-top</class>
+            <label>Documentation</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_Core::documentation</resource>
+            <group id="general" translate="label" type="text" sortOrder="5" showInDefault="1">
+                <label>Carpet Avenue Documentation</label>
+                <field id="documentation_doc" translate="label comment" showInDefault="1">
+                    <frontend_model>CarpetAvenue\Core\Block\System\Config\Fieldset\Hint\Documentation</frontend_model>
+                </field>
+            </group>
+        </section>
+
+    </system>
+</config>

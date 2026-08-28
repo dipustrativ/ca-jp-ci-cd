@@ -1,0 +1,124 @@
+<?php
+/** @var Magento\Catalog\Block\Product\View $block */
+
+/** @var Magento\Framework\Pricing\Helper\Data $priceHelper */
+$priceHelper = $this->helper(Magento\Framework\Pricing\Helper\Data::class);
+
+$product = $block->getProduct();
+
+$attr_oekoStandard = 'oeko_tex_standard';
+$attr_oekoStep = 'oeko_tex_step';
+$attr_material = 'pile';
+if ($oekoStandard = $product->getCustomAttribute($attr_oekoStandard)){
+    if ("1" == $oekoStandard->getValue()){
+        $oekoStandard = true;
+    }
+    else{
+        $oekoStandard = false;
+    }
+}
+if($oekoStep = $product->getCustomAttribute($attr_oekoStep)){
+    if ("1" == $oekoStep->getValue()){
+        $oekoStep = true;
+    }
+    else{
+        $oekoStep = false;
+    }
+}
+$material = $product->getResource()->getAttribute($attr_material)->getFrontend()->getValue($product);
+$oekoMaterial = $product->getResource()->getAttribute($attr_material)->setStoreId(0)->getFrontend()->getValue($product);
+
+$materials = array(
+    "Cotton" => "Cotton is a hypoallergenic and odour-free natural material. The fibres are soft, strong and hold dyes very effectively. Carpets made of cotton are low maintenance and easy to keep clean. A cotton carpet is both a functional and versatile choice for a bathroom or kitchen as it can easily be turned if it becomes stained or dirtied.",
+    "Silk" => "Silk is amongst the most durable of all natural fibers. The luxurious and exclusive silk yarn has a high level of elasticity, allowing it to stretch up to 20% its own length. Silk is extremely soft to the touch and has an unparalleled natural sheen and lustre. The fibres are extremely fine, making it an excellent choice of material to work with when producing refined carpets with a high level of intricate details. In some carpets the silk is merely used to accentuate certain patterns and details in the pile whereas in more exclusive carpets the entire pile (and warp at times) can be made entirely of silk.",
+    "Polyester" => "Polyester is a durable synthetic fabric and an excellent choice of material for carpets. Carpets made of polyester are affordable, easy to keep clean and resistant to water-based stains. The result is a low-maintenance, soft and comfortable carpet with a nice sheen to it.",
+    "Polypropylene" => "Polypropylene (PP) is a man-made fibre with a high resistance to wear and tear. Carpets made with PP provide excellent value for money and are perfectly capable of withstanding both water and stains to a high degree. PP is an ideal alternative for people with allergies to natural materials such as wool. The carpets are easy to keep clean, have anti-static properties and are colourfast, meaning they do not fade as easily when exposed to direct sunlight.",
+    "Viscose" => "Viscose, also known as rayon, is a versatile fibre renowned for its silk-like qualities. Carpets made of viscose are extremely soft and comfortable to walk on. Viscose can be used to either accentuate certain patterns and details in a carpet, or alternatively used to resemble the aesthetic splendour of a pure silk carpet, by providing a stunning sheen to the entire carpet - at a fraction of the price.",
+    "Wool" => "Wool is a 100% natural and sustainable textile fiber. Carpets made of wool are highly durable and perfectly suited for daily use and heavily trafficked areas. Wool has a natural ability to resist both dirt and stains as well as being flame retardant. Since wool fibres are naturally coiled, there is a built-in resiliency that enables the pile of the carpet to rise and regain it’s shape if it gets crushed or weighted down by furniture or foot traffic."
+);
+
+$materials["Wool/Silk"] = $materials["Wool"] . "<br><br>" . $materials["Silk"];
+
+?>
+
+<?php if($oekoStandard || $oekoStep): ?>
+<div class="additional-attributes-wrapper oeko-tex-wrapper" id="product-oeko-collapsible">
+
+    <div class="attributes-collapse-trigger" data-role="trigger">
+        <h3><?= __('Material') ?></h3>
+        <span class="collapse-arrow"></span>
+    </div>
+
+    <div data-role="content">
+<div class="attribute oeko-tex">
+
+    <?php if($oekoStandard || $oekoStep): ?>
+        <div class="oeko-tex--descriptions">
+
+            <?php if($oekoMaterial && array_key_exists($oekoMaterial, $materials)): ?>
+                <div class="oeko-tex--descr__material">
+                    <strong><?= $material ?></strong>
+                    <p>
+                        <?= __($materials[$oekoMaterial]) ?>
+                    </p>
+                </div>
+            <?php endif; ?>
+
+            <?php if($oekoStandard): ?>
+                <div class="oeko-tex--descr__standard">
+                    <strong><?= __("Oeko-Tex Standard") ?></strong>
+                    <p>
+                        <?= __("This carpet has been tested for harmful substances and is free from hazardous chemicals that could be harmful to human health. OEKO-TEX® STANDARD 100 is a globally uniform and independent testing- and certification system for textiles. All tests are conducted by independent OEKO-TEX® partner institutes.") ?>
+                    </p>
+                </div>
+            <?php endif; ?>
+
+            <?php if($oekoStep): ?>
+                <div class="oeko-tex--descr__step">
+                    <strong><?= __("Oeko-Tex STeP") ?></strong>
+                    <p>
+                        <?= __("This carpet has been produced under OEKO-TEX® STeP certified conditions. The OEKO-TEX® STeP certification system includes a comprehensive analysis and assessment of all production conditions. The aim is the long-term implementation of environmentally friendly production processes, social working conditions and optimum health and safety.") ?>
+                    </p>
+                </div>
+            <?php endif; ?>
+
+        </div>
+    <?php endif; ?>
+
+    <?php if($oekoStandard): ?>
+    <div class="oeko-tex--standard">
+        <img src="<?php echo $this->getViewFileUrl('images/OekoTex-Logo-Standard100.png.webp'); ?>" alt="Oeko Tex Standard 100" />
+    </div>
+    <?php endif; ?>
+
+    <?php if($oekoStep): ?>
+    <div class="oeko-tex--step">
+        <img src="<?php echo $this->getViewFileUrl('images/step-by-oeko-tex-vector-logo.webp'); ?>" alt="Oeko Tex Step" />
+    </div>
+    <?php endif; ?>
+
+</div>
+    </div><!-- end data-role="content" -->
+</div><!-- end #product-oeko-collapsible -->
+
+<script>
+    require(['jquery', 'domReady!'], function($) {
+        var $wrapper = $('#product-oeko-collapsible');
+        var $content = $wrapper.find('[data-role="content"]');
+        var $trigger = $wrapper.find('[data-role="trigger"]');
+
+        $content.hide();
+
+        $trigger.on('click', function(e) {
+            e.stopPropagation();
+            $wrapper.toggleClass('_active');
+            $content.slideToggle(300);
+        });
+    });
+</script>
+<style>
+    #product-oeko-collapsible [data-role="content"] {
+        padding: 16px;
+    }
+</style>
+<?php endif; ?>

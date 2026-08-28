@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/**
+ * @var $block CarpetAvenue\Trackify\Block\TagManager
+ */
+?>
+
+<?php
+    //-- Google Tag Manager (noscript)
+    echo $block->getNoScriptContainer();
+?>
+
+<?php $pageType = $block->getPageType(); ?>
+
+<script type="text/javascript">
+    /*
+     Data Layer Necessary Variable
+     For Both Google Analytics & Google Tag Manager
+     */
+    dataLayer = window.dataLayer || [];
+    dataLayer.push(
+        {
+            'page_type': '<?php echo $pageType;?>'
+        }
+    );
+</script>

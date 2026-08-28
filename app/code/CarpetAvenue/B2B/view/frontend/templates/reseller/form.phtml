@@ -1,0 +1,229 @@
+<?php
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * "Become a Carpient® Reseller" application page — layout/copy mirror
+ * carpient.com/pages/become-a-carpient-reseller.
+ *
+ * @var \CarpetAvenue\B2B\Block\Reseller\Form $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="reseller-page">
+    <div class="container">
+        <div class="reseller-page__intro reading-width">
+            <h1 class="reseller-page__title"><?= $escaper->escapeHtml(__('BECOME A CARPIENT® RESELLER')) ?></h1>
+        </div>
+
+        <?php $introHtml = $block->getIntroHtml(); ?>
+        <?php if ($introHtml !== ''): ?>
+            <div class="reseller-page__content reading-width rte">
+                <?= /* @noEscape - trusted CMS block content, already filtered */ $introHtml ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="reseller-page__form-wrap reading-width">
+            <form class="form reseller-form"
+                  action="<?= $escaper->escapeUrl($block->getFormAction()) ?>"
+                  method="post"
+                  id="reseller-application-form"
+                  data-mage-init='{"validation":{}}'>
+                <?= $block->getBlockHtml('formkey') ?>
+
+                <div class="reseller-form__grid">
+                    <div class="reseller-form__field reseller-form__field--half is-required">
+                        <label class="label" for="reseller-name"><?= $escaper->escapeHtml(__('Name')) ?></label>
+                        <input type="text" id="reseller-name" name="name" class="input"
+                               placeholder="<?= $escaper->escapeHtmlAttr(__('Name')) ?>"
+                               autocomplete="name"
+                               value="<?= $escaper->escapeHtmlAttr($block->getValue('name')) ?>"
+                               required data-validate="{required:true}"/>
+                    </div>
+
+                    <div class="reseller-form__field reseller-form__field--half is-required">
+                        <label class="label" for="reseller-email"><?= $escaper->escapeHtml(__('Email')) ?></label>
+                        <input type="email" id="reseller-email" name="email" class="input"
+                               placeholder="<?= $escaper->escapeHtmlAttr(__('Email')) ?>"
+                               autocomplete="email"
+                               value="<?= $escaper->escapeHtmlAttr($block->getValue('email')) ?>"
+                               required data-validate="{required:true, 'validate-email':true}"/>
+                    </div>
+
+                    <div class="reseller-form__field">
+                        <label class="label" for="reseller-company"><?= $escaper->escapeHtml(__('Company Name')) ?></label>
+                        <input type="text" id="reseller-company" name="company_name" class="input"
+                               placeholder="<?= $escaper->escapeHtmlAttr(__('Company Name')) ?>"
+                               value="<?= $escaper->escapeHtmlAttr($block->getValue('company_name')) ?>"/>
+                    </div>
+
+                    <div class="reseller-form__field">
+                        <label class="label" for="reseller-homepage"><?= $escaper->escapeHtml(__('Homepage')) ?></label>
+                        <input type="text" id="reseller-homepage" name="homepage" class="input"
+                               placeholder="<?= $escaper->escapeHtmlAttr(__('Homepage')) ?>"
+                               value="<?= $escaper->escapeHtmlAttr($block->getValue('homepage')) ?>"/>
+                    </div>
+
+                    <div class="reseller-form__field reseller-form__prompt rte">
+                        <p><?= $escaper->escapeHtml(__('Type of Business: What type of business do you operate?')) ?></p>
+                    </div>
+
+                    <div class="reseller-form__field">
+                        <label class="label" for="reseller-business-type"><?= $escaper->escapeHtml(__('Select Type of Business')) ?></label>
+                        <div class="select">
+                            <select id="reseller-business-type" name="business_type" class="input" required data-validate="{required:true}">
+                                <option value="" disabled <?= $block->getValue('business_type') === '' ? 'selected' : '' ?>><?= $escaper->escapeHtml(__('Select Type of Business')) ?></option>
+                                <?php foreach ($block->getBusinessTypeOptions() as $option): ?>
+                                    <option value="<?= $escaper->escapeHtmlAttr($option['value']) ?>"
+                                        <?= $block->getValue('business_type') === $option['value'] ? 'selected' : '' ?>>
+                                        <?= $escaper->escapeHtml($option['label']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="reseller-form__field reseller-form__prompt rte">
+                        <p><?= $escaper->escapeHtml(__('Sales Channels: What are your main sales channels?')) ?></p>
+                    </div>
+
+                    <div class="reseller-form__field">
+                        <label class="label" for="reseller-sales-channels"><?= $escaper->escapeHtml(__('Select Sales channels')) ?></label>
+                        <div class="select">
+                            <select id="reseller-sales-channels" name="sales_channels" class="input" required data-validate="{required:true}">
+                                <option value="" disabled <?= $block->getValue('sales_channels') === '' ? 'selected' : '' ?>><?= $escaper->escapeHtml(__('Select Sales channels')) ?></option>
+                                <?php foreach ($block->getSalesChannelOptions() as $option): ?>
+                                    <option value="<?= $escaper->escapeHtmlAttr($option['value']) ?>"
+                                        <?= $block->getValue('sales_channels') === $option['value'] ? 'selected' : '' ?>>
+                                        <?= $escaper->escapeHtml($option['label']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="reseller-form__field is-required">
+                        <label class="label" for="reseller-message"><?= $escaper->escapeHtml(__('Message')) ?></label>
+                        <textarea id="reseller-message" name="message" class="input" rows="8"
+                                  placeholder="<?= $escaper->escapeHtmlAttr(__('Message')) ?>"
+                                  required data-validate="{required:true}"><?= $escaper->escapeHtml($block->getValue('message')) ?></textarea>
+                    </div>
+                </div>
+
+                <?php if ($block->isRecaptchaEnabled()): ?>
+                    <?= $block->getChildHtml('recaptcha') ?>
+                <?php endif; ?>
+
+                <div class="reseller-form__actions">
+                    <button type="submit" class="btn btn--primary"><?= $escaper->escapeHtml(__('SEND MESSAGE')) ?></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Values mirror carpient.com (Craft theme): 4px space unit, .rte 12px,
+       inputs 13px / 11px 24px / square / 20% border, h1 40px, btn 13px/700. */
+    .reseller-page {
+        padding: 0 0 6.4rem;
+        font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #1a1a1a;
+    }
+    .reseller-page .container { width: 100%; max-width: 120rem; margin: 0 auto; padding: 0 2rem; box-sizing: border-box; }
+    .reseller-page .reading-width { max-width: 72rem; margin-left: auto; margin-right: auto; }
+
+    /* Title — h1 40px / 1.25, centered, regular weight */
+    .reseller-page__intro { margin: 4rem 0 2.4rem; }
+    .reseller-page__title {
+        margin: 0;
+        text-align: center;
+        font-size: 4rem;
+        line-height: 1.25;
+        font-weight: 400;
+        letter-spacing: normal;
+    }
+
+    /* Description — .rte 12px */
+    .reseller-page__content { margin: 4.8rem auto 4rem; font-size: 1.5rem; line-height: 1.5; }
+    .reseller-page__content p { margin: 0 0 2em; }
+    .reseller-page__content ul { margin: 0 0 2em; padding-left: 1.6em; }
+    .reseller-page__content li { margin-bottom: .4em; }
+
+    /* Form grid — 2 cols, row-gap 24px (6×4), col-gap 24px */
+    .reseller-form__grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 2.4rem;
+        row-gap: 2.4rem;
+    }
+    .reseller-form__field { grid-column: 1 / -1; }
+    .reseller-form .label { display: block; margin: 0 0 .8rem; font-size: 1.3rem; font-weight: 700; text-align: left; }
+    .reseller-form__prompt { margin-top: .4rem; }
+    .reseller-form__prompt p { margin: 0; font-size: 1.2rem; }
+
+    /* Inputs — padding 11px 24px, 1px 20%-black border, square, 13px */
+    .reseller-form .input,
+    .reseller-form select.input,
+    .reseller-form textarea.input {
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 1.1rem 2.4rem;
+        border: 1px solid rgba(26, 26, 26, .2);
+        border-radius: 0;
+        background: #fff;
+        color: #1a1a1a;
+        font-family: inherit;
+        font-size: 1.3rem;
+        line-height: 1.2;
+        transition: border-color .2s, box-shadow .2s;
+    }
+    .reseller-form textarea.input { line-height: 1.5; resize: vertical; }
+    .reseller-form .input:focus {
+        outline: 0;
+        border-color: rgba(26, 26, 26, .6);
+        box-shadow: 0 0 0 1px rgba(26, 26, 26, .6);
+    }
+    .reseller-form .select { position: relative; }
+    .reseller-form .select select.input { appearance: none; -webkit-appearance: none; padding-right: 4rem; cursor: pointer; }
+    .reseller-form .select::after {
+        content: "";
+        position: absolute;
+        right: 2rem; top: 50%;
+        width: .7rem; height: .7rem;
+        border-right: 1.5px solid #1a1a1a; border-bottom: 1.5px solid #1a1a1a;
+        transform: translateY(-70%) rotate(45deg);
+        pointer-events: none;
+    }
+
+    /* Button — 12px 26px, square, 13px/700, uppercase */
+    .reseller-form__actions { margin-top: 2.4rem; }
+    .reseller-form .btn--primary {
+        display: inline-block;
+        width: 100%;
+        padding: 1.2rem 2.6rem;
+        background: #1a1a1a;
+        color: #fff;
+        border: 1px solid #1a1a1a;
+        border-radius: 0;
+        font-family: inherit;
+        font-size: 1.3rem;
+        font-weight: 700;
+        line-height: 1.2;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: normal;
+        cursor: pointer;
+        transition: opacity .3s ease, background .3s ease, color .3s ease;
+    }
+    .reseller-form .btn--primary:hover { background: #fff; color: #1a1a1a; }
+
+    @media (min-width: 768px) {
+        .reseller-page__intro { margin-top: 6.4rem; margin-bottom: 3.2rem; }
+        .reseller-form__field--half { grid-column: span 1; }
+        .reseller-form .btn--primary { width: auto; }
+    }
+    @media (max-width: 767px) {
+        .reseller-page__title { font-size: 3rem; }
+    }
+</style>

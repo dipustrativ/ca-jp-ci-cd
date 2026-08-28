@@ -1,0 +1,23 @@
+"Invoice: ","Faktura: "
+"Order: ","Ordrenummer: "
+"Customer Number: ","Kundenummer: "
+"Invoice Date: ","Fakturadato: "
+"Sold to:","Solgt til:"
+"CA - Sold to:","Solgt til:"
+"Ship to:","Leveres til:"
+"Payment Method:","Betalingsmåte:"
+"Shipping Method:","Leveringsmåte:"
+"Order Summary","Ordresammendrag"
+Products,Produkter
+"SKU",Varenummer
+"CA - SKU",Varenummer
+Price,Pris
+Quantity,Antall
+Subtotal,Delsum
+"Subtotal:","Delsum:"
+"Grand Total Excl. Tax","Totalsum (ekskl. mva.)"
+"Grand Total Incl. Tax","Totalsum (inkl. mva.)"
+"CA - Grand Total (Excl. Tax)","Totalsum (ekskl. mva.)"
+"CA - Grand Total (Incl. Tax)","Totalsum (inkl. mva.)"
+"CA - Qty","Antall"
+"CA - Ship to:","Leveres til:"

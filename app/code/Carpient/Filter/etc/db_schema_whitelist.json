@@ -1,0 +1,19 @@
+{
+    "carpient_filter_option_image": {
+        "column": {
+            "entity_id": true,
+            "option_id": true,
+            "image": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "CARPIENT_FILTER_OPTION_IMAGE_OPTION_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "CARPIENT_FILTER_OPTION_IMAGE_OPTION_ID": true,
+            "CARPIENT_FILTER_OPT_IMAGE_OPT_ID_EAV_ATTR_OPT_OPT_ID": true
+        }
+    }
+}
