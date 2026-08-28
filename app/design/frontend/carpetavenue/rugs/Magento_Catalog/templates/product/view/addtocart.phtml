@@ -1,0 +1,127 @@
+<?php
+/**
+ * Ported from the reference carpetavenue theme without Trackify,
+ * Evalent_ProductionType, Evalent_DynamicSimilarProducts and
+ * Evalent_CatalogMods — uses core APIs and Productify only.
+ *
+ * @var $block Magento\Catalog\Block\Product\View
+ */
+$productifyConfigHelper = $this->helper(CarpetAvenue\Productify\Helper\Config::class);
+$urlHelper = $this->helper(CarpetAvenue\Core\Helper\URL::class);
+$baseUrl = $urlHelper->getBaseUrl();
+
+$_product = $block->getProduct();
+$buttonTitle = __('Add to Cart');
+
+// "unique" boolean attribute: one-off carpets that can only be bought once
+$isUniqueProduct = (int) $_product->getData('unique') === 1;
+
+$customAddToCartButton = $productifyConfigHelper->getProductDetailsCustomAddToCart();
+$customButtonStyle = '';
+if (!empty($customAddToCartButton['enabled'])) {
+    $productCategoryIds = $_product->getCategoryIds();
+    $configuredCategoryIds = $customAddToCartButton['category_ids'] ?? [];
+    if (empty($configuredCategoryIds) || array_intersect($productCategoryIds, $configuredCategoryIds)) {
+        $styles = [];
+        if (!empty($customAddToCartButton['background_color'])) {
+            $bg = $customAddToCartButton['background_color'];
+            $styles[] = "background-color: $bg !important";
+            $styles[] = "border-color: $bg !important";
+        }
+        if (!empty($customAddToCartButton['color'])) {
+            $styles[] = "color: {$customAddToCartButton['color']} !important";
+        }
+        if ($styles) {
+            $customButtonStyle = ' style="' . implode('; ', $styles) . '"';
+        }
+    }
+}
+?>
+<?php if ($_product->isSaleable()) :?>
+
+<?php
+$inCart = false;
+foreach ($this->helper(Magento\Checkout\Helper\Cart::class)->getQuote()->getAllVisibleItems() as $cartItem) {
+    $inCart = $cartItem->getProduct()->getSku() == $_product->getSku();
+}
+?>
+
+<div class="box-tocart">
+    <div class="fieldset">
+        <?php if (!$isUniqueProduct):?>
+        <?php if ($block->shouldRenderQuantity()) :?>
+        <div class="field qty">
+            <label class="label" for="qty"><span><?= $block->escapeHtml(__('Qty')) ?></span></label>
+            <div class="control">
+                <input type="number"
+                       name="qty"
+                       id="qty"
+                       min="1"
+                       value="<?= ($block->getProductDefaultQty() * 1) ?: 1 ?>"
+                       title="<?= $block->escapeHtmlAttr(__('Qty')) ?>"
+                       class="input-text qty"
+                       data-validate="<?= $block->escapeHtml(json_encode($block->getQuantityValidators())) ?>"
+                       />
+            </div>
+        </div>
+        <?php endif; ?>
+        <?php endif; ?>
+        <div class="actions<?= $isUniqueProduct ? ' unique' : '' ?>">
+            <button type="submit"
+                    title="<?= $block->escapeHtmlAttr($buttonTitle) ?>"
+                    class="action primary tocart <?= $inCart ? ' out-of-stock' : '' ?>"
+                    id="product-addtocart-button" disabled <?= $customButtonStyle ?>>
+                <span><?= $block->escapeHtml($buttonTitle) ?></span>
+            </button>
+            <?= $block->getChildHtml('', true) ?>
+        </div>
+    </div>
+</div>
+<?php else: ?>
+
+<div class="box-tocart out-of-stock">
+    <div class="fieldset">
+        <div class="actions<?= $isUniqueProduct ? ' unique' : '' ?>">
+            <button type="button"
+                    title="<?= __('Sold') ?>"
+                    class="action primary tocart disabled"
+                    id="product-addtocart-button" disabled>
+                <span><?= __('Sold') ?></span>
+            </button>
+            <?= $block->getChildHtml('', true) ?>
+            <?php $similarToUrl = $baseUrl . "productify/similarto?sku=" . $_product->getSku() ?>
+            <div class="product-item-similar">
+                <a class="action primary similar" href="<?= $block->escapeUrl($similarToUrl) ?>">
+                    <span><?= $block->escapeHtml(__('Show similar carpets')) ?> &gt;</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        ".box-tocart.out-of-stock": {
+            "Magento_Catalog/js/change-style-if-sold": {
+                "outOfStockClass": "out-of-stock",
+                "priceElement": ".product-info-main .price-box.price-final_price",
+                "priceSoldClass": "price--sold"
+            }
+        }
+    }
+</script>
+
+<?php endif; ?>
+
+<script type="text/x-magento-init">
+    {
+        "#product_addtocart_form": {
+            "Magento_Catalog/js/validate-product": {}
+        },
+         ".box-tocart .actions.unique #product-addtocart-button": {
+            "Magento_Catalog/js/change-style-if-unique": {
+                "outOfStockClass": "out-of-stock"
+            }
+        }
+    }
+</script>

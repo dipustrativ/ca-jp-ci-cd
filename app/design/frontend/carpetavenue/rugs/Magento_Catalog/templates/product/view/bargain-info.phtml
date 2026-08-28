@@ -1,0 +1,9 @@
+<?php
+$_product = $block->getProduct();
+$bargainAttr = $_product->getData("bargain_product");
+
+if($bargainAttr):
+    echo $block->getChildHtml();
+endif;
+
+?>

@@ -1,0 +1,251 @@
+"Click <a href=""%1"">here</a> to continue shopping.","Klicken Sie bitte <a href=""%1"">hier</a>, um weiter einzukaufen."
+"Search for products, categories, ...","Finden Sie Ihren Teppich..."
+"Search entire store here...","Finden Sie Ihren Teppich..."
+"Unique","Einzelstück"
+Read more,Mehr anzeigen
+Description,Beschreibung
+Specifications,Eigenschaften
+Similar Products,Ähnliche Teppiche
+Similar Products to %1,Ähnliche Teppiche zu %1
+"Show similar carpets", "Ähnliche Teppiche anzeigen"
+Show All,Zeige alle
+Save,Sparen Sie
+Show all %1,Zeige alle %1
+Show all,Zeige alle
+Sign up and get access to exclusive offers and deals.,Melden Sie sich jetzt an und Sie verpassen nie wieder unsere exklusiven Angebote.
+Read less,Weniger anzeigen
+"Carpet in Cart","Teppich im Warenkorb"
+"Carpets in Cart","Teppiche im Warenkorb"
+"Item in Cart","Teppich im Warenkorb"
+"Items in Cart","Teppiche im Warenkorb"
+"Shop by","Shoppen nach"
+"Shop By","Filter"
+"Please type the letters and numbers below","Bitte geben Sie die unten angezeigten Buchstaben und Zahlen ein"
+%1 products,%1
+"Items %1-%2 of %3","Teppiche %1-%2 von %3"
+"Items %1 of %2","Zeige %1 von %2 Teppichen"
+"%1 Item","%1 Teppich"
+"%1 Items","%1 Teppiche"
+"%1 Item(s)","%1 Teppich(e)"
+"We would love to hear from you!","Wir würden uns freuen, von Ihnen zu hören!"
+"Keep shopping","Weiter einkaufen"
+"We can't find products matching the selection.--MOBILE","Leider können wir keine Teppiche finden, die Ihren Suchkriterien entsprechen. Bitte setzen Sie ihre Filter neu oder kontaktieren Sie uns unter info@carpetavenue.com Wir werden unser Bestes tun, um Ihnen zu helfen, den richtigen Teppich für Sie zu finden!"
+"We can't find products matching the selection.--DESKTOP","Leider können wir keine Teppiche finden, die Ihren Suchkriterien entsprechen. Bitte setzen Sie Ihre Suchfilteroptionen zurück, um die Suche fortzusetzen. Wir haben eine große Auswahl an Teppichen zur Verfügung und sind hier, um Ihnen zu helfen, genau den richtigen Teppich für Sie zu finden. Sie können sich jederzeit unter info@carpetavenue.com an unser Kundenservice-Team wenden - wir helfen Ihnen gerne weiter!"
+"My Wish List","Meine Favoriten"
+"Go to Wish List","Meine Favoriten bearbeiten"
+"By unchecking the box below you can enter another billing address","Durch Deaktivieren des Kontrollkästchens unten können Sie eine andere Rechnungsadresse eingeben"
+"Contact email","Kontakt",module,Magento_Email
+"To unsubscribe click <a href=%url_unsubscribe>here</a>","Newsletter abbestellen <a href=%url_unsubscribe>hier</a>","module","Magento_Email"
+"Privacy Policy","Datenschutz","module","Magento_Email"
+"Terms & Conditions","AGB","module","Magento_Email"
+"Oriental Carpets","Orientteppiche","module","Magento_Email"
+"Modern Carpets","Moderne Teppiche","module","Magento_Email"
+"Email imprint","USt.-IDNr: DE327707896, Geschäftsführer: Amir Reza Vani<br/>Registergericht: Amtsgericht Hamburg, HRB 160212","module","Magento_Email"
+Free shipping,Kostenloser Versand
+Express delivery,Express-Lieferung
+UPS Express delivery,UPS Express-Lieferung
+UPS Shipping,UPS Versand
+Free shipping (2 - 5 working days),Kostenloser Versand (2 - 5 Werktage)
+Express delivery (1 - 2 working days),Express-Lieferung (1 - 2 Werktage)
+Free Shipping (2-5 working days),Kostenloser Versand (2-5 Werktage)
+"Free Shipping (3-5 working days)","Kostenloser Versand (3-5 Werktage)"
+"DHL (1-3 working days)","DHL (1-3 Werktage)"
+"DHL (2-4 working days)","DHL (2-4 Werktage)"
+"DHL (2-5 working days)","DHL (2-5 Werktage)"
+"DHL (3-5 working days)","DHL (3-5 Werktage)"
+"DHL (3-6 working days)","DHL (3-6 Werktage)"
+"DHL (4-6 working days)","DHL (4-6 Werktage)"
+"UPS (1-3 working days)","UPS (1-3 Werktage)"
+"UPS (2-4 working days)","UPS (2-4 Werktage)"
+"UPS (2-5 working days)","UPS (2-5 Werktage)"
+"UPS (3-5 working days)","UPS (3-5 Werktage)"
+"UPS Shipping (1-3 working days)","UPS Versand (1-3 Werktage)"
+"UPS Shipping (2-4 working days)","UPS Versand (2-4 Werktage)"
+"UPS Shipping (2-5 working days)","UPS Versand (2-5 Werktage)"
+"UPS Shipping (3-5 working days)","UPS Versand (3-5 Werktage)"
+"DHL Shipping (1-3 working days)","DHL Versand (1-3 Werktage)"
+"DHL Shipping (2-4 working days)","DHL Versand (2-4 Werktage)"
+"DHL Shipping (2-5 working days)","DHL Versand (2-5 Werktage)"
+"DHL Shipping (3-5 working days)","DHL Versand (3-5 Werktage)"
+"DHL Shipping (3-6 working days)","DHL Versand (3-6 Werktage)"
+"DHL Shipping (4-6 working days)","DHL Versand (4-6 Werktage)"
+"UPS Free Shipping (1-3 working days)","UPS Kostenloser Versand (1-3 Werktage)"
+"UPS Free Shipping (2-4 working days)","UPS Kostenloser Versand (2-4 Werktage)"
+"UPS Free Shipping (2-5 working days)","UPS Kostenloser Versand (2-5 Werktage)"
+"UPS Free Shipping (3-5 working days)","UPS Kostenloser Versand (3-5 Werktage)"
+"DHL Free Shipping (1-3 working days)","DHL Kostenloser Versand (1-3 Werktage)"
+"DHL Free Shipping (2-4 working days)","DHL Kostenloser Versand (2-4 Werktage)"
+"DHL Free Shipping (2-5 working days)","DHL Kostenloser Versand (2-5 Werktage)"
+"DHL Free Shipping (3-5 working days)","DHL Kostenloser Versand (3-5 Werktage)"
+"DHL Free Shipping (3-6 working days)","DHL Kostenloser Versand (3-6 Werktage)"
+"DHL Free Shipping (4-6 working days)","DHL Kostenloser Versand (4-6 Werktage)"
+"GLS (2-4 working days)","GLS (2-4 Werktage)"
+"GLS (2-5 working days)","GLS (2-5 Werktage)"
+"GLS (3-5 working days)","GLS (3-5 Werktage)"
+Express delivery (1-2 working days),Express-Lieferung (1-2 Werktage)
+DLH Shipping,DHL Versand
+DHL Express delivery,DHL Express-Lieferung
+Sign up for our newsletter,Abonnieren Sie unseren Newsletter
+Use alternative payment method,Per Vorkasse/Überweisung bezahlen
+"Email Address","E-Mail Adresse"
+"Email address","E-Mail Adresse"
+"Your name","Ihre Name"
+"Your email","Ihre E-Mail Adresse"
+"Enter your destination to get a shipping estimate.","Geben Sie Ihre Anschrift ein, um die Versandkosten zu erhalten."
+"Order Total Excl. Tax","Bestellsumme exkl. MwSt"
+"The requested qty is not available","Dieses Product ist nicht auf Lager"
+"The confirmation request has been sent.","Die Bestätigungsanfrage wurde gesendet."
+"A confirmation request has been sent.","Die Bestätigungsanfrage wurde gesendet."
+"Confirmation request has been sent.","Die Bestätigungsanfrage wurde gesendet."
+"We have removed your newsletter subscription.","Sie haben sich von unserem Newsletter abgemeldet."
+"Order Information","Bestellinformationen"
+"You unsubscribed.","Sie haben sich abgemeldet."
+"Something went wrong while saving the page. Please refresh the page and try again.","Beim Speichern der Seite ist ein Fehler aufgetreten. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut."
+"Wish List Sharing","Meine Wunschliste teilen"
+%1 %2 has been removed from your Wish List.,%1 %2 wurde von Ihre Wunschliste entfernt.
+%1 %2 has been added to your Wish List.,Sie haben %1 %2 zu Ihrer Wunschliste hinzugefügt.
+"You added %1 %2 to your <a href=""%3"">shopping cart</a>.","Sie haben %1 %2 in den <a href=""%3"">Warenkorb</a> gelegt."
+"You added %1 %2 to your shopping cart.","Sie haben %1 %2 in den Warenkorb gelegt."
+"Germany","Deutschland",module,Magento_Email
+"Check &quot;Remember Me&quot; to access your shopping cart on this computer even if you are not signed in.","Kreuzen Sie &quot;Angemeldet bleiben&quot; an, um auf diesem Computer angemeldet zu bleiben und künftig Ihren Warenkorb anzusehen ohne sich erneut anzumelden."
+"Cancel Order","Bestellung stornieren",module,Evalent_OrderMods
+"Tracking information is currently not available. Please ","Tracking-Informationen sind derzeit nicht verfügbar. Bitte ",module,Magento_Shipping
+" for more information or "," für weitere Informationen oder ",module,Magento_Shipping
+" for more information or "," für weitere Informationen oder ",module,Magento_Shipping
+"email us at ","mailen Sie uns an ",module,Magento_Shipping
+"General Subscription","Newsletter",module,Magento_Customer
+"Order Shipments","Sendungen bestellen",module,Magento_Sales
+"You unsubscribed.","Sie haben sich abgemeldet."
+"Order Information","Bestellinformationen"
+"The account sign-in was incorrect or your account is disabled temporarily. Please wait and try again later.","Die Kontoanmeldung war falsch oder Ihr Konto ist vorübergehend deaktiviert. Bitte warten Sie und versuchen Sie es später erneut."
+"You have placed no orders.","Sie haben keine Bestellungen hinterlegt."
+"Save","Speichern"
+"General Subscription","Newsletter"
+"Share Wish List","Meine Wunschliste teilen"
+"Order Shipments","Sendungen bestellen"
+"The requested qty is not available","Die angeforderte Menge ist nicht verfügbar"
+"Something went wrong while saving the page. Please refresh the page and try again.","Beim Speichern der Seite ist ein Fehler aufgetreten. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut."
+"Now Filtering by","Jetzt filtern"
+"Sold","Verkauft"
+"No results","Keine Treffer"
+"No products for query","Keine Treffer für die Suche"
+"Write Us --CONTACT","Schreiben Sie uns"
+"Send us a message --CONTACT","Hinterlassen Sie uns eine Nachricht, und wir melden uns baldmöglichst bei Ihnen."
+"Your message --CONTACT","Ihre Nachricht"
+"Your Receipt #%invoice_id for Order #%order_id","Ihre Quittung #%invoice_id für Bestellung #%order_id"
+"View and Edit Cart","Zum Warenkorb"
+"Proceed with Bank Transfer","Weiter mit Vorkasse/Überweisung"
+"Proceed with Klarna","Weiter mit Klarna"
+"Back to Shopping Cart","Zurück zum Warenkorb"
+"Please use the bank details you receive in your order confirmation (once your order is placed) to make your payment.","Bitte überweisen Sie den Rechnungsbetrag an die in der Bestellbestätigung angebene Bankverbindung, die Ihnen nach Abschluss des Bestellvorgangs per E-mail zugesandt wird."
+"Sold to:","Rechnungsadresse:"
+"Ship to:","Versandadresse:"
+Payment Method:,Zahlungsart
+Payment Method,Zahlungsart
+"Shipping Method:","Versandart"
+"Shipping Method","Versandart"
+Products,Artikel
+SKU,Art.-Nr.
+Price,Preis
+Qty,Anzahl
+Tax,ges MwSt.
+Subtotal,Zwischensumme
+Grand Total (Excl. Tax),Gesamtsumme (exkl. MwSt)
+Grand Total (Incl. Tax),Gesamtsumme (inkl. MwSt)
+Order summary,"Bestellübersicht"
+Invoice Date: ,"Rechnungsdatum: "
+Invoice ,"Rechnungsnummer: "
+Order ,"Bestellnummer: "
+"Customer number: ","Kundennummer: "
+"Already have an account? Click here to login","Haben sie bereits ein Konto? Klicken Sie hier, um sich einzuloggen"
+"Register for newsletter","Registrieren Sie sich für unseren Newsletter"
+"Create account","Konto anlegen"
+"My billing and delivery address are the same","Meine Rechnungs- und Lieferanschrift sind identisch"
+"Please pay using the bank details you will receive in your order confirmation","Bitte überweisen Sie den Rechnungsbetrag an die in der Bestellbestätigung angebene Bankverbindung, die Ihnen nach Abschluss des Bestellvorgangs per E-mail zugesandt wird."
+"Delivery Address","Lieferadresse"
+Not Sold,Nicht Verkauft
+"We use cookies to make your experience better.","Wir verwenden Cookies, um Ihr Nutzererlebnis zu verbessern."
+"You already have an account with us.","Haben Sie bereits ein Konto?"
+"We hereby guarantee that the carpet supplied is %s and genuine.","Wir garantieren hiermit, dass der gelieferte Teppich %s und echt ist."
+"* The carpet is %s. Therefore, there may be slight variations in shape, thickness and dimensions.","* Der Teppich ist %s. Daher kann es zu geringfügigen Abweichungen in Form, Dicke und Abmessungen kommen."
+"Carpet Type","Teppich Art"
+"Size","Größe"
+"Hamburg, Germany","Hamburg, Deutschland"
+"%1 days left","Noch %1 tage"
+"Proceed","Weiter"
+"Proceed with Other Payment Methods","Weiter mit anderer Zahlungsmethode"
+"We recommend the following products:","Wir empfehlen folgende Produkte:"
+days,Tage
+Days,Tage
+day,tag
+Day,Tag
+hours,Stunden
+minutes,Minuten
+"Cancellation invoice: ","Storno-Rechnung: "
+"Please select","Bitte auswählen"
+"-- Please select --","-- Bitte auswählen --"
+"Telephone number","Telefonnnummer"
+"Cancellation invoice","Storno-Rechnung"
+"Are you sure?","Sind Sie sicher?"
+"Welcome, %1!","Willkommen, %1!"
+"%1 - and above","%1 - und mehr"
+"Contact","Fragen?"
+"Always active","Immer aktiv"
+"Done","Fertig"
+"Please select and accept your Cookies Group","Bitte wählen und akzeptieren Sie Ihre Cookies-Gruppe"
+"All filters","Alle Filter"
+"See All","Zeige alle"
+"Suggestions","Vorschläge"
+VAT incl.,Inkl. MwSt.
+Excl. Tax,Exkl. MwSt.
+"Request a callback","Ich möchte zurückgerufen werden"
+"What can we help you with?","Womit können wir Ihnen helfen?"
+"Thanks for contacting us with your comments and questions. We'll respond to you very soon.","Vielen Dank für Ihre Nachricht. Wir werden Ihnen so schnell wie möglich antworten."
+"Accept all","Alle akzeptieren"
+"Last Day","Letzter Tag"
+"Material","Material"
+"This carpet has been tested for harmful substances and is free from hazardous chemicals that could be harmful to human health. OEKO-TEX® STANDARD 100 is a globally uniform and independent testing- and certification system for textiles. All tests are conducted by independent OEKO-TEX® partner institutes.","Dieser Teppich ist schadstoffgeprüft und frei von gefährlichen Chemikalien, die der menschlichen Gesundheit schaden könnten. OEKO-TEX® STANDARD 100 ist ein weltweit einheitliches und unabhängiges Prüf- und Zertifizierungssystem für Textilien. Alle Tests werden von unabhängigen OEKO-TEX® Partnerinstituten durchgeführt."
+"This carpet has been produced under OEKO-TEX® STeP certified conditions. The OEKO-TEX® STeP certification system includes a comprehensive analysis and assessment of all production conditions. The aim is the long-term implementation of environmentally friendly production processes, social working conditions and optimum health and safety.","Dieser Teppich wurde unter OEKO-TEX® STeP-zertifizierten Bedingungen hergestellt. Das OEKO-TEX® STeP Zertifizierungssystem beinhaltet eine umfassende Analyse und Bewertung aller Produktionsbedingungen. Ziel ist die langfristige Umsetzung umweltfreundlicher Produktionsverfahren, sozialer Arbeitsbedingungen und optimaler Arbeitssicherheit."
+"Cotton is a hypoallergenic and odour-free natural material. The fibres are soft, strong and hold dyes very effectively. Carpets made of cotton are low maintenance and easy to keep clean. A cotton carpet is both a functional and versatile choice for a bathroom or kitchen as it can easily be turned if it becomes stained or dirtied.","Baumwolle ist ein hypoallergenes und geruchsneutrales Naturmaterial. Die Fasern sind weich, stark und halten Farbstoffe sehr gut fest. Teppiche aus Baumwolle sind pflegeleicht und einfach sauber zu halten. Ein Baumwollteppich ist eine funktionelle und vielseitige Wahl für ein Badezimmer oder eine Küche, da er leicht gewendet werden kann, wenn er fleckig oder verschmutzt ist."
+"Silk is amongst the most durable of all natural fibers. The luxurious and exclusive silk yarn has a high level of elasticity, allowing it to stretch up to 20% its own length. Silk is extremely soft to the touch and has an unparalleled natural sheen and lustre. The fibres are extremely fine, making it an excellent choice of material to work with when producing refined carpets with a high level of intricate details. In some carpets the silk is merely used to accentuate certain patterns and details in the pile whereas in more exclusive carpets the entire pile (and warp at times) can be made entirely of silk.","Seide gehört zu den haltbarsten Naturfasern überhaupt. Das luxuriöse und exklusive Seidengarn hat ein hohes Maß an Elastizität, so dass es sich um bis zu 20 % seiner eigenen Länge dehnen kann. Seide fühlt sich extrem weich an und hat einen unvergleichlichen, natürlichen Glanz. Die Fasern sind extrem fein, was sie zu einem ausgezeichneten Material für die Herstellung von raffinierten Teppichen mit vielen kleinen Details macht. Bei einigen Teppichen wird die Seide lediglich verwendet, um bestimmte Muster und Details im Flor hervorzuheben, während bei exklusiveren Teppichen der gesamte Flor (und manchmal auch die Kette) vollständig aus Seide bestehen kann."
+"Polyester is a durable synthetic fabric and an excellent choice of material for carpets. Carpets made of polyester are affordable, easy to keep clean and resistant to water-based stains. The result is a low-maintenance, soft and comfortable carpet with a nice sheen to it.","Polyester ist ein strapazierfähiges, synthetisches Gewebe und eine ausgezeichnete Materialwahl für Teppiche. Teppiche aus Polyester sind erschwinglich, leicht sauber zu halten und beständig gegen Flecken auf Wasserbasis. Das Ergebnis ist ein pflegeleichter, weicher und bequemer Teppich mit schönem Glanz."
+"Polypropylene (PP) is a man-made fibre with a high resistance to wear and tear. Carpets made with PP provide excellent value for money and are perfectly capable of withstanding both water and stains to a high degree. PP is an ideal alternative for people with allergies to natural materials such as wool. The carpets are easy to keep clean, have anti-static properties and are colourfast, meaning they do not fade as easily when exposed to direct sunlight.","Polypropylen (PP) ist eine Kunstfaser mit hoher Verschleißfestigkeit. Aus PP hergestellte Teppiche bieten ein hervorragendes Preis-Leistungs-Verhältnis und sind in hohem Maße wasser- und schmutzabweisend. PP ist eine ideale Alternative für Menschen mit Allergien gegen Naturmaterialien wie Wolle. Die Teppiche sind pflegeleicht, antistatisch und farbecht, bleichen also bei direkter Sonneneinstrahlung nicht so leicht aus."
+"Viscose, also known as rayon, is a versatile fibre renowned for its silk-like qualities. Carpets made of viscose are extremely soft and comfortable to walk on. Viscose can be used to either accentuate certain patterns and details in a carpet, or alternatively used to resemble the aesthetic splendour of a pure silk carpet, by providing a stunning sheen to the entire carpet - at a fraction of the price.","Viskose, auch bekannt als Rayon, ist eine vielseitige Faser, die für ihre seidenähnlichen Eigenschaften bekannt ist. Teppiche aus Viskose sind extrem weich und angenehm zu begehen. Viskose kann verwendet werden, um entweder bestimmte Muster und Details in einem Teppich zu betonen, oder alternativ dazu verwendet zu werden, die ästhetische Pracht eines Teppichs aus reiner Seide wiederzugeben, indem dem gesamten Teppich ein atemberaubender Glanz verliehen wird – zu einem Bruchteil des Preises."
+"Wool is a 100% natural and sustainable textile fiber. Carpets made of wool are highly durable and perfectly suited for daily use and heavily trafficked areas. Wool has a natural ability to resist both dirt and stains as well as being flame retardant. Since wool fibres are naturally coiled, there is a built-in resiliency that enables the pile of the carpet to rise and regain it’s shape if it gets crushed or weighted down by furniture or foot traffic.","Wolle ist eine 100% natürliche und nachhaltige Textilfaser. Teppiche aus Wolle sind sehr strapazierfähig und eignen sich perfekt für den täglichen Gebrauch und stark beanspruchte Flächen. Wolle ist von Natur aus schmutz- und fleckenabweisend sowie flammhemmend. Da die Wollfasern von Natur aus gewunden sind, verfügt der Teppichflor über eine eingebaute Elastizität, die es ihm ermöglicht, sich aufzurichten und seine Form wiederzuerlangen, wenn er durch Möbel oder Schritte eingedrückt oder beschwert wird."
+"Lowest price latest %1 days","Niedrigster Preis der letzten %1 Tage"
+"Incl. VAT","Inkl. MwSt."
+"Only <span>1</span> in stock","Nur <span>1</span> auf Lager"
+"Back to Home Page","Zurück zur Startseite"
+Your Credit Memo #%creditmemo_id for Order #%order_id,Ihre Rückzahlung #%creditmemo_id für die Bestellung #%order_id
+"VAT Number","EU-Mehrwertsteuernummer"
+"VAT Number:","EU-Mehrwertsteuernummer:"
+"My Favourites","Meine Favoriten"
+"Your payment failed, Please try again later","Ihre Zahlung ist fehlgeschlagen, bitte versuchen Sie es noch einmal."
+Relevance,Relevanz
+"Invoice date","Rechnungsdatum"
+"Reference","Referenz"
+"Delivery date","Liefertermin"
+"Your customer no","Ihre Kunden-Nr."
+"Your contact","Ihr Ansprechpartner"
+"Dear Customer,<br>we hereby charge you for the delivery of following service","Sehr geehrter Kunde,<br>hiermit stellen wir Ihnen die Erbringung folgender Dienstleistung in Rechnung"
+"Service date corresponds to invoice date.","Das Leistungsdatum entspricht dem Rechnungsdatum."
+"Tax free export","Steuerfreier Export"
+"Unit price","Einzelpreis"
+"Total price","Gesamtpreis"
+"piece","Stk"
+"pieces","Stk"
+"Total net","Gesamtbetrag netto"
+"Total gross","Gesamtbetrag brutto"
+page,Seite
+of,von
+"size","Größe"
+"sizes","Größen"
+"Size","Größe"
+"Sizes","Größen"
+"colours","Farben"
+"colour","Farbe"
+"you save","Sie sparen"
+"To Checkout", "Zur Kasse"
+"Street address (street and number)","Straße und Hausnummer"
+"Suite, floor, c/o, etc. (optional)","Adresszusatz (optional)"
+"Address Line 2","Adresszeile 2"

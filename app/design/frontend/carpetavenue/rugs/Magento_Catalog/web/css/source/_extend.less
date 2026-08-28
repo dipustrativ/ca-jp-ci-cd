@@ -1,0 +1,744 @@
+//
+//  CarpetAvenue Rugs — category product grid (lightweight, matches reference)
+//  _____________________________________________
+
+@ca-price:                        #7c232e;
+@ca-green:                        #2C8E3B;
+@product-item__hover__box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+//
+//  Bold product names site-wide (matches base; blank parent doesn't set it)
+//  _____________________________________________
+.page-wrapper .product-item-name,
+.page-wrapper .product.name a {
+    font-weight: @font-weight__bold;
+}
+
+//
+//  Full-width grid — no left sidebar; filters sit above the grid
+//  _____________________________________________
+.page-layout-2columns-left.page-layout-fullwidth-filter {
+    .column.main {
+        width: 100%;
+        padding-left: 0;
+    }
+
+    //  Empty sidebar collapses
+    .sidebar.sidebar-main,
+    .sidebar.sidebar-additional {
+        display: none;
+    }
+
+    //  Floating "scroll to filter" helper — redundant (filters already on top)
+    .wrap-filter-top-button {
+        display: none;
+    }
+
+    //  Layered navigation as a horizontal button bar — every button opens the
+    //  slide-out filter modal (see .modal-slide.filter-modal below)
+    .block.filter {
+        margin-bottom: 20px;
+
+        .block-title.filter-title {
+            display: none;
+        }
+
+        .block-content.filter-content {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px 20px;
+        }
+
+        //  Hidden until the filter-modal widget moves it into the modal
+        #filter-popup {
+            display: none;
+        }
+
+        button.button-filter {
+            position: relative;
+            margin: 0;
+            padding: 10px 34px 10px 14px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: @button__border-radius;
+            .lib-font-size(14px);
+            font-weight: @font-weight__bold;
+            line-height: 1.2;
+            cursor: pointer;
+
+            &:after {
+                content: '\e622';
+                font-family: 'luma-icons';
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 9px;
+                font-weight: normal;
+            }
+
+            &:hover {
+                border-color: #c6c6c6;
+            }
+        }
+
+        //  Active filters row: "All filters" opener + chips + clear
+        .filter-state-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 14px;
+            width: 100%;
+
+            button.open-filter-popup {
+                flex-shrink: 0;
+                margin: 0;
+                padding: 0;
+                border: 0;
+                background: none;
+                color: #333;
+                font-weight: 600;
+                text-transform: uppercase;
+                cursor: pointer;
+
+                &:before {
+                    margin-right: 10px;
+                    .lib-css(color, #888);
+                    .lib-font-size(20);
+                    vertical-align: middle;
+                }
+            }
+
+            .am-filter-chips,
+            .filter-actions {
+                margin: 0;
+            }
+        }
+    }
+}
+
+//
+//  Filter slide-out modal (right side) — matches reference theme
+//  _____________________________________________
+.modal-slide.filter-modal {
+    left: 0;
+
+    &:not(._show) .modal-inner-wrap {
+        transform: translateX(100%);
+    }
+
+    .modal-inner-wrap {
+        position: relative; // anchor for the bottom apply bar
+    }
+
+    &._inner-scroll .modal-content {
+        overflow-y: auto;
+        height: 100%;
+        padding: 0 0 70px; // keep last options clear of the apply bar
+        box-sizing: border-box;
+    }
+
+    .modal-header {
+        position: relative;
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+
+        .modal-title {
+            position: absolute;
+            left: 25%;
+            right: 25%;
+            top: 25%;
+            bottom: 25%;
+            margin: auto;
+            padding: 0;
+            border: 0;
+            text-align: center;
+            .lib-font-size(25);
+        }
+    }
+
+    .action-close {
+        left: auto;
+        right: 0;
+
+        &:before {
+            .lib-css(color, #333);
+            .lib-font-size(20);
+            line-height: 40px;
+        }
+    }
+
+    #filter-popup {
+        .filter-options {
+            display: block;
+            margin: 0;
+        }
+
+        .filter-options-item {
+            position: relative;
+            display: block;
+            margin: 0;
+            border: 0;
+
+            &:after {
+                content: '';
+                display: block;
+                position: absolute;
+                width: 100%;
+                height: 1px;
+                border-bottom: 1px solid #ccc;
+            }
+        }
+
+        .filter-options-title {
+            position: relative;
+            margin: 0;
+            .lib-font-size(15);
+            font-weight: 700;
+            text-transform: none;
+            cursor: pointer;
+
+            &:after {
+                content: '\e900';
+                font-family: 'nav-icons';
+                position: absolute;
+                right: 0;
+                top: auto;
+                .lib-font-size(20);
+            }
+        }
+
+        //  Each filter's options slide in as a full-height panel over the list.
+        //  position:fixed resolves against the transformed .modal-inner-wrap,
+        //  so the panel fills the modal, not the viewport.
+        .filter-options-content {
+            display: block !important; // stay in flow so the slide transition works
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 20px 20px 80px; // bottom space for the apply bar
+            background: #e8e8e8;
+            z-index: 99;
+            transform: translate(100vw);
+            transition: transform 0.1s;
+            overflow: auto;
+            .lib-font-size(16);
+
+            &:before {
+                content: '';
+                display: block;
+                position: absolute;
+                width: 100%;
+                height: 100px;
+                left: 0;
+                right: 0;
+                top: 0;
+                background: #fff;
+                z-index: 0;
+            }
+        }
+
+        .filter-options-content__title {
+            display: inline-block;
+            position: relative;
+            transform: translateY(-20px);
+            width: 65%;
+            margin: 0 auto;
+            padding: 15px 20px;
+            text-align: center;
+            line-height: 1;
+            font-size: 2rem;
+            font-weight: 700;
+            box-sizing: border-box;
+        }
+
+        .filter-options-item.active .filter-options-content {
+            transform: translate(0);
+        }
+
+        button.filter-options-back {
+            display: inline-block;
+            position: relative;
+            margin-left: -20px;
+            border: 0;
+            border-radius: 0;
+            background: #e8e8e8;
+
+            &:before {
+                content: '\e901';
+                font-family: 'nav-icons';
+                margin-right: 10px;
+            }
+        }
+
+        //  Option rows: white cards on the grey panel
+        .am-filter-items {
+            position: relative;
+
+            .am-filter-item {
+                background: #fff;
+                margin: 10px 0;
+                padding: 5px;
+                border: 2px solid transparent;
+
+                &:hover {
+                    border-color: #429a3c;
+                }
+            }
+        }
+
+        .am-price-slider {
+            position: relative;
+            background: #fff;
+            margin: 10px 0;
+            padding: 12px 10px;
+        }
+    }
+
+    //  Bottom-pinned apply bar: Clear + Show (matches base Amasty apply button)
+    .am_shopby_apply_filters {
+        position: absolute;
+        bottom: 0;
+        top: auto;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 100; // above the slide-in option panels (z-index 99)
+
+        .am-show-button {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            margin-bottom: 0;
+            padding: 10px 0;
+            background: #fff;
+            box-shadow: none;
+        }
+
+        .amshopby-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 45%;
+            margin: 0;
+            padding: 10px;
+            border-radius: 0;
+            box-sizing: border-box;
+            background: #000;
+            border: 1px solid #000;
+            color: #fff;
+            font-weight: @font-weight__bold;
+            text-align: center;
+            text-decoration: none;
+
+            > span {
+                width: auto;
+            }
+
+            .am-items {
+                margin-left: 5px;
+            }
+
+            &.filter-clear.action.clear {
+                border-radius: 0;
+                border-color: #000;
+                background: #fff;
+                .lib-css(color, #000);
+            }
+        }
+    }
+}
+
+//
+//  Bottom category description — Read more / Read less (parity with base)
+//  _____________________________________________
+.toggle-readmore {
+    position: relative;
+
+    & > .content {
+        position: relative;
+        overflow: hidden;
+        transition: max-height 0.5s;
+    }
+
+    &:not(.toggle-readmore--expand) {
+        & > .content:after {
+            content: "";
+            display: block;
+            height: 50px;
+            width: 100%;
+            top: 6ch;
+            position: absolute;
+            background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 0)), to(#ffffff));
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #ffffff);
+        }
+    }
+
+    &.category-description:not(.toggle-readmore--expand) {
+        & > .content {
+            max-height: 11ch;
+        }
+    }
+
+    &--expand {
+        & > .content {
+            max-height: 2000px;
+        }
+    }
+}
+
+.product-read-more {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+//  Bottom category-view-holder layout (parity with base)
+.category-view-holder {
+    position: relative;
+}
+
+.catalog-category-view,
+.catalogsearch-result-index {
+    .column.main > .category-view-holder.category-view {
+        .page-title-wrapper {
+            position: relative;
+            .lib-css(color, #333);
+            left: auto;
+            bottom: auto;
+
+            h1 {
+                text-shadow: none;
+            }
+        }
+
+        .category-image.cover {
+            display: none;
+
+            .image {
+                display: block;
+                height: auto;
+                max-width: 100%;
+                object-fit: cover;
+                border-radius: 0;
+            }
+        }
+    }
+}
+
+//  Page title sizing across category, similar-products and search pages
+.catalog-category-view,
+.similar-products-view,
+.catalogsearch-result-index {
+    .page-title-wrapper .page-title {
+        font-size: 2rem;
+    }
+}
+
+//  Desktop: holder becomes a flex row with a small 150px thumbnail
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .catalog-category-view,
+    .catalogsearch-result-index {
+        .column.main > .category-view-holder.category-view {
+            display: flex;
+            align-items: flex-start;
+
+            .category-image.cover {
+                display: block;
+                margin-right: 20px;
+                flex: 0 0 auto;
+
+                .image {
+                    max-width: 150px;
+                    height: 150px;
+                    width: 150px;
+                }
+            }
+
+            .category-description {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+        }
+    }
+}
+
+//
+//  Grid wrapper
+//  _____________________________________________
+.catalog-category-view,
+.catalogsearch-result-index {
+
+    .products {
+        margin: 18px 0;
+    }
+
+    .products-grid .product-items {
+        .product-item {
+            .lib-font-size(14px);
+            margin-bottom: 20px;
+            line-height: 1.1;
+            letter-spacing: normal;
+            vertical-align: top;
+
+            //  Card
+            .product-item-info {
+                position: relative;
+                width: auto;
+                text-align: left;
+                transition: box-shadow 0.2s ease;
+
+                &:hover {
+                    box-shadow: @product-item__hover__box-shadow;
+                }
+            }
+
+            .product-item-photo {
+                display: block;
+            }
+
+            //  Portrait rug image — constrain width; Magento's inline
+            //  aspect-ratio (560/750) drives the height, so no padding hack.
+            .product-image-container {
+                display: block;
+                width: 280px;
+                max-width: 100%;
+                margin: 0;
+            }
+
+            .product-image-photo {
+                margin: 0;
+            }
+
+            .product-item-details {
+                position: static;
+                padding: 12px 10px 16px;
+            }
+
+            //  Name
+            .product-item-name {
+                .lib-font-size(16px);
+                font-weight: @font-weight__bold;
+                margin: 0 0 4px;
+
+                .product-item-link {
+                    color: @primary__color;
+                }
+            }
+
+            //  Size line
+            .size {
+                .lib-font-size(13px);
+                color: #7d7d7d;
+                margin-bottom: 6px;
+            }
+
+            //  Price — left-aligned, "Rec. price:" label, sale colouring
+            .price-box.price-final_price {
+                margin: 6px 0 0;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+
+                &:before {
+                    content: "Rec. price:";
+                    .lib-font-size(13px);
+                    color: #7d7d7d;
+                    font-weight: @font-weight__regular;
+                    margin-right: 6px;
+                    white-space: nowrap;
+                }
+
+                .price-label {
+                    display: none;
+                }
+
+                .price-container .price {
+                    .lib-font-size(16px);
+                    font-weight: @font-weight__bold;
+                    color: @ca-price;
+                }
+
+                .special-price {
+                    order: 1;
+
+                    .price-wrapper .price {
+                        color: @ca-price;
+                    }
+                }
+
+                .old-price {
+                    margin: 0 8px 0 0;
+                    text-decoration: line-through;
+
+                    .price-container .price {
+                        color: #7d7d7d;
+                        font-weight: @font-weight__regular;
+                        .lib-font-size(14px);
+                    }
+                }
+            }
+
+            //  Add-to-cart / wishlist actions
+            .product-item-inner {
+                border: 0;
+                box-shadow: none;
+            }
+
+            .product-item-actions {
+                margin: 10px 0 0;
+
+                .tocart {
+                    .lib-css(border-radius, @button__border-radius);
+                    .lib-font-size(13px);
+                    line-height: 1;
+                    padding: 10px 15px;
+                    white-space: nowrap;
+                }
+
+                .towishlist {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    z-index: 2;
+                    margin: 0;
+                    font-size: 0;
+                    background: rgba(255, 255, 255, 0.95);
+                    border-radius: 50px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.13);
+                }
+            }
+        }
+    }
+}
+
+//
+//  Discount flag — maroon ribbon (top-left)
+//  _____________________________________________
+.product-item__flag--discount {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    width: 39px;
+    padding: 1.2rem;
+    line-height: 1.1;
+    color: @color-white;
+    font-weight: @font-weight__bold;
+    .lib-font-size(15px);
+    background: url('@{baseDir}images/catalog_flags/discount_1.svg') no-repeat;
+    background-size: 100%;
+}
+
+//
+//  Sold badge
+//  _____________________________________________
+.sold-caption {
+    display: inline-block;
+    margin: 5px auto 0;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    background: #d00;
+    color: @color-white;
+    .lib-font-size(13px);
+}
+
+//
+//  Filter modal — mobile
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .modal-slide.filter-modal {
+        padding: 0;
+
+        #filter-popup {
+            button.filter-options-back {
+                float: right;
+                margin-top: 20px;
+                top: -23px;
+                left: 10px;
+            }
+
+            .filter-options-title {
+                padding: 10px 40px 10px 10px;
+            }
+
+            .filter-options-content__title {
+                margin-top: 10px;
+            }
+
+            .filter-options-item:after {
+                margin-left: -10px;
+            }
+        }
+    }
+}
+
+//
+//  Filter modal — desktop: 30% wide panel docked right
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .modal-slide.filter-modal {
+        left: 70%;
+        right: 0;
+
+        #filter-popup {
+            button.filter-options-back {
+                top: -20px;
+                left: 0;
+            }
+
+            .filter-options-title {
+                padding: 20px 40px 20px 10px;
+            }
+
+            .filter-options-item {
+                padding: 0 25px;
+
+                &:after {
+                    margin-left: -25px;
+                }
+
+                &:hover {
+                    background: #f2f2f2;
+                }
+            }
+        }
+    }
+}
+
+//
+//  Desktop grid — 5 products per row (matches reference)
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+    .page-products {
+        .products-grid {
+            .product-item {
+                width: calc(~'(100% - 8%) / 5');
+
+                &:nth-child(4n + 1) {
+                    margin-left: 2%;
+                }
+
+                &:nth-child(5n + 1) {
+                    margin-left: 0;
+                }
+            }
+        }
+    }
+}
+
+@import "_product-view";
+@import "_carpient";
+@import "_slider";

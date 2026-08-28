@@ -1,0 +1,258 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * Top menu for store
+ *
+ * @var $block \Evalent\MegaMenu\Block\Html\Topmenu
+ */
+
+//$columnsLimit = $block->getColumnsLimit() ?: 0;
+$_menuHtml = $block->getToMenuHtml();
+$coreHelper = $this->helper("CarpetAvenue\Core\Helper\SysConfig");
+$additionalDataUsp = (int) $coreHelper->getConfig("catalog/navigation/show_hide_usp");
+$additionalDataShow = (int) $coreHelper->getConfig("catalog/navigation/show_hide_additional_data");
+?>
+
+<nav class="navigation megamenu" data-action="navigation">
+    <ul data-mage-init='{"menu":{"responsive":true, "openOnClick":true, "expandChildren":false, "expanded":false, "position":{"my":"left top","at":"left bottom"}}}'>
+        <?= /* @noEscape */ $_menuHtml?>
+        <?= $block->getChildHtml() ?>
+    </ul>
+    <div class="megamenu__backdrop-wrapper"
+         data-role="menu-background-overlay"
+         style="display: none;">
+        <div class="megamenu__backdrop-container" data-role="menu-background">
+            <?php if ($additionalDataUsp === 1): ?>
+                <div id="megamenu-usp" style="display: none;">
+                    <?php echo $block->getLayout()
+                        ->createBlock('Magento\Cms\Block\Block')
+                        ->setBlockId('top_header_static-desktop')
+                        ->toHtml(); ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</nav>
+
+<style>
+    .navigation.megamenu li.level0 ul.submenu .level1 a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+    .white_border a {
+        border: 1px solid #fff;
+    }
+    <?php if (!$additionalDataShow) : ?>
+        /* Desktop only: this forced 100% width + 6-col grid has high specificity
+           (0,4,2) and would otherwise beat the mobile panel rules below, blowing
+           the drill-down panel to full width. Scope it to desktop so mobile uses
+           the off-canvas width. */
+        @media screen and (min-width: 769px) {
+            .navigation.megamenu li.level0 ul.submenu:after {
+                display: none !important;
+            }
+            .navigation.megamenu li.level0 ul.submenu {
+                width: 100% !important;
+                grid-template-columns: repeat(6, 1fr) !important;
+            }
+        }
+    <?php endif;?>
+    @media screen and (max-width: 768px) {
+        .nav-sections-item-content {
+            padding: 10px 0 !important;
+        }
+        .navigation .submenu:not(:first-child) ul > li {
+            border-bottom: 1px solid #e5e5e5;
+        }
+        /* Drill-down panels: full-height overlay matching the drawer width
+           (Luma's calc(100% - 54px)) so panels align with the off-canvas
+           drawer instead of overflowing the viewport.
+           Slide via `transform: translateX` (not `left`) so the animation is
+           GPU-composited and smooth — safe because this menu has no 3-level
+           nesting (verified: nested drill panels = 0), so the documented
+           "nested fixed panel anchoring" concern does not apply. */
+        .navigation.megamenu .submenu {
+            display: block !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: calc(100% - 54px) !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            grid-template-columns: none !important;
+            background: #fff !important;
+            transform: translate3d(100vw, 0, 0) !important; /* 3d => own GPU layer => smooth */
+            transition: transform .28s cubic-bezier(.4, 0, .2, 1) !important;
+            will-change: transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+            z-index: 1000 !important;
+        }
+        .navigation.megamenu .submenu.is-active {
+            transform: translate3d(0, 0, 0) !important;
+        }
+        /* jQuery-UI focus/active on a row adds a border + negative margin
+           (Luma main-nav) => row jumps a couple px on tap. Neutralize it. */
+        .navigation.megamenu .ui-state-focus,
+        .navigation.megamenu .ui-state-active,
+        .navigation.megamenu .ui-menu-item-wrapper:focus,
+        .navigation.megamenu li.level0 > a:focus {
+            border: 0 !important;
+            margin: 0 !important;
+            background: none !important;
+            outline: 0 !important;
+        }
+        /* Subcategory rows: small thumbnail on the left, title on the right */
+        .navigation.megamenu li.level0 ul.submenu .level1 a {
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            padding: 8px 40px 8px 15px;
+        }
+        .navigation.megamenu .submenu .megamenu__child-image.picture {
+            order: 0;
+            clip-path: none;
+        }
+        .navigation.megamenu .submenu .level1 .megamenu__child-title {
+            order: 1;
+            text-align: left;
+            border-bottom: 0;
+            padding-bottom: 0;
+            margin: 0 !important; /* kill the desktop 10px margin-top on mobile */
+        }
+        /* Kill the base theme's extra caret (the duplicate arrow). Only our
+           single .ui-menu-icon chevron stays. */
+        .navigation .parent .level-top:after {
+            display: none !important;
+        }
+        /* No border on active/has-active rows (drops the stray left/bottom
+           border line seen on the selected category). */
+        .navigation .level0.active > a:not(.ui-state-active),
+        .navigation .level0.has-active > a:not(.ui-state-active) {
+            border-width: 0 !important;
+        }
+
+        /* ============================================================
+           Premium mobile menu polish.
+           NOTE: forced here (not in Evalent/MegaMenu _module.less) because
+           that module's `.media-width('max', @screen__m)` block is NOT
+           compiled into styles-m.css — the inline <style> is the only thing
+           that actually drives the mobile drawer. Keep mobile rules HERE.
+           ============================================================ */
+
+        /* Top breathing room so the list doesn't butt the close arrow */
+        .navigation.megamenu > ul {
+            padding-top: 10px !important;
+        }
+
+        /* Inset hairline dividers (15px gap each side, not edge-to-edge).
+           Kill Luma's full-width 1px #d1d1d1 border-TOP on every row; draw a
+           single inset hairline on a pseudo instead. */
+        .navigation.megamenu .level0,
+        .navigation.megamenu .submenu > li {
+            border: 0 !important;
+            position: relative;
+        }
+        .navigation.megamenu .level0:not(.megamenu--block):after,
+        .navigation.megamenu .submenu > li:not(.megamenu--block):after {
+            content: "";
+            position: absolute;
+            left: 15px;
+            right: 15px;
+            bottom: 0;
+            height: 1px;
+            background: #ececec;
+        }
+        /* Drop the desktop submenu's vertical #ccc separator line, and the
+           row-divider leaking onto the submenu <ul> (it carries .level0). */
+        .navigation.megamenu .submenu:after {
+            display: none !important;
+        }
+
+        /* Active / current category: kill the orange fill (it sits on the LI,
+           not the <a>) and the green border — just a bold green label. */
+        .navigation.megamenu .level0.active,
+        .navigation.megamenu .level0.has-active,
+        .navigation.megamenu .level0.active > a,
+        .navigation.megamenu .level0.has-active > a,
+        .navigation.megamenu .submenu li.active,
+        .navigation.megamenu .submenu .active > a {
+            background: none !important;
+            border-color: transparent !important;
+        }
+        .navigation.megamenu .level0.active > a,
+        .navigation.megamenu .level0.has-active > a,
+        .navigation.megamenu .submenu .active > a,
+        .navigation.megamenu .level0.active > a .megamenu__child-title,
+        .navigation.megamenu .level0.has-active > a .megamenu__child-title,
+        .navigation.megamenu .submenu .active > a .megamenu__child-title {
+            color: #2c8e3b !important;
+            font-weight: 700 !important;
+        }
+
+        /* Standard small thumbnail; square source cropped ~15% top + 15%
+           bottom (box is ~70% height) so it reads landscape, image centred */
+        .navigation.megamenu .submenu .megamenu__child-image.picture {
+            -webkit-box-flex: 0 !important;
+            -webkit-flex: 0 0 56px !important;
+            -ms-flex: 0 0 56px !important;
+            flex: 0 0 56px !important;
+            width: 56px !important;
+            height: 40px !important;
+            padding-top: 0 !important;
+            aspect-ratio: auto !important;
+            overflow: hidden !important;
+            clip-path: none !important;
+            margin: 0 !important;
+        }
+        .navigation.megamenu .submenu .megamenu__child-image.picture img {
+            width: 56px !important;
+            height: 40px !important;
+            -o-object-fit: cover !important;
+            object-fit: cover !important;
+            -o-object-position: center !important;
+            object-position: center !important;
+            aspect-ratio: auto !important;
+        }
+
+        /* Lighter, premium chevron */
+        .navigation.megamenu .ui-menu-icon:after {
+            border-top: 1px solid #999 !important;
+            border-right: 1px solid #999 !important;
+        }
+
+        /* Promo / highlight blocks (e.g. "Popular"): plain rows, no arrow */
+        .navigation.megamenu .megamenu--block .ui-menu-icon,
+        .navigation.megamenu .megamenu--block .menu-back {
+            display: none !important;
+        }
+        .navigation.megamenu .megamenu--block {
+            margin: 0 !important;
+            padding: 0 15px 8px !important; /* no big top gap; h3 brings its own spacing */
+        }
+        /* "Popular" header: tighten the desktop 20px top margin */
+        .navigation.megamenu .megamenu--block h3 {
+            margin: 12px 0 6px !important;
+        }
+
+        /* "All <category>" link: spacing before/after, no banner divider */
+        .navigation.megamenu .all-category--bottom {
+            margin: 8px 0 !important;
+        }
+        .navigation.megamenu .all-category--bottom:after {
+            display: none !important;
+        }
+    }
+</style>

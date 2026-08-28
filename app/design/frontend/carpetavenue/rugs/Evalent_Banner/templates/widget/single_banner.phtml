@@ -1,0 +1,139 @@
+<?php
+use \Evalent\Banner\Api\Data\BannerInterface;
+
+/** @var \Evalent\Banner\Block\Widget\SingleBanner $block   */
+
+/** @var \Evalent\Banner\Api\Data\BannerInterface $banner */
+$banner = $block->getBanner();
+
+$timeZone = new \DateTimeZone("Europe/Stockholm");
+
+$dateStart = $banner->getDateStart();
+$dateEnd = $banner->getDateEnd();
+$_dateStart = !empty($dateStart) ? date_format(date_create($dateStart . '+ 1 hour', $timeZone),"Y/m/d H:i") : "";
+$_dateEnd = !empty($dateEnd) ? date_format(date_create($dateEnd . '+ 1 hour', $timeZone),"Y/m/d H:i") : "";
+$dateNow = date("Y/m/d H:i");
+$_daysLeft = 0;
+
+if(!empty($_dateStart) && !empty($_dateEnd) && ($_dateEnd < $dateNow || $_dateStart > $dateNow)):
+
+    return;
+
+endif;
+
+if(empty($_dateStart) && !empty($_dateEnd) && $_dateEnd < $dateNow):
+
+    return;
+
+endif;
+
+if(!empty($_dateStart) && empty($_dateEnd) && $_dateStart > $dateNow):
+
+    return;
+
+endif;
+
+$_bannerDisplayMode = $block->getDisplayMode();
+$_bannerCssClass = $block->getCssClass();
+$_bannerMarginTopDesktop = $block->getData('margin_top_desktop');
+$_bannerMarginBottomDesktop = $block->getData('margin_bottom_desktop');
+$_bannerMarginTopMobile = $block->getData('margin_top_mobile');
+$_bannerMarginBottomMobile = $block->getData('margin_bottom_mobile');
+$_bannerButtonContentTheme = $banner->getButtonContentTheme();
+$_bannerButtonStyle = $banner->getButtonStyle();
+$_bannerHeading = $banner->getHeading();
+$_bannerHeading2 = $banner->getHeadingSecondary();
+$_bannerDescription = $banner->getDescription();
+$_bannerButtonText = $banner->getButtonText();
+$_bannerLinkUrl = $banner->getBannerLinkUrl();
+$_bannerAnimation = $banner->getAnimationEffect();
+$_bannerAlignDesktop = $banner->getContentAlignDesktop();
+$_bannerAlignMobile = $banner->getContentAlignMobile();
+$_bannerTextAlignDesktop = $banner->getTextAlignDesktop();
+$_bannerTextAlignMobile = $banner->getTextAlignMobile();
+$_bannerImageDesktop = $banner->getImageUrl(BannerInterface::DESKTOP_IMAGE);
+$_bannerImageMobile = $banner->getImageUrl(BannerInterface::MOBILE_IMAGE);
+$_bannerLinkNewWindow = $banner->getBannerLinkUrlNewWindow();
+$_bannerButtonEnabledDesktop = $banner->getButtonEnabledDesktop();
+$_bannerButtonEnabledMobile = $banner->getButtonEnabledMobile();
+$_bannerHeadingSizeDesktop = $banner->getHeadingSizeDesktop();
+$_bannerHeadingSizeMobile = $banner->getHeadingSizeMobile();
+$_bannerHeadingTag = $banner->getHeadingTag();
+$_headingSecondarySizeDesktop = $banner->getHeadingSecondarySizeDesktop();
+$_headingSecondarySizeMobile = $banner->getHeadingSecondarySizeMobile();
+$_descriptionSizeDesktop = $banner->getDescriptionSizeDesktop();
+$_descriptionSizeMobile = $banner->getDescriptionSizeMobile();
+$_buttonSizeDesktop = $banner->getButtonSizeDesktop();
+$_buttonSizeMobile = $banner->getButtonSizeMobile();
+$_customColor = $banner->getContentCustomColor() ?? "#FFFFFF";
+$_customButtonTextColor = $banner->getButtonTextColor() ?? "#000000";
+$_shadowEffect = $banner->getShadowEffect() == "1";
+$_descriptionPosition = $banner->getDescriptionPosition() ?? "after-button";
+
+if($_bannerButtonContentTheme != "custom") {
+    $_customColor = "";
+    $_customButtonTextColor = "";
+}
+// Set default heading tag if empty
+if(!isset($_bannerHeadingTag) || empty($_bannerHeadingTag)): $_bannerHeadingTag = "h2"; endif;
+?>
+
+<div class="ev-banners ev-banners--single ev-banners-display--<?= $_bannerDisplayMode ? $_bannerDisplayMode : 'default' ?> margin-top--desktop--<?= $_bannerMarginTopDesktop ?> margin-bottom--desktop--<?= $_bannerMarginBottomDesktop ?> margin-top--mobile--<?= $_bannerMarginTopMobile ?> margin-bottom--mobile--<?= $_bannerMarginBottomMobile ?> <?= $_shadowEffect ? "text-shadow" : "" ?> <?= $_bannerCssClass; ?>">
+
+    <div class="ev-banners--single__banner <?= 'button-style--' . $_bannerButtonStyle . ' content-theme--' . $_bannerButtonContentTheme ?> animation--<?= $_bannerAnimation ?> align--desktop--<?= $_bannerAlignDesktop ?> align--mobile--<?= $_bannerAlignMobile ?> text-align--desktop--<?= $_bannerTextAlignDesktop ?> text-align--mobile--<?= $_bannerTextAlignMobile ?>"
+         style="<?= $_customColor != "" ? '--content-custom-color:'.$_customColor : '' ?>">
+
+        <div class="inner-wrapper">
+            <?php if ($_bannerLinkUrl) : ?>
+                <a href="<?= $_bannerLinkUrl ?>" class="ev-banners__link" target="<?= $_bannerLinkNewWindow === '1' ? '_blank' : '_self' ?>"></a>
+            <?php endif; ?>
+
+            <?php if ($_bannerImageMobile !== null && $_bannerImageDesktop !== null) : ?>
+
+                <img class="lazy-load" data-original="<?= $_bannerImageDesktop ?>" src="<?= $this->getViewFileUrl('Evalent_Banner::images/lazyload_banner.png') ?>" data-original-srcset="<?= $_bannerImageMobile . ' 768w, ' . $_bannerImageDesktop ?>"  alt="Banner image">
+
+            <?php elseif ($_bannerImageMobile == null && $_bannerImageDesktop !== null): ?>
+
+                <img class="lazy-load" src="<?= $this->getViewFileUrl('Evalent_Banner::images/lazyload_banner.png') ?>" data-original="<?= $_bannerImageDesktop ?>" alt="Banner image">
+
+            <?php endif; ?>
+
+            <div class="ev-banners__content">
+                <?php if ($_bannerHeading2) : ?>
+                    <h3 class="ev-banners__content__heading--secondary size--desktop--<?= $_headingSecondarySizeDesktop ?> size--mobile--<?= $_headingSecondarySizeMobile ?>" data-heading="<?= strip_tags($_bannerHeading2) ?>">
+                        <?= $_bannerHeading2 ?>
+                    </h3>
+                <?php endif; ?>
+
+                <?php if ($_bannerHeading) : ?>
+                <<?= $_bannerHeadingTag ?> class="ev-banners__content__heading size--desktop--<?= $_bannerHeadingSizeDesktop ?> size--mobile--<?= $_bannerHeadingSizeMobile ?>" data-heading="<?= strip_tags($_bannerHeading) ?>">
+                <?= $_bannerHeading ?>
+            </<?= $_bannerHeadingTag ?>>
+        <?php endif; ?>
+
+            <?php if ($_descriptionPosition == "after-heading" && $_bannerDescription) : ?>
+                <p class="ev-banners__content__description size--desktop--<?= $_descriptionSizeDesktop ?> size--mobile--<?= $_descriptionSizeMobile ?>" data-heading="<?= $_bannerDescription ?>">
+                    <?= $_bannerDescription ?>
+                </p>
+            <?php endif; ?>
+
+            <?php if ($_bannerButtonText) : ?>
+                <a class="ev-banners__content__button <?= !$_bannerButtonEnabledDesktop ? 'hidden-m' : '' ?> <?= !$_bannerButtonEnabledMobile ? 'hidden-xs' : '' ?>  size--desktop--<?= $_buttonSizeDesktop ?> size--mobile--<?= $_buttonSizeMobile ?>" href="<?= $_bannerLinkUrl ? $_bannerLinkUrl : '#' ?>" target="<?= $_bannerLinkNewWindow === '1' ? '_blank' : '_self' ?>"
+                   style="<?= $_customButtonTextColor != "" ? '--buttontext-custom-color:'.$_customButtonTextColor : '' ?>">
+                        <span>
+                            <?= $_bannerButtonText ?>
+                        </span>
+                </a>
+            <?php endif; ?>
+
+            <?php if ($_descriptionPosition == "after-button" && $_bannerDescription) : ?>
+                <p class="ev-banners__content__description size--desktop--<?= $_descriptionSizeDesktop ?> size--mobile--<?= $_descriptionSizeMobile ?>" data-heading="<?= $_bannerDescription ?>">
+                    <?= $_bannerDescription ?>
+                </p>
+            <?php endif; ?>
+        </div>
+    </div>
+
+</div>
+
+</div>

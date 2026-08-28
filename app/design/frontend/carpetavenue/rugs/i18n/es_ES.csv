@@ -1,0 +1,301 @@
+"Search for products, categories, ...","Encuentre su alfombra aquí ..."
+"Oriental Carpets","Alfombras Orientales","module","Magento_Email"
+"Modern Carpets","Alfombras modernas","module","Magento_Email"
+"Shop by","Comprar por"
+"Sold","Vendido"
+Show All,Mostar todas
+Show all,Mostar todas
+Show all %1,Mostar todas %1
+"Terms & Conditions","Condiciones de Uso y Venta","module","Magento_Email"
+"Contact email","Contacto",module,Magento_Email
+Price,Precio
+Read more,Lee más
+Read less,Leer menos
+"Items %1-%2 of %3","Alfombras %1-%2 de %3"
+"Items %1 of %2","Mostrando %1 de %2 alfombras"
+Sort by,Ordenar por
+Random Sorting,Selección al azar
+Position,Posición
+"Set Descending Direction","Establecer dirección descendente"
+"Set Ascending Direction","Establecer dirección ascendente"
+Previous,Anterior
+Next,Siguiente
+"Now Filtering by","Ahora filtrando por"
+"Clear All","Eliminar todo"
+"Clear all","Eliminar todo"
+"Add to Cart","Añadir al carro",module,Magento_Catalog
+Adding...,Agregar...
+Added,Agregado
+"You added %1 %2 to your <a href=""%3"">shopping cart</a>.","Ha agregado %1 %2 a su <a href=""%3"">carrito de compras</a>."
+"You added %1 %2 to your shopping cart.","Ha agregado %1 %2 a su carrito de compras."
+Specifications,Especificaciones
+Description,Descripción
+Submit,Enviar
+Similar Products,Alfombras similares
+Similar Products to %1,Alfombras similares a %1
+"Show similar carpets", "Mostrar alfombras similares"
+"Recently Viewed","Visto recientemente"
+"Shopping Cart","Carro"
+"Carpet in Cart","alfombra en el carro"
+"Carpets in Cart","alfombras en el carro"
+"Item in Cart","alfombra en el carro"
+"Items in Cart","alfombras en el carro"
+"Cart Subtotal","Subtotal del carro",module,Magento_Checkout
+"View and Edit Cart","Ver y editar carro",module,Magento_Checkout
+"View and edit cart","Ver y editar carro",module,Magento_Checkout
+Qty,Cantidad
+"Close","Cerrar"
+"Remove item","Eliminar el artículo"
+"Are you sure you would like to remove this item from the shopping cart?","¿Está seguro de que desea eliminar este artículo del carro de compras?"
+Cancel,Cancelar
+"You have no items in your shopping cart.","No tiene alfombras en su carrito de compras."
+"My Wish List","Mis favoritos"
+"Go to Wish List","Mostrar mis favoritos"
+"Share Wish List","Compartir lista de favoritos"
+"Add All to Cart","Añadir todo al carrito"
+"Update Wish List","Actualizar lista de favoritos"
+"Email addresses, separated by commas","Direcciones de correo electrónico, separadas por comas"
+"Your name","Su nombre"
+"Your email","Su correo electrónico"
+message,mensaje
+Message,Mensaje
+"This is a required field.","Este es un campo obligatorio."
+"You have no items in your wish list.","No tiene artículos en su lista de deseados."
+"Customer Login","Inicio de sesión del cliente"
+"Registered Customers","Clientes Registrados"
+"If you have an account, sign in with your email address.","Si tiene una cuenta, inicie sesión con su dirección de correo electrónico."
+Email,Correo electrónico
+"Password","Contraseña"
+"Remember Me","Recordarme"
+"What's this?","¿Qué es esto?"
+"Sign in","Iniciar sesión"
+"Forgot Your Password?","¿Olvidó su contraseña?"
+"Please enter your email below and we will send you the confirmation link.","Ingrese su dirección de correo electrónico a continuación para recibir un enlace de restablecimiento de contraseña."
+"* Required Fields","* Campos requeridos"
+"Please type the letters and numbers below","Por favor escriba las letras y números a continuación"
+"Reload captcha","Recargar captcha"
+"Reset My Password","Restablecer mi contraseña"
+"New Customers","Nuevos clientes"
+"Creating an account has many benefits:","Crear una cuenta tiene muchos beneficios:"
+"Create an Account","Crea una cuenta"
+"Create New Customer Account","Crear nueva cuenta de cliente"
+"Personal Information","Información personal"
+"First Name","Nombre"
+"Last Name","Apellido"
+"Sign Up for Newsletter","Suscribirse al boletín"
+"Sign-in Information","Información sobre inicio de sesión"
+"Confirm Password","Confirmar contraseña"
+"Password Strength","Seguridad de la contraseña"
+No Password,sin contraseña
+Weak,Débil
+Medium,medio
+Strong,fuerte
+"Very Strong","Muy fuerte"
+"My Account","Mi cuenta"
+"Sign Out","Cerrar sesión"
+"You are signed out","Estás desconectado"
+"You have signed out and will go to our homepage in 5 seconds.","Ha cerrado la sesión correctamente y será redirigido a la página de inicio en 5 segundos."
+"Account Information","Información de la cuenta"
+"Contact Information","Información del contacto"
+Edit,Editar
+"Change Password","Cambiar Contraseña"
+Newsletters,Boletines informativos
+"You aren't subscribed to our newsletter.","No estás suscrito a nuestro boletín."
+"Address Book","Directorio de direcciones"
+"Manage Addresses","Administrar direcciones"
+"Default Billing Address","Dirección de facturación (por defecto)"
+"You have not set a default billing address.","No ha establecido una dirección de facturación predeterminada."
+"Edit Address","Editar dirección"
+"Default Shipping Address","Dirección de entrega (por defecto)"
+"You have not set a default shipping address.","No ha establecido una dirección de envío predeterminada."
+"My Orders","Mis pedidos"
+"You have placed no orders.","No ha realizado ningún pedido."
+"Add New Address","Agregar nueva dirección"
+City,Ciudad
+Company,Empresa
+Country,País
+State/Province,Provincia del estado
+Address,Dirección
+"Street Address","Dirección"
+"Phone Number","Número de teléfono"
+"Zip/Postal Code","Código Postal (ZIP Code)"
+"Please select a region, state or province.","Por favor seleccione una región, estado o provincia."
+"Save Address","Guardar dirección"
+"Edit Account Information","Editar información de la cuenta"
+"Change Email","Cambiar e-mail"
+Save,Salvar
+"Newsletter Subscriptions","Suscripciones a los boletines"
+"Newsletter Subscription","Boletín de suscripción"
+"Subscription option","Opciones de suscripción"
+"General Subscription","Suscripción General"
+"Apply Discount Code","Aplicar código de descuento"
+"Enter discount code","Introduzca el código de descuento"
+"Apply Discount","Aplicar descuento"
+"Update Shopping Cart","Actualizar carro",module,Magento_Checkout
+Summary,Resumen
+"Estimate Shipping and Tax","Calcular impuestos de envío"
+"Enter your destination to get a shipping estimate.","Ingrese su destino para obtener un precio estimado de envío."
+"UPS Shipping","Envío de UPS"
+"Free shipping (2 - 5 Working days)","Envío gratis (2-5 dias laborables)"
+"Express delivery (1 - 2 Working days)","Entrega express (1-2 dias laborables)"
+"DHL (1-3 working days)","DHL (1-3 dias laborables)"
+"DHL (2-4 working days)","DHL (2-4 dias laborables)"
+"DHL (2-5 working days)","DHL (2-5 dias laborables)"
+"DHL (3-5 working days)","DHL (3-5 dias laborables)"
+"DHL (3-6 working days)","DHL (3-6 dias laborables)"
+"DHL (4-6 working days)","DHL (4-6 dias laborables)"
+"UPS (1-3 working days)","UPS (1-3 dias laborables)"
+"UPS (2-4 working days)","UPS (2-4 dias laborables)"
+"UPS (2-5 working days)","UPS (2-5 dias laborables)"
+"UPS (3-5 working days)","UPS (3-5 dias laborables)"
+"UPS Shipping (1-3 working days)","UPS Envío (1-3 dias laborables)"
+"UPS Shipping (2-4 working days)","UPS Envío (2-4 dias laborables)"
+"UPS Shipping (2-5 working days)","UPS Envío (2-5 dias laborables)"
+"UPS Shipping (3-5 working days)","UPS Envío (3-5 dias laborables)"
+"DHL Shipping (1-3 working days)","DHL Envío (1-3 dias laborables)"
+"DHL Shipping (2-4 working days)","DHL Envío (2-4 dias laborables)"
+"DHL Shipping (2-5 working days)","DHL Envío (2-5 dias laborables)"
+"DHL Shipping (3-5 working days)","DHL Envío (3-5 dias laborables)"
+"DHL Shipping (3-6 working days)","DHL Envío (3-6 dias laborables)"
+"DHL Shipping (4-6 working days)","DHL Envío (4-6 dias laborables)"
+"UPS Free Shipping (1-3 working days)","UPS Envío gratis (1-3 dias laborables)"
+"UPS Free Shipping (2-4 working days)","UPS Envío gratis (2-4 dias laborables)"
+"UPS Free Shipping (2-5 working days)","UPS Envío gratis (2-5 dias laborables)"
+"UPS Free Shipping (3-5 working days)","UPS Envío gratis (3-5 dias laborables)"
+"DHL Free Shipping (1-3 working days)","DHL Envío gratis (1-3 dias laborables)"
+"DHL Free Shipping (2-4 working days)","DHL Envío gratis (2-4 dias laborables)"
+"DHL Free Shipping (2-5 working days)","DHL Envío gratis (2-5 dias laborables)"
+"DHL Free Shipping (3-5 working days)","DHL Envío gratis (3-5 dias laborables)"
+"DHL Free Shipping (3-6 working days)","DHL Envío gratis (3-6 dias laborables)"
+"DHL Free Shipping (4-6 working days)","DHL Envío gratis (4-6 dias laborables)"
+"GLS (2-4 working days)","GLS (2-4 dias laborables)"
+"GLS (2-5 working days)","GLS (2-5 dias laborables)"
+"GLS (3-5 working days)","GLS (3-5 dias laborables)"
+Subtotal,Subtotal
+Tax,Impuesto
+"Order Total Excl. Tax","Costo del pedido sin impuesto incluido"
+"Order Total Incl. Tax","Costo del pedido con impuesto incluido"
+"Proceed with Bank Transfer","Continuar con la transferencia bancaria"
+"Proceed with Klarna","Continuar con Klarna"
+"Back to Shopping Cart","Volver al carro de compras"
+"Already have an account? Click here to login","¿Ya tiene una cuenta? Haga clic aquí para ingresar"
+"Delivery Address","Dirección de entrega"
+"Email Address","Dirección de correo electrónico"
+"Email address","Dirección de correo electrónico"
+"We'll send your order confirmation here.","Le enviaremos la confirmación de su pedido aquí."
+"For delivery questions.","Para preguntas sobre entrega."
+"Register for newsletter","Regístrese para recibir el boletín"
+"Create account","Crear una cuenta"
+"My billing and delivery address are the same","Mi dirección de facturación y entrega son las mismas."
+"Shipping Methods","Métodos de envío"
+"Please specify a shipping method.","Por favor especifique un método de envío."
+"Please specify a shipping method","Por favor especifique un método de envío."
+Payment Method:,Método de pago:
+Payment Method,Método de pago
+"Bank Transfer Payment","Transferencia bancaria"
+"Bank transfer","Transferencia bancaria"
+"Please use the bank details you receive in your order confirmation (once your order is placed) to make your payment.","Utilice los datos bancarios que ha recibido en la confirmación del pedido (una vez que se realiza el pedido) para realizar su pago."
+"Order Summary","Resumen de pedido"
+"Product Name","Nombre del producto"
+Shipping,Envío
+"Not yet calculated","Aún no calculado"
+"Place Order","Realizar pedido"
+"Unique","Única"
+Sign up and get access to exclusive offers and deals.,Regístrese y obtenga acceso a ofertas y ofertas exclusivas.
+"Please pay using the bank details you will receive in your order confirmation","Utilice los datos bancarios que ha recibido en la confirmación del pedido (una vez que se realiza el pedido) para realizar su pago."
+"Thumbnail","Imagen"
+"SKU","Réf. Article"
+"What’s on your mind?","Su pregunta",module,Magento_Contact
+"Add to Cart","Añadir al carro",module,Magento_Catalog
+"Cart Subtotal","Subtotal del carro",module,Magento_Checkout
+"retail_price","Precio en tiendas"
+"A question about %name %sku","Una pregunta sobre la alfombra %name %sku",module,Evalent_ProductContactForm
+"Hamburg","Hamburgo"
+"Germany","Alemania"
+"Email imprint","USt.-IDNr: DE327707896, CEO: Amir Reza Vani, HRB 160212","module","Magento_Email"
+"Thank you for your purchase!","¡Gracias por su compra!"
+"Your order number is: %1.","Su número de pedido es %1",module,Magento_Checkout
+"We'll email you an order confirmation with details and tracking info.","Le enviaremos una confirmación con toda la información del pedido.",module,Magento_Checkout
+"You already have an account with us.","Ya tienes una cuenta con nosotros."
+We can't find products matching the selection.--MOBILE,"Lamentablemente, no hemos podido encontrar ninguna alfombras que coincidan con sus criterios de búsqueda. Restablezca su filtro de búsqueda o contáctenos en info@carpetavenue.com. ¡Haremos todo lo posible para ayudarlo a encontrar la alfombra que está buscando!"
+We can't find products matching the selection.--DESKTOP,"Lamentablemente, no hemos podido encontrar ninguna alfombras que coincidan con sus criterios de búsqueda. Restablezca su filtro de búsqueda o contáctenos en info@carpetavenue.com. ¡Haremos todo lo posible para ayudarlo a encontrar la alfombra que está buscando!"
+"We hereby guarantee that the carpet supplied is %s and genuine.","Por la presente garantizamos que la alfombra suministrada está %s y es genuina."
+"* The carpet is %s. Therefore, there may be slight variations in shape, thickness and dimensions.","* La alfombra está %s. Por tanto, puede haber ligeras variaciones de forma, grosor y dimensiones."
+"Carpet Type","Type de tapis"
+"Size","Tamaño"
+"Hamburg, Germany","Hamburgo, Alemania"
+"Proceed","Continuar"
+"Proceed with Other Payment Methods","Continuar con otra forma de pago"
+"We recommend the following products:","Recomendamos los siguientes productos:"
+"days","días"
+"day","día"
+"Days","Días"
+"Day","Día"
+hours,horas
+minutes,minutos
+"Are you sure?","¿Seguro que quiere continuar?"
+"%1 - and above","%1 - y superior"
+"The confirmation request has been sent.","La petición de confirmación ha sido enviada."
+"Thank you for your subscription.","Gracias por suscribirse."
+"Always active","Siempre activo"
+"Please select and accept your Cookies Group","Por favor, seleccione y acepte su Grupo de Cookies"
+"Done","Hecho"
+"All filters","Todos filtros"
+"Search entire store here...","Encuentre su alfombra aquí..."
+"See All","Mostar todas"
+"Suggestions","Sugerencias"
+"No results","Sin resultados"
+VAT incl.,IVA incluido
+Excl. Tax,IVA excluido
+"Request a callback","Solicitar una devolución de llamada"
+"What can we help you with?","¿En qué podemos ayudarle"
+"Your message --CONTACT","Mensaje"
+"Thanks for contacting us with your comments and questions. We'll respond to you very soon.","Gracias por su consulta. Estaremos en contacto en breve."
+"Accept all","Aceptar todo"
+"Last Day","Último día"
+"Material","Material"
+"This carpet has been tested for harmful substances and is free from hazardous chemicals that could be harmful to human health. OEKO-TEX® STANDARD 100 is a globally uniform and independent testing- and certification system for textiles. All tests are conducted by independent OEKO-TEX® partner institutes.","Esta alfombra ha sido probada para sustancias dañinas y está libre de químicos peligrosos que podrían ser dañinos para la salud humana."
+"This carpet has been produced under OEKO-TEX® STeP certified conditions. The OEKO-TEX® STeP certification system includes a comprehensive analysis and assessment of all production conditions. The aim is the long-term implementation of environmentally friendly production processes, social working conditions and optimum health and safety.","Esta alfombra ha sido producida bajo condiciones certificadas por OEKO-TEX® STeP. El sistema de certificación OEKO-TEX® STeP incluye un análisis y una evaluación exhaustivos de todas las condiciones de producción. El objetivo es la aplicación a largo plazo de procesos de producción respetuosos con el medio ambiente, condiciones sociales de trabajo y una salud y seguridad óptimas."
+"Cotton is a hypoallergenic and odour-free natural material. The fibres are soft, strong and hold dyes very effectively. Carpets made of cotton are low maintenance and easy to keep clean. A cotton carpet is both a functional and versatile choice for a bathroom or kitchen as it can easily be turned if it becomes stained or dirtied.","El algodón es un material natural hipoalergénico y sin olores. Sus fibras son suaves, resistentes y retienen muy bien los tintes. Las alfombras de algodón requieren poco mantenimiento y son fáciles de limpiar. Una alfombra de algodón es una opción funcional y versátil para un cuarto de baño o una cocina, ya que se puede dar la vuelta fácilmente si se mancha o ensucia."
+"Silk is amongst the most durable of all natural fibers. The luxurious and exclusive silk yarn has a high level of elasticity, allowing it to stretch up to 20% its own length. Silk is extremely soft to the touch and has an unparalleled natural sheen and lustre. The fibres are extremely fine, making it an excellent choice of material to work with when producing refined carpets with a high level of intricate details. In some carpets the silk is merely used to accentuate certain patterns and details in the pile whereas in more exclusive carpets the entire pile (and warp at times) can be made entirely of silk.","La seda es una de las fibras naturales más duraderas. El lujoso y exclusivo hilo de seda tiene un alto nivel de elasticidad, lo que le permite estirar hasta un 20% su propia longitud. La seda es extremadamente suave al tacto y tiene un brillo natural sin igual. Las fibras son extremadamente finas, por lo que es una excelente elección de material para trabajar cuando se producen alfombras refinadas con un alto nivel de detalles intrincados."
+"Polyester is a durable synthetic fabric and an excellent choice of material for carpets. Carpets made of polyester are affordable, easy to keep clean and resistant to water-based stains. The result is a low-maintenance, soft and comfortable carpet with a nice sheen to it.","El poliéster es un tejido sintético duradero y una excelente elección de material para alfombras. Las alfombras de poliéster son asequibles, fáciles de mantener limpias y resistentes a las manchas a base de agua. El resultado es una alfombra de bajo mantenimiento, suave y cómoda con un brillo agradable."
+"Polypropylene (PP) is a man-made fibre with a high resistance to wear and tear. Carpets made with PP provide excellent value for money and are perfectly capable of withstanding both water and stains to a high degree. PP is an ideal alternative for people with allergies to natural materials such as wool. The carpets are easy to keep clean, have anti-static properties and are colourfast, meaning they do not fade as easily when exposed to direct sunlight.","El polipropileno (PP) es una fibra artificial con una alta resistencia al desgaste. Las alfombras hechas con PP proporcionan una excelente relación calidad-precio y son perfectamente capaces de soportar tanto el agua como las manchas en un alto grado. PP es una alternativa ideal para personas con alergias a materiales naturales como la lana. Las alfombras son fáciles de mantener limpias, tienen propiedades antiestáticas y son resistentes a los colores, lo que significa que no se desvanecen tan fácilmente cuando se exponen a la luz solar directa."
+"Viscose, also known as rayon, is a versatile fibre renowned for its silk-like qualities. Carpets made of viscose are extremely soft and comfortable to walk on. Viscose can be used to either accentuate certain patterns and details in a carpet, or alternatively used to resemble the aesthetic splendour of a pure silk carpet, by providing a stunning sheen to the entire carpet - at a fraction of the price.","La viscosa, también conocida como rayón, es una fibra versátil conocida por sus cualidades similares a la seda. Las alfombras de viscosa son extremadamente suaves y cómodas para caminar. La viscosa se puede utilizar para acentuar ciertos patrones y detalles en una alfombra, o alternativamente se utiliza para parecerse al esplendor estético de una alfombra de seda pura, proporcionando un brillo impresionante a toda la alfombra - a una fracción del precio."
+"Wool is a 100% natural and sustainable textile fiber. Carpets made of wool are highly durable and perfectly suited for daily use and heavily trafficked areas. Wool has a natural ability to resist both dirt and stains as well as being flame retardant. Since wool fibres are naturally coiled, there is a built-in resiliency that enables the pile of the carpet to rise and regain it’s shape if it gets crushed or weighted down by furniture or foot traffic.","La lana es una fibra textil 100% natural y sostenible. Las alfombras hechas de lana son altamente duraderas y perfectamente adecuadas para el uso diario y las áreas con mucho tráfico. La lana tiene una capacidad natural para resistir tanto la suciedad como las manchas, además de ser ignífuga. Dado que las fibras de lana se enrollan naturalmente, hay una resistencia incorporada que permite que la pila de la alfombra se levante y recupere su forma si se aplasta o se lastra por los muebles o el piseteo."
+"Lowest price latest %1 days","Precio más bajo en los últimos %1 días"
+"Incl. VAT","IVA incluido"
+"Only <span>1</span> in stock","Solo <span>1</span> en stock"
+"Back to Home Page","Volver a la página de inicio"
+"We would love to hear from you!","Nos encantaría saber de usted!"
+"VAT Number","Número UE de IVA"
+"VAT Number:","Número UE de IVA:"
+Relevance,Relevancia
+%1 Item,%1 alfombra
+%1 Items,%1 alfombras
+"Invoice date","Fecha de la factura"
+"Reference","Referencia"
+"Delivery date","Fecha de entrega"
+"Your customer no","Su número de cliente"
+"Your contact","Su contacto"
+"Dear Customer,<br>we hereby charge you for the delivery of following service","Estimado cliente,<br>por la presente le cobramos la entrega del siguiente servicio"
+"Service date corresponds to invoice date.","La fecha del servicio corresponde a la fecha de la factura."
+"Tax free export","Exportación libre de impuestos"
+"Unit price","Precio Unitario"
+"Total price","Precio total"
+"piece","pedazo"
+"pieces","piezas"
+"Total net","Neto total"
+"Total gross","Bruto total"
+page,página
+of,de
+"size","tamaño"
+"sizes","tamaños"
+"Size","Tamaño"
+"Sizes","Tamaños"
+"colours","colores"
+"colour","color"
+"you save","ahorras"
+"To Checkout", "Comenzar pedido"
+"Street address (street and number)","Calle y número"
+"Suite, floor, c/o, etc. (optional)","Información adicional (opcional)"
+"Address Line 2","Línea de dirección 2"

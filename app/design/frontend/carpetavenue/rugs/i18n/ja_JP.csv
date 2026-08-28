@@ -1,0 +1,277 @@
+Show all %1,全ての%1を表示する
+All Carpets,すべての絨毯
+Categories,カテゴリ
+"Show All","全て表示"
+"Shop by","商品紹介"
+Price,価格
+Production Type,制作工程
+Handknotted,手織り
+Handloom,ハンドルーム
+Handwoven,手機織り
+Read more,詳細を見る
+Read less,表示を戻す
+Items %1-%2 of %3,%3件中 %1 - %2 件表示
+Sort by,並び順
+Random Sorting,新商品
+Position,使用場所
+Set Descending Direction,降順にする
+Set Ascending Direction,昇順にする
+Next,次へ
+Previous,前へ
+Clear All,すべて解除
+Remove This Item,ご選択の商品を削除する
+Similar Products,関連する商品
+Similar Products to %1,%1に関連する商品
+"Show similar carpets", "類似のカーペットを表示"
+Retail Price,小売価格
+Add to Cart,カートに追加する
+Adding...,追加しています...
+Added,追加されました
+"You added %1 %2 to your <a href=""%3"">shopping cart</a>.","%1 %2を<a href=""%3"">カート</a>に追加しました。"
+You added %1 %2 to your shopping cart.,%1 %2をウィッシュリストに追加しました。
+%1 %2 has been removed from your Wish List.,%1 %2 がウィッシュリストに追加されました。
+%1 %2 has been added to your Wish List.,%1 %2はウィッシュリストから削除されました。
+%1 products,%1
+Specifications,製品仕様
+The colours of the carpet look different depending on the angle from which you look at it.,The colours of the carpet look different depending on the angle from which you look at it.
+Article Number,商品番号
+Email,メールアドレス
+Name,お名前
+Shopping Cart,"ショッピングカート"
+Carpet in Cart,点の商品がカートに入っています
+Carpets in Cart,点の商品がカートに入っています
+Item in Cart,点の商品がカートに入っています
+Items in Cart,点の商品がカートに入っています
+Remove item,商品を削除する
+Are you sure you would like to remove this item from the shopping cart?,ショッピングカートからこの商品を削除してもよろしいですか？
+Cancel,キャンセル
+My Wish List,お気に入り
+Go to Wish List,お気に入りを表示する
+Update Wish List,ウィッシュリストを更新
+Share Wish List,ウィッシュリストを共有
+"Email addresses, separated by commas","メールアドレス（複数ある場合はコンマで区切ってください）"
+Your name,お名前
+Your email,メールアドレス
+Message,メッセージ
+This is a required field.,必須項目です
+Add all to Cart,すべてカートに入れる
+You have no items in your wish list.,ほしい物リストに登録された商品はありません
+Customer Login,ログイン
+Registered Customers,ご登録済みのお客様
+"If you have an account, sign in with your email address.",アカウントをお持ちのお客様は、メールアドレスを入力してログインしてください。
+Sign In,サインイン
+Forgot your password?,パスワードをお忘れですか？
+"Please enter your email address below to receive a password reset link.","下記フォームに登録時のメールアドレスをご入力ください。パスワード変更用のURLを送信いたします。"
+Required Fields,必須項目
+Please type the letters and numbers below,画像の文字と数字をご入力ください。
+Reload captcha,別の画像を表示する
+Reset My Password,パスワードをリセットする
+New Customers,初めてのお客様
+"Creating an account has many benefits: check out faster, keep more than one address, track orders and more.","アカウントを作成いただくと、より簡単にご注文手続きを進めることができ、複数の配送先の登録や配送状況の確認など便利な機能をご利用いただけます。"
+Create an Account,アカウントを作成
+Create New Customer Account,新しいアカウントを作成
+Personal Information,お名前
+Sign Up for Newsletter,ニュースレターの購読を希望する
+Sign-in Information,ログイン情報
+Password Strength,パスワードの強度
+No Password,パスワードが入力されていません。
+Weak,弱
+Medium,中強
+Strong,最強
+Confirm Password,パスワードの再確認
+You are signed out,ログアウトしました
+You have signed out and will go to our homepage in 5 seconds.,ログアウトしました。５秒後に自動的にトップページに戻ります。
+Newsletters,ニュースレター
+You aren't subscribed to our newsletter.,現在ニュースレターを購読されていません
+A confirmation request has been sent.,確認メールが送信されました
+Address Book,アドレス帳
+Manage Addresses,アドレス帳の管理
+Default Billing Address,既定の請求先ご住所
+You have not set a default billing address,既定のご請求先住所は登録されていません
+Edit Address,住所の編集
+Default Shipping Address,既定のお届け先住所
+You have not set a default shipping address.,既定のお届け先住所は登録されていません
+My Orders,注文履歴
+You have placed no orders.,ご注文履歴はありません
+Add New Address,新しい住所を追加
+Contact Information,ご連絡先
+Company,会社名
+Phone Number,電話番号
+Address,ご住所
+Street Address,町域.番地.建物名
+City,市区町村
+State/Province,都道府県
+"Please select a region, state or province.","都道府県を選択してください"
+Zip/Postal Code,郵便番号
+Country,国
+Edit Account Information,ご登録情報の編集
+Change Email,メールアドレスの変更
+Change Password,パスワードの変更
+Save,保存
+Newsletter Subscriptions,ニュースレターの定期購読
+Need Help?,お困りですか？
+Subscription option,配信設定
+"Yes! I want to receive the newsletter, get updated about new collections and take part in competitions.","ニュースレターの購読を希望し、新商品の最新情報をメールで受け取る"
+Apply Discount Code,割引コードを適用する
+Enter discount code,割引コードを入力する
+Apply Discount,割引を適用する
+Update Shopping Cart,カートを更新する
+Summary,ご注文内容
+Estimate Shipping and Tax,配送料・税を見積もる
+Enter your destination to get a shipping estimate.,お届け先から配送料金を見積もる
+Country,国
+State/province,都道府県
+"Please select a region, state or province.",都道府県を選択してください
+Zip/Postal Code,郵便番号
+Subtotal,小計
+Tax,税
+Order Total Incl. Tax,ご注文合計（税込）
+Order Total Excl. Tax,ご注文合計（税抜）
+Proceed with Bank Transfer,銀行振込で支払う
+Proceed with Klarna,クレジットカードで支払う
+"Proceed with Other Payment Methods","クレジットカード決済"
+Back to Shopping Cart,カートに戻る
+Already have an account? Click here to login,アカウントはお持ちですか？ ログインはこちら
+Delivery Address,お届け先住所
+We’ll send your order confirmation here.,ご注文確認メールを送付いたします。
+For delivery questions.,配送についてのご質問
+My billing and shipping address are the same,請求先住所は配送先住所と同じです。
+My billing and delivery address are the same,請求先住所は配送先住所と同じです。
+Shipping Methods,配送方法
+Please specify a shipping method,配送方法をご指定ください
+Payment Method,お支払い方法
+Please use the bank details you receive in your order confirmation (once your order is placed) to make your payment.,ご注文後、確認メールが届きます。そこに記載された振込先にお支払いください。
+Apply Discount Code,割引コードを適用する
+Enter discount code,割引コードを入力する
+Apply Discount,割引を適用する
+Cart Subtotal,カート内小計
+Shipping,配送料
+Not yet calculated,計算されていません
+Tax €,税
+Order Total Incl. Tax,ご注文合計（税込）
+Order Total Excl. Tax,ご注文合計（税抜）
+Please specify a shipping method,配送方法を指定してください
+Thank you for your purchase!,お買い上げありがとうございます
+"Your order # is: <span>%1</span>.","お客様のご注文（＃）は: <span>%1</span>."
+You can track your order status by creating an account.,アカウントを作成すると、配送状況を追跡することができます。
+"Invoice ","請求書 "
+"Order ","ご注文 "
+"Invoice Date: ","請求日: "
+"Customer number: ","お客様番号: "
+"Order summary","ご注文内容"
+Sold to:,売却先
+Ship to:,お届け先
+Payment Method,お支払い方法
+Shipping Method:,配送方法
+Shipping Method,配送方法
+Qty,数量
+QTY,数量
+Article number,商品番号
+Tax,税
+Subtotal,小計
+Grand Total (Excl. Tax),合計（税別）
+Grand Total (Incl. Tax),合計
+Status,お支払い状況
+"Thanks for contacting us with your comments and questions. We'll respond to you very soon.","この度はお問い合わせいただきありがとうございます。担当者より速やかにご連絡させていただきます。"
+"Search for products, categories, ...","絨毯を探す"
+Unique,個性的
+Description,種類
+"%1 Item","%1絨毯"
+"%1 Items","%1絨毯"
+"%1 Item(s)","%1絨毯"
+We use cookies to make your experience better.,"弊社は、お客様へのサービス向上のため、クッキーを利用します。"
+"To comply with the new e-Privacy directive, we need to ask for your consent to set the cookies.","新たなe-プライバシー指令に基づき、クッキーの設定にお客様の同意が必要となります。"
+"<a href=""%1"">Learn more</a>.","<a href=""%1"">詳細を確認する。</a>."
+Allow Cookies,クッキーを有効にする
+We can't find products matching the selection.--MOBILE,"申し訳ありませんがご指定の条件に一致する商品はございません。他の条件をお試しいただくか、メール(info@carpetavenue.com)にて弊社までお問い合わせください。 お客様のお買い物を最大限サポートさせていただきます。"
+We can't find products matching the selection.--DESKTOP,"申し訳ありませんがご指定の条件に一致する商品はございません。他の条件をお試しいただくか、メール(info@carpetavenue.com)にて弊社までお問い合わせください。 お客様のお買い物を最大限サポートさせていただきます。"
+Sign up and get access to exclusive offers and deals.,お申し込み後、特別オファーやお得な情報をお届けします。
+Register for newsletter,ニュースレターの配信登録をする
+Create account,アカウント作成
+UPS Shipping,UPS配送
+Please select,選択してください
+Remember Me,入力情報をブラウザに記憶する
+"What’s this?","ヘルプ"
+"A question about %name %sku",(%sku)に関する質問
+"We hereby guarantee that the carpet supplied is %s and genuine.","Wir garantieren hiermit, dass der gelieferte Teppich %s und echt ist."
+"* The carpet is %s. Therefore, there may be slight variations in shape, thickness and dimensions.","* Der Teppich ist %s. Daher kann es zu geringfügigen Abweichungen in Form, Dicke und Abmessungen kommen."
+"Carpet Type","絨毯の種類"
+"Size","サイズ"
+"Hamburg, Germany","ハンブルグ, ドイツ"
+"Date","日付"
+"We hereby guarantee that the carpet supplied is %s and genuine.","これにより絨毯は%sで純正であることを我々は保証いたします。"
+"* The carpet is %s. Therefore, there may be slight variations in shape, thickness and dimensions.","* 絨毯は%sです。従って僅かに形や厚みや寸法に違いがあります。"
+"Japanese Additional Invoice Message","価格には、消費税、税関手続き(該当する場合のみ)を含むすべての料金が含まれています。"
+"Now Filtering by","選択中の検索条件"
+"We would love to hear from you!","お気軽にお電話ください！"
+Write Us --CONTACT,"お問い合わせ"
+Send us a message --CONTACT,"メールにてお問い合わせください。速やかに対応いたします"
+Your message --CONTACT,"お問い合わせ内容"
+"Submit","送信する"
+"View and Edit Cart","カートを見る"
+"Sold","販売済"
+days,日
+day,日
+Days,日
+Day,日
+hours,時間
+minutes,分
+"Are you sure?","よろしいですか？"
+"%1 - and above","%1 - と以上"
+"Always active","常に有効"
+"Please select and accept your Cookies Group","Cookieグループを選択して受け入れてください"
+"Done","以上"
+"All filters","すべてのフィルター"
+"Search entire store here...","絨毯を探す"
+"See All","全て表示"
+"Suggestions","提案"
+"No results","結果がありません"
+VAT incl.,税込
+Excl. Tax,税抜
+"Accept all","すべて受け入れる"
+"Last Day","最終⽇"
+"Material","素材"
+"Oeko-Tex Standard","エコテックス規格"
+"Oeko-Tex STeP","エコテックス STeP"
+"This carpet has been tested for harmful substances and is free from hazardous chemicals that could be harmful to human health. OEKO-TEX® STANDARD 100 is a globally uniform and independent testing- and certification system for textiles. All tests are conducted by independent OEKO-TEX® partner institutes.","このカーペットは、有害物質についてテストされており、人間の健康に害を及ぼす可能性のある有害な化学物質は含まれていません。OEKO-TEX® STANDARD 100 は、テキスタイルの世界的な統一基準であり、独自の試験および認証システムです。 すべてのテストは、独立した OEKO-TEX® パートナー機関によって実施されています。"
+"This carpet has been produced under OEKO-TEX® STeP certified conditions. The OEKO-TEX® STeP certification system includes a comprehensive analysis and assessment of all production conditions. The aim is the long-term implementation of environmentally friendly production processes, social working conditions and optimum health and safety.","このカーペットは、OEKO-TEX® STeP 認定条件下で製造されています。OEKO-TEX® STeP 認証システムには、全ての生産条件に対して広範囲に及ぶ分析と評価が含まれています。 その目的は、環境に優しい生産プロセス、社会的労働条件、最適な健康と安全を長期的に実施することです。"
+"Cotton is a hypoallergenic and odour-free natural material. The fibres are soft, strong and hold dyes very effectively. Carpets made of cotton are low maintenance and easy to keep clean. A cotton carpet is both a functional and versatile choice for a bathroom or kitchen as it can easily be turned if it becomes stained or dirtied.","綿は低刺激性で無臭の天然素材です。 繊維は柔らかく、強く、染料を非常に効果的に保持します。 綿製のカーペットは手入れが簡単で、お手入れも簡単です。シミがついたり汚れても簡単に裏返すことができるため、バスルームやキッチンに適しており、機能的でかつ用途が広いです。"
+"Silk is amongst the most durable of all natural fibers. The luxurious and exclusive silk yarn has a high level of elasticity, allowing it to stretch up to 20% its own length. Silk is extremely soft to the touch and has an unparalleled natural sheen and lustre. The fibres are extremely fine, making it an excellent choice of material to work with when producing refined carpets with a high level of intricate details. In some carpets the silk is merely used to accentuate certain patterns and details in the pile whereas in more exclusive carpets the entire pile (and warp at times) can be made entirely of silk.","シルクは、すべての天然繊維の中で最も耐久性があります。 豪華で高級なシルク糸は高い伸縮性を持ち、最大 20% まで伸ばすことができます。シルクは手触りが非常に柔らかく、比類のない自然な光沢と輝きがあります。繊維は非常に細かいため、複雑な模様を細部まで表現できます。よって洗練されたカーペットを製造する際に使用する優れた素材です。一部のカーペットでは、シルクはパイルの特定の模様や細部を強調するためにのみ使用されますが、より高級なカーペットでは、パイル全体 (および時には経糸) が完全にシルクでできています。"
+"Polyester is a durable synthetic fabric and an excellent choice of material for carpets. Carpets made of polyester are affordable, easy to keep clean and resistant to water-based stains. The result is a low-maintenance, soft and comfortable carpet with a nice sheen to it.","ポリエステルは耐久性のある合成繊維で、カーペットの素材として最適です。 ポリエステル製のカーペットは手頃な価格で、お手入れが簡単で、水性の汚れに強いです。　ポリエステルを使うことによってメンテナンスの手間がかからず、ソフトで気持ちの良い手触りになり、そして光沢があるカーペットとなります。"
+"Polypropylene (PP) is a man-made fibre with a high resistance to wear and tear. Carpets made with PP provide excellent value for money and are perfectly capable of withstanding both water and stains to a high degree. PP is an ideal alternative for people with allergies to natural materials such as wool. The carpets are easy to keep clean, have anti-static properties and are colourfast, meaning they do not fade as easily when exposed to direct sunlight.","ポリプロピレン (PP) は、耐摩耗性に優れた人造繊維です。 PP で作られたカーペットは、優れたコストパフォーマンスを提供し、水と汚れの両方に高度に完全に耐えることができます。 PP は、ウールなどの天然素材にアレルギーのある方にとって理想的な代替品です。 カーペットはお手入れが簡単で、帯電防止特性があり、色落ちしないため、直射日光にさらされても色あせしません。"
+"Viscose, also known as rayon, is a versatile fibre renowned for its silk-like qualities. Carpets made of viscose are extremely soft and comfortable to walk on. Viscose can be used to either accentuate certain patterns and details in a carpet, or alternatively used to resemble the aesthetic splendour of a pure silk carpet, by providing a stunning sheen to the entire carpet - at a fraction of the price.","レーヨンとも呼ばれるビスコースは、シルクのような性質で知られており、用途の広い繊維です。 ビスコースで作られたカーペットは非常に柔らかく、踏み心地が良いです。 ビスコースは、カーペットの正確な模様や細部を際立たせるために使用することもあります。カーペット全体に見事な光沢を与えることで、純粋なシルクカーペットのような美しさ、素晴らしさに似ている要素を低価格にて提供することが可能です。"
+"Wool is a 100% natural and sustainable textile fibre. Carpets made of wool are highly durable and perfectly suited for daily use and heavily trafficked areas. Wool has a natural ability to resist both dirt and stains as well as being flame retardant. Since wool fibres are naturally coiled, there is a built-in resiliency that enables the pile of the carpet to rise and regain it’s shape if it gets crushed or weighted down by furniture or foot traffic.","ウールは 100% 天然の環境に優しい織物繊維です。 ウールで作られたカーペットは耐久性が高く、毎日使用頻度の高い出入りの多い場所に最適です。 ウールには、汚れやしみの両方に耐え得る力と、難燃性があります。 ウール繊維は自然にコイル状になっているため、家具や歩くことによって押しつぶされたりしても、カーペットのパイルが立ち上がって元の形に戻ることができる弾力性が組み込まれています。"
+"Only <span>1</span> in stock","在庫 <span>1</span> 点のみ"
+"Back to Home Page","トップページに戻る"
+"Shipping Info","配送先情報"
+Relevance,関連性
+"What can we help you with?","ご用件は何ですか?"
+"Request a callback","コールバックが必要"
+"Invoice date","請求日"
+"Reference","リファレンスID"
+"Delivery date","配送日"
+"Your customer no","顧客番号"
+"Your contact","連絡先"
+"Dear Customer,<br>we hereby charge you for the delivery of following service","お客様各位、<br>以下のサービスの提供料金を請求させていただきます。"
+"Service date corresponds to invoice date.","サービス日付は請求書の日付と一致します。"
+"Tax free export","非課税輸出"
+"Unit price","ユニット価格"
+"Total price","合計金額"
+"piece","ピース"
+"pieces","ピース"
+"Total net","純額合計"
+"Total gross","総計"
+"Surname","姓"
+"Postal Code","郵便番号"
+"NEW CATALOGUE 2025","ニューカタログ 2025"
+"We recommend the following products:","絨毯をご購入の際は、滑り止めの併用をおすすめします。"
+"size","サイズ"
+"sizes","サイズ"
+"Size","サイズ"
+"Sizes","サイズ"
+"colours","色"
+"colour","色"
+"Installments","分割払い"
+"Do not use Installments","一括払い"
+Items %1 of %2,全%2件中%1件を表示
+"you save","節約"

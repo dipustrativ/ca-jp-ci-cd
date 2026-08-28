@@ -1,0 +1,85 @@
+<?php
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Layered navigation as a horizontal button bar — each attribute button opens
+ * the slide-out filter modal (right side) with that filter's section active.
+ * Matches the reference theme (Evalent/carpet view_slideout).
+ *
+ * @var $block \Magento\LayeredNavigation\Block\Navigation
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<?php if ($block->canShowBlock()) : ?>
+    <?php
+    $filters = $block->getFilters();
+    $activeFilters = $block->getLayer()->getState()->getFilters();
+    $filtered = count($activeFilters);
+    $jsConfig = json_encode([
+        'carpetavenueFilterModal' => ['title' => (string) __('Filter')],
+    ]);
+    ?>
+    <div class="block filter" id="layered-filter-block" data-mage-init="<?= $escaper->escapeHtmlAttr($jsConfig) ?>">
+        <div class="block-title filter-title" data-role="title" data-count="<?= (int) $filtered ?>">
+            <strong><?= $escaper->escapeHtml(__('Shop By')) ?></strong>
+        </div>
+
+        <div class="block-content filter-content">
+            <?php $i = 0;
+            foreach ($filters as $filter) : ?>
+                <?php if ($filter->getItemsCount()) : ?>
+                    <button type="button"
+                            class="button action button-filter button-filter--<?= $escaper->escapeHtmlAttr($filter->getRequestVar()) ?>"
+                            data-filter-tab="<?= (int) $i ?>"
+                            disabled>
+                        <?= $escaper->escapeHtml(__($filter->getName())) ?>
+                    </button>
+                    <?php $i++; ?>
+                <?php endif; ?>
+            <?php endforeach; ?>
+
+            <div id="filter-popup" style="display: none" class="transition-menus">
+                <div class="filter-options" id="narrow-by-list" data-role="content">
+                    <?php $i = 0;
+                    foreach ($filters as $filter) : ?>
+                        <?php if ($filter->getItemsCount()) : ?>
+                            <div class="filter-options-item <?= $escaper->escapeHtmlAttr($filter->getRequestVar()) ?>"
+                                 data-filter-tab="<?= (int) $i ?>">
+                                <div data-role="title" role="heading" aria-level="3" class="filter-options-title"><?= $escaper->escapeHtml(__($filter->getName())) ?></div>
+                                <div data-role="content" class="filter-options-content">
+                                    <button type="button" class="filter-options-back">
+                                        <span><?= $escaper->escapeHtml(__('Back')) ?></span>
+                                    </button>
+                                    <h2 class="filter-options-content__title"><?= $escaper->escapeHtml(__($filter->getName())) ?></h2>
+                                    <?= /* @noEscape */ $block->getChildBlock('renderer')->render($filter) ?>
+                                </div>
+                            </div>
+                            <?php $i++; ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+
+                <div class="am_shopby_apply_filters">
+                    <div class="am-show-button -horizontal wrap">
+                        <a href="<?= $escaper->escapeUrl($block->getClearUrl()) ?>"
+                           class="button action clear filter-clear amshopby-button"><span><?= $escaper->escapeHtml(__('Clear')) ?></span></a>
+                        <button type="button" class="amshopby-button am-apply-close">
+                            <span><?= $escaper->escapeHtml(__('Show')) ?></span>
+                            <span class="am-items">(<?= (int) $block->getLayer()->getProductCollection()->getSize() ?>)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <?php if ($filtered) : ?>
+                <div class="filter-state-bar">
+                    <button type="button" class="open-filter-popup navicon-equalizer"><?= $escaper->escapeHtml(__('All filters')) ?></button>
+                    <?= $block->getChildHtml('state') ?>
+                    <div class="block-actions filter-actions">
+                        <a href="<?= $escaper->escapeUrl($block->getClearUrl()) ?>" class="action clear filter-clear"><span><?= $escaper->escapeHtml(__('Clear all')) ?></span></a>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+<?php endif; ?>

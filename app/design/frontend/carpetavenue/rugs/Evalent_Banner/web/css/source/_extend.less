@@ -1,0 +1,796 @@
+@banner__heading-desktop-size-large: 60;
+@banner__heading-desktop-size-medium: 40;
+@banner__heading-desktop-size-small: 30;
+@banner__heading-desktop-size-xl: 70;
+@banner__heading-desktop-size-xxl: 80;
+@banner__heading-desktop-size-xxxl: 90;
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+  .cms-home {
+    .column {
+      & > .ev-banners--multiple {
+        .ev-banners__content__heading {
+          &:after {
+            display: inline-block;
+            width: 5px;
+            content: '';
+            height: 5px;
+            position: relative;
+            transform: rotate(45deg);
+          }
+        }
+          .ev-banners__link {
+              z-index: 3;
+          }
+      }
+    }
+  }
+
+  /*
+   * Custom banner styling
+   */
+  .ev-banners--single {
+    .ev-banners__link {
+      z-index: 3;
+    }
+    // Sale background styling
+    &.summer-sale, &.bg-green {
+      .ev-banners__content {
+        background: rgba(107, 128, 9, 0.8);
+        padding: 15px;
+      }
+    }
+    // Sale font size
+    &.sale {
+      .ev-banners__content {
+        .ev-banners__content__description {
+          //.lib-font-size(30);
+        }
+        h1, h2, h3 {
+          //.lib-font-size(41);
+          //margin-bottom: 0;
+        }
+      }
+    }
+    &.smaller-text {
+      .ev-banners__content {
+        h1, h2, h3 {
+          //.lib-font-size(22);
+          //line-height: 2.5rem;
+          margin-bottom: 1.5rem;
+        }
+      }
+    }
+    &.smaller-text-2 {
+      .ev-banners__content {
+        h1, h2, h3 {
+          //.lib-font-size(30);
+          //line-height: 2.5rem;
+          margin-bottom: 1.5rem;
+        }
+      }
+    }
+
+    .ev-banners__content__heading {
+      span.subtitle {
+        font-size: 85%;
+      }
+    }
+
+
+    // Custom Buttons styling (general)
+    &.no-border-button, &.bg-green {
+      .ev-banners__content__button {
+        .lib-font-size(14);
+        font-weight: 500;
+        margin: 0 auto;
+
+        /*&:after {
+          width: 5px;
+          height: 5px;
+          display: inline-block;
+          top: -1px;
+          content: '';
+          left: 5px;
+          position: relative;
+          transform: rotate(45deg);
+        }*/
+      }
+    }
+
+    // Button with no border/background
+    &.no-border-button {
+      .ev-banners__content__button {
+        border: 0;
+        background: transparent;
+        .lib-css(color, #fff);
+
+        &:hover {
+          border: 0;
+          background: transparent;
+        }
+
+        /*&:after {
+          border-top: 1px solid #fff;
+          border-right: 1px solid #fff;
+        }*/
+      }
+    }
+
+    // Button with green text
+    &.bg-green {
+      .ev-banners__content__button {
+        .lib-css(color, #6B8009);
+
+        /*&:after {
+          border-top: 1px solid #6B8009;
+          border-right: 2px solid #6B8009;
+        }*/
+      }
+    }
+
+    // Button with square corners
+    &.square-button {
+      .ev-banners__content__button {
+        border-radius: 0;
+      }
+    }
+
+    // Button with rounded corners
+    &.rounded-button {
+      .ev-banners__content__button {
+        border-radius: 6rem;
+      }
+    }
+
+    &.yellow-button {
+      .ev-banners__content__button {
+        color: black;
+        margin-bottom: 1rem;
+        display: inline-block;
+        font-weight: 700;
+        background-color: #FEAE00;
+      }
+
+    }
+
+    // Text with shadow
+    &.text-shadow {
+      h1, h2, h3, h4, .ev-banners__content__description {
+        text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7);
+      }
+      .ev-banners__content__description {
+        line-height: 1;
+        font-weight: 700;
+      }
+    }
+  }
+
+  // Custom template: Winter sale 2021
+  .ev-banners--winter-sale-2021 {
+    .content-theme {
+      &--light, &--dark {
+        .ev-banners__content {
+          background: transparent !important;
+
+          &__heading {
+            text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 0.9rem;
+            line-height: 0.9;
+          }
+
+          &__button {
+            border-radius: 0 !important;
+            background-color: rgba(204,153,51,0.8);
+            margin-top: 0;
+            font-weight: 700 !important;
+          }
+        }
+      }
+
+      &--light {
+        .ev-banners__content {
+          &__heading {
+            color: #daa520;
+          }
+        }
+      }
+      &--dark {
+        .ev-banners__content {
+          &__heading, &__button:not(:hover) {
+            color: #000;
+          }
+          &__button {
+            box-shadow: 0px 0px 2px rgba(0,0,0,0.9);
+          }
+        }
+      }
+    }
+
+    &.green-button {
+      .content-theme {
+        &--light, &--dark {
+          .ev-banners__content {
+            &__button {
+              background-color: rgba(1,131,0,0.75);
+            }
+          }
+        }
+      }
+    }
+
+    &.yellow-button {
+      .content-theme {
+        &--light, &--dark {
+          .ev-banners__content {
+            &__button {
+              background-color: rgba(204,153,51,.8);
+            }
+          }
+        }
+      }
+    }
+    &.white-button {
+      .content-theme {
+        &--light, &--dark {
+          .ev-banners__content {
+            &__button {
+              background-color: rgba(255,255,255,.85);
+              padding: 7px 12px;
+            }
+          }
+        }
+      }
+    }
+    &.white-text {
+      .content-theme {
+        &--light {
+          .ev-banners__content {
+            &__heading {
+              color: #fff;
+              text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.85);
+            }
+          }
+        }
+      }
+    }
+
+    h1.ev-banners__content__heading {
+      &.size--desktop--large {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+    .ev-banners--single.sale {
+        .ev-banners__content__heading {
+           /*
+            &.size--mobile--large {
+                font-size: 6rem;
+            }
+            &.size--mobile--medium {
+                font-size: 4rem;
+            }
+            &.size--mobile--small {
+                font-size: 3rem;
+            }
+            */
+
+            position: relative;
+            font-weight: 800;
+
+        }
+
+        .content-theme {
+            &--gold {
+                .ev-banners__content__heading {
+                    background: radial-gradient(ellipse farthest-corner at right bottom, #FEDB37 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%), radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #FFFFAC 8%, #D1B464 25%, #5d4a1f 62.5%, #5d4a1f 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    text-shadow: none;
+                    line-height: 1;
+                }
+                .ev-banners__content {
+                    &__button {
+                        background: radial-gradient(ellipse farthest-corner at right bottom, #FEDB37 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%),
+                        radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #FFFFAC 8%, #D1B464 25%, #5d4a1f 62.5%, #5d4a1f 100%);
+                        box-shadow: -5px 5px 10px #000000;
+                        color: #000000;
+                    }
+                    &__description,
+                    &__heading--secondary {
+                        background: linear-gradient(-45deg, #efbb4e, #fffbd4, #efbb4e, #fffbd4, #AA771C);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        color: #fff;
+                        text-shadow: none;
+                        position: relative;
+                    }
+
+                    &__heading,
+                    &__description,
+                    &__heading--secondary {
+                        &:after {
+                            background: none;
+                            content: attr(data-heading) / "";
+                            left: 0;
+                            right: 0;
+                            top: 0;
+                            z-index: -1;
+                            position: absolute;
+                            text-shadow: -3px 3px 3px #000000;
+                        }
+                    }
+                }
+            }
+        }
+
+        .ev-banners__content {
+            .ev-banners__content {
+
+                &__button {
+                    border-radius: 0;
+                    //font-size: 2.2rem;
+                    padding: 5px 20px;
+                    box-sizing: border-box;
+                    font-weight: 800;
+                }
+
+                &__heading--secondary {
+                    //font-size: 2rem;
+                    font-weight: 300;
+                }
+                &__description {
+                    //font-size: 2rem;
+                    //margin-bottom: 0;
+                   // margin-top: 2rem;
+                }
+            }
+        }
+    }
+}
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+  .ev-banners {
+    .col-sm-6 {
+      .ev-banners__content {
+        h2 {
+          .lib-font-size(13px);
+          margin: 0 0 0.1rem;
+          font-weight: bold;
+        }
+      }
+    }
+
+      img {
+          width: 100%;
+          height: auto;
+      }
+
+    picture {
+      width: 100%;
+
+      img {
+        width: 100%;
+      }
+    }
+
+    .ev-banners__content {
+      h2 {
+        //.lib-font-size(20px);
+        font-weight: bold;
+        margin: 0 0 1rem;
+      }
+    }
+
+    .align--desktop--bottom-center {
+      .inner-wrapper {
+        display: block;
+      }
+
+      .ev-banners__content {
+        position: relative;
+        text-align: center;
+
+        h2 {
+          //.lib-font-size(15px);
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  // Custom custom custom
+  .banner-start-top {
+    .ev-banners__content {
+      &__heading {
+        text-shadow: 0 0 5px @color-black;
+        margin-bottom: 0.5rem !important;
+      }
+      &__description {
+        margin-bottom: 15px;
+        text-shadow: 0 0 5px @color-black;
+      }
+      &__button {
+        text-shadow: 0 0 5px @color-black;
+        box-shadow: 0 0 3px @color-black;
+      }
+    }
+  }
+
+  .ev-banners--single {
+    // Sale background styling
+    &.summer-sale, &.bg-green {
+      .align--mobile--top-left {
+        .ev-banners__content {
+          left: 10px;
+          top: 10px;
+        }
+      }
+    }
+
+    // Colored buttons
+    &.yellow-button, &.green-button {
+      .ev-banners__content {
+        padding: 0.5rem 0.75rem;
+
+        &__description {
+          margin-bottom: 0.75rem;
+          margin-top: -0.5rem;
+          .lib-font-size(30);
+
+        }
+        &__button {
+
+          .lib-font-size(21);
+          padding: 6px 24px;
+          font-weight: 700;
+        }
+      }
+    }
+
+    &.yellow-button {
+      .ev-banners__content {
+        &__button {
+          background-color: #FEAE00;
+        }
+      }
+    }
+
+    &.green-button {
+      .ev-banners__content {
+        &__button {
+          background-color: rgba(1,131,0,0.75)
+        }
+      }
+    }
+
+    // Text with shadow
+    &.text-shadow {
+      h1, h2, h3, h4 {
+        font-weight: 700;
+        //.lib-font-size(41);
+        text-shadow: 0px 0px 5px rgba(0,0,0,0.7);
+      }
+      .ev-banners__content__description {
+        //margin-bottom: 0.75rem;
+        //margin-top: -0.5rem;
+        text-shadow: 0px 0px 5px rgba(0,0,0,0.7);
+      }
+      .ev-banners__content__button {
+        padding: 6px 24px;
+        //.lib-font-size(21);
+      }
+    }
+  }
+
+
+  // Custom template: Winter sale 2021
+  .ev-banners--winter-sale-2021 {
+    .content-theme {
+      &--light,
+      &--dark {
+        .ev-banners__content {
+
+          &__heading {
+            font-size: 4.1rem;
+          }
+
+          &__button {
+            font-size: 1.8rem;
+
+            &:after {
+              /*
+              display: inline-block;
+              border-top: 1px solid #000 !important;
+              border-right: 1px solid #000 !important;
+              width: 5px;
+              height: 5px;
+              content: '';
+              position: relative;
+              transform: rotate(45deg);
+              top: -2px;
+              left: 2px;
+              */
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+
+  .cms-home {
+    .column {
+      & > .ev-banners--single:not(.custom) {
+        .ev-banners__content {
+          background: rgba(42, 45, 52, 0.8);
+          padding-top: 15px;
+
+          .ev-banners__content__description {
+            font-size: 18px;
+          }
+
+          .ev-banners__content__button {
+            border-color: #fff;
+            border-radius: 5px;
+            padding: 10px 17px;
+            font-size: 16px;
+            font-weight: bold;
+
+            &:after {
+              display: inline-block;
+              width: 5px;
+              top: -1px;
+              height: 5px;
+              border-top: 1px solid #fff;
+              border-right: 1px solid #fff;
+              content: '';
+              left: 5px;
+              position: relative;
+              transform: rotate(45deg);
+            }
+          }
+        }
+      }
+      & > .ev-banners--single {
+        .align--desktop--bottom-left {
+          .ev-banners__content {
+            bottom: 25px;
+            left: 25px;
+          }
+        }
+      }
+    }
+  }
+
+  .ev-banners--single {
+    // Sale font size
+    &.sale {
+      .ev-banners__content {
+        .ev-banners__content__description {
+          //.lib-font-size(40);
+         // margin-bottom: 0;
+        }
+        h1, h2, h3 {
+          //.lib-font-size(60);
+          line-height: .9;
+        }
+      }
+    }
+    // Button with no border/background
+    &.no-border-button {
+      .ev-banners__content__button {
+        .lib-font-size(30);
+
+        /*&:after {
+          width: 10px;
+          height: 10px;
+        }*/
+      }
+    }
+
+    &.bg-green {
+      .ev-banners__content__button {
+        .lib-font-size(30);
+        padding-right: 15px;
+
+        /*&:after {
+          width: 12px;
+          height: 12px;
+          left: 0;
+          border-top: 2px solid #6B8009;
+          border-right: 2px solid #6B8009;
+        }*/
+      }
+    }
+
+    // Colored buttons
+    &.yellow-button, &.green-button {
+      .ev-banners__content {
+        padding: 0.5rem 0.75rem;
+
+        h1, h2, h3 {
+          font-weight: 700;
+        }
+        &__button {
+          .lib-font-size(30);
+          padding: 7px 25px;
+          margin-top: 0;
+        }
+      }
+    }
+
+    // Text with shadow
+    &.text-shadow {
+      .ev-banners__content__description {
+        //margin-bottom: 1rem;
+        //margin-top: -1rem;
+      }
+    }
+
+    // Button with square corners
+    &.square-button {
+      .ev-banners__content__button {
+        border-radius: 0;
+      }
+    }
+
+    &.winter-sale, &.winter-sale.sale {
+      .ev-banners__content__description {
+        .lib-font-size(60);
+      }
+    }
+  }
+
+  .ev-banners {
+    .col-sm-6 {
+      .ev-banners__content {
+        h2 {
+          .lib-font-size(20px);
+          font-weight: 700;
+          margin: 0 0 0.2rem;
+        }
+      }
+    }
+
+      img {
+          width: 100%;
+          height: auto;
+      }
+
+    //
+    //  Heading size (desktop)
+    //  ---------------------------------------------
+    &__content__heading {
+      &.size--desktop--small {
+        .lib-font-size(@banner__heading-desktop-size-small);
+      }
+      &.size--desktop--medium {
+        .lib-font-size(@banner__heading-desktop-size-medium);
+      }
+      &.size--desktop--large {
+        .lib-font-size(@banner__heading-desktop-size-large);
+      }
+    }
+
+    picture {
+      width: 100%;
+
+      img {
+        width: 100%;
+      }
+    }
+
+    .ev-banners__content {
+      h2 {
+        .lib-font-size(40px);
+        font-weight: 700;
+        margin: 0 0 1rem;
+      }
+    }
+
+    .ev-banners__content__description {
+    }
+
+    .align--desktop--bottom-center {
+      .inner-wrapper {
+        display: block;
+      }
+
+      .ev-banners__content {
+        position: relative;
+        text-align: center;
+
+        h2 {
+          .lib-font-size(18px);
+          font-weight: 700;
+          margin: 0 0 1rem;
+        }
+      }
+    }
+  }
+
+
+
+
+  // Custom template: Winter sale 2021
+  .ev-banners--winter-sale-2021 {
+    .content-theme {
+      &--light,
+      &--dark {
+        .ev-banners__content {
+          &__heading {
+            font-size: 7rem;
+          }
+
+          &__button {
+            font-size: 2.8rem !important;
+
+            &:after {
+              border-top: 2px solid #000 !important;
+              border-right: 2px solid #000 !important;
+              left: 5px;
+              top: -3px !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+    .ev-banners--single.sale {
+        .ev-banners__content {
+            /*.ev-banners__content__heading {
+                &.size--desktop--small{
+                    font-size: 4.5rem;
+                }
+                &.size--desktop--medium {
+                    font-size: 6rem;
+                }
+                &.size--desktop--large {
+                    font-size: 7rem;
+                }
+                &.size--desktop--xl {
+                    font-size: 8rem;
+                }
+                &.size--desktop--xxl {
+                    font-size: 9rem;
+                }
+                &.size--desktop--xxxl {
+                    font-size: 10rem;
+                }
+            }
+
+            .ev-banners__content {
+
+                &__heading--secondary {
+                    font-size: 4rem;
+                }
+                &__button {
+                    font-size: 5rem;
+                }
+                &__description {
+                    font-size: 3rem;
+                }
+            }*/
+
+        }
+    }
+}

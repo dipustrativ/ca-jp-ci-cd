@@ -1,0 +1,156 @@
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+  .view-de:before {
+    background-image: url('@{baseDir}images/flags/de.svg');
+  }
+  .view-en:before {
+    background-image: url('@{baseDir}images/flags/en.svg');
+  }
+  .view-es:before {
+    background-image: url('@{baseDir}images/flags/es.svg');
+  }
+  .view-fr:before {
+    background-image: url('@{baseDir}images/flags/fr.svg');
+  }
+  .view-se:before {
+    background-image: url('@{baseDir}images/flags/se.svg');
+  }
+  .view-dk:before {
+    background-image: url('@{baseDir}images/flags/dk.svg');
+  }
+  .view-no:before {
+    background-image: url('@{baseDir}images/flags/no.svg');
+  }
+  .view-pl:before {
+    background-image: url('@{baseDir}images/flags/pl.svg');
+  }
+  .view-nl:before {
+    background-image: url('@{baseDir}images/flags/nl.svg');
+  }
+  .view-fi:before {
+    background-image: url('@{baseDir}images/flags/fi.svg');
+  }
+  .view-it:before {
+    background-image: url('@{baseDir}images/flags/it.svg');
+  }
+  .view-pt:before {
+    background-image: url('@{baseDir}images/flags/pt.svg');
+  }
+  .view-jp:before {
+    background-image: url('@{baseDir}images/flags/jp.svg');
+  }
+  .view-hu:before {
+    background-image: url('@{baseDir}images/flags/hu.svg')
+  }
+  .view-ch_de:before {
+    background-image: url('@{baseDir}images/flags/ch.svg')
+  }
+  .view-ch_fr:before {
+    background-image: url('@{baseDir}images/flags/ch.svg')
+  }
+
+  .page-header {
+    .switcher.language {
+      .options {
+        ul.dropdown {
+          a {
+              margin-left: 37px;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+  .nav-sections {
+    .switcher {
+      .label {
+        display: inline;
+        margin-right: 15px;
+        font-weight: @font-weight__bold;
+      }
+    }
+  }
+
+  .switcher-language {
+    .switcher-option {
+      position: relative;
+
+      &:before {
+        position: absolute;
+        top: 10px;
+        left: 2px;
+        width: 24px;
+        height: 20px;
+        background-size: 100%;
+        background-repeat: no-repeat;
+        content: "";
+      }
+    }
+
+    .switcher-trigger > strong {
+      position: relative;
+
+      &:before {
+        position: absolute;
+        left: -35px;
+        top: 2px;
+        width: 30px;
+        height: 20px;
+        background-size: 80%;
+        background-repeat: no-repeat;
+        content: "";
+      }
+    }
+  }
+}
+
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+  .switcher-language {
+    .switcher-option {
+      position: relative;
+      &:before {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        width: 24px;
+        height: 20px;
+        background-size: 100%;
+        background-repeat: no-repeat;
+        content: "";
+      }
+    }
+
+    .switcher-trigger > strong {
+      position: relative;
+      left: -45px;
+      &:before {
+        position: absolute;
+        left: 8px;
+        width: 27px;
+        height: 18px;
+        background-size: 100%;
+        background-repeat: no-repeat;
+        content: "";
+      }
+
+      & > span {
+        display: none;
+      }
+    }
+  }
+}

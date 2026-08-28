@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ */
+-->
+<view xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/view.xsd">
+    <media>
+        <images module="Magento_Catalog">
+            <!-- Related products carousel thumbnails -->
+            <image id="related_products_carousel_list" type="thumbnail">
+                <width>175</width>
+                <height>175</height>
+            </image>
+            <!-- Portrait rug image on the category product grid (matches reference theme) -->
+            <image id="category_page_grid" type="small_image">
+                <width>560</width>
+                <height>750</height>
+            </image>
+            <image id="category_page_list" type="small_image">
+                <width>560</width>
+                <height>750</height>
+            </image>
+            <!-- PDP gallery sizes (matches reference theme; MagicGallery reads product_page_image_medium) -->
+            <image id="product_base_image" type="image">
+                <width>265</width>
+                <height>265</height>
+            </image>
+            <image id="product_page_image_large" type="image">
+                <aspect_ratio>true</aspect_ratio>
+                <frame>false</frame>
+            </image>
+            <image id="product_page_image_medium" type="image">
+                <width>1000</width>
+                <height>1380</height>
+            </image>
+            <image id="product_page_image_small" type="thumbnail">
+                <width>320</width>
+                <height>280</height>
+            </image>
+            <image id="product_page_main_image" type="image">
+                <width>400</width>
+                <height>600</height>
+            </image>
+        </images>
+    </media>
+</view>

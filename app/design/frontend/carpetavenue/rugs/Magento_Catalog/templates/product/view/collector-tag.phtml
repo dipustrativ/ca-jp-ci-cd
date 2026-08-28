@@ -1,0 +1,25 @@
+<?php
+
+/** @var Magento\Catalog\Block\Product\View $block */
+
+$product = $block->getProduct();
+$productId = (int)$product->getId();
+$viewModel = $block->getData('collector_view_model');
+
+if ($viewModel && $viewModel->isCollectorProduct($productId)): ?>
+    <div class="collector-tag">
+        COLLECTORS
+     </div>
+<?php endif; ?>
+
+
+<style>
+    .collector-tag {
+        box-sizing: border-box;
+        color: #000000 !important;
+        /*background: #cfaf46 !important;*/
+    }
+    .collector-tag img {
+        height: 12px;
+    }
+</style>

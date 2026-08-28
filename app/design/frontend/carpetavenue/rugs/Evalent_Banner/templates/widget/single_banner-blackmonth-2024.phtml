@@ -1,0 +1,101 @@
+<?php
+use \Evalent\Banner\Api\Data\BannerInterface;
+
+/** @var \Evalent\Banner\Block\Widget\SingleBanner $block   */
+
+/** @var \Evalent\Banner\Api\Data\BannerInterface $banner */
+$banner = $block->getBanner();
+$_bannerDisplayMode = $block->getDisplayMode();
+$_bannerCssClass = $block->getCssClass();
+$_bannerMarginTopDesktop = $block->getData('margin_top_desktop');
+$_bannerMarginBottomDesktop = $block->getData('margin_bottom_desktop');
+$_bannerMarginTopMobile = $block->getData('margin_top_mobile');
+$_bannerMarginBottomMobile = $block->getData('margin_bottom_mobile');
+$_bannerButtonContentTheme = $banner->getButtonContentTheme();
+$_bannerButtonStyle = $banner->getButtonStyle();
+$_bannerHeading = $banner->getHeading();
+$_bannerHeading2 = $banner->getHeadingSecondary();
+$_bannerDescription = $banner->getDescription();
+$_bannerButtonText = $banner->getButtonText();
+$_bannerLinkUrl = $banner->getBannerLinkUrl();
+$_bannerAnimation = $banner->getAnimationEffect();
+$_bannerAlignDesktop = $banner->getContentAlignDesktop();
+$_bannerAlignMobile = $banner->getContentAlignMobile();
+$_bannerTextAlignDesktop = $banner->getTextAlignDesktop();
+$_bannerTextAlignMobile = $banner->getTextAlignMobile();
+$_bannerImageDesktop = $banner->getImageUrl(BannerInterface::DESKTOP_IMAGE);
+$_bannerImageMobile = $banner->getImageUrl(BannerInterface::MOBILE_IMAGE);
+$_bannerLinkNewWindow = $banner->getBannerLinkUrlNewWindow();
+$_bannerButtonEnabledDesktop = $banner->getButtonEnabledDesktop();
+$_bannerButtonEnabledMobile = $banner->getButtonEnabledMobile();
+$_bannerHeadingSizeDesktop = $banner->getHeadingSizeDesktop();
+$_bannerHeadingSizeMobile = $banner->getHeadingSizeMobile();
+$_bannerHeadingTag = $banner->getHeadingTag();
+// Set default heading tag if empty
+if(!isset($_bannerHeadingTag) || empty($_bannerHeadingTag)): $_bannerHeadingTag = "h2"; endif;
+?>
+
+<div class="ev-banners ev-banners--blackmonth ev-banners--single ev-banners-display--<?= $_bannerDisplayMode ? $_bannerDisplayMode : 'default' ?> margin-top--desktop--<?= $_bannerMarginTopDesktop ?> margin-bottom--desktop--<?= $_bannerMarginBottomDesktop ?> margin-top--mobile--<?= $_bannerMarginTopMobile ?> margin-bottom--mobile--<?= $_bannerMarginBottomMobile ?> <?= $_bannerCssClass; ?>">
+
+    <div class="ev-banners--single__banner <?= 'button-style--' . $_bannerButtonStyle . ' content-theme--' . $_bannerButtonContentTheme ?> animation--<?= $_bannerAnimation ?> align--desktop--<?= $_bannerAlignDesktop ?> align--mobile--<?= $_bannerAlignMobile ?> text-align--desktop--<?= $_bannerTextAlignDesktop ?> text-align--mobile--<?= $_bannerTextAlignMobile ?>">
+
+        <div class="inner-wrapper">
+            <?php if ($_bannerLinkUrl) : ?>
+                <a href="<?= $_bannerLinkUrl ?>" class="ev-banners__link" target="<?= $_bannerLinkNewWindow === '1' ? '_blank' : '_self' ?>"></a>
+            <?php endif; ?>
+
+            <?php /*
+            <picture>
+                <?php if ($_bannerImageMobile !== null) : ?>
+                    <source media="(max-width: 768px)" srcset="<?= $_bannerImageMobile ?>">
+                <?php endif; ?>
+
+                <?php if ($_bannerImageDesktop !== null) : ?>
+                    <source media="(min-width: 769px)" srcset="<?= $_bannerImageDesktop ?>">
+                    <img src="<?= $_bannerImageDesktop ?>" alt="Banner image">
+                <?php endif; ?>
+            </picture>
+ */ ?>
+
+            <?php if ($_bannerImageMobile !== null && $_bannerImageDesktop !== null) : ?>
+
+                <img class="lazy-load" data-original="<?= $_bannerImageDesktop ?>" src="<?= $this->getViewFileUrl('Evalent_Banner::images/lazyload_banner.png') ?>" data-original-srcset="<?= $_bannerImageMobile . ' 768w, ' . $_bannerImageDesktop ?>"  alt="Banner image">
+
+            <?php elseif ($_bannerImageMobile == null && $_bannerImageDesktop !== null): ?>
+
+                <img class="lazy-load" src="<?= $this->getViewFileUrl('Evalent_Banner::images/lazyload_banner.png') ?>" data-original="<?= $_bannerImageDesktop ?>" alt="Banner image">
+
+            <?php endif; ?>
+
+            <div class="ev-banners__content">
+                <?php if ($_bannerHeading2) : ?>
+                    <h3 class="ev-banners__content__heading--secondary" data-heading="<?= $_bannerHeading2 ?>">
+                    <?= $_bannerHeading2 ?>
+                    </h3>
+                <?php endif; ?>
+
+                <?php if ($_bannerHeading) : ?>
+                    <<?= $_bannerHeadingTag ?> class="ev-banners__content__heading size--desktop--<?= $_bannerHeadingSizeDesktop ?> size--mobile--<?= $_bannerHeadingSizeMobile ?>" data-heading="<?= $_bannerHeading ?>">
+                        <?= $_bannerHeading ?>
+                    </<?= $_bannerHeadingTag ?>>
+                <?php endif; ?>
+
+                <?php if ($_bannerButtonText) : ?>
+                    <a class="ev-banners__content__button <?= !$_bannerButtonEnabledDesktop ? 'hidden-m' : '' ?> <?= !$_bannerButtonEnabledMobile ? 'hidden-xs' : '' ?>" href="<?= $_bannerLinkUrl ? $_bannerLinkUrl : '#' ?>" target="<?= $_bannerLinkNewWindow === '1' ? '_blank' : '_self' ?>">
+                        <span>
+                            <?= $_bannerButtonText ?>
+                        </span>
+                    </a>
+                <?php endif; ?>
+
+                <?php if ($_bannerDescription) : ?>
+                    <p class="ev-banners__content__description" data-heading="<?= $_bannerDescription ?>">
+                        <?= $_bannerDescription ?>
+                    </p>
+                <?php endif; ?>
+            </div>
+        </div>
+
+    </div>
+
+</div>

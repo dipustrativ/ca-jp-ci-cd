@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Product detail page — ported from the reference carpetavenue theme
+ * (Evalent/carpet) without Trustpilot, RuleBanner, PriceHistory,
+ * ProductionType and ProductContactForm blocks.
+ */
+-->
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <remove src="mage/gallery/gallery.min.css"/>
+        <remove src="mage/gallery/gallery.css"/>
+        <remove src="mage/calendar.css"/>
+    </head>
+    <body>
+        <referenceBlock name="head.additional">
+            <block class="Magento\Catalog\Block\Product\View"
+                   name="product.image.preload"
+                   template="Magento_Catalog::product/image_preload.phtml"
+                   before="-"/>
+        </referenceBlock>
+
+        <referenceContainer name="product.info.main">
+            <block class="Magento\Catalog\Block\Product\View"
+                   name="product.info.sku.ean"
+                   template="Magento_Catalog::product/view/sku-ean.phtml"/>
+            <container name="container.size.attribute" htmlTag="div" htmlClass="size-product__attribute">
+                <block name="size.attribute"
+                       class="Magento\Catalog\Block\Product\View"
+                       template="Magento_Catalog::product/view/size-attr.phtml"/>
+            </container>
+            <container name="ups-list" htmlTag="div" htmlClass="product-ups-list">
+                <block class="Magento\Cms\Block\Block" name="product.ups.info">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">product-ups-list</argument>
+                    </arguments>
+                </block>
+            </container>
+            <block class="Magento\Catalog\Block\Product\View\Description"
+                   name="product.info.carpientdescription"
+                   template="Magento_Catalog::product/view/attribute.phtml">
+                <arguments>
+                    <argument name="at_call" xsi:type="string">getCarpientDescription</argument>
+                    <argument name="at_code" xsi:type="string">carpient_description</argument>
+                    <argument name="css_class" xsi:type="string">carpient_description</argument>
+                    <argument name="at_label" xsi:type="string">default</argument>
+                    <argument name="add_attribute" xsi:type="string">itemprop="carpientdescription"</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Catalog\Block\Product\View\Description"
+                   name="product.info.main.catalog_inventory_stockqty_unique"
+                   template="Magento_CatalogInventory::stockqty/unique.phtml"
+                   after="product.info.price"/>
+        </referenceContainer>
+
+        <referenceContainer name="product.info.media">
+            <!-- Sale flag if applicable -->
+            <block name="product.discount.precent"
+                   class="Magento\Catalog\Block\Product\View"
+                   template="Magento_Catalog::product/sale-flag.phtml"/>
+
+            <container name="cms.block.bargain" htmlTag="div" htmlClass="info-bargain" after="-">
+                <block name="bargain.info"
+                       class="Magento\Catalog\Block\Product\View"
+                       template="Magento_Catalog::product/view/bargain-info.phtml">
+                    <block class="Magento\Cms\Block\Block" name="product.info.bargain">
+                        <arguments>
+                            <argument name="block_id" xsi:type="string">product-info-bargain</argument>
+                        </arguments>
+                    </block>
+                </block>
+            </container>
+        </referenceContainer>
+
+        <referenceContainer name="content">
+            <container name="product.info.main.after" htmlTag="div" htmlClass="product-info-details" after="product.media"/>
+            <container name="product.bottom.holder" htmlTag="div" after="-" htmlClass="product-bottom_holder"/>
+        </referenceContainer>
+
+        <!-- Details wrapper (description + Specifications) renders under the
+             gallery as its own column in .column.main; flex order in
+             _product-view.less places it below the media, after the buy box. -->
+
+        <move element="product.info.description" destination="product.info.main.after" before="-"/>
+        <move element="product.info.carpientdescription" destination="product.info.main.after" after="product.info.description"/>
+        <move element="product.attributes.title" destination="product.info.main.after" after="product.info.carpientdescription"/>
+        <move element="product.attributes" destination="product.info.main.after" after="product.attributes.title"/>
+        <move element="product.description" destination="product.info.main.after" after="product.attributes"/>
+        <move element="cms.block.bargain" destination="product.info.main" after="product.info.stock.sku"/>
+        <move element="product.discount.precent" destination="product.info.main" before="product.info.price"/>
+
+        <referenceBlock name="product.info.overview" remove="true" />
+
+        <referenceContainer name="product.info.stock.sku">
+            <block name="product.info.carpient"
+                   class="Magento\Catalog\Block\Product\View"
+                   template="Magento_Catalog::product/view/carpient-tag.phtml"/>
+            <block name="product.info.collector"
+                   class="Magento\Catalog\Block\Product\View"
+                   template="Magento_Catalog::product/view/collector-tag.phtml"/>
+        </referenceContainer>
+
+        <referenceBlock name="product.info.details">
+            <referenceBlock name="product.attributes">
+                <arguments>
+                    <argument translate="true" name="title" xsi:type="string">Specifications</argument>
+                    <argument name="sort_order" xsi:type="number">10</argument>
+                </arguments>
+            </referenceBlock>
+            <referenceBlock name="product.info.description">
+                <arguments>
+                    <argument name="title" translate="true" xsi:type="string">Description</argument>
+                    <argument name="sort_order" xsi:type="number">20</argument>
+                </arguments>
+            </referenceBlock>
+        </referenceBlock>
+
+        <referenceBlock name="product.attributes">
+            <block class="Magento\Catalog\Block\Product\View\Description"
+                   name="product.attribute.oeko"
+                   template="Magento_Catalog::product/view/oeko.phtml"
+                   after="-"/>
+        </referenceBlock>
+
+        <move element="product.info.social" destination="product.info.form.content" after="-"/>
+        <!-- Product name (page title) first inside product-info-main -->
+        <move element="page.main.title" destination="product.info.main" before="-"/>
+        <move element="product.info.sku.ean" destination="product.info.main" before="page.main.title"/>
+        <move element="container.size.attribute" destination="product.info.main" after="page.main.title"/>
+        <move element="product.info.stock.sku" destination="product.info.main" before="product.info.price"/>
+        <move element="product.info.details" destination="product.bottom.holder" before="-"/>
+        <move element="content.aside" destination="product.bottom.holder" after="-"/>
+
+        <referenceBlock name="product.info.sku" remove="true"/>
+        <referenceBlock name="product.info.type" remove="true"/>
+        <!-- No product reviews: summary link + reviews tab + form -->
+        <referenceBlock name="product.info.review" remove="true"/>
+        <referenceBlock name="reviews.tab" remove="true"/>
+        <referenceBlock name="product.review.form" remove="true"/>
+
+        <!-- Breadcrumbs after header (match category page): keep in page.top -->
+        <move element="breadcrumbs" destination="page.top" after="-"/>
+    </body>
+</page>

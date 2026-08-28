@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <referenceBlock name="guest.customer.wishlist.items">
+
+        <!-- Adding sale flag to wishlist -->
+        <block class="BelVG\GuestWishlist\Block\Wishlist\Item\Column"
+               name="guest.customer.wishlist.item.sale"
+               template="BelVG_GuestWishlist::sale-flag.phtml"
+               after="guest.customer.wishlist.item.image"
+               before="guest.customer.wishlist.item.name"
+               cacheable="false"/>
+
+        <!-- Adding size info to wishlist -->
+        <block class="BelVG\GuestWishlist\Block\Wishlist\Item\Column"
+               name="guest.customer.wishlist.item.size"
+               template="BelVG_GuestWishlist::size.phtml"
+               after="guest.customer.wishlist.item.name"
+               before="guest.customer.wishlist.item.price"
+               cacheable="false" />
+
+        <block class="BelVG\GuestWishlist\Block\Wishlist\Item\Column"
+               name="guest.customer.wishlist.item.carpient"
+               template="BelVG_GuestWishlist::carpient-tag.phtml"
+               after="-"
+               cacheable="false" />
+
+    </referenceBlock>
+</page>

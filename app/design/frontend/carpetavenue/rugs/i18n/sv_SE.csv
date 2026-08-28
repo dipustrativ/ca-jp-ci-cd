@@ -1,0 +1,99 @@
+"Shopping Cart","Kundvagn"
+"The requested qty is not available","Det begärda antalet är inte tillgängligt."
+"Placed on <span class=""no-link"">%created_at</span>","Beställd den <span class=""no-link"">%created_at</span>"
+"Product that you are trying to add is not available.","Mattan du försöker lägga till är inte tillgänglig."
+"You already have an account with us.","Du har redan ett konto hos oss."
+"We hereby guarantee that the carpet supplied is %s and genuine.","Vi garanterar härmed att den levererade mattan är %s och äkta."
+"* The carpet is %s. Therefore, there may be slight variations in shape, thickness and dimensions.","* Mattan är %s. Det innebär att viss avvikelse i form, tjocklek och storlek kan förekomma."
+"Carpet Type","Matta typ"
+"Rozmiar","Storlek"
+"Hamburg, Germany","Hamburg, Tyskland"
+"SKU","Artikelnummer"
+"%1 days left","%1 dagar kvar"
+Tax,Moms
+"Proceed","Gå vidare"
+"Proceed with Other Payment Methods","Fortsätt med övriga betalsätt"
+"Gender","Kön",module,Adyen_Payment
+"-Please select-","-Vänligen välj-",module,Adyen_Payment
+"Telephone","Telefon",module,Adyen_Payment
+"We recommend the following products:","Vi rekommenderar följande produkter:"
+days,dagar
+day,dag
+Days,Dagar
+Day,Dag
+hours,timmar
+minutes,minuter
+"Personal number","Personnummer (ÅÅMMDDXXXX)"
+"Please select","Välj"
+"-- Please select --","-- Välj --"
+"Are you sure?","Är du säker?"
+"%1 - and above","%1 - kr och över"
+"Show similar carpets", "Visa liknande mattor"
+"Contact","Frågor?"
+My Wish List,Mina favoriter
+Go to Wish List,Till mina favoriter
+"Always active","Alltid aktiva"
+"Done","Klar"
+"Please select and accept your Cookies Group","Vänligen välj och godkänn din cookiegrupp"
+"All filters","Alla filter"
+"Search entire store here...","Hitta din matta här..."
+"See All","Visa alla"
+"Suggestions","Förslag"
+"No results","Inga resultat"
+VAT incl.,Inkl. moms
+Excl. Tax,Exkl. moms
+"Shop By","Filtrera"
+"Items %1-%2 of %3","Mattor %1-%2 av %3"
+"Write Us --CONTACT","Kontakta mig"
+"Send us a message --CONTACT","Lämna dina kontaktuppgifter så tar vi kontakt med dig så fort en kundtjänst medarbetare är tillgänglig."
+"I want to be called","Jag vill bli uppringd"
+"Request a callback","Jag vill bli uppringd"
+"What can we help you with?","Vad kan vi hjälpa dig med?"
+"Thanks for contacting us with your comments and questions. We'll respond to you very soon.","Tack för din förfrågan. Vi svarar dig så fort vi kan."
+"Accept all","Acceptera alla"
+"Last Day","Sista dagen"
+"Material","Material"
+"This carpet has been tested for harmful substances and is free from hazardous chemicals that could be harmful to human health. OEKO-TEX® STANDARD 100 is a globally uniform and independent testing- and certification system for textiles. All tests are conducted by independent OEKO-TEX® partner institutes.","Denna matta har testats för skadliga ämnen och är fri från farliga kemikalier som kan vara skadliga för människors hälsa. OEKO-TEX® STANDARD 100 är ett globalt enhetligt och oberoende test- och certifieringssystem för textilier. Alla tester utförs av oberoende OEKO-TEX®-partnerinstitut."
+"This carpet has been produced under OEKO-TEX® STeP certified conditions. The OEKO-TEX® STeP certification system includes a comprehensive analysis and assessment of all production conditions. The aim is the long-term implementation of environmentally friendly production processes, social working conditions and optimum health and safety.","Denna matta har producerats under OEKO-TEX® STeP-certifierade förhållanden. OEKO-TEX® STeP-certifieringssystemet inkluderar en omfattande analys och bedömning av alla produktionsförhållanden. Målet är ett långsiktigt genomförande av miljövänliga produktionsprocesser, sociala arbetsförhållanden och optimal hälsa och säkerhet."
+"Cotton is a hypoallergenic and odour-free natural material. The fibres are soft, strong and hold dyes very effectively. Carpets made of cotton are low maintenance and easy to keep clean. A cotton carpet is both a functional and versatile choice for a bathroom or kitchen as it can easily be turned if it becomes stained or dirtied.","Bomull är ett allergivänligt och luktfritt naturmaterial. Fibrerna är mjuka, starka och absorberar färgämnen mycket effektivt. Mattor gjorda av bomull är enkla att underhålla och att hålla rena. En bomullsmatta är ett funktionellt och mångsidigt val för badrum eller kök då den lätt kan vändas om den blir fläckig eller smutsig."
+"Silk is amongst the most durable of all natural fibers. The luxurious and exclusive silk yarn has a high level of elasticity, allowing it to stretch up to 20% its own length. Silk is extremely soft to the touch and has an unparalleled natural sheen and lustre. The fibres are extremely fine, making it an excellent choice of material to work with when producing refined carpets with a high level of intricate details. In some carpets the silk is merely used to accentuate certain patterns and details in the pile whereas in more exclusive carpets the entire pile (and warp at times) can be made entirely of silk.","Silke är bland det mest hållbara av alla naturfibrer. Det lyxiga och exklusiva silkegarnet är mycket elastiskt, och kan sträcka sig upp till 20 % av sin egen längd. Silke är extremt mjukt och har en enastående naturlig glans och lyster. Fibrerna är mycket tunna, vilket gör silke till ett utmärkt val vid tillverkning av finare och mer detaljrika mattor. I vissa mattor används silke endast för att framhäva särskilda detaljer och motiv i luggen, medan i de mer exklusiva mattorna kan hela luggen (och ibland även varpen) vara helt och hållet gjorda av silke."
+"Polyester is a durable synthetic fabric and an excellent choice of material for carpets. Carpets made of polyester are affordable, easy to keep clean and resistant to water-based stains. The result is a low-maintenance, soft and comfortable carpet with a nice sheen to it.","Polyester är ett slitstarkt syntetiskt fiber och ett utmärkt val av material till mattor. Mattor av polyester är prisvärda, lätta att hålla rena och resistenta mot vattenbaserade fläckar. Resultatet är en lätthanterlig, mjuk och bekväm matta med en fin glans."
+"Polypropylene (PP) is a man-made fibre with a high resistance to wear and tear. Carpets made with PP provide excellent value for money and are perfectly capable of withstanding both water and stains to a high degree. PP is an ideal alternative for people with allergies to natural materials such as wool. The carpets are easy to keep clean, have anti-static properties and are colourfast, meaning they do not fade as easily when exposed to direct sunlight.","Polypropylen (PP) är en konstgjord fiber med hög motståndskraft mot slitage. Mattor gjorda med PP är prisvärda och kan motstå både vatten och fläckar i hög grad. PP lämpar sig bra till personer med allergier mot t ex naturliga material så som ull. Mattorna är lätta att hålla rena, har antistatiska egenskaper och är färgbeständiga, vilket innebär att de inte bleknar lika lätt när de utsätts för direkt solljus."
+"Viscose, also known as rayon, is a versatile fibre renowned for its silk-like qualities. Carpets made of viscose are extremely soft and comfortable to walk on. Viscose can be used to either accentuate certain patterns and details in a carpet, or alternatively used to resemble the aesthetic splendour of a pure silk carpet, by providing a stunning sheen to the entire carpet - at a fraction of the price.","Viskos, även känt som rayon, är en mångsidig konstfiber känd för sina sidenliknande egenskaper. Mattor av viskos är extremt mjuka och sköna att gå på. Viskos kan användas för att antingen accentuera vissa mönster och detaljer i en matta, eller användas för att efterlikna den estetiska prakten hos en ren sidenmatta, genom att ge en fantastisk glans till hela mattan - till en bråkdel av priset."
+"Wool is a 100% natural and sustainable textile fiber. Carpets made of wool are highly durable and perfectly suited for daily use and heavily trafficked areas. Wool has a natural ability to resist both dirt and stains as well as being flame retardant. Since wool fibres are naturally coiled, there is a built-in resiliency that enables the pile of the carpet to rise and regain it’s shape if it gets crushed or weighted down by furniture or foot traffic.","Ull är en 100% naturlig och hållbar textilfiber. Mattor gjorda av ull är mycket slitstarka och perfekt lämpade för dagligt bruk och hård gångtrafik. Ull har en naturlig smutsavvisande effekt och har även ett naturligt flamskydd. Eftersom att ullfibrer är naturligt lindade finns det en inbyggd elasticitet som gör att mattans lugg tillåts att resa sig och återfå sin form om den möts av tyngd från t.ex möbler eller gångtrafik."
+Size,Storlek
+"Lowest price latest %1 days","Lägsta pris senaste %1 dagarna"
+"Incl. VAT","Inkl. moms"
+"Only <span>1</span> in stock","Endast <span>1</span> i lager"
+"Back to Home Page","Tillbaka till startsidan"
+"VAT Number","EU VAT nummer"
+"VAT Number:","EU VAT nummer:"
+Relevance,Relevans
+"Invoice date","Fakturadatum"
+"Reference","Referens"
+"Delivery date","Leveransdatum"
+"Your customer no","Ditt kundnummer"
+"Your contact","Din kontakt"
+"Dear Customer,<br>we hereby charge you for the delivery of following service","Kära kund,<br>vi debiterar dig härmed för leverans av följande tjänst"
+"Service date corresponds to invoice date.","A data do serviço corresponde à data da fatura."
+"Tax free export","Skattefri export"
+"Unit price","Enhetspris"
+"Total price","Totalpris"
+"piece","st"
+"pieces","st"
+"Total net","Totalt netto"
+"Total gross","Totalt brutto"
+page,sida
+of,av
+"size","storlek"
+"sizes","storlekar"
+"Size","Storlek"
+"Sizes","Storlekar"
+"colours","färger"
+"colour","färg"
+Items %1 of %2,Visar %1 av %2 mattor
+"you save","du spar"
+"To Checkout", "Till kassan"
+"Street address (street and number)","Gata och husnummer"
+"Suite, floor, c/o, etc. (optional)","C/o, avdelning, våning (valfritt)"
+"Address Line 2","Adressrad 2"

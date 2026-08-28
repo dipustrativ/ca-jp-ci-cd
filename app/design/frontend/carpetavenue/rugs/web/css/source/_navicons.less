@@ -1,0 +1,76 @@
+@navicon-font-family: "nav-icons";
+@navicon-font-path: "../fonts/navicons";
+
+@navicon-arrow-right: "\e900";
+@navicon-arrow-left: "\e901";
+@navicon-arrow-down: "\e902";
+@navicon-arrow-up: "\e903";
+@navicon-equalizer: "\e992";
+
+
+@font-face {
+    font-family: '@{navicon-font-family}';
+    src:
+        url('@{navicon-font-path}/@{navicon-font-family}.ttf') format('truetype'),
+        url('@{navicon-font-path}/@{navicon-font-family}.woff') format('woff'),
+        url('@{navicon-font-path}/@{navicon-font-family}.svg#@{navicon-font-family}') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+[class^="navicon-"], [class*=" navicon-"] {
+
+    &:before {
+        /* use !important to prevent issues with browser extensions that change fonts */
+        font-family: '@{navicon-font-family}' !important;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+
+        /* Better Font Rendering =========== */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        speak: never;
+    }
+}
+
+.navicon-arrow-right {
+    &:before {
+        content: @navicon-arrow-right;
+    }
+}
+.navicon-arrow-left {
+    &:before {
+        content: @navicon-arrow-left;
+    }
+}
+.navicon-arrow-down {
+    &:before {
+        content: @navicon-arrow-down;
+    }
+}
+.navicon-arrow-up {
+    &:before {
+        content: @navicon-arrow-up;
+    }
+}
+.navicon-equalizer {
+    &:before {
+        content: @navicon-equalizer;
+    }
+}
+
+.navicon-check {
+    .lib-icon-font(
+        @icon-checkmark,
+        @_icon-font-size: 15px
+    );
+
+    &:before {
+        font-weight: 800;
+        font-family: 'luma-icons' !important;
+    }
+}

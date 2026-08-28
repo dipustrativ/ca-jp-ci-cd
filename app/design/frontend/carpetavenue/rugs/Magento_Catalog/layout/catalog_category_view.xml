@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- Breadcrumbs last in page.top: after the callout widget, still
+             above #maincontent. The category h1 comes from category content
+             instead of the default page title. -->
+        <move element="breadcrumbs" destination="page.top" after="-"/>
+
+        <!-- Bottom category info holder (parity with base project):
+             image.cover (picture) + description with title + read-more,
+             pinned to the bottom of content. -->
+        <referenceBlock name="category.image" template="Magento_Catalog::product/view/title-image.phtml"/>
+        <referenceContainer name="category.view.container" htmlTag="div" htmlClass="category-view-holder category-view"/>
+        <move element="category.image" destination="category.view.container" before="-"/>
+        <move element="page.main.title" destination="category.description" before="-"/>
+        <move element="category.description" destination="category.view.container" after="-"/>
+        <move element="category.view.container" destination="content" after="-"/>
+    </body>
+</page>

@@ -1,0 +1,21 @@
+{
+    "name": "carpetavenue/theme-frontend-rugs",
+    "description": "CarpetAvenue Rugs frontend theme",
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "php": "~8.1.0||~8.2.0||~8.3.0||~8.4.0",
+        "magento/theme-frontend-blank": "*",
+        "magento/framework": "*"
+    },
+    "type": "magento2-theme",
+    "license": [
+        "proprietary"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ]
+    }
+}
