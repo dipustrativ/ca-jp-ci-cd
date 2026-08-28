@@ -12,22 +12,18 @@ var theme = require('../tools/files-router').get('themes'),
  * Define Combos for repetitive code.
  */
 module.exports = {
-    // The bare php command, with no preceding clean — callers that already
-    // scoped their own clean (e.g. watch:*Src, which only wipes *.less
-    // to avoid nuking published JS) use this instead of collector().
-    deployCommand: function (themeName) {
-        return 'php bin/magento dev:source-theme:deploy ' +
+    collector: function (themeName) {
+        var cmdPlus = /^win/.test(process.platform) ? ' & ' : ' && ',
+            command = 'grunt --force clean:' + themeName + cmdPlus;
+
+        command = command + 'php bin/magento dev:source-theme:deploy ' +
             theme[themeName].files.join(' ') +
             ' --type=less' +
             ' --locale=' + theme[themeName].locale +
             ' --area=' + theme[themeName].area +
             ' --theme=' + theme[themeName].name;
-    },
 
-    collector: function (themeName) {
-        var cmdPlus = /^win/.test(process.platform) ? ' & ' : ' && ';
-
-        return 'grunt --force clean:' + themeName + cmdPlus + this.deployCommand(themeName);
+        return command;
     },
 
     autopath: function (themeName, folder) {

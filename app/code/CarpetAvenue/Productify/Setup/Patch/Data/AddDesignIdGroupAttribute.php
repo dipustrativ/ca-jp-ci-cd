@@ -85,7 +85,11 @@ class AddDesignIdGroupAttribute implements DataPatchInterface
             $eavSetup->updateAttribute(Product::ENTITY, self::ATTRIBUTE_CODE, 'used_in_product_listing', 1);
         }
 
-        $attributeSetId = $eavSetup->getAttributeSetId(Product::ENTITY, self::TARGET_ATTRIBUTE_SET);
+        // Magento 2.4.9 changed getAttributeSetId() to throw a LocalizedException when the
+        // set name can't be resolved (older cores returned false). getAttributeSet() returns
+        // a falsy value when the 'Carpet' set is absent (e.g. fresh install), so the guard
+        // below still short-circuits instead of aborting the whole install.
+        $attributeSetId = $eavSetup->getAttributeSet(Product::ENTITY, self::TARGET_ATTRIBUTE_SET, 'attribute_set_id');
         if ($attributeSetId) {
             $groupId = $eavSetup->getAttributeGroupId(Product::ENTITY, $attributeSetId, self::TARGET_ATTRIBUTE_GROUP);
             if (!$groupId) {

@@ -697,8 +697,24 @@
     margin-top: 20px;
 
     a {
+        width: 40px;
+        height: 40px;
+        background: #333;
+        border-radius: 50%;
         display: inline-flex;
         align-items: center;
+        justify-content: center;
+        transition: background 0.3s;
+
+        &:hover {
+            background: #555;
+        }
+    }
+
+    svg {
+        width: 20px;
+        height: 20px;
+        fill: #fff;
     }
 
     img {

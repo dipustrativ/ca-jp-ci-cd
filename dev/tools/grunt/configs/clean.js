@@ -27,22 +27,6 @@ _.each(themes, function(theme, name) {
             }
         ]
     };
-
-    // Scoped to *.less only, so watch:*Src can force a republish of edited
-    // source without wiping published JS/fonts/images (unlike clean:<name>,
-    // which nukes the whole theme/locale directory).
-    themeOptions[name + 'Less'] = {
-        "force": true,
-        "files": [
-            {
-                "force": true,
-                "dot": true,
-                "src": [
-                    "<%= combo.autopath(\""+name+"\", path.pub ) %>**/*.less"
-                ]
-            }
-        ]
-    };
 });
 
 var cleanOptions = {

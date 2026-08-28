@@ -50,7 +50,7 @@
         <!-- Reset blank logo width so CSS controls it -->
         <referenceBlock name="logo">
             <arguments>
-                <argument name="logo_file" xsi:type="string">images/carpient_logo.svg</argument>
+                <argument name="logo_file" xsi:type="string">images/logo.svg</argument>
                 <argument name="logo_width" xsi:type="null"/>
             </arguments>
         </referenceBlock>
@@ -164,6 +164,11 @@
         <referenceBlock name="form.subscribe" template="Magento_Newsletter::subscribe.phtml"/>
 
         <referenceBlock name="footer_links" remove="true"/>
+
+        <!-- Copyright renders below the custom footer content (Magento appends the
+             default copyright/report-bugs blocks first). Report bugs is disabled
+             via design/footer/report_bugs config. -->
+        <move element="copyright" destination="footer" after="footer.content.flex"/>
 
         <!-- Remove compare (reference theme has no compare) -->
         <referenceBlock name="catalog.compare.link" remove="true"/>
