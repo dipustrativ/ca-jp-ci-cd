@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fe64cc09dd1a399c6380ef82182fc824",
+    "content-hash": "e2116ec692f7e284ecab0904b0661354",
     "packages": [
         {
             "name": "2tvenom/cborencode",
@@ -19428,6 +19428,41 @@
                 "source": "https://github.com/magento/magento-zend-pdf/tree/1.16.6"
             },
             "time": "2025-12-11T10:52:59+00:00"
+        },
+        {
+            "name": "magentoj/language-ja_jp",
+            "version": "1.1.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/magento/language-ja_JP.git",
+                "reference": "7254eab8c21be8a6cdfd3b374a962dd9bb13bd3c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/magento/language-ja_JP/zipball/7254eab8c21be8a6cdfd3b374a962dd9bb13bd3c",
+                "reference": "7254eab8c21be8a6cdfd3b374a962dd9bb13bd3c",
+                "shasum": ""
+            },
+            "require": {
+                "magento/framework": "*"
+            },
+            "type": "magento2-language",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OSL-3.0",
+                "AFL-3.0"
+            ],
+            "description": "This module provides the Japanese translations of UI strings for Adobe Commerce 2.4.8",
+            "support": {
+                "issues": "https://github.com/magento/language-ja_JP/issues",
+                "source": "https://github.com/magento/language-ja_JP/tree/push"
+            },
+            "time": "2025-04-21T05:39:47+00:00"
         },
         {
             "name": "mageplaza/module-core",

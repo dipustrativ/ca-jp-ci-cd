@@ -18,6 +18,20 @@ _.each(themes, function (theme, name) {
         ],
         'tasks': 'less:' + name
     };
+
+    // '<name>Src' watches the real theme sources under app/design instead of the
+    // published copy in pub/static. Magento's asset publisher skips a file that
+    // already exists at the destination, so once 'exec:<name>' has published a
+    // file, later edits under app/design are invisible to 'watch:<name>' — it
+    // would sit idle forever. Running exec before less republishes on each save.
+    // Path is derived from the theme entry, so renaming the theme in
+    // local-themes.js is enough; nothing here hardcodes a vendor.
+    themeOptions[name + 'Src'] = {
+        'files': [
+            'app/design/' + theme.area + '/' + theme.name + '/**/*.less'
+        ],
+        'tasks': ['exec:' + name, 'less:' + name]
+    };
 });
 
 var watchOptions = {
