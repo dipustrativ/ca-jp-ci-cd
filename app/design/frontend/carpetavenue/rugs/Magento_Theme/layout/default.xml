@@ -165,10 +165,13 @@
 
         <referenceBlock name="footer_links" remove="true"/>
 
-        <!-- Copyright renders below the custom footer content (Magento appends the
-             default copyright/report-bugs blocks first). Report bugs is disabled
-             via design/footer/report_bugs config. -->
-        <move element="copyright" destination="footer" after="footer.content.flex"/>
+        <!-- Copyright sits directly under <footer class="page-footer">, as a sibling
+             after <div class="footer content"> (core nests it inside). -->
+        <move element="copyright" destination="footer-container" after="footer"/>
+
+        <!-- Core's ifconfig="design/footer/report_bugs" defaults to 1, so removing the
+             block here is what actually keeps the "Report Bugs" link off the storefront. -->
+        <referenceBlock name="report.bugs" remove="true"/>
 
         <!-- Remove compare (reference theme has no compare) -->
         <referenceBlock name="catalog.compare.link" remove="true"/>
