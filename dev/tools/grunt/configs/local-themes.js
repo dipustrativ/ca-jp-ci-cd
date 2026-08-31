@@ -7,8 +7,8 @@
 module.exports = {
     rugs: {
         area: 'frontend',
-        name: 'carpient/rugs',
-        locale: 'en_US',
+        name: 'carpetavenue/rugs',
+        locale: 'ja_JP',
         files: [
             'css/styles-m',
             'css/styles-l'

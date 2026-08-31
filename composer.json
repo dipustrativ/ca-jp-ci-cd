@@ -28,6 +28,7 @@
         "magento/composer-dependency-version-audit-plugin": "~0.1",
         "magento/composer-root-update-plugin": "^2.0.4",
         "magento/product-community-edition": "2.4.9",
+        "magentoj/language-ja_jp": "^1.1",
         "mageplaza/module-core": "^1.5",
         "mageplaza/module-smtp": "^4.7",
         "mageworx/module-searchsuiteautocomplete": "^2.2",

@@ -596,12 +596,28 @@
     .footer.content {
         max-width: @ca-max-width;
         margin: 0 auto;
-        padding: 40px 20px 0;
+        padding: 50px 32px 0;
         border-top: 0;
+
+        .footer-logo p {
+            margin: 0px;
+        }
+        .footer-column h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        .footer-column p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #cccccc;
+            margin-bottom: 12px;
+        }
     }
 
     a {
-        color: @ca-footer-txt;
+        color: #ffffff;
         text-decoration: none;
         transition: color 0.3s;
 
@@ -631,7 +647,19 @@
         padding: 0;
 
         li {
-            margin-bottom: 10px;
+            margin-bottom: 10px !important;
+
+            a {
+                color: #cccccc;
+                text-decoration: none;
+                font-size: 14px;
+                transition: color 0.3s;
+            }
+            a:hover, a:focus{
+                color: #ffffff;
+            }
+
+
         }
     }
 }
@@ -690,18 +718,20 @@
     color: @ca-footer-txt;
 }
 
+.social-links{
+    margin-top: 20px;
+}
+
 .social-links,
 .footer-social {
     display: flex;
     gap: 15px;
-    margin-top: 20px;
-
     a {
         width: 40px;
         height: 40px;
         background: #333;
         border-radius: 50%;
-        display: inline-flex;
+        display: flex;
         align-items: center;
         justify-content: center;
         transition: background 0.3s;
@@ -711,18 +741,15 @@
         }
     }
 
-    svg {
-        width: 20px;
-        height: 20px;
-        fill: #fff;
-    }
-
     img {
-        height: 32px;
+        height: 40px;
         width: auto;
     }
 }
 
+.trust-badges{
+    margin-top: 22px;
+}
 .trust-badges img {
     height: 40px;
     width: auto;
@@ -749,7 +776,8 @@
     .footer-ship-row {
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: 0px;
+        margin-top: 25px;
     }
 
     img {
@@ -765,41 +793,83 @@
 .footer-newsletter-bottom {
     display: flex;
     justify-content: flex-start;
-    padding-bottom: 30px;
+    position: relative;
+    bottom: 70px;
 
     .footer-newsletter {
         text-align: left;
-        max-width: 420px;
+        margin-top: 30px;
         width: 100%;
     }
 
     .block.newsletter {
+        width: unset;
+        max-width: 100%;
+        float: unset !important;
+        margin-bottom: 20px;
+
+        .title{
+            margin-bottom: 5px !important;
+            display: block;
+            font-size: 2rem;
+        }
         .title strong {
-            font-size: 1.8rem;
             color: #ffffff;
+            letter-spacing: .04em;
+            font-size: 2rem;
         }
 
         .description {
             font-size: 1.4rem;
             color: @ca-footer-txt;
-            margin-bottom: 15px;
+            margin-bottom: 1.5em;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .form.subscribe {
+            -webkit-display: flex;
+            -moz-display: flex;
+            -ms-display: flex;
+            display: flex;
+        }
+
+        .field{
+            margin-right: 10px;
+            .control:before{
+                display: none;
+            }
         }
 
         input {
-            height: 48px;
-            border: 1px solid #333;
-            background: #2a2a2a;
+            height: 36px !important;
+            padding: 0 20px;
+            border: 1px solid #c2c2c2;
+            background: #ffffff;
             color: #ffffff;
+            margin: 0px;
+            border-radius: 0px;
 
             &::placeholder {
                 color: #888;
             }
         }
 
+        .action{
+            width: fit-content;
+            margin-left: 10px !important;
+            float: left;
+
+        }
+
         .action.subscribe {
-            background: #ffffff;
-            color: #1a1a1a;
+            color: #484545 !important;
+            background: #d8d6d0 !important;
+            padding: 10px 20px !important;
             border: 0;
+            border-radius: 0;
+            margin-left: -1px;
+            white-space: nowrap;
             font-weight: 600;
 
             &:hover {
@@ -813,8 +883,10 @@
 .copyright {
     background: @ca-black;
     border-top: 1px solid #333;
-    color: #888;
+    color: #ffffff;
     text-align: center;
+    display: block;
+    padding: 20px 0px 30px;
 }
 
 //
