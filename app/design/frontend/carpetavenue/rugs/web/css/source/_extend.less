@@ -1189,3 +1189,115 @@
         }
     }
 }
+
+//
+//  Full-bleed "fullscreen" banner
+//  ------------------------------------------------
+//  Evalent_Banner's base rule only caps the banner's max-width; the banner still
+//  sits inside the centered, padded `.page-main` (max-width 1440px, 15px side
+//  padding on mobile / 20px from @screen__m up), so `ev-banners-display--fullscreen`
+//  never reaches the container edges. Pull it out across that side padding so the
+//  image spans the full content width — same technique the carpient/rugs theme uses,
+//  with this theme's own padding values. Compound selector beats the base rule's
+//  single-class specificity.
+//
+.ev-banners.ev-banners-display--fullscreen {
+    // Stretch container outside the bounds of its padded parent
+    margin-left: calc(~"-100% / 2 + ( 100% - " 15px * 2 ~" ) / 2") !important;
+    margin-right: calc(~"-100% / 2 + ( 100% - " 15px * 2 ~" ) / 2") !important;
+
+    @media (min-width: @screen__m) {
+        margin-left: calc(~"-100% / 2 + ( 100% - " 20px * 2 ~" ) / 2") !important;
+        margin-right: calc(~"-100% / 2 + ( 100% - " 20px * 2 ~" ) / 2") !important;
+    }
+}
+
+//  PageBuilder wraps this banner in a `text` content-type and leaves stray
+//  whitespace/empty <p> siblings around it (a `<p>\n</p>` before the banner
+//  adds the gap at the top). They aren't descendants and aren't `:empty`
+//  (the newline is a text node), so target them by adjacency to the banner:
+//  the <p> immediately before (:has) and every <p> after it in the block.
+[data-content-type="text"] > p:has(+ .ev-banners),
+[data-content-type="text"] > .ev-banners ~ p {
+    display: none !important;
+}
+
+//  Mobile — drop the long description, show the CTA button instead (matches
+//  the compact banner design). The button ships with `hidden-xs`, which the
+//  banner module hides below @screen__m; override that here.
+@media (max-width: @screen__m) {
+    .ev-banners-display--fullscreen {
+        .ev-banners__content__description {
+            display: none !important;
+        }
+
+        .ev-banners__content__button.hidden-xs {
+            display: inline-block !important;
+        }
+    }
+}
+
+//
+//  "Why this price" pricing-features section (home-section-n1-e1 CMS block)
+//  ------------------------------------------------
+.ca-pricing-features-wrapper {
+    border-bottom: 1px solid #d1d1d1;
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+}
+
+.ca-pricing-features-container {
+    max-width: 2440px;
+    margin: 40px auto 0;
+}
+
+.ca-pricing-features-title {
+    text-align: center;
+    font-weight: 800 !important;
+    margin-bottom: 30px !important;
+    color: #000;
+    font-size: 23px !important;
+}
+
+@media (min-width: 769px) {
+    .ca-pricing-features-title {
+        margin-bottom: 20px !important;
+        font-size: 37px !important;
+    }
+
+    .ca-pricing-scroll {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 40px;
+    }
+}
+
+.ca-pricing-feature-card {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 10px;
+    align-items: center;
+}
+
+//  Mobile — swipeable horizontal snap-scroll instead of a stacked column
+@media (max-width: 768px) {
+    .ca-pricing-scroll {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        gap: 16px;
+        padding-bottom: 8px;
+
+        //  Hide the scrollbar (still swipeable)
+        scrollbar-width: none;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    .ca-pricing-card {
+        flex: 0 0 85%;
+        scroll-snap-align: start;
+    }
+}
