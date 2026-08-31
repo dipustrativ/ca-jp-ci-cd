@@ -200,6 +200,38 @@ class CategoryList extends Template implements BlockInterface
         return $return;
     }
 
+    /**
+     * Resolve the image to show for a category tile.
+     *
+     * Categories have no `thumbnail` attribute (that is a product attribute); the
+     * standard category image lives in `image`. When a category has no image set,
+     * fall back to a module placeholder so the tile is never blank.
+     *
+     * @param \Magento\Catalog\Api\Data\CategoryInterface|\Magento\Framework\DataObject $category
+     * @return string
+     */
+    public function getCategoryImageUrl($category): string
+    {
+        // `thumbnail` is the custom category image field the admin uploads to
+        // (added by Productify's AddCategoryImageAttributes patch); fall back to
+        // the core `image` attribute, then to a placeholder so tiles are never blank.
+        $image = $category->getData('thumbnail') ?: $category->getData('image');
+
+        if (!empty($image)) {
+            return $this->getImageUrl((string) $image, 200, 200);
+        }
+
+        return $this->getPlaceholderImageUrl();
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlaceholderImageUrl(): string
+    {
+        return $this->getViewFileUrl('CarpetAvenue_Widget::images/category-placeholder.svg');
+    }
+
     public function getImageUrl(string $imagePath, ?int $width = null, ?int $height = null): string
     {
         $store = $this->_storeManager->getStore();
