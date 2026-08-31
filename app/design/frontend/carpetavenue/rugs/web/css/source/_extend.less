@@ -51,6 +51,13 @@
 @ca-footer-txt:  #cccccc;
 @ca-max-width:   2440px;
 
+
+._keyfocus *:focus, input:not([disabled]):focus, textarea:not([disabled]):focus, select:not([disabled]):focus {
+    background-color: #f1f1f1 !important;
+    border: 1px solid #a2a2a2 !important;
+    box-shadow: none !important;
+}
+
 //
 //  USP announcement bar
 //  _____________________________________________
@@ -193,21 +200,18 @@
     .header.content {
         max-width: @ca-max-width;
         margin: 0 auto;
-        padding: 12px 20px;
+        padding: 5px 20px;
         display: flex;
         align-items: center;
         flex-wrap: nowrap;
-        column-gap: 20px;
+        column-gap: 0px;
         position: relative;
     }
 }
 
 //  Center — logo (absolutely centred so search expansion can't shift it)
 .header-wrapper__centered {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;
     min-width: 0;
     text-align: center;
     pointer-events: none;
@@ -225,7 +229,7 @@
         float: none;
         margin: 0 auto;
         max-width: 100%;
-        width: 280px;
+        width: 320px;
         min-width: unset;
 
         img {
@@ -244,7 +248,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 22px;
+    gap: 0px;
 }
 
 //  Vertically centre every header item on one line
@@ -297,16 +301,18 @@
     gap: 14px;
     position: relative;
     margin: 0;
-    padding: 0;
+    padding: 0 !important;
     width: auto;
     max-width: 100%;
 
     //  Magnifier / close trigger (always visible)
     .block-title {
-        display: block;
-        flex: 0 0 auto;
+        position: relative;
         margin: 0;
+        display: flex;
+        text-decoration: none;
         cursor: pointer;
+
 
         strong {
             font-size: 0;
@@ -315,8 +321,22 @@
 
         &:before {
             .ca-icon("\e618");
-            font-size: @ca-header-icon-size;
-            color: @ca-black;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 28px;
+            line-height: 33px;
+            color: #757575;
+            content: '\e615';
+            font-family: 'luma-icons';
+            vertical-align: middle;
+            display: inline-block;
+            font-weight: 400;
+            overflow: hidden;
+            speak: none;
+            text-align: center;
+        }
+        &:hover:before {
+            color: #333;
         }
     }
 
@@ -337,7 +357,24 @@
         max-width: 520px;
 
         .block-title:before {
-            content: "\e680";
+            //content: "\e680";
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 28px;
+            line-height: 33px;
+            color: #757575;
+            content: '\e616';
+            font-family: 'luma-icons';
+            vertical-align: middle;
+            display: inline-block;
+            font-weight: 400;
+            overflow: hidden;
+            speak: none;
+            text-align: center;
+        }
+
+        .block-title:hover:before{
+            color: #333;
         }
 
         .block-content {
@@ -391,12 +428,14 @@
                 left: auto;
                 margin: 0;
                 width: 100%;
-                height: 46px;
-                border: 1px solid #e2e2e2;
-                border-radius: 6px;
-                background: #f2f2f2;
-                padding: 0 16px 0 46px;
-                font-size: 1.5rem;
+                padding: 24px;
+                padding-left: 45px;
+                padding-right: 0;
+                border-radius: 5px;
+                border: 1px solid #d1d1d1;
+                background: #efefef;
+                font-size: 16px !important;
+                height: 50px;
             }
         }
 
@@ -421,7 +460,7 @@
 .customer-account-header .header.links {
     display: flex;
     align-items: center;
-    gap: 22px;
+    gap: 40px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -442,19 +481,19 @@
         font-size: 0;
         line-height: 1;
         color: @ca-black;
+        text-decoration: none;
+    }
+    a:hover{
+        text-decoration: none;
     }
 
     //  My Account (first) -> person (SVG icon)
     > li:first-child > a:before {
-        content: '';
-        display: inline-block;
-        width: @ca-header-icon-size;
-        height: @ca-header-icon-size;
-        background-color: currentColor;
-        -webkit-mask: url('@{baseDir}images/icon-account.svg') no-repeat center;
-        mask: url('@{baseDir}images/icon-account.svg') no-repeat center;
-        -webkit-mask-size: contain;
-        mask-size: contain;
+        font-family: 'Pe-icon-7-stroke';
+        font-size: 2.8rem;
+        display: block;
+        line-height: .3;
+        content: "\e605";
     }
 
     //  Wish list -> heart
@@ -474,23 +513,29 @@
 
 //  Cart icon
 .minicart-wrapper {
+    margin-left: 0px !important;
     .action.showcart {
         position: relative;
         height: auto;
         padding: 0;
         border: 0;
         background: none;
+        padding-right: 30px;
 
         &:before {
-            content: '';
+            content: '\e66e';
+            font-family: 'Pe-icon-7-stroke';
+            position: relative;
+            font-size: 2.8rem;
+            line-height: normal;
+            color: #000;
+            margin: 0;
+            vertical-align: top;
             display: inline-block;
-            width: @ca-header-icon-size;
-            height: @ca-header-icon-size;
-            background-color: @ca-black;
-            -webkit-mask: url('@{baseDir}images/icon-cart.svg') no-repeat center;
-            mask: url('@{baseDir}images/icon-cart.svg') no-repeat center;
-            -webkit-mask-size: contain;
-            mask-size: contain;
+            font-weight: 400;
+            overflow: hidden;
+            speak: none;
+            text-align: center;
         }
 
         .counter.qty {
@@ -510,6 +555,24 @@
             display: none;
         }
     }
+    .action.active{
+        &:before{
+            content: '\e66e' !important;
+            font-family: 'Pe-icon-7-stroke' !important;
+            position: relative;
+            font-size: 2.8rem !important;
+            line-height: normal !important;
+            color: #000;
+            margin: 0;
+            vertical-align: top;
+            display: inline-block;
+            font-weight: 400 !important;
+            overflow: hidden;
+            speak: none;
+            text-align: center;
+        }
+    }
+
 
     //  Cart has items → stay plain (no button), red badge on top-right with
     //  white number — matches base Evalent/carpet cart icon.
@@ -851,7 +914,7 @@
             border-radius: 0px;
 
             &::placeholder {
-                color: #888;
+                color: #333333;
             }
         }
 
@@ -971,7 +1034,7 @@
         display: flex;
         align-items: center;
         flex-wrap: nowrap;
-        column-gap: 0;
+        column-gap: 0 !important;
         padding: 12px 14px;
     }
 

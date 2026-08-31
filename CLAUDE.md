@@ -5,26 +5,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 Magento 2.4.9 Community Edition store (**CarpetAvenue** — an online carpet/rug
-retailer, dev codename "carpient"). This directory (`.../carpient/src`) is the
-Magento application root and its own git repo. The parent directory
-(`.../carpient/`) holds the local Docker stack (a
+retailer, dev codename "carpient"). This directory (`.../carpetavenue-jp/src`) is
+the Magento application root and its own git repo. The parent directory
+(`.../carpetavenue-jp/`) holds the local Docker stack (a
 [markshust/docker-magento](https://github.com/markshust/docker-magento) setup)
 and its `bin/` wrapper scripts.
 
 Two separate Docker setups exist — don't confuse them:
 - **Local dev** — parent `../compose.yaml` + `../bin/*` wrappers. Containers are
-  named `carpient-*` (e.g. `carpient-phpfpm-1`).
+  named after the parent directory, `carpetavenue-jp-*` (e.g.
+  `carpetavenue-jp-phpfpm-1`) — older notes say `carpient-*`.
 - **Production deploy** — `docker/` inside this repo (Dokploy + private
   registry, one image run as five roles). See `docker/README.md`. Never build
   or run the production compose files for local work.
 
 ## Running commands (local dev)
 
-The app runs at `/var/www/html` inside `carpient-phpfpm-1`. The host `bin/magento`
+The app runs at `/var/www/html` inside `carpetavenue-jp-phpfpm-1`. The host `bin/magento`
 shebang fails in this environment, so run Magento CLI through the container:
 
 ```bash
-docker exec carpient-phpfpm-1 sh -c "cd /var/www/html && php bin/magento <cmd>"
+docker exec carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && php bin/magento <cmd>"
 ```
 
 The parent-dir docker-magento wrappers (`../bin/cli`, `../bin/magento`,
@@ -32,26 +33,27 @@ The parent-dir docker-magento wrappers (`../bin/cli`, `../bin/magento`,
 intended UX when they work — `bin/cli <cmd>` runs inside the container,
 `bin/copytocontainer <path>` syncs host → container.
 
-- **DB:** `docker exec carpient-db-1 mariadb -umagento -pmagento magento`
+- **DB:** `docker exec carpetavenue-jp-db-1 mariadb -umagento -pmagento magento`
 - **Search:** OpenSearch at `localhost:9200`
-- **Frontend:** `https://carpient.devs` **or** `https://carpient.test` — the local
-  hostname differs per machine, so don't hardcode either. Resolve it first:
+- **Frontend:** `https://carpetavenue-jp.devs` — the local hostname differs per
+  machine, so don't hardcode it. Resolve it first:
 
   ```bash
-  docker exec carpient-db-1 mariadb -umagento -pmagento magento -N -B \
+  docker exec carpetavenue-jp-db-1 mariadb -umagento -pmagento magento -N -B \
     -e "select value from core_config_data where path='web/secure/base_url';"
   ```
 
-  Both are self-signed — always `curl -sk`. If a host returns `000`, it's missing
-  from `/etc/hosts` (`127.0.0.1 ::1 carpient.devs`); switch to the other one.
-- Other services: `carpient-redis-1`, `carpient-rabbitmq-1`, `carpient-mailcatcher-1`, `carpient-phpmyadmin-1`.
+  Self-signed — always `curl -sk`. If the host returns `000`, it's missing from
+  `/etc/hosts` (`127.0.0.1 ::1 carpetavenue-jp.devs`).
+- Other services: `carpetavenue-jp-redis-1` (valkey), `carpetavenue-jp-rabbitmq-1`,
+  `carpetavenue-jp-mailcatcher-1`. No phpmyadmin container in this stack.
 
 ### After changing code
 
 ```bash
 # after DI/schema/module changes
-docker exec carpient-phpfpm-1 sh -c "cd /var/www/html && php bin/magento setup:upgrade --keep-generated"
-docker exec carpient-phpfpm-1 sh -c "cd /var/www/html && php bin/magento cache:flush"
+docker exec carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && php bin/magento setup:upgrade --keep-generated"
+docker exec carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && php bin/magento cache:flush"
 ```
 
 php-fpm runs with `opcache.validate_timestamps = 0` and `opcache.enable_cli = 0`
@@ -61,15 +63,15 @@ the old bytecode. `cache:flush` is not enough. Never call a browser-facing fix v
 from a CLI-only test.
 
 ```bash
-docker restart carpient-phpfpm-1 carpient-phpfpm-xdebug-1
+docker restart carpetavenue-jp-phpfpm-1 carpetavenue-jp-phpfpm-xdebug-1
 ```
 
 Static assets do **not** regenerate on the fly reliably (requirejs-config.js
 404s). After frontend/theme changes, deploy manually:
 
 ```bash
-docker exec carpient-phpfpm-1 sh -c "cd /var/www/html && php bin/magento setup:static-content:deploy -f --area frontend --theme carpient/rugs en_US"
-docker exec carpient-phpfpm-1 sh -c "cd /var/www/html && php bin/magento cache:clean full_page block_html layout"
+docker exec carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && php bin/magento setup:static-content:deploy -f --area frontend --theme carpetavenue/rugs ja_JP"
+docker exec carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && php bin/magento cache:clean full_page block_html layout"
 ```
 
 For LESS work, grunt gives source maps (DevTools names the origin `.less` file
@@ -77,13 +79,32 @@ instead of `styles-m.css`) and a watch loop, so you don't redeploy static conten
 on every save:
 
 ```bash
-docker exec -it carpient-phpfpm-1 sh -c "cd /var/www/html && npx grunt watch:rugs"
+docker exec -it carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && npx grunt watch:rugs"
 ```
 
 `watch:rugs`, never bare `grunt watch` (two targets fight over livereload port
-35729). Requires developer mode and a one-time `npm install` + `grunt exec:rugs`
-inside the container — full setup, gotchas and verification in
-`docs/runbooks/frontend-less-grunt.md`.
+35729). The target is defined in `dev/tools/grunt/configs/local-themes.js`
+(`carpetavenue/rugs`, `ja_JP`). Requires developer mode and a one-time
+`npm install` + `grunt exec:rugs` inside the container — full setup, gotchas and
+verification in `docs/runbooks/frontend-less-grunt.md`.
+
+**Turn full-page cache off before starting the watch loop** — otherwise all
+storefront JS dies on your first LESS save:
+
+```bash
+docker exec carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && php bin/magento cache:disable full_page && php bin/magento cache:flush"
+```
+
+Why: this repo's `watch.js` adds a `<name>Src` target that runs `exec:rugs` on
+every `.less` save under `app/design` (so watch sees source edits at all).
+Magento's `exec:<theme>` is `grunt clean:<theme> && bin/magento
+dev:source-theme:deploy`, and `clean.js` deletes `pub/static/**/*.js` and
+`deployed_version.txt` — taking `requirejs-config.js` with it. That file is
+virtual: `static.php` cannot resolve it, and Magento only rewrites it during an
+*uncached* page render. With FPC on, that render never happens, so every request
+404s — served as `text/plain`, so the browser refuses the script and the whole
+requirejs graph fails. With FPC off it regenerates on the next reload, every
+time. Re-enable with `cache:enable full_page` when done.
 
 ## Lint / static analysis / tests
 
@@ -93,18 +114,18 @@ or `phpcs.xml` — pass paths explicitly. `.php-cs-fixer.dist.php` targets
 `*.phtml` only (PSR-2 + short arrays + concat spacing).
 
 ```bash
-docker exec carpient-phpfpm-1 sh -c "cd /var/www/html && vendor/bin/phpcs --standard=Magento2 app/code/<Vendor>/<Module>"
-docker exec carpient-phpfpm-1 sh -c "cd /var/www/html && vendor/bin/phpstan analyse app/code/<Vendor>/<Module>"
-docker exec carpient-phpfpm-1 sh -c "cd /var/www/html && vendor/bin/phpunit app/code/<Vendor>/<Module>/Test/Unit/<Test>.php"
-docker exec carpient-phpfpm-1 sh -c "cd /var/www/html && php -l <file.php>"   # quick syntax check
+docker exec carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && vendor/bin/phpcs --standard=Magento2 app/code/<Vendor>/<Module>"
+docker exec carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && vendor/bin/phpstan analyse app/code/<Vendor>/<Module>"
+docker exec carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && vendor/bin/phpunit app/code/<Vendor>/<Module>/Test/Unit/<Test>.php"
+docker exec carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && php -l <file.php>"   # quick syntax check
 ```
 
 Quick browser render check (system Chrome, ignore the self-signed cert):
 
 ```bash
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
-  --disable-gpu --ignore-certificate-errors --dump-dom https://carpient.devs/
-  # swap in https://carpient.test/ if that's this machine's base_url
+  --disable-gpu --ignore-certificate-errors --dump-dom https://carpetavenue-jp.devs/
+  # confirm the host against base_url first — it differs per machine
 ```
 
 ## Git commits
@@ -145,8 +166,11 @@ commit**, including ones that recorded a theory since disproved.
 ## Architecture
 
 Standard Magento 2 layout. Custom code lives in `app/code/<Vendor>/<Module>`;
-the single custom theme is `app/design/frontend/carpient/rugs` — "Carpient Rugs",
-parent `Magento/blank`. `vendor/`, `generated/`, `pub/*`, `var/*`, and
+the active custom theme is `app/design/frontend/carpetavenue/rugs` —
+"CarpetAvenue Rugs", parent `Magento/blank`, locale `ja_JP`. An older
+`app/design/frontend/carpient/rugs` ("Carpient Rugs") is still on disk and
+registered in the `theme` table, but nothing uses it — `design/theme/theme_id`
+points at `carpetavenue/rugs`. Edit the carpetavenue one. `vendor/`, `generated/`, `pub/*`, `var/*`, and
 `app/etc/*` (except `config.php`) are gitignored — only custom code, the theme,
 and `config.php` are tracked.
 
