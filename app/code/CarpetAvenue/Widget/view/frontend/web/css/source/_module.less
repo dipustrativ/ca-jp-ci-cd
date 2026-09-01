@@ -1496,3 +1496,38 @@
         border: 1px solid #000000 !important;
     }
 }
+
+//  Card hover shadow for the product widgets — parity with the catalog list
+//  (@product-item__hover__box-shadow: 0 10px 15px rgba(0,0,0,0.1)). The second
+//  image on hover is handled by a JS src-swap in items.phtml / sku_slider.phtml
+//  (data-hover-image), the same mechanism the catalog list uses.
+.ev-product-item .product-item-info {
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+}
+
+//  Reveal the secondary add-to links (wishlist / compare) only while the product
+//  card is hovered. Kept in layout via opacity/visibility so nothing jumps.
+.ev-product-item {
+    .secondary-addto-links.actions-secondary {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    &:hover .secondary-addto-links.actions-secondary {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+//  Touch devices have no hover — keep the links always visible there.
+@media (hover: none) {
+    .ev-product-item .secondary-addto-links.actions-secondary {
+        opacity: 1;
+        visibility: visible;
+    }
+}

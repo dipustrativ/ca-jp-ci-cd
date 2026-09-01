@@ -90,14 +90,10 @@ if ($hoverImage->isEnableHoverImage()) {
                                 <?= /* @noEscape */ '<!-- ' . $image . '-->' ?>
                                 <?php $hoverSrc = $hoverImageMapper[$_item->getId()] ?? ''; ?>
                                 <a href="<?= $block->escapeUrl($block->getProductUrl($_item)) ?>"
-                                   class="product photo product-item-photo<?= $hoverSrc ? ' has-hover-image' : '' ?>"
+                                   class="product photo product-item-photo"
+                                   <?php if ($hoverSrc): ?>data-hover-image="<?= $block->escapeUrl($hoverSrc) ?>"<?php endif; ?>
                                 >
                                     <?= $block->getImage($_item, $image)->toHtml() ?>
-                                    <?php if ($hoverSrc) : ?>
-                                        <img class="product-image-photo--hover"
-                                             src="<?= $block->escapeUrl($hoverSrc) ?>"
-                                             loading="lazy" decoding="async" alt="" aria-hidden="true">
-                                    <?php endif; ?>
                                 </a>
                                 <div class="product details product-item-details">
                                     <strong class="product name product-item-name"><a class="product-item-link" title="<?= $block->escapeHtml($_item->getName()) ?>" href="<?= $block->escapeUrl($block->getProductUrl($_item)) ?>">
@@ -219,6 +215,48 @@ if ($hoverImage->isEnableHoverImage()) {
         $('#elastyslider__slides-<?= $randomId ?>').scrollbar();
     })
 </script>
+
+<?php if ($hoverImage->isEnableHoverImage()) : ?>
+<script>
+    (function () {
+        // Hover image swap — mirrors the catalog list. Swap img.src to the second
+        // image on hover, restore on leave; never touch data-original (lazyload).
+        function getLink(el) {
+            return el && el.closest ? el.closest('.product-item-photo[data-hover-image]') : null;
+        }
+        document.addEventListener('mouseenter', function (e) {
+            var a = getLink(e.target);
+            if (!a || a._isHovered) return;
+            a._isHovered = true;
+            var img = a.querySelector('img');
+            if (!img) return;
+            if (!a._origSrc) {
+                a._origSrc = img.getAttribute('data-original') || img.src;
+            }
+            var hoverUrl = a.dataset.hoverImage;
+            if (a._hoverReady) {
+                img.src = hoverUrl;
+            } else {
+                var pre = new Image();
+                pre.onload = function () {
+                    a._hoverReady = true;
+                    if (a._isHovered) { img.src = hoverUrl; }
+                };
+                pre.src = hoverUrl;
+            }
+        }, true);
+        document.addEventListener('mouseleave', function (e) {
+            var a = getLink(e.target);
+            if (!a) return;
+            if (a.contains(e.relatedTarget)) return;
+            a._isHovered = false;
+            var img = a.querySelector('img');
+            if (!img || !a._origSrc) return;
+            img.src = a._origSrc;
+        }, true);
+    }());
+</script>
+<?php endif; ?>
 
 <style>
     .block.widget.block-products-list.grid .block-title strong {

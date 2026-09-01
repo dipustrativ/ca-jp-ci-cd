@@ -15,11 +15,8 @@
     $filters = $block->getFilters();
     $activeFilters = $block->getLayer()->getState()->getFilters();
     $filtered = count($activeFilters);
-    $jsConfig = json_encode([
-        'carpetavenueFilterModal' => ['title' => (string) __('Filter')],
-    ]);
     ?>
-    <div class="block filter" id="layered-filter-block" data-mage-init="<?= $escaper->escapeHtmlAttr($jsConfig) ?>">
+    <div class="block filter" id="layered-filter-block">
         <div class="block-title filter-title" data-role="title" data-count="<?= (int) $filtered ?>">
             <strong><?= $escaper->escapeHtml(__('Shop By')) ?></strong>
         </div>
@@ -39,11 +36,13 @@
             <?php endforeach; ?>
 
             <div id="filter-popup" style="display: none" class="transition-menus">
-                <div class="filter-options" id="narrow-by-list" data-role="content">
+                <div class="filter-options" id="narrow-by-list" data-role="content"
+                     data-mage-init='{"accordion":{"openedState":"active","collapsible":true,"active":false,"multipleCollapsible":true}}'>
                     <?php $i = 0;
                     foreach ($filters as $filter) : ?>
                         <?php if ($filter->getItemsCount()) : ?>
                             <div class="filter-options-item <?= $escaper->escapeHtmlAttr($filter->getRequestVar()) ?>"
+                                 data-role="collapsible"
                                  data-filter-tab="<?= (int) $i ?>">
                                 <div data-role="title" role="heading" aria-level="3" class="filter-options-title"><?= $escaper->escapeHtml(__($filter->getName())) ?></div>
                                 <div data-role="content" class="filter-options-content">
@@ -82,4 +81,73 @@
             <?php endif; ?>
         </div>
     </div>
+
+    <?php // Slide-out filter modal opener. Replaces the removed carpetavenueFilterModal
+          // module — uses core Magento_Ui modal (type: 'filter'). The filter buttons
+          // render disabled and are enabled here once the modal is wired. ?>
+    <script>
+        require([
+            'jquery',
+            'Magento_Ui/js/modal/modal',
+            'mage/accordion'
+        ], function ($, modal) {
+            'use strict';
+
+            var $popup = $('#filter-popup'),
+                $block = $('#layered-filter-block'),
+                $list = $('#narrow-by-list');
+
+            if (!$popup.length || $popup.data('carpFilterReady')) {
+                return;
+            }
+            $popup.data('carpFilterReady', true);
+
+            // Buttons render disabled until the modal JS is ready.
+            $block.find('.button-filter').prop('disabled', false);
+
+            modal({
+                type: 'slide',
+                responsive: true,
+                innerScroll: true,
+                modalClass: 'filter-modal filter-drawer',
+                title: '<?= $escaper->escapeJs(__('Filter')) ?>',
+                buttons: []
+            }, $popup);
+
+            function activateTab(tab) {
+                if (tab === undefined || tab === null || tab === '') {
+                    return;
+                }
+                try {
+                    $list.accordion('activate', parseInt(tab, 10));
+                } catch (e) {
+                    // accordion may not be ready on the very first paint — ignore.
+                }
+            }
+
+            $block.on('click', '.button-filter', function () {
+                var tab = $(this).attr('data-filter-tab');
+                $popup.modal('openModal');
+                activateTab(tab);
+            });
+
+            $block.on('click', '.open-filter-popup, .filter-title', function () {
+                $popup.modal('openModal');
+            });
+
+            // "Back" inside a section collapses it again (mobile drill-down feel).
+            $popup.on('click', '.filter-options-back', function () {
+                var idx = $(this).closest('.filter-options-item').index();
+
+                try {
+                    $list.accordion('deactivate', idx);
+                } catch (e) {}
+            });
+
+            // "Show" applies the staged filters (carpetavenueFilterAjax) — close the drawer.
+            $popup.on('click', '.am-apply-close', function () {
+                $popup.modal('closeModal');
+            });
+        });
+    </script>
 <?php endif; ?>
