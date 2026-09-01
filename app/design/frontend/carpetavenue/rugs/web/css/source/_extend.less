@@ -51,6 +51,12 @@
 @ca-footer-txt:  #cccccc;
 @ca-max-width:   2440px;
 
+//  proxima-nova renders at weight 500 as the base text weight on carpetavenue.jp
+//  (measured on .page-header, footer links and the newsletter title). Magento's
+//  blank sets 400, which reads noticeably lighter across the whole storefront.
+body {
+    font-weight: 500;
+}
 
 ._keyfocus *:focus, input:not([disabled]):focus, textarea:not([disabled]):focus, select:not([disabled]):focus {
     background-color: #f1f1f1 !important;
@@ -81,16 +87,22 @@
         }
 
         li {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             display: flex;
             align-items: center;
+            margin: 0px;
         }
 
         .navicon-check:before {
-            content: "\2713";
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 15px;
+            line-height: inherit;
+            font-family: 'luma-icons' !important;
+            content: '\e610';
             color: @ca-green-check;
-            font-weight: 700;
-            margin-right: 6px;
+            font-weight: 800;
+            margin-right: 7px;
         }
     }
 }
@@ -112,11 +124,19 @@
         max-width: @ca-max-width;
         width: 100%;
         margin: 0 auto;
-        padding: 9px 20px 6px;
+        padding: 9px 32px 6px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 20px;
+        gap: 0;   //  space-between already separates USP from the switcher; a
+                  //  gap here only inset the USP row off its gutter
+
+        //  Magento's skip-to-content link is a 1px-wide flex child here. Take it
+        //  out of the flow rather than hiding it — keyboard users still need it,
+        //  and it reveals itself on focus.
+        > .action.skip {
+            position: absolute;
+        }
     }
 
     //  USP list — left
@@ -195,6 +215,7 @@
 .page-header {
     background: #ffffff;
     border-bottom: 0;
+    margin-bottom: 0px;
 
     //  3 flex zones: search (left, 1fr) · logo (absolute, true center) · actions (right, 1fr)
     .header.content {
@@ -206,15 +227,20 @@
         flex-wrap: nowrap;
         column-gap: 0px;
         position: relative;
+        height: 60px;
     }
 }
 
 //  Center — logo (absolutely centred so search expansion can't shift it)
 .header-wrapper__centered {
-    position: relative;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     min-width: 0;
     text-align: center;
     pointer-events: none;
+    z-index: 99;
 
     .logo {
         pointer-events: auto;
@@ -229,12 +255,12 @@
         float: none;
         margin: 0 auto;
         max-width: 100%;
-        width: 320px;
-        min-width: unset;
+        width: 16.667vw;
+        min-width: 210px;
+        color: @ca-black;   //  stop Magento's link blue reaching currentColor icons
 
         img {
             max-width: 100%;
-            max-height: 56px;
             width: auto;
             height: auto;
             margin: auto;
@@ -248,7 +274,6 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 0px;
 }
 
 //  Vertically centre every header item on one line
@@ -354,7 +379,7 @@
     &.active {
         justify-self: start;
         width: 100%;
-        max-width: 520px;
+        max-width: 35%;
 
         .block-title:before {
             //content: "\e680";
@@ -661,6 +686,7 @@
         margin: 0 auto;
         padding: 50px 32px 0;
         border-top: 0;
+        background: #0a0a0a;   //  live footer sits one step lighter than the page
 
         .footer-logo p {
             margin: 0px;
@@ -861,12 +887,12 @@
 
     .footer-newsletter {
         text-align: left;
-        margin-top: 30px;
+        margin-top: 0px;
         width: 100%;
     }
 
     .block.newsletter {
-        width: unset;
+        width: 377px;   //  live constrains the block; full width stretched the rule
         max-width: 100%;
         float: unset !important;
         margin-bottom: 20px;
@@ -906,10 +932,11 @@
 
         input {
             height: 36px !important;
+            width: 223px;
             padding: 0 20px;
             border: 1px solid #c2c2c2;
             background: #ffffff;
-            color: #ffffff;
+            color: #000000;   //  was #ffffff — typed text was invisible on the white field
             margin: 0px;
             border-radius: 0px;
 
@@ -949,7 +976,10 @@
     color: #ffffff;
     text-align: center;
     display: block;
-    padding: 20px 0px 30px;
+    padding: 20px 20px 30px;
+    //  The min-width:769px block below gives this width: 100%; without
+    //  border-box the horizontal padding overflows the viewport.
+    box-sizing: border-box;
 }
 
 //
@@ -958,13 +988,23 @@
 .button-go_top {
     display: none;
     position: fixed;
-    right: 20px;
-    bottom: 20px;
+    right: 25px;
+    bottom: 55px;
     z-index: 100;
-    width: 44px;
-    height: 44px;
+    width: 49px;
+    height: 49px;
     border-radius: 50%;
     padding: 0;
+    background: @ca-black;
+    border-color: @ca-black;
+    color: #ffffff;
+
+    &:hover,
+    &:focus {
+        background: #333333;
+        border-color: #333333;
+        color: #ffffff;
+    }
 
     .arrow.up:before {
         content: "\2191";
@@ -1018,6 +1058,11 @@
         align-items: flex-start;
         gap: 15px;
     }
+
+    .footer-newsletter-bottom {
+        bottom: 18px;
+    }
+
 }
 
 @media (max-width: 768px) {
@@ -1029,13 +1074,19 @@
         justify-content: flex-start;
     }
 
+    .customer-account-header .header.links {
+        gap: 0;
+    }
+
     //  Mobile header: toggle + search (left) · logo (center) · heart + cart (right)
     .page-header .header.content {
         display: flex;
         align-items: center;
         flex-wrap: nowrap;
         column-gap: 0 !important;
-        padding: 12px 14px;
+        padding: 10px 15px;
+        height: auto;
+        min-height: 50px;
     }
 
     .toggle-nav__container {
@@ -1045,7 +1096,8 @@
         justify-self: auto;
 
         .nav-toggle:before {
-            font-size: 2.6rem;
+            font-size: 2.8rem;
+            color: #000;
         }
     }
 
@@ -1054,44 +1106,91 @@
         flex: 0 0 auto;
         justify-self: auto;
         margin-left: 12px;
+        margin-top: 0px !important;
 
         .block-title:before {
-            font-size: 2.6rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 22px;
+            line-height: 28px;
+            color: #757575;
+            content: '\e615';
+            font-family: 'luma-icons';
+            margin: 0 10px 0 0;
+            vertical-align: middle;
+            display: inline-block;
+            font-weight: 400;
+            overflow: hidden;
+            speak: none;
+            text-align: center;
         }
 
         &.active {
             flex: 1 1 auto;
             max-width: none;
             margin-left: 10px;
-        }
-    }
+            gap: 0px;
 
-    .header-wrapper__centered {
-        order: 2;
-        flex: 1 1 auto;
-        min-width: 0;
-        text-align: center;
-        padding: 0 8px;
+            .block-title:before{
+                font-size: 22px;
+                line-height: 28px;
+            }
 
-        .logo {
-            width: auto;
-            max-width: 160px;
-
-            img {
-                max-height: 40px;
+            .field.search input{
+                position: absolute;
+                top: -21px;
+                left: 0;
+                right: 10px;
+                width: calc(100vw - 100px);
+                padding: 5px 20px;
+                background: #fff !important;
+                height: 40px;
+                z-index: 999;
             }
         }
     }
 
+    //  Stays absolutely centred, same as desktop, so the logo sits on the true
+    //  viewport centre rather than centring in whatever space the icons leave.
+    //  The logo needs an EXPLICIT width here: the img inside carries
+    //  max-width: 100%, so an auto-width inline-block resolves to 0 and the
+    //  whole logo silently disappears.
+    .header-wrapper__centered {
+        order: 2;
+        min-width: 0;
+        text-align: center;
+        padding: 0 8px;
+        //  Reserve both icon groups (~121px each side at the narrowest) plus a
+        //  little clearance, so the centred logo shrinks instead of colliding.
+        max-width: ~"calc(100% - 190px)";
+
+        .logo {
+            width: 225px;
+            min-width: auto;
+
+        }
+    }
+
+    //  Grows to fill the row so the icons reach the right edge on their own —
+    //  the centred logo is out of flow and cannot push them there.
     .header-actions {
         order: 3;
-        flex: 0 0 auto;
+        flex: 1 1 auto;
         gap: 14px;
 
         .action.showcart:before,
         .header.links > li > a:before {
             width: 2.6rem;
             height: 2.6rem;
+        }
+
+        //  Desktop reserves 30px right of the cart for the qty badge. On mobile
+        //  that dead space drags the whole icon group left, into the logo.
+        .action.showcart {
+            padding-right: 0;
+        }
+        .minicart-wrapper{
+            margin-top: 0px !important;
         }
     }
 
@@ -1102,6 +1201,38 @@
 
     .foo-col3 {
         display: none;
+    }
+
+    //  Footer drops to a 15px gutter on mobile (desktop keeps 32px)
+    .page-footer {
+        padding: 40px 0 20px;
+
+        .footer.content {
+            padding: 0 15px;
+        }
+    }
+
+    .footer-grid{
+        margin-bottom: 20px;
+    }
+
+    .footer-newsletter-bottom{
+        bottom: 0;
+    }
+
+    .footer-newsletter-bottom .block.newsletter {
+        .title,
+        .title strong {
+            font-size: 1.8rem;
+        }
+
+        input {
+            font-size: 1.2rem;
+        }
+    }
+
+    .copyright{
+        padding-bottom: 0px;
     }
 }
 
@@ -1269,6 +1400,21 @@
     margin-left: calc(~"-100% / 2 + ( 100% - " 15px * 2 ~" ) / 2") !important;
     margin-right: calc(~"-100% / 2 + ( 100% - " 15px * 2 ~" ) / 2") !important;
 
+    .ev-banners__content__button{
+        border-radius: 0;
+        padding: 5px 20px;
+        box-sizing: border-box;
+        font-weight: 800;
+        border-color: #fff;
+        background-color: #fff;
+        color: #000;
+        border: 0;
+        -o-transition: background-color .25s,color .25s;
+        -moz-transition: background-color .25s,color .25s;
+        -webkit-transition: background-color .25s, color .25s;
+        transition: background-color .25s, color .25s;
+    }
+
     @media (min-width: @screen__m) {
         margin-left: calc(~"-100% / 2 + ( 100% - " 20px * 2 ~" ) / 2") !important;
         margin-right: calc(~"-100% / 2 + ( 100% - " 20px * 2 ~" ) / 2") !important;
@@ -1322,6 +1468,20 @@
     font-size: 23px !important;
 }
 
+
+.ca-pricing-feature-heading {
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.ca-pricing-feature-text {
+    font-size: 16px;
+    line-height: 20px;
+    color: #333;
+}
+
 @media (min-width: 769px) {
     .ca-pricing-features-title {
         margin-bottom: 20px !important;
@@ -1363,4 +1523,15 @@
         flex: 0 0 85%;
         scroll-snap-align: start;
     }
+}
+
+//
+//  Evalent_Banner overlay — the module ships `padding: 15px 20px` on a
+//  content-box element sized to its card, so the caption box renders 40px
+//  wider than the banner it sits on and pushes the page into horizontal
+//  scroll. Corrected here rather than in the module.
+//  _____________________________________________
+.ev-banner__overlay-content .bottom-banner {
+    box-sizing: border-box;
+    max-width: 100%;
 }
