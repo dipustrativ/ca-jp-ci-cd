@@ -326,14 +326,16 @@ define([
                     _hrefLink = (self.isVideo(imageData)) ? imageData['videoUrl'] : imageData['full'],
                     _fancyBox = (self.config.imagePopup.imagePopupStatus) ? 'href="' + _hrefLink + '"' : '',
                     _dataType = imageData.provider == "youtube" ? 'data-type="iframe"' : 'data-type="' + imageData['type'] + '"',
-                    // Use the full-resolution image for the main stage (crisp);
-                    // fall back to the medium if full is missing. Videos keep their thumb.
-                    _mainSrc = (self.isVideo(imageData)) ? imageData['img'] : (imageData['full'] || imageData['img']),
-                    _slide = '<' + (imageData.provider == "youtube" ? 'div data-fancybox data-type="iframe"' : 'div') + ' class="slick-slide-wrap '+ _className + (imageData.provider == "youtube" ? ' iframe' : '') + '" data-data-index="' + index + '" ' + _fancyBox + ' ><img width="'+self.config.image_width+'" height="'+self.config.image_height+'" ' + _dataType + ' src="' + _mainSrc + '"/></' + (imageData.provider == "youtube" ? 'a' : 'div') + '>';
+                    _slide = '<' + (imageData.provider == "youtube" ? 'div data-fancybox data-type="iframe"' : 'div') + ' class="slick-slide-wrap '+ _className + (imageData.provider == "youtube" ? ' iframe' : '') + '" data-data-index="' + index + '" ' + _fancyBox + ' ><img width="'+self.config.image_width+'" height="'+self.config.image_height+'" ' + _dataType + ' src="' + imageData['img'] + '"/></' + (imageData.provider == "youtube" ? 'a' : 'div') + '>';
 
-                // Single-image carousel (matches carpient.com): add every slide on all
-                // breakpoints. Thumbnails below drive navigation via syncThumbs().
-                self.sliderElement.slick('slickAdd', _slide);
+                if(self.isMobile()) {
+                    self.sliderElement.slick('slickAdd', _slide);
+                } else {
+                    if(index < 2) {
+                        self.sliderElement.slick('slickAdd', _slide);
+                    }
+                }
+
             });
         },
 
@@ -346,75 +348,18 @@ define([
             this.thumbsElement = $('<div/>', {'class': this.THUMBS_CLASS});
             this.sliderElement.parent().find('.mz-gallery-thumbs-wrap').append(this.thumbsElement);
 
-            // The thumbnail strip is a plain horizontal, scrollable flex row
-            // (styled in gallery.phtml) rather than a nested slick slider —
-            // slickAdd into an empty slider does not reliably render, and a flat
-            // strip matches the carpient.com gallery exactly.
+            if(!jQuery.isEmptyObject(this.config.thumbsSettings)) {
+                this.thumbsElement.slick(this.config.thumbsSettings.options);
+            }
 
             // Make thumbnails
             this.addThumbs();
-
-            // Wire thumbnail strip <-> main slider (click to navigate + active state)
-            this.syncThumbs();
 
             // Thumbnails expand button
             $('.mz-gallery-thumbs--expand__btn').on("click", function () {
                $('.mz-gallery-thumbs').toggleClass("expand");
                $(this).hide(500);
             });
-        },
-
-        /**
-         * Link the thumbnail strip to the main slider: clicking a thumb moves the
-         * main image, and the current main image highlights + scrolls its thumb
-         * into view. Matches the carpient.com gallery behaviour.
-         */
-        syncThumbs: function () {
-            var self = this,
-                $thumbs = this.thumbsElement;
-
-            if (!$thumbs || !$thumbs.length) {
-                return;
-            }
-
-            // Click a thumb -> navigate the main slider (don't follow the href).
-            $thumbs.on('click', '.thumb', function (e) {
-                e.preventDefault();
-                var idx = $(this).data('index');
-                if (typeof idx === 'undefined') {
-                    idx = $thumbs.find('.thumb').index(this);
-                }
-                self.sliderElement.slick('slickGoTo', idx);
-            });
-
-            // Main slider changes -> highlight the matching thumb and keep it visible.
-            this.sliderElement.on('afterChange', function (e, slick, current) {
-                self.setActiveThumb(current);
-            });
-
-            // Initial highlight.
-            this.setActiveThumb(0);
-        },
-
-        /**
-         * Highlights the thumbnail for the given slide index.
-         */
-        setActiveThumb: function (index) {
-            var $thumbs = this.thumbsElement;
-
-            if (!$thumbs || !$thumbs.length) {
-                return;
-            }
-
-            var $active = $thumbs.find('.thumb').removeClass('thumb--active')
-                .filter('[data-index="' + index + '"]').addClass('thumb--active');
-
-            // Keep the active thumb centred within the scrollable strip.
-            if ($active.length) {
-                var strip = $thumbs[0],
-                    el = $active[0];
-                strip.scrollLeft = el.offsetLeft - (strip.clientWidth / 2) + (el.clientWidth / 2);
-            }
         },
 
         /**
@@ -427,10 +372,11 @@ define([
                     _hrefLink = (self.isVideo(imageData)) ? imageData['videoUrl'] : imageData['full'],
                     _fancyBox = (self.config.imagePopup.imagePopupStatus) ? 'href="' + _hrefLink + '"' : '',
                     _dataType = imageData.provider == "youtube" ? 'data-type="iframe"' : 'data-type="' + imageData['type'] + '"',
-                     _thumb = '<a class="thumb ' + _className + '" href="javascript:void(0)" data-index="' + index + '" ' + _dataType + '><img width="320" height="280" src="' + imageData['thumb'] + '"/></a>';
+                     _thumb = '<a class="thumb ' + _className + '"' + _fancyBox + ' ' + _dataType + '><img width="320" height="280" src="' + imageData['thumb'] + '"/></a>';
 
-                // One thumb per image so the strip maps 1:1 onto the main slider.
-                self.thumbsElement.append(_thumb);
+                if(index > 1) {
+                    self.thumbsElement.slick('slickAdd', _thumb);
+                }
             });
         },
 
@@ -439,21 +385,22 @@ define([
          */
         reInitSlider: function () {
             var slick = this.sliderElement.slick('getSlick'),
-                slides = slick.$slides;
+                slides = slick.$slides,
+                slickThumbs = this.thumbsElement.slick('getSlick'),
+                thumbs = slickThumbs.$slides;
 
-            // Remove main slider slides
+            // Remove slides
             while (slides.length !== 0) {
                 this.sliderElement.slick('slickRemove', --slides.length);
             }
 
-            // Thumbs are a plain strip (not slick) — just clear and rebuild.
-            if (this.thumbsElement) {
-                this.thumbsElement.empty();
+            // Remove thumbs
+            while (thumbs.length !== 0) {
+                this.thumbsElement.slick('slickRemove', --thumbs.length);
             }
 
             this.addSlides();
             this.addThumbs();
-            this.setActiveThumb(0);
         },
 
         /**

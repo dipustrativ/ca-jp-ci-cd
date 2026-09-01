@@ -46,8 +46,8 @@
         .block-content.filter-content {
             display: flex;
             flex-wrap: wrap;
-            align-items: center;
-            gap: 10px 20px;
+            align-items: stretch;
+            gap: 10px;
         }
 
         //  Hidden until the filter-modal widget moves it into the modal
@@ -57,14 +57,17 @@
 
         button.button-filter {
             position: relative;
+            flex: 1 1 auto;
+            min-width: 130px;
             margin: 0;
-            padding: 10px 34px 10px 14px;
+            padding: 12px 34px;
             background: #fff;
             border: 1px solid #e0e0e0;
             border-radius: @button__border-radius;
             .lib-font-size(14px);
             font-weight: @font-weight__bold;
             line-height: 1.2;
+            text-align: center;
             cursor: pointer;
 
             &:after {
@@ -130,6 +133,7 @@
 
     .modal-inner-wrap {
         position: relative; // anchor for the bottom apply bar
+        height: 100%;       // so the absolute apply bar pins to the viewport bottom
     }
 
     &._inner-scroll .modal-content {
@@ -226,7 +230,13 @@
             z-index: 99;
             transform: translate(100vw);
             transition: transform 0.1s;
-            overflow: auto;
+            //  Long option lists (e.g. Pattern) scroll inside the panel while the
+            //  クリア / 表示 apply bar stays pinned. max-height guards against any
+            //  ancestor whose height doesn't resolve to the full viewport.
+            max-height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
             .lib-font-size(16);
 
             &:before {
@@ -276,19 +286,68 @@
             }
         }
 
-        //  Option rows: white cards on the grey panel
+        //  Option rows: white cards on the grey panel — label left, count right,
+        //  green border on hover/selected (reference "パターン" list design).
         .am-filter-items {
             position: relative;
 
             .am-filter-item {
                 background: #fff;
-                margin: 10px 0;
-                padding: 5px;
-                border: 2px solid transparent;
+                margin: 8px 0;
+                padding: 0;
+                border: 2px solid #e6e6e6;
 
-                &:hover {
+                &:hover,
+                &.-selected {
                     border-color: #429a3c;
                 }
+
+                &.-disabled {
+                    opacity: 0.5;
+                }
+
+                &.-selected .count {
+                    color: #3a6fb0;
+                }
+            }
+
+            .am-filter-link {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                padding: 14px 16px;
+                color: #333;
+                text-decoration: none;
+                box-sizing: border-box;
+            }
+
+            //  Reference text list shows no checkbox; keep swatch when present.
+            .am-filter-checkbox {
+                display: none;
+            }
+
+            .am-filter-swatch {
+                flex: 0 0 auto;
+                width: 28px;
+                height: 28px;
+                margin-right: 12px;
+                border-radius: 3px;
+                background-size: cover;
+                background-position: center;
+            }
+
+            .am-filter-label {
+                flex: 1 1 auto;
+                text-align: left;
+            }
+
+            .count {
+                flex: 0 0 auto;
+                margin-left: 12px;
+                color: #888;
+                font-size: 1.3rem;
+                font-weight: 500;
             }
         }
 
@@ -297,6 +356,27 @@
             background: #fff;
             margin: 10px 0;
             padding: 12px 10px;
+        }
+
+        //  "Size" section groups Length + Width sliders, each under its own label.
+        .filter-dimension {
+            margin: 0 0 24px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            &__label {
+                margin: 6px 0 8px;
+                font-size: 1.6rem;
+                font-weight: 700;
+                line-height: 1.2;
+                text-transform: none;
+            }
+
+            .am-price-slider {
+                margin: 0;
+            }
         }
     }
 
@@ -326,11 +406,11 @@
             align-items: center;
             flex: 0 1 45%;
             margin: 0;
-            padding: 10px;
+            padding: 12px;
             border-radius: 0;
             box-sizing: border-box;
-            background: #000;
-            border: 1px solid #000;
+            background: #2c8e3b;
+            border: 1px solid #2c8e3b;
             color: #fff;
             font-weight: @font-weight__bold;
             text-align: center;
@@ -346,9 +426,9 @@
 
             &.filter-clear.action.clear {
                 border-radius: 0;
-                border-color: #000;
+                border-color: #333;
                 background: #fff;
-                .lib-css(color, #000);
+                .lib-css(color, #333);
             }
         }
     }

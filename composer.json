@@ -33,6 +33,7 @@
         "mageplaza/module-smtp": "^4.7",
         "mageworx/module-searchsuiteautocomplete": "^2.2",
         "mpdf/mpdf": "^8.3",
+        "trustpilot/module-reviews": "^2.6",
         "webshopapps/module-matrixrate": "^20.5"
     },
     "autoload": {

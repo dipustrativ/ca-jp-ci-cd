@@ -401,6 +401,7 @@ return [
         'PayPal_BraintreeGiftWrapping' => 1,
         'PayPal_BraintreeGraphQl' => 1,
         'PayPal_BraintreeReward' => 1,
+        'Trustpilot_Reviews' => 1,
         'WebShopApps_MatrixRate' => 1
     ],
     'system' => [

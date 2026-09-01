@@ -37,6 +37,9 @@
 
             $sizeLabel = 'Size';
 
+            //-- Motifs (Display both Anatomy and Patterns if either exists)
+            $motifs = [];
+
             // NOTE: check if the attribute 'shape' is round.
             // I also remove the shape attribute from frontend
             $isRound = false;
@@ -58,6 +61,10 @@
                         $isRound = true;
                     }
                 }
+
+                if ($_data['code'] == 'anatomy' || $_data['code'] == 'patterns') {
+                    $motifs[] = $_data['value'];
+                }
             }
 
             $sizeValue = $widthValue . ' x ' . $lengthValue . ' cm';
@@ -75,6 +82,16 @@
                 <?php
                     if ($_data['code'] == 'age' && str_contains($_data['value'], '0-20')) {
                         continue;
+                    }
+                    if ($_data['code'] == 'patterns') {
+                        continue ;
+                    }
+                    if ($_data['code'] == 'anatomy' && !empty($motifs)) {
+                        $_data['label'] = __("Motifs");
+                        $_data['value'] = implode(', ', $motifs);
+                    }
+                    if ($_data['code'] == 'weight') {
+                        $_data['value'] =  ceil($_data['value']). ' kg';
                     }
                 ?>
                 <tr>

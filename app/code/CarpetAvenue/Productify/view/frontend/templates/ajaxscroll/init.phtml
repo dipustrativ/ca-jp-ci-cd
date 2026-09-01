@@ -218,29 +218,52 @@ if($helper->isEnabled() && $enable) { ?>
                         var countTpl = '<?php echo $helper->jsQuoteEscape(__('Showing %1 - %2 of %3 products')) ?>';
 
                         function renderIasCount() {
-                            var $trigger = $('.ias-trigger-next'),
-                                total = $('.toolbar-number').last().text().replace(/[^0-9]/g, ''),
-                                loaded = $('.products.wrapper .product-item').length,
-                                $count,
-                                text;
-
-                            if (!$trigger.length || !loaded || !total) {
+                            var $trigger = $('.ias-trigger-next');
+                            if (!$trigger.length) {
                                 return;
                             }
 
-                            text = countTpl.replace('%1', 1).replace('%2', loaded).replace('%3', total);
-                            $count = $trigger.find('.ias-count');
+                            //  Grand total is the largest toolbar-number — robust
+                            //  against locale word-order (JP puts total first,
+                            //  EN last). The old code took .last(), which is the
+                            //  "to" value, so it read 50/100 instead of the total.
+                            var total = 0;
+                            $('.column.main .toolbar-amount .toolbar-number').each(function () {
+                                var n = parseInt($(this).text().replace(/[^0-9]/g, ''), 10) || 0;
+                                if (n > total) { total = n; }
+                            });
 
-                            //  Writing the text mutates the tree the observer
-                            //  watches — bail when nothing changed or it loops.
-                            if ($count.length && $count.text() === text) {
+                            //  Loaded = tiles in the category list only (first
+                            //  product-items <ol>), never upsell/related widgets.
+                            var $list = $('.column.main ol.products.product-items').first();
+                            var loaded = ($list.length ? $list.children('li.product-item') : $('.products.wrapper .product-item')).length;
+
+                            if (!total || !loaded) {
                                 return;
                             }
 
+                            //  Signature guard: data() does not touch the DOM the
+                            //  observer watches, so updating it cannot re-trigger us.
+                            var sig = loaded + '/' + total;
+                            if ($trigger.data('iasSig') === sig) {
+                                return;
+                            }
+                            $trigger.data('iasSig', sig);
+
+                            var text = countTpl.replace('%1', 1).replace('%2', loaded).replace('%3', total);
+                            var pct = Math.min(100, Math.round((loaded / total) * 100));
+
+                            var $count = $trigger.find('.ias-count');
                             if (!$count.length) {
                                 $count = $('<div class="ias-count"></div>').prependTo($trigger);
                             }
                             $count.text(text);
+
+                            var $bar = $trigger.find('.progressbar');
+                            if (!$bar.length) {
+                                $bar = $('<div class="progressbar"><span class="progressbar__fill"></span></div>').insertAfter($count);
+                            }
+                            $bar.find('.progressbar__fill').css('width', pct + '%');
                         }
 
                         if (window.MutationObserver && !window.iasCountObserver) {
