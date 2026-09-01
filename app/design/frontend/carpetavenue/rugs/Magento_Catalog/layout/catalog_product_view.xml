@@ -51,6 +51,10 @@
                    name="product.info.main.catalog_inventory_stockqty_unique"
                    template="Magento_CatalogInventory::stockqty/unique.phtml"
                    after="product.info.price"/>
+            <block class="Magento\Catalog\Block\Product\View"
+                   name="product.info.delivery"
+                   template="Magento_Catalog::product/view/delivery-info.phtml"
+                   before="product.info.main.catalog_inventory_stockqty_unique"/>
         </referenceContainer>
 
         <referenceContainer name="product.info.media">

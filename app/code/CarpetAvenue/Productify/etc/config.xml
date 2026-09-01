@@ -83,8 +83,8 @@
                     <done_text><![CDATA[<em>Congratulations, you've reached the end of the internet.</em>]]></done_text>
                     <hide_toolbar>1</hide_toolbar>
                     <buffer>150</buffer>
-                    <load_more>5</load_more>
-                    <load_more_text>See more</load_more_text>
+                    <load_more>1</load_more>
+                    <load_more_text>もっと見る</load_more_text>
                     <load_prev_text>Previous</load_prev_text>
                     <local_mode>0</local_mode>
                     <show_progressbar>1</show_progressbar>
