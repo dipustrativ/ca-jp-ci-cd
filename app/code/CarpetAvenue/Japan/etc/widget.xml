@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    <widget id="carpet_finder" class="CarpetAvenue\Japan\Block\CarpetFinderWidget">
+        <label>Carpet Finder block</label>
+        <description>Show the carpet finder</description>
+        <parameters>
+            <parameter name="buttons_color" xsi:type="select" visible="true" required="false" sort_order="10">
+                <label translate="true">Buttons Color</label>
+                <options>
+                    <option name="default" value="default" selected="true">
+                        <label translate="true">Default</label>
+                    </option>
+                    <option name="dark" value="dark">
+                        <label translate="true">Dark</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>

@@ -1,0 +1,144 @@
+//
+//  Carpet Finder widget
+//  _____________________________________________
+
+@cf__text-color: #2b2b2b;
+@cf__price-border: #050505;
+@cf__size-border: #070707;
+@cf__bg: #f6f5f4;
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+  .page-main {
+    .carpetfinder {
+      &.block {
+        margin-bottom: 0;
+        position: relative;
+      }
+    }
+  }
+
+  //  Wrapper around both step blocks — carries the background band
+  .carpetfinder-widget {
+    background: @cf__bg;
+    padding: 3rem 2rem;
+    margin: 25px auto;
+  }
+
+  .carpetfinder {
+    text-align: center;
+    color: @cf__text-color;
+
+    &__title-wrapper {
+      font-size: 3.2rem;
+      font-weight: @font-weight__bold;
+      line-height: 1.2;
+      color: @cf__text-color;
+    }
+
+    &__question-wrapper {
+      font-size: 1.8rem;
+      font-weight: @font-weight__regular;
+      margin: 0.6em 0 0;
+      color: @cf__text-color;
+    }
+
+    //  Shared button row
+    &__filteroptions {
+      &.items {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 14px;
+        margin: 1.6em auto 2.6em;
+        padding: 0;
+        list-style: none;
+      }
+
+      &.item {
+        margin: 0;
+        display: block;
+      }
+
+      a {
+        display: inline-block;
+        background: @color-white;
+        color: @cf__text-color;
+        font-weight: @font-weight__bold;
+        border-radius: 0;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+
+        &:hover,
+        &:focus {
+          background: @color-black;
+          color: @color-white;
+          text-decoration: none;
+        }
+      }
+    }
+
+    //  Price step — bold black outline
+    &__step-price {
+      .carpetfinder__filteroptions a {
+        border: 2px solid @cf__price-border;
+        padding: 0.9em 1.9em;
+      }
+    }
+
+    //  Size step — light thin outline (also neutralise the theme's .button styling)
+    &__step-size {
+      .carpetfinder__filteroptions a,
+      .carpetfinder__filteroptions a.button,
+      .carpetfinder__filteroptions a.button.action {
+        border: 2px solid @cf__size-border;
+        background: @color-white;
+        color: @cf__text-color;
+        font-weight: @font-weight__bold;
+        padding: 0.9em 1.7em;
+        box-shadow: none;
+        text-shadow: none;
+        line-height: 1.2;
+
+        &:hover,
+        &:focus {
+          background: @color-black;
+          color: @color-white;
+          border-color: @color-black;
+        }
+      }
+    }
+  }
+}
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+  .carpetfinder {
+    &__title-wrapper {
+      font-size: 2.6rem;
+    }
+
+    &__filteroptions {
+      &.items {
+        gap: 10px;
+      }
+
+      &.item {
+        width: 75%;
+        max-width: 420px;
+      }
+
+      a {
+        display: block;
+        white-space: normal;
+      }
+    }
+  }
+}

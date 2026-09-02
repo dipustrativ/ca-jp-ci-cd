@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <!--
+        Declares the "carpetfinder" block on the home page but does NOT place it.
+        Drop the "Carpet Finder block" widget into the home CMS page content to
+        render it where you want.
+    -->
+    <update handle="carpet_finder"/>
+</page>
