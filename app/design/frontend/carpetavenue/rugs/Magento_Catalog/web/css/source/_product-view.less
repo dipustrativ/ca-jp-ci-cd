@@ -1377,43 +1377,68 @@
             > span {
                 .lib-visually-hidden();
             }
-
-            //  Already in wishlist — red heart (JS adds .active)
-            &.active:before {
-                content: '\e642';
-                color: #d0011b;
-            }
         }
     }
 }
 
 //
-//  Wishlist heart active state on product cards (PLP grids, CMS/widget
+//  Wishlist heart active state — PDP plus product cards (PLP grids, CMS/widget
 //  carousels, related/similar sliders). belvg.guestwishlist adds .active to the
 //  add-to-wishlist link when the product is already in the wishlist. Wrapper
 //  classes differ per context (.product-item, .ev-product-item, …), so key off
-//  the link itself and just recolor whatever heart glyph the card uses.
+//  the link itself: hide the context's own glyph and draw like.svg instead.
+//  Geometry matches carpetavenue.jp — 16px centred in the card's 35px pill,
+//  30px hanging off the origin of the zero-width PDP link.
 //  _____________________________________________
 & when (@media-common = true) {
 
-    .product-social-links .action.towishlist{
-        position: relative;
-    }
-    .action.towishlist.active:before {
-        display: none;
+    .action.towishlist.active {
+        //  Drop whatever heart glyph the context draws; the SVG replaces it.
+        &:before {
+            display: none;
+        }
+
+        &:after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            transform: translate(-50%, -50%);
+            background: url('@{baseDir}images/icons/like.svg') no-repeat 0 0;
+            background-size: 100% auto;
+        }
     }
 
-    .action.towishlist.active:after {
-            background-image: url('@{baseDir}images/icons/like.svg');
-            position: absolute;
+    //  Cards carry the blank-theme glyph via
+    //  `.product-item-actions .actions-secondary > .action:before`, which beats
+    //  a plain `.active` selector — repeat the hide at that depth or the
+    //  outline heart stays visible behind the SVG.
+    .product-item-actions .actions-secondary > .action.towishlist.active {
+        //  The label span is visually hidden (absolute), so the glyph was the
+        //  pill's only in-flow content — without a height it collapses to 0.
+        //  Matches the blank-theme `width: 35px; line-height: 35px` pill.
+        height: 35px;
+
+        &:before {
+            display: none;
+        }
+    }
+
+    //  PDP link is inline and zero-width, so the heart hangs off its origin
+    //  rather than centring in a pill.
+    .product-social-links .action.towishlist {
+        position: relative;
+
+        &.active:after {
             top: 0;
             left: 0;
-            transform: translateY(-50%);
             width: 30px;
             height: 30px;
-            background-size: 100%;
-            background-repeat: no-repeat;
-            content: "";
+            transform: translateY(-50%);
+        }
     }
 }
 //

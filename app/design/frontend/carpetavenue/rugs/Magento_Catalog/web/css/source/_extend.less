@@ -14,6 +14,10 @@
     font-weight: @font-weight__bold;
 }
 
+.subcategory-card span{
+    color: #333333;
+}
+
 //
 //  Full-width grid — no left sidebar; filters sit above the grid
 //  _____________________________________________
@@ -47,7 +51,7 @@
             display: flex;
             flex-wrap: wrap;
             align-items: stretch;
-            gap: 10px;
+            gap: 0px;
         }
 
         //  Hidden until the filter-modal widget moves it into the modal
@@ -59,30 +63,38 @@
             position: relative;
             flex: 1 1 auto;
             min-width: 130px;
-            margin: 0;
-            padding: 12px 34px;
             background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: @button__border-radius;
-            .lib-font-size(14px);
-            font-weight: @font-weight__bold;
-            line-height: 1.2;
+            font-size: 1.4rem;
             text-align: center;
             cursor: pointer;
+            flex-grow: 1;
+            margin: 0 5px;
+            box-sizing: border-box;
+            border: 1px solid #505050;
+            line-height: 26px;
+            vertical-align: middle;
+            padding: 10px 20px;
+            border-radius: 0;
+
+            &:first-child{
+                margin-left: 0;
+            }
 
             &:after {
                 content: '\e622';
                 font-family: 'luma-icons';
                 position: absolute;
-                right: 12px;
+                right: 20px;
                 top: 50%;
                 transform: translateY(-50%);
-                font-size: 9px;
+                font-size: 16px;
                 font-weight: normal;
             }
 
             &:hover {
+                background: #f2f2f2;
                 border-color: #c6c6c6;
+                color: #333;
             }
         }
 
@@ -265,6 +277,8 @@
             font-size: 2rem;
             font-weight: 700;
             box-sizing: border-box;
+            margin-top: 2.5rem;
+            margin-bottom: 2rem;
         }
 
         .filter-options-item.active .filter-options-content {
@@ -278,6 +292,7 @@
             border: 0;
             border-radius: 0;
             background: #e8e8e8;
+            padding: 15px 20px;
 
             &:before {
                 content: '\e901';
@@ -290,16 +305,21 @@
         //  green border on hover/selected (reference "パターン" list design).
         .am-filter-items {
             position: relative;
+            background: #fff;
+            padding: 10px 10px;
+
 
             .am-filter-item {
                 background: #fff;
-                margin: 8px 0;
-                padding: 0;
-                border: 2px solid #e6e6e6;
+                margin: 0px;
+                padding: 0 5px 0;
+                border: 2px solid transparent;
+                border-bottom: 1px solid #ccc !important;
 
                 &:hover,
                 &.-selected {
-                    border-color: #429a3c;
+                    border-color: #429a3c !important;
+                    border-width: 2px !important;
                 }
 
                 &.-disabled {
@@ -698,6 +718,10 @@
                     opacity: 0;
                     visibility: hidden;
                     transition: opacity 0.25s ease, visibility 0.25s ease;
+
+                    &:before {
+                        line-height: 29px;
+                    }
                 }
             }
 
@@ -777,6 +801,8 @@
         }
     }
 }
+
+
 
 //
 //  Filter modal — desktop: 30% wide panel docked right
