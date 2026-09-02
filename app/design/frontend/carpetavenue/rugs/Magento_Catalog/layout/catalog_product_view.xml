@@ -21,9 +21,6 @@
         </referenceBlock>
 
         <referenceContainer name="product.info.main">
-            <block class="Magento\Catalog\Block\Product\View"
-                   name="product.info.sku.ean"
-                   template="Magento_Catalog::product/view/sku-ean.phtml"/>
             <container name="container.size.attribute" htmlTag="div" htmlClass="size-product__attribute">
                 <block name="size.attribute"
                        class="Magento\Catalog\Block\Product\View"
@@ -129,7 +126,6 @@
         <move element="product.info.social" destination="product.info.form.content" after="-"/>
         <!-- Product name (page title) first inside product-info-main -->
         <move element="page.main.title" destination="product.info.main" before="-"/>
-        <move element="product.info.sku.ean" destination="product.info.main" before="page.main.title"/>
         <move element="container.size.attribute" destination="product.info.main" after="page.main.title"/>
         <move element="product.info.stock.sku" destination="product.info.main" before="product.info.price"/>
         <move element="product.info.details" destination="product.bottom.holder" before="-"/>
