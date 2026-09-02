@@ -12,7 +12,19 @@ $readMoreChars = (int) $currentCategory->getData('description_read_more_chars');
 $showDescriptionTop = (bool) $currentCategory->getData('show_description_top');
 $categoryDescriptionShowOnTop = $showDescriptionTop || $customBottomBlock;
 $customCss = $currentCategory->getData('category_custom_css');
-$descriptionPlain = strip_tags($description ?? '');
+// Drop <style>/<script> blocks first — strip_tags keeps their inner text,
+// and PageBuilder descriptions embed a <style> block whose CSS would otherwise
+// leak into the plain text and break sentence extraction.
+$descriptionNoEmbeds = preg_replace('#<(style|script)\b[^>]*>.*?</\1>#is', '', $description ?? '');
+$descriptionPlain = trim(strip_tags($descriptionNoEmbeds));
+// First complete sentence — used in bottom-description (else) branch preview
+// Includes Japanese sentence terminators (。！？) alongside Latin (.!?) for ja_JP
+preg_match('/[^.!?。！？]*[.!?。！？]+/u', $descriptionPlain, $firstSentenceMatch);
+$firstSentence = trim($firstSentenceMatch[0] ?? '');
+if ($firstSentence === '') {
+    $firstSentence = trim($descriptionPlain);
+}
+$hasMoreThanFirstSentence = mb_strlen(trim($descriptionPlain)) > mb_strlen($firstSentence);
 if ($readMoreChars > 0) {
     $hasMoreContent = mb_strlen($descriptionPlain) > $readMoreChars;
     $truncatedText  = $hasMoreContent
@@ -20,7 +32,7 @@ if ($readMoreChars > 0) {
         : $descriptionPlain;
 } else {
     $sentenceLimit  = 2;
-    preg_match_all('/[^.!?]*[.!?]+/u', $descriptionPlain, $matches);
+    preg_match_all('/[^.!?。！？]*[.!?。！？]+/u', $descriptionPlain, $matches);
     $sentences      = $matches[0] ?? [];
     $hasMoreContent = count($sentences) > $sentenceLimit;
     $truncatedText  = $hasMoreContent
@@ -28,6 +40,8 @@ if ($readMoreChars > 0) {
         : $descriptionPlain;
 }
 $showReadMore = $isReadMoreEnabled && $showDescriptionTop && $hasMoreContent;
+// Bottom-description case: show 1st sentence under heading, jump+expand to bottom toggle-readmore
+$showBottomPreview = $description && !$categoryDescriptionShowOnTop;
 ?>
 <?php if ($description && $categoryDescriptionShowOnTop): ?>
 <style>
@@ -94,8 +108,16 @@ $showReadMore = $isReadMoreEnabled && $showDescriptionTop && $hasMoreContent;
     </div>
 </div>
 <?php else: ?>
-    <div class="container category-heading">
+    <div class="container category-heading<?= $showBottomPreview ? ' category-heading-with-description' : '' ?>">
         <h1><?= !empty($customCategoryTitle) ? $customCategoryTitle : $name ?></h1>
+        <?php if ($showBottomPreview): ?>
+            <div class="category-description category-description-preview">
+                <span class="desc-first-sentence"><?= $escaper->escapeHtml($firstSentence) ?></span>
+                <?php if ($hasMoreThanFirstSentence): ?>
+                    <a href="javascript:void(0)" class="read-more-toggle" id="desc-jump-readmore"><strong> <?= $escaper->escapeHtml(__("Read more")) ?></strong></a>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </div>
 <?php endif; ?>
 
@@ -163,6 +185,21 @@ $showReadMore = $isReadMoreEnabled && $showDescriptionTop && $hasMoreContent;
             btn.textContent = expanded ? '<?= $escaper->escapeJs(__('Read less'))."..." ?>' : '<?= $escaper->escapeJs(__('Read more'))."..." ?>';
         });
     }
+})();
+</script>
+<?php endif; ?>
+
+<?php if ($showBottomPreview && $hasMoreThanFirstSentence): ?>
+<script>
+(function() {
+    var jumpBtn = document.getElementById('desc-jump-readmore');
+    if (!jumpBtn) { return; }
+    jumpBtn.addEventListener('click', function() {
+        var target = document.querySelector('.category-description.toggle-readmore')
+            || document.querySelector('.category-description:not(.category-description-preview)');
+        if (!target) { return; }
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 })();
 </script>
 <?php endif; ?>
