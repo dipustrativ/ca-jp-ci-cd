@@ -6,7 +6,11 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="catalog.navigation.renderer" template="CarpetAvenue_Productify::layer/filter.phtml"/>
+        <referenceBlock name="catalog.navigation.renderer" template="CarpetAvenue_Productify::layer/filter.phtml">
+            <arguments>
+                <argument name="category_image_view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\CategoryImages</argument>
+            </arguments>
+        </referenceBlock>
         <referenceBlock name="catalog.navigation.state" template="CarpetAvenue_Productify::layer/state.phtml"/>
         <referenceContainer name="before.body.end">
             <block class="Magento\Framework\View\Element\Template" name="carpetavenue.layerednav.ajax" template="CarpetAvenue_Productify::ajax/init.phtml">

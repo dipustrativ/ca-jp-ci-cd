@@ -21,6 +21,9 @@
         echo $sizeValue;
         ?>
     </div>
+    <div class="sku-attribute">
+        <?= $block->escapeHtml($_product->getSku()) ?>
+    </div>
 </div>
 <style>
     @media (max-width: 800px) {

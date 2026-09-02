@@ -1098,7 +1098,8 @@
 & when (@media-common = true) {
     //  Title row: heading left (#333) + "Show All" link right, same line.
     //  "Show All" matches base project styling (black bold text-link + arrow).
-    .block-products-list.grid .block-title {
+    .block-products-list.grid .block-title,
+    .block-viewed-products-grid .block-title {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
@@ -1152,7 +1153,8 @@
         }
     }
 
-    .block-products-list.grid {
+    .block-products-list.grid,
+    .block-viewed-products-grid {
         .products-grid .product-items {
             .product-item,
             .ev-product-item {
@@ -1169,6 +1171,11 @@
                     text-align: center;
                 }
 
+                //  Discount flag stays above the hover image (z-index 2).
+                .product-item__flag--discount {
+                    z-index: 999;
+                }
+
                 //  Same 280px box as the image container below — the hover
                 //  second image is absolutely positioned against this link, so
                 //  a wider link would render the hover image wider than the
@@ -1178,6 +1185,36 @@
                     width: 280px;
                     max-width: 100%;
                     margin: 0 auto;
+
+                    //  Hover image: emitted as a sibling of .product-image-
+                    //  container (outside the aspect-ratio wrapper), so without
+                    //  this it rendered stacked below the thumbnail. Overlay it
+                    //  and reveal on hover only.
+                    &.has-hover-image {
+                        position: relative;
+                    }
+
+                    .product-image-photo--hover {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
+                        opacity: 0;
+                        //  Main image lives in a positioned wrapper and paints
+                        //  after this one in tree order, so without a z-index it
+                        //  covered the hover image. Lift the hover image above it.
+                        z-index: 2;
+                        transition: opacity .3s ease;
+                        pointer-events: none;
+                    }
+                }
+
+                //  Reveal the hover image when hovering anywhere on the card
+                //  (not only the image link).
+                &:hover .product-image-photo--hover {
+                    opacity: 1;
                 }
 
                 //  Portrait rug image — constrain width, height driven by
@@ -1216,8 +1253,10 @@
                     margin-bottom: 6px;
                 }
 
-                //  Price — centered, sale colouring
-                .price-box.price-final_price {
+                //  Price — centered, sale colouring. Match plain `.price-box`
+                //  too: the recently-viewed widget omits the `.price-final_price`
+                //  modifier the similar/related carousels carry.
+                .price-box {
                     margin: 6px 0 0;
                     display: flex;
                     align-items: center;
@@ -1290,19 +1329,20 @@
 //  Desktop — 5 products per row (matches theme category grid). On mobile
 //  the items stay in the horizontal elastyslider from _slider.less.
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
-    .block-products-list.grid {
+    .block-products-list.grid,
+    .block-viewed-products-grid {
         .products-grid .product-items {
             display: flex;
             flex-wrap: wrap;
 
-            .ev-product-item {
+            //  5 per row. Recently-viewed items are plain .product-item (no
+            //  col-md-2 class), so width them directly too.
+            .ev-product-item,
+            .product-item {
                 box-sizing: border-box;
                 padding: 0 10px;
-
-                &.col-md-2 {
-                    max-width: 20%;
-                    flex-basis: 20%;
-                }
+                max-width: 20%;
+                flex-basis: 20%;
             }
         }
     }
@@ -1314,6 +1354,24 @@
             .ev-product-item.col-lg-2 {
                 max-width: 20%;
                 flex-basis: 20%;
+            }
+        }
+    }
+}
+
+//  Recently-viewed on mobile: 2-column static grid (Similar uses the JS
+//  elastyslider scroll, which this widget doesn't emit).
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .block-viewed-products-grid {
+        .products-grid .product-items {
+            display: flex;
+            flex-wrap: wrap;
+
+            .product-item {
+                box-sizing: border-box;
+                width: 50%;
+                max-width: 50%;
+                padding: 0 8px;
             }
         }
     }
@@ -1527,6 +1585,66 @@
 //  Touch devices have no hover — keep the links always visible there.
 @media (hover: none) {
     .ev-product-item .secondary-addto-links.actions-secondary {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+//  Recently-viewed widget renders plain .product-item (no .ev-product-item, no
+//  .secondary-addto-links wrapper, and it prints size BEFORE the name), so give
+//  it the same catalog-card behaviour explicitly.
+.block-viewed-products-grid {
+    //  Hover box-shadow (parity with .ev-product-item cards).
+    .product-item-info {
+        transition: box-shadow 0.2s ease;
+
+        &:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    //  Reorder details: name first, then size, then price/actions.
+    .product-item-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-item-name {
+        order: 1;
+    }
+
+    .size {
+        order: 2;
+    }
+
+    .price-box {
+        order: 3;
+    }
+
+    .product-item-actions {
+        order: 4;
+    }
+
+    .product-item-description {
+        order: 5;
+    }
+
+    //  Wishlist heart: hidden until the card is hovered.
+    .product-item-actions .actions-secondary {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .product-item:hover .actions-secondary {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+//  Touch devices: keep the wishlist heart visible (no hover).
+@media (hover: none) {
+    .block-viewed-products-grid .product-item-actions .actions-secondary {
         opacity: 1;
         visibility: visible;
     }

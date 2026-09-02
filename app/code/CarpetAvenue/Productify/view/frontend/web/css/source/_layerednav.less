@@ -76,6 +76,67 @@
         }
     }
 
+    //  Category filter ("cat"): show the category thumbnail as an image card
+    //  with the count in a pill on the right (matches the reference theme).
+    .am-filter-items.am-filter--cat {
+        .am-filter-item {
+            margin: 0;
+            border-bottom: 1px solid rgba(0, 0, 0, .08);
+
+            &:last-child {
+                border-bottom: 0;
+            }
+
+            .am-filter-link {
+                gap: 14px;
+                padding: 10px 6px;
+            }
+
+            //  Thumbnail (background-image set inline) and the placeholder box
+            //  shown when a category has no thumbnail share one footprint.
+            .am-filter-swatch,
+            .am-filter-checkbox {
+                flex-shrink: 0;
+                width: 92px;
+                height: 64px;
+                border: 0;
+                border-radius: 3px;
+                background-color: @color-gray95;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
+
+            .am-filter-label {
+                flex: 1 1 auto;
+                font-size: 1.4rem;
+                color: @text__color;
+            }
+
+            .count {
+                flex-shrink: 0;
+                margin-left: auto;
+                padding: 3px 10px;
+                border-radius: 6px;
+                background: @color-gray95;
+                color: @color-gray56;
+                font-size: 1.2rem;
+
+                //  Category counts show bare numbers, no parentheses.
+                &:before,
+                &:after {
+                    content: none;
+                }
+            }
+
+            &.-selected .am-filter-swatch,
+            &.-selected .am-filter-checkbox {
+                outline: 2px solid @color-gray20;
+                outline-offset: 1px;
+            }
+        }
+    }
+
     .am-price-slider {
         padding: 8px 6px 4px;
 
