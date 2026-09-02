@@ -16,6 +16,10 @@
             width: auto;
 
             &:hover {
+                //  Restate the white — the theme's global `a:hover` sets #333 at
+                //  the same specificity as `.ias-trigger a` and loads after this
+                //  module's CSS, so the label goes dark without it.
+                color: #fff;
                 text-decoration: none;
                 background: #24762f;
             }

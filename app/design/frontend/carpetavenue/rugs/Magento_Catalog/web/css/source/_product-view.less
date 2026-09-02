@@ -192,8 +192,17 @@
       }
     }
 
-    .catalog-product-similar-ajax .block-title.title {
-      padding: 0 15px;
+    //  Inset the whole similar block by the page gutter, the way live does.
+    //  It sits in the full-width container, so without this the grid ran edge
+    //  to edge while the rest of the page was inset — and only the title
+    //  carried an ad-hoc 15px, so title and grid did not even line up.
+    .catalog-product-similar-ajax {
+      padding-left: @layout-indent__width;
+      padding-right: @layout-indent__width;
+
+      .block-title.title {
+        padding: 0;
+      }
     }
 
   //
@@ -368,12 +377,31 @@
       .lib-font-size(16px);
     }
 
+    //  Bare heart, no button chrome — matches carpetavenue.jp, where this link
+    //  is 35x28 with no padding, radius or background in any state.
+    //
+    //  Magento's blank theme styles `.product-info-main .action.towishlist` as a
+    //  grey secondary button (#f2f2f2, 1px #cdcdcd, 5px radius, #e2e2e2 on
+    //  hover). Zeroing only `background`/`border` left the radius behind and let
+    //  the fill return on :hover/:focus, so the heart sat in a grey rounded box.
+    //  The radius mattered twice over: when `.active` hides the glyph the box
+    //  collapses to 10x10, and a 5px radius on that is a grey circle sitting
+    //  under the offset SVG heart.
     .action.towishlist {
       background: none;
       border: 0;
-      margin: 10px 10px;
+      border-radius: 0;
+      margin: 0 10px;
       margin-top: 0 !important;
-      padding: 5px 5px;
+      padding: 0;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background: none;
+        border: 0;
+        box-shadow: none;
+      }
     }
   }
 
@@ -663,8 +691,7 @@
     &__flag {
       &--discount {
         position: absolute;
-        /*background: url('@{baseDir}images/catalog_flags/discount.svg');*/
-        background: url('@{baseDir}images/catalog_flags/discount_1.svg');
+        background: url('@{baseDir}images/catalog_flags/discount.svg');
         z-index: 2;
         padding: 1.2rem;
         background-size: 100%;

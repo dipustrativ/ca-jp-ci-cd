@@ -134,6 +134,27 @@
 }
 
 //
+//  Modal close icon — swap the blank theme's glyph for the luma one.
+//  Must stay at the top level: nested under .modal-slide.filter-modal these
+//  compile to `.filter-modal .modal-slide .action-close`, which needs a
+//  .modal-slide *inside* .modal-inner-wrap. It is the ancestor, so nothing
+//  matches. Magento sets the same selectors in lib/_modals.less; the theme
+//  loads later, so equal specificity is enough to win.
+//  _____________________________________________
+.modal-custom,
+.modal-popup,
+.modal-slide {
+    .action-close {
+        padding: 15px;
+
+        &:before {
+            content: '\e616';
+            font-family: 'luma-icons';
+        }
+    }
+}
+
+//
 //  Filter slide-out modal (right side) — matches reference theme
 //  _____________________________________________
 .modal-slide.filter-modal {
@@ -229,7 +250,10 @@
         //  position:fixed resolves against the transformed .modal-inner-wrap,
         //  so the panel fills the modal, not the viewport.
         .filter-options-content {
-            display: block !important; // stay in flow so the slide transition works
+            //  !important because Magento's accordion widget inlines
+            //  `display: none` when the option group is collapsed; the panel has
+            //  to stay in flow for the slide transition.
+            display: flex !important;
             position: fixed;
             top: 0;
             right: 0;
@@ -242,12 +266,15 @@
             z-index: 99;
             transform: translate(100vw);
             transition: transform 0.1s;
-            //  Long option lists (e.g. Pattern) scroll inside the panel while the
-            //  クリア / 表示 apply bar stays pinned. max-height guards against any
-            //  ancestor whose height doesn't resolve to the full viewport.
+            //  Column layout so the option list can take whatever height is left
+            //  under the title and scroll *inside* the white card, the way live
+            //  does. Live gets there by setting a pixel height on the list from
+            //  JS; flex needs no measuring and survives a taller title.
+            //  The panel itself must not scroll, or the card scrolls out of view
+            //  and the pinned クリア / 表示 bar ends up floating over the list.
+            flex-direction: column;
             max-height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
+            overflow: hidden;
             -webkit-overflow-scrolling: touch;
             .lib-font-size(16);
 
@@ -266,6 +293,7 @@
         }
 
         .filter-options-content__title {
+            flex: 0 0 auto;
             display: inline-block;
             position: relative;
             transform: translateY(-20px);
@@ -285,10 +313,16 @@
             transform: translate(0);
         }
 
+        //  Out of flow, so the title centres on its own line and the option list
+        //  below can flex to the remaining height. In flow it was an inline
+        //  sibling of the title, which blocked the column layout.
         button.filter-options-back {
             display: inline-block;
-            position: relative;
-            margin-left: -20px;
+            position: absolute;
+            top: 28px;
+            left: 0;
+            z-index: 2;
+            margin: 0;
             border: 0;
             border-radius: 0;
             background: #e8e8e8;
@@ -303,21 +337,28 @@
 
         //  Option rows: white cards on the grey panel — label left, count right,
         //  green border on hover/selected (reference "パターン" list design).
+        //  Takes the height left under the title and scrolls its own rows, so
+        //  the white card always reaches down to the apply bar instead of ending
+        //  wherever the list happens to stop. `min-height: 0` is what lets a
+        //  flex item shrink below its content and actually scroll.
         .am-filter-items {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
             position: relative;
             background: #fff;
             padding: 10px 10px;
 
 
             .am-filter-item {
+                position: relative; // anchor for the selected tick
                 background: #fff;
                 margin: 0px;
                 padding: 0 5px 0;
                 border: 2px solid transparent;
                 border-bottom: 1px solid #ccc !important;
 
-                &:hover,
-                &.-selected {
+                &:hover {
                     border-color: #429a3c !important;
                     border-width: 2px !important;
                 }
@@ -326,17 +367,58 @@
                     opacity: 0.5;
                 }
 
-                &.-selected .count {
-                    color: #3a6fb0;
+                //  Selected rows get a tick at the top-left, the way live marks
+                //  them with its `.amshopby-choice` element. Our layered nav
+                //  renders no checkbox — the JS only adds `-selected` and flips
+                //  `aria-checked` — so it is drawn here.
+                //
+                //  Two pseudos, mirroring live: a white 20x20 square (:before)
+                //  so the mark stays legible over a dark rug thumbnail, and the
+                //  check itself (:after) as two rotated borders. Live uses a
+                //  base64 SVG on a white background; borders avoid carrying the
+                //  blob and can't fail to load.
+                &.-selected {
+                    &:before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        z-index: 2;
+                        width: 20px;
+                        height: 20px;
+                        background: #fff;
+                    }
+
+                    &:after {
+                        content: '';
+                        position: absolute;
+                        top: 5px;
+                        left: 5px;
+                        z-index: 3;
+                        width: 10px;
+                        height: 5px;
+                        border-left: 2px solid #000;
+                        border-bottom: 2px solid #000;
+                        transform: rotate(-45deg);
+                    }
+
+                    .am-filter-label,
+                    .count {
+                        color: #3a6fb0;
+                    }
                 }
             }
 
+            //  No horizontal padding — live's row link is `padding: 0`, so the
+            //  thumbnail sits against the card edge and the count against the
+            //  right. Our 16px inset pulled both inwards and read as a narrower
+            //  card. Vertical padding stays: it sets the row height.
             .am-filter-link {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
                 width: 100%;
-                padding: 14px 16px;
+                padding: 14px 0;
                 color: #333;
                 text-decoration: none;
                 box-sizing: border-box;
@@ -347,12 +429,12 @@
                 display: none;
             }
 
+            //  Square corners — live's thumbnails are not rounded.
             .am-filter-swatch {
                 flex: 0 0 auto;
                 width: 28px;
                 height: 28px;
                 margin-right: 12px;
-                border-radius: 3px;
                 background-size: cover;
                 background-position: center;
             }
@@ -378,7 +460,6 @@
                     width: 92px;
                     height: 64px;
                     margin-right: 16px;
-                    border-radius: 4px;
                 }
 
                 .count {
@@ -458,7 +539,6 @@
                     width: 40px;
                     height: 40px;
                     margin-right: 16px;
-                    border-radius: 4px;
                     background-size: contain;
                 }
 
@@ -542,24 +622,28 @@
             flex-wrap: wrap;
             justify-content: space-evenly;
             margin-bottom: 0;
-            padding: 10px 0;
+            padding: 15px 5px;
             background: #fff;
             box-shadow: none;
         }
 
+        //  Black "apply" / outlined "clear", 40px tall at 16px/600 — the values
+        //  carpetavenue.jp renders. Ours was a green fill at 12px padding.
         .amshopby-button {
             display: flex;
             justify-content: center;
             align-items: center;
             flex: 0 1 45%;
+            height: 40px;
             margin: 0;
-            padding: 12px;
+            padding: 0 10px;
             border-radius: 0;
             box-sizing: border-box;
-            background: #2c8e3b;
-            border: 1px solid #2c8e3b;
+            background: #000;
+            border: 1px solid #000;
             color: #fff;
-            font-weight: @font-weight__bold;
+            .lib-font-size(16);
+            font-weight: 600;
             text-align: center;
             text-decoration: none;
 
@@ -571,13 +655,43 @@
                 margin-left: 5px;
             }
 
+            //  Live greys the apply button out while nothing is selected — it is
+            //  a real `<button disabled>` at 50% opacity, which is why it reads
+            //  grey rather than black in the reference design.
+            &:disabled,
+            &[disabled] {
+                opacity: 0.5;
+                pointer-events: none;
+            }
+
+            //  Our layered nav never disables the button, so mirror the same two
+            //  states off the selection itself: dimmed while nothing is ticked,
+            //  green once something is. `:has()` reads the panel's state from the
+            //  bar, which sits in the same modal.
+            &:not(.filter-clear) {
+                opacity: 0.5;
+            }
+
             &.filter-clear.action.clear {
                 border-radius: 0;
-                border-color: #333;
+                border-color: #000;
                 background: #fff;
-                .lib-css(color, #333);
+                .lib-css(color, #000);
+                opacity: 1;
             }
         }
+    }
+}
+
+//  Apply turns green the moment a filter is ticked — live's enabled state
+//  (#429a3c). Kept out of the block above because it has to qualify the modal,
+//  not the button: `:has()` lets the bar react to the panel's selection without
+//  the layered-nav JS having to touch the button.
+.modal-slide.filter-modal:has(.am-filter-item.-selected) {
+    .am_shopby_apply_filters .amshopby-button:not(.filter-clear) {
+        background: #429a3c;
+        border-color: #429a3c;
+        opacity: 1;
     }
 }
 
@@ -725,10 +839,21 @@
                 position: relative;
                 width: auto;
                 text-align: center;
-                transition: box-shadow 0.2s ease;
 
+                //  Hover lift, matching carpetavenue.jp. The negative margin
+                //  cancels the padding + border (20px total), so the card grows
+                //  outward by 20px on every side without reflowing the grid.
+                //  No transition — live applies it instantly, and animating
+                //  only the shadow leaves it trailing the box.
                 &:hover {
+                    background: @color-white;
+                    border: 1px solid #e6e6e6;
+                    border-radius: 5px;
                     box-shadow: @product-item__hover__box-shadow;
+                    margin: -20px;
+                    padding: 19px;
+                    z-index: 9;
+                    overflow: hidden;
                 }
             }
 
@@ -882,7 +1007,10 @@
     color: @color-white;
     font-weight: @font-weight__bold;
     .lib-font-size(15px);
-    background: url('@{baseDir}images/catalog_flags/discount_1.svg') no-repeat;
+    //  Green ribbon. `discount_1.svg` is the maroon variant — carpetavenue.jp
+    //  ships both and overrides to the green one via admin CSS; we point the
+    //  theme straight at it.
+    background: url('@{baseDir}images/catalog_flags/discount.svg') no-repeat;
     background-size: 100%;
 }
 
@@ -907,11 +1035,11 @@
         padding: 0;
 
         #filter-popup {
+            //  Mobile puts it top-right (live: 10px in from the panel edge).
             button.filter-options-back {
-                float: right;
-                margin-top: 20px;
-                top: -23px;
-                left: 10px;
+                top: 17px;
+                left: auto;
+                right: 10px;
             }
 
             .filter-options-title {
@@ -940,9 +1068,11 @@
         right: 0;
 
         #filter-popup {
+            //  Desktop keeps it top-left, flush with the panel edge (live: 28px).
             button.filter-options-back {
-                top: -20px;
+                top: 28px;
                 left: 0;
+                right: auto;
             }
 
             .filter-options-title {

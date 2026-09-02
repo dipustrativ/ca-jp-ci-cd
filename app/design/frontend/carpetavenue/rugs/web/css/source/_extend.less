@@ -238,6 +238,7 @@ a:hover, .alink:hover {
         column-gap: 0px;
         position: relative;
         height: 60px;
+        z-index: 9;
     }
 }
 
@@ -428,6 +429,23 @@ a:hover, .alink:hover {
             position: relative;
             margin: 0;
 
+            //  MageWorx autocomplete dropdown. The module ships
+            //  `left: -85px; width: 350px`, sized for a narrow stock search box,
+            //  which hangs the panel off the left of our full-width header field.
+            //  Live pins it to the field instead, so it lines up under the input
+            //  and matches its width.
+            #searchsuite-autocomplete {
+                left: 0;
+                width: 100%;
+
+                //  Section heading ("Suggested", "類似検索", …) — live uses #f4f4f4
+                //  at weight 600; the body's base 500 reads too light here.
+                .title {
+                    background: #f4f4f4;
+                    font-weight: 600;
+                }
+            }
+
             //  Magnifier inside the field
             .label {
                 position: absolute !important;
@@ -539,10 +557,50 @@ a:hover, .alink:hover {
         content: "\e605";
     }
 
-    //  Wish list -> heart
-    .link.wishlist > a:before {
-        .ca-icon("\e642");
-        font-size: @ca-header-icon-size;
+    //  Wish list -> heart. Outline while the list is empty, filled once it has
+    //  items — same swap carpetavenue.jp does, where the empty state is keyed
+    //  off BelVG's `.no-display` class.
+    //
+    //  Here the marker is Magento's own counter: the header link only renders
+    //  `.counter.qty` when `wishlist().counter` is set, and Knockout inserts
+    //  and removes it as items come and go, so `:has()` follows the state
+    //  live with no JS. The counter itself is 0x0 (the link is `font-size: 0`),
+    //  so it only ever acts as a flag.
+    .link.wishlist > a {
+        position: relative;
+
+        &:before {
+            .ca-icon("\e642");
+            font-size: @ca-header-icon-size;
+        }
+
+        &:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: @ca-header-icon-size;
+            height: @ca-header-icon-size;
+            transform: translate(-50%, -50%);
+            background: url('@{baseDir}images/icons/like.svg') no-repeat 0 0;
+            background-size: 100%;
+            opacity: 0;
+            transition: opacity .5s;
+        }
+
+        &:has(.counter.qty) {
+            //  Hide the outline by colour, not by dropping `content` — the link
+            //  is `font-size: 0` with an absolutely positioned `:after`, so the
+            //  glyph box is the only thing giving it height. Emptying it
+            //  collapses the link to 0x0 and the icon row shifts.
+            &:before {
+                color: transparent;
+            }
+
+            &:after {
+                opacity: 1;
+            }
+        }
     }
 }
 
@@ -1245,11 +1303,19 @@ a:hover, .alink:hover {
         //  Glyph sizes match carpetavenue.jp mobile: 25px heart, 30px cart.
         //  The heart needs the full desktop selector — the @ca-header-icon-size
         //  rule at line ~545 is (0,5,2) and beats a plainer one.
-        .customer-account-header .header.links .link.wishlist > a:before {
-            width: 2.5rem;
-            height: 2.5rem;
-            font-size: 2.5rem;
-            color: #333;
+        .customer-account-header .header.links .link.wishlist > a {
+            &:before {
+                width: 2.5rem;
+                height: 2.5rem;
+                font-size: 2.5rem;
+                color: #333;
+            }
+
+            //  Keep the filled heart the same size as the outline it replaces.
+            &:after {
+                width: 2.5rem;
+                height: 2.5rem;
+            }
         }
 
         .action.showcart:before {

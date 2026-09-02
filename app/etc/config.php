@@ -387,7 +387,7 @@ return [
         'Fooman_EmailAttachments' => 1,
         'IXPF_Syncer' => 1,
         'IXPF_SyncerMsi' => 1,
-        'MageWorx_SearchSuiteAutocomplete' => 0,
+        'MageWorx_SearchSuiteAutocomplete' => 1,
         'CarpetAvenue_B2B' => 1,
         'Mageplaza_DeliveryTime' => 1,
         'Mageplaza_GeoIP' => 1,
