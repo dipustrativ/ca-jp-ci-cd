@@ -266,6 +266,15 @@ define([
             this.sliderElement.removeClass('_block-content-loading');
 
             this.sliderElement.addClass(this.GALLERY_CLASS);
+
+            // Build the slide markup into the DOM BEFORE initializing slick.
+            // Slicking an empty element and then slickAdd-ing breaks on mobile:
+            // when a responsive breakpoint (<=769px) is active at init, the slick
+            // instance silently rejects every slickAdd, so the main image never
+            // renders on phones. Initializing slick with the slides already present
+            // avoids that broken state.
+            this.appendSlides();
+
             this.sliderElement.slick(this.config.sliderSettings.options);
 
             if (this.config.imagePopup.imagePopupStatus) {
@@ -276,8 +285,6 @@ define([
                 }
             }
 
-            // Add slides
-            this.addSlides();
             this.initThumbs();
         },
 
@@ -319,24 +326,33 @@ define([
         /**
          *
          */
-        addSlides: function () {
+        /**
+         * Builds one slide's markup.
+         */
+        buildSlide: function (imageData, index) {
+            var _className = (this.isVideo(imageData)) ? 'slick-video-slide' : '',
+                _hrefLink = (this.isVideo(imageData)) ? imageData['videoUrl'] : imageData['full'],
+                _fancyBox = (this.config.imagePopup.imagePopupStatus) ? 'href="' + _hrefLink + '"' : '',
+                _dataType = imageData.provider == "youtube" ? 'data-type="iframe"' : 'data-type="' + imageData['type'] + '"';
+
+            return '<' + (imageData.provider == "youtube" ? 'div data-fancybox data-type="iframe"' : 'div') + ' class="slick-slide-wrap '+ _className + (imageData.provider == "youtube" ? ' iframe' : '') + '" data-data-index="' + index + '" ' + _fancyBox + ' ><img width="'+this.config.image_width+'" height="'+this.config.image_height+'" ' + _dataType + ' src="' + imageData['img'] + '"/></' + (imageData.provider == "youtube" ? 'a' : 'div') + '>';
+        },
+
+        /**
+         * Appends the slide markup to the main slider element (call BEFORE slick init).
+         * Mobile shows every slide; desktop keeps the first two (the rest live in the
+         * thumbnail rail).
+         */
+        appendSlides: function () {
             var self = this;
+            var html = '';
             $.each(this.config.data, function (index, imageData) {
-                var _className = (self.isVideo(imageData)) ? 'slick-video-slide' : '',
-                    _hrefLink = (self.isVideo(imageData)) ? imageData['videoUrl'] : imageData['full'],
-                    _fancyBox = (self.config.imagePopup.imagePopupStatus) ? 'href="' + _hrefLink + '"' : '',
-                    _dataType = imageData.provider == "youtube" ? 'data-type="iframe"' : 'data-type="' + imageData['type'] + '"',
-                    _slide = '<' + (imageData.provider == "youtube" ? 'div data-fancybox data-type="iframe"' : 'div') + ' class="slick-slide-wrap '+ _className + (imageData.provider == "youtube" ? ' iframe' : '') + '" data-data-index="' + index + '" ' + _fancyBox + ' ><img width="'+self.config.image_width+'" height="'+self.config.image_height+'" ' + _dataType + ' src="' + imageData['img'] + '"/></' + (imageData.provider == "youtube" ? 'a' : 'div') + '>';
-
-                if(self.isMobile()) {
-                    self.sliderElement.slick('slickAdd', _slide);
-                } else {
-                    if(index < 2) {
-                        self.sliderElement.slick('slickAdd', _slide);
-                    }
+                if (!self.isMobile() && index >= 2) {
+                    return;
                 }
-
+                html += self.buildSlide(imageData, index);
             });
+            this.sliderElement.append(html);
         },
 
         /**
@@ -384,22 +400,22 @@ define([
          *
          */
         reInitSlider: function () {
-            var slick = this.sliderElement.slick('getSlick'),
-                slides = slick.$slides,
-                slickThumbs = this.thumbsElement.slick('getSlick'),
+            // Rebuild the main slider from scratch: unslick, clear, re-append the
+            // slides, then slick again. Same reason as initSlider — going back to an
+            // empty slick and slickAdd-ing breaks under the mobile responsive
+            // breakpoint. Re-slicking with slides already in the DOM is reliable.
+            this.sliderElement.slick('unslick');
+            this.sliderElement.empty();
+            this.appendSlides();
+            this.sliderElement.slick(this.config.sliderSettings.options);
+
+            // Thumbs are unaffected by the breakpoint bug (they render fine); just
+            // clear and repopulate them.
+            var slickThumbs = this.thumbsElement.slick('getSlick'),
                 thumbs = slickThumbs.$slides;
-
-            // Remove slides
-            while (slides.length !== 0) {
-                this.sliderElement.slick('slickRemove', --slides.length);
-            }
-
-            // Remove thumbs
             while (thumbs.length !== 0) {
                 this.thumbsElement.slick('slickRemove', --thumbs.length);
             }
-
-            this.addSlides();
             this.addThumbs();
         },
 
