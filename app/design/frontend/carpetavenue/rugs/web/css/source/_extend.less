@@ -284,7 +284,6 @@ a:hover, .alink:hover {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding-right: 30px;
 }
 
 //  Vertically centre every header item on one line
@@ -496,7 +495,6 @@ a:hover, .alink:hover {
 .customer-account-header .header.links {
     display: flex;
     align-items: center;
-    gap: 40px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -511,6 +509,15 @@ a:hover, .alink:hover {
     > li {
         margin: 0;
     }
+
+    > li:first-child{
+        padding: 0 20px;
+    }
+
+    li.link.wishlist{
+        padding: 0 20px;
+    }
+
 
     a {
         display: inline-block;
@@ -553,8 +560,12 @@ a:hover, .alink:hover {
     .action.showcart {
         position: relative;
         height: auto;
-        padding: 0;
+        padding: 15px 30px 15px 15px;
+        border-radius: 5px;
+        box-sizing: border-box;
         border: 0;
+        color: #333;
+        height: 50px;
         background: none;
 
         &:before {
@@ -571,17 +582,18 @@ a:hover, .alink:hover {
             overflow: hidden;
             speak: none;
             text-align: center;
+            top: -5px !important;
         }
 
         .counter.qty {
             top: -6px;
-            min-width: 17px;
-            height: 17px;
-            line-height: 17px;
+            min-width: 18px;
+            height: 24px;
+            line-height: 24px;
             padding: 0 4px;
             font-size: 1rem;
             background: @ca-price;
-            color: #ffffff;
+            color: #000;
             border-radius: 9px;
         }
 
@@ -606,6 +618,7 @@ a:hover, .alink:hover {
             speak: none;
             text-align: center;
         }
+
     }
 
 
@@ -613,27 +626,39 @@ a:hover, .alink:hover {
     //  white number — matches base Evalent/carpet cart icon.
     &.has-items {
         .action.showcart {
-            background: none;
-            border: 0;
-            border-radius: 0;
-            padding: 0;
+            border: 1px solid #2b8d3a;
+            background: #2b8d3a;
+            color: #fff;
+            line-height: 28px;
 
             &:before {
-                color: @ca-black;
+                color: #fff;
             }
 
             .counter.qty {
                 position: absolute;
-                top: -6px;
-                left: 30px;
-                right: auto;
-                background: @ca-price;
-                color: #ffffff;
+                top: 3px;
+                left: 38px;
+                background: #fff;
+                border-radius: 10em;
+                color: #000;
             }
 
             .counter-number {
-                color: #ffffff;
                 text-shadow: none;
+                font-size: 13px;
+            }
+
+            &:hover{
+                &:before{
+                    color: #ffffff !important;
+                }
+            }
+
+            &:focus{
+                &:before{
+                    color: #ffffff !important;
+                }
             }
         }
     }
@@ -1214,35 +1239,73 @@ a:hover, .alink:hover {
     .header-actions {
         order: 3;
         flex: 1 1 auto;
-        gap: 14px;
+        gap: 8px;
         padding-right: 0px;
 
-        .action.showcart:before,
-        .header.links > li > a:before {
-            width: 2.6rem;
-            height: 2.6rem;
+        //  Glyph sizes match carpetavenue.jp mobile: 25px heart, 30px cart.
+        //  The heart needs the full desktop selector — the @ca-header-icon-size
+        //  rule at line ~545 is (0,5,2) and beats a plainer one.
+        .customer-account-header .header.links .link.wishlist > a:before {
+            width: 2.5rem;
+            height: 2.5rem;
+            font-size: 2.5rem;
+            color: #333;
+        }
+
+        .action.showcart:before {
+            width: 3rem;
+            height: 3rem;
+            font-size: 3rem;
+            //  Desktop pulls the glyph up 5px with !important; live sits it at +2.
+            top: 2px !important;
         }
 
         //  Desktop reserves 30px right of the cart for the qty badge. On mobile
         //  that dead space drags the whole icon group left, into the logo.
+        //  Height matches live's 40px, down from the desktop 50px.
         .action.showcart {
-            padding-right: 0;
+            padding: 2px;
+            height: 40px;
         }
         .minicart-wrapper{
             margin-top: 0px !important;
+
+            //  Live leaves the cart a plain black glyph when it has items — the
+            //  green filled button is a desktop-only treatment.
+            &.has-items .action.showcart {
+                background: none;
+                border: 0;
+                line-height: 28px;
+
+                &:before {
+                    color: #000;
+                }
+            }
 
             //  Must repeat `.has-items .action.showcart` — the desktop badge rule
             //  (line ~604) is .minicart-wrapper.has-items .action.showcart .counter.qty
             //  (0,6,0) and outguns a plainer selector, so top/left never applied.
             &.has-items .action.showcart .counter.qty {
-                top: 1px;
-                left: 14px;
-                height: 17px;
+                position: absolute;
+                top: 5px;
+                left: 20px;
+                width: 17px;
                 min-width: 17px;
-                line-height: 2;
+                height: 17px;
+                line-height: 18px;
                 font-size: .9rem;
                 margin: 0;
                 padding: 0;
+                overflow: hidden;
+                text-align: center;
+                background: @ca-price;
+                border-radius: 90px;
+
+                .counter-number {
+                    font-size: .9rem;
+                    color: @color-white;
+                    text-shadow: none;
+                }
             }
         }
     }
@@ -1250,6 +1313,10 @@ a:hover, .alink:hover {
     //  No account/person icon on mobile — keep wishlist heart
     .customer-account-header .header.links > li:first-child {
         display: none;
+    }
+
+    .customer-account-header .header.links li.link.wishlist {
+        padding: 0 0px;
     }
 
     .foo-col3 {
