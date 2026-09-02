@@ -27,7 +27,7 @@ $_enableCatalogSearchApi = $block->getEnableSimilarProductCatalogSearchApi();
     <div class="catalog-product-similar-ajax"
          data-mage-init='{
         "CarpetAvenue_Productify/js/similar-products-ajax": {
-            "similarProductTitle": <?= json_encode(__('You might also like')) ?>,
+            "similarProductTitle": <?= json_encode($_product->getSku() ? $_product->getSku() . __('に関連する商品') : __('You might also like')) ?>,
             "showAllTax": <?= json_encode(__('Show All')) ?>,
             "productId": <?= (int) $_product->getId() ?>,
             "productName": <?= json_encode($_product->getName()) ?>,

@@ -184,4 +184,25 @@
             }
         }
     }
+
+    // Similar products on PDP: static 5-column grid on desktop (2 rows of 5 for 10 items).
+    // CSS grid controls the columns so per-item margins can't wrap the 5th card.
+    .catalog-product-similar-ajax {
+        .products.list.items.product-items,
+        .elastyslider__slides {
+            display: grid !important;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 30px 20px;
+            flex-wrap: wrap;
+            overflow: visible !important;
+        }
+        .elastyslider__slide,
+        .product-item {
+            width: auto !important;
+            max-width: none !important;
+            min-width: 0 !important;
+            margin: 0 !important;
+            float: none !important;
+        }
+    }
 }

@@ -17,7 +17,10 @@ if ($exist = $block->getItems()) {
     $class = 'widget' . ' ' . $type;
 
     $image = 'category_page_grid'; // match category grid image (560x750) instead of low-res widget default
-    $title = __('You might also like');
+    // Heading: "<current product SKU>に関連する商品" (products related to <SKU>)
+    $currentProduct = $block->getProduct();
+    $currentSku = $currentProduct ? $currentProduct->getSku() : '';
+    $title = $currentSku ? $currentSku . __('に関連する商品') : __('You might also like');
     $items = $exist;
 
     $showAddTo = true;
