@@ -307,17 +307,44 @@ define([
          * @returns {boolean}
          */
         imageModalPopup: function (event, config) {
-            var self = this;
-            let slickClass = this.config.thumbsSettings.options.slidesToShow < 10 ?
-                ".slick-slide-wrap.slick-slide.slick-current:not(.slick-video-slide)" :
-                ".slick-slide";
+            //  Bind and index on the elements that actually carry the fancybox
+            //  `href`: the slide wrapper from buildSlide() and the thumbnail
+            //  anchors from addThumbs().
+            //
+            //  The old selector keyed off `thumbsSettings.slidesToShow < 10` and
+            //  fell back to bare `.slick-slide`. That class only lands on our
+            //  wrapper when the wrapper is a direct child of the slider; when
+            //  slick nests it, `.slick-slide` is an outer div with no href, so
+            //  fancybox cannot resolve an image and falls back to inline content
+            //  — the slide then renders the slick box instead of the picture
+            //  (small, off-centre, close button pushed below). Only the two main
+            //  slides were affected, since the thumbnails are anchors that always
+            //  carry their own href.
+            var ITEMS = '.slick-slide-wrap:not(.slick-cloned):not(.slick-video-slide),' +
+                        ' .mz-gallery-thumbs a.thumb';
 
-            $(document).on(event, slickClass, function(e) {
-                let slickVisibleLinks = self.config.thumbsSettings.options.slidesToShow < 10 ?
-                    ".slick-slide-wrap:not(.slick-cloned):not(.slick-video-slide)" :
-                    ".slick-slide:not(.slick-cloned)";
-                var visibleLinks = $(slickVisibleLinks);
-                $.fancybox.open( visibleLinks, config, visibleLinks.index( this ) );
+            $(document).on(event, ITEMS, function () {
+                //  One entry per image, in document order. Desktop keeps slides
+                //  0-1 in the main slider and the rest as thumbs; mobile puts
+                //  every image in the slider *and* still builds thumbs, so
+                //  de-duplicate on href or the gallery lists them twice.
+                var seen = {},
+                    items = $(ITEMS).filter(function () {
+                        var href = this.getAttribute('href');
+
+                        if (!href || seen[href]) {
+                            return false;
+                        }
+                        seen[href] = true;
+
+                        return true;
+                    }),
+                    hrefs = items.map(function () {
+                        return this.getAttribute('href');
+                    }).get(),
+                    start = hrefs.indexOf(this.getAttribute('href'));
+
+                $.fancybox.open(items, config, start < 0 ? 0 : start);
 
                 return false;
             });
@@ -330,12 +357,25 @@ define([
          * Builds one slide's markup.
          */
         buildSlide: function (imageData, index) {
-            var _className = (this.isVideo(imageData)) ? 'slick-video-slide' : '',
+            var _isYoutube = imageData.provider == "youtube",
+                _className = (this.isVideo(imageData)) ? 'slick-video-slide' : '',
                 _hrefLink = (this.isVideo(imageData)) ? imageData['videoUrl'] : imageData['full'],
                 _fancyBox = (this.config.imagePopup.imagePopupStatus) ? 'href="' + _hrefLink + '"' : '',
-                _dataType = imageData.provider == "youtube" ? 'data-type="iframe"' : 'data-type="' + imageData['type'] + '"';
+                _dataType = _isYoutube ? 'data-type="iframe"' : 'data-type="' + imageData['type'] + '"';
 
-            return '<' + (imageData.provider == "youtube" ? 'div data-fancybox data-type="iframe"' : 'div') + ' class="slick-slide-wrap '+ _className + (imageData.provider == "youtube" ? ' iframe' : '') + '" data-data-index="' + index + '" ' + _fancyBox + ' ><img width="'+this.config.image_width+'" height="'+this.config.image_height+'" ' + _dataType + ' src="' + imageData['img'] + '"/></' + (imageData.provider == "youtube" ? 'a' : 'div') + '>';
+            //  `data-type` belongs on the slide element, not the inner <img> —
+            //  fancybox reads it off the item it is handed. Without it a plain
+            //  <div> item falls back to inline content, so the lightbox renders
+            //  the slick wrapper at its inline width instead of the image: small,
+            //  off-centre, close button pushed below it. addThumbs() already puts
+            //  it on the <a>, which is why only the two main slides broke —
+            //  appendSlides() keeps indexes 0-1 here and sends the rest to thumbs.
+            return '<div ' + (_isYoutube ? 'data-fancybox ' : '') +
+                'class="slick-slide-wrap ' + _className + (_isYoutube ? ' iframe' : '') + '"' +
+                ' data-data-index="' + index + '" ' + _fancyBox + ' ' + _dataType + '>' +
+                '<img width="' + this.config.image_width + '" height="' + this.config.image_height + '"' +
+                ' src="' + imageData['img'] + '"/>' +
+                '</div>';
         },
 
         /**

@@ -100,7 +100,6 @@
                 width: 92px;
                 height: 64px;
                 border: 0;
-                border-radius: 3px;
                 background-color: @color-gray95;
                 background-size: cover;
                 background-position: center;
@@ -129,11 +128,9 @@
                 }
             }
 
-            &.-selected .am-filter-swatch,
-            &.-selected .am-filter-checkbox {
-                outline: 2px solid @color-gray20;
-                outline-offset: 1px;
-            }
+            //  No outline on the selected swatch — the row carries a tick at its
+            //  top-left instead (see the theme's filter-modal styles), which is
+            //  how carpetavenue.jp marks a selection. The ring was doubling up.
         }
     }
 
