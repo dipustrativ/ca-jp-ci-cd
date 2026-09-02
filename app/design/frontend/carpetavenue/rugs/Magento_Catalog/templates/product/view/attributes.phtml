@@ -75,7 +75,6 @@
             }
 
             unset($_additional[$widthKey]);
-            unset($_additional[$shapeKey]);
             // Weirdness above to remove/mod attributes before printout
             ?>
             <?php foreach ($_additional as $_data) : ?>
@@ -85,6 +84,10 @@
                     }
                     if ($_data['code'] == 'patterns') {
                         continue ;
+                    }
+                    // Stray price attribute mislabelled "Length" — not a real spec.
+                    if ($_data['code'] == 'height2') {
+                        continue;
                     }
                     if ($_data['code'] == 'anatomy' && !empty($motifs)) {
                         $_data['label'] = __("Motifs");

@@ -1649,3 +1649,40 @@
         visibility: visible;
     }
 }
+
+//  CTA banner: give the wrapper vertical breathing room on desktop (matches the
+//  base project's rendered 25px top/bottom margin).
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .cta-banner-wrapper {
+        margin: 25px auto;
+    }
+
+    //  Smaller desktop heading than base's 5rem so it fits two lines.
+    .cta-banner-wrapper.cta-banner.ev-banners .cta-banner__content__heading.large,
+    .cta-banner-wrapper.cta-banner.ev-banners .cta-banner__content__heading.big {
+        font-size: 4rem;
+    }
+}
+
+//  CTA banner: base renders left-family content positions with CENTER-aligned
+//  text (its Callout module overrides Banner's `left`). This project has no
+//  Callout module, so replicate it. Extra .cta-banner-wrapper class outranks the
+//  Banner module's (0,4,0) left-align rule regardless of load order.
+.cta-banner-wrapper.cta-banner.ev-banners {
+    .cta-banner__container__content {
+        &.left,
+        &.top-left,
+        &.center-left,
+        &.bottom-left {
+            p,
+            .cta-banner__content__description,
+            .cta-banner__content__heading {
+                text-align: center;
+            }
+
+            .cta-banner__content__button {
+                align-self: center;
+            }
+        }
+    }
+}

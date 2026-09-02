@@ -98,7 +98,8 @@ if(!isset($_bannerHeadingTag) || empty($_bannerHeadingTag)): $_bannerHeadingTag 
              style="background-color: <?= $_bgcolor ?>; --ctabanner-content-color: <?= $_textcolor ?>; --ctabanner-button-color: <?= $_buttonColor ?>;">
             <<?= $_bannerHeadingTag ?> class="cta-banner__content__heading <?= $_headlineSize ?>"><?= $_title ?></<?= $_bannerHeadingTag ?>>
 
-            <?php if($_descriptionPosition == "after-heading"): ?>
+            <?php // Default template order: heading -> description -> button. ?>
+            <?php if($_description): ?>
                 <div class="cta-banner__content__description <?= $_descSize ?>" style="color: <?= $_descColor ?>;">
                     <?= $_description ?>
                 </div>
@@ -107,12 +108,6 @@ if(!isset($_bannerHeadingTag) || empty($_bannerHeadingTag)): $_bannerHeadingTag 
             <?php if($_buttonText): ?>
                 <span class="cta-banner__content__button <?= $_buttonSize . ' button-style--' . $_bannerButtonStyle ?>"
                       style="color: <?= $_buttonTextColor ?>;"><?= $_buttonText ?></span>
-            <?php endif; ?>
-
-            <?php if($_descriptionPosition == "after-button"): ?>
-                <div class="cta-banner__content__description <?= $_descSize ?>" style="color: <?= $_descColor ?>;">
-                    <?= $_description ?>
-                </div>
             <?php endif; ?>
 
         </div>
