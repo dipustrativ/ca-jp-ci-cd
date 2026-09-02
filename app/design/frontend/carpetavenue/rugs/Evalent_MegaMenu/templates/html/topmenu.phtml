@@ -21,6 +21,16 @@ $additionalDataShow = (int) $coreHelper->getConfig("catalog/navigation/show_hide
     <ul data-mage-init='{"menu":{"responsive":true, "openOnClick":true, "expandChildren":false, "expanded":false, "position":{"my":"left top","at":"left bottom"}}}'>
         <?= /* @noEscape */ $_menuHtml?>
         <?= $block->getChildHtml() ?>
+        <li class="level0 category-item right">
+            <a href="<?= $block->escapeUrl($block->getUrl('contact')) ?>" class="level-top">
+                <div class="megamenu__child-title"><?= $block->escapeHtml(__('お問い合わせ')) ?></div>
+            </a>
+        </li>
+        <li class="level0 category-item last right">
+            <a href="<?= $block->escapeUrl($block->getUrl('subete-no-jutan/about')) ?>" class="level-top">
+                <div class="megamenu__child-title"><?= $block->escapeHtml(__('当社について')) ?></div>
+            </a>
+        </li>
     </ul>
     <div class="megamenu__backdrop-wrapper"
          data-role="menu-background-overlay"
