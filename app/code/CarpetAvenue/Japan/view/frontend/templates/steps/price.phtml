@@ -1,0 +1,16 @@
+<?php
+/** @var \CarpetAvenue\Japan\Block\CarpetFinder\PriceStep $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$buttonsColor = (string) $block->getData("buttons_color");
+?>
+<div class="carpetfinder carpetfinder__step-price block buttons--<?= $escaper->escapeHtmlAttr($buttonsColor) ?>">
+    <?= $block->getChildHtml("step_content"); ?>
+    <ul class="carpetfinder__filteroptions items">
+        <?php foreach ($block->getPriceItems() as $item): ?>
+        <li class="carpetfinder__filteroptions item">
+            <a href="<?= $escaper->escapeUrl($item->getUrl()) ?>"><?= $escaper->escapeHtml($item->getLabel()) ?></a>
+        </li>
+        <?php endforeach; ?>
+    </ul>
+</div>

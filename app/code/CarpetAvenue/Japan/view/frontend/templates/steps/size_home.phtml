@@ -1,0 +1,30 @@
+<?php
+/** @var \CarpetAvenue\Japan\Block\CarpetFinder\SizeStepHome $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$buttonsColor = (string) $block->getData("buttons_color");
+?>
+
+<?php if (!$block->shouldRender()): return; endif; ?>
+<?php $_sizeItems = $block->getSizeItems(); ?>
+<div class="carpetfinder carpetfinder__step-size size-slider block buttons--<?= $escaper->escapeHtmlAttr($buttonsColor) ?>" data-label="<?= $escaper->escapeHtmlAttr(__("or")) ?>">
+
+    <?= $block->getChildHtml("step_content"); ?>
+
+    <ul class="carpetfinder__filteroptions items">
+        <?php foreach ($_sizeItems as $key => $item): ?>
+            <li class="carpetfinder__filteroptions item">
+                <a class="button action price-button" href="<?= $escaper->escapeUrl($item['url']) ?>"
+                        data-range-width="<?= $escaper->escapeHtmlAttr($item['width'][0] .'-'. $item['width'][1]) ?>"
+                        data-min-width="<?= $escaper->escapeHtmlAttr($item['width'][0]) ?>"
+                        data-max-width="<?= $escaper->escapeHtmlAttr($item['width'][1]) ?>"
+                        data-range-height="<?= $escaper->escapeHtmlAttr($item['length'][0] .'-'. $item['length'][1]) ?>"
+                        data-min-height="<?= $escaper->escapeHtmlAttr($item['length'][0]) ?>"
+                        data-max-height="<?= $escaper->escapeHtmlAttr($item['length'][1]) ?>"
+                >
+                    <?= $escaper->escapeHtml(__($key)) ?>
+                </a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</div>
