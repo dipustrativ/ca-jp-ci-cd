@@ -64,6 +64,11 @@ body {
     box-shadow: none !important;
 }
 
+a, .alink {
+    color: #333;
+    text-decoration: none;
+}
+
 //
 //  USP announcement bar
 //  _____________________________________________
@@ -274,6 +279,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    padding-right: 30px;
 }
 
 //  Vertically centre every header item on one line
@@ -545,7 +551,6 @@ body {
         padding: 0;
         border: 0;
         background: none;
-        padding-right: 30px;
 
         &:before {
             content: '\e66e';
@@ -662,6 +667,13 @@ body {
 .navigation {
     background: @ca-black;
     max-width: none;
+
+    .megamenu__backdrop-wrapper{
+
+        .megamenu__backdrop-container{
+            background: #ffffff;
+        }
+    }
 
     .level0 > .level-top {
         color: #ffffff;
@@ -1066,6 +1078,27 @@ body {
 }
 
 @media (max-width: 768px) {
+
+    .navigation {
+        background: #fff;
+        box-sizing: border-box;
+    }
+
+    .navigation.megamenu > ul {
+        padding-top: 10px !important;
+    }
+    .navigation a, .navigation a:hover {
+        color: #575757 !important;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .nav-sections-item-title a{
+        color: #333;
+        text-decoration: none;
+    }
+
+
     .page-header.custom-panel {
         display: none;
     }
@@ -1177,6 +1210,7 @@ body {
         order: 3;
         flex: 1 1 auto;
         gap: 14px;
+        padding-right: 0px;
 
         .action.showcart:before,
         .header.links > li > a:before {
@@ -1191,6 +1225,20 @@ body {
         }
         .minicart-wrapper{
             margin-top: 0px !important;
+
+            //  Must repeat `.has-items .action.showcart` — the desktop badge rule
+            //  (line ~604) is .minicart-wrapper.has-items .action.showcart .counter.qty
+            //  (0,6,0) and outguns a plainer selector, so top/left never applied.
+            &.has-items .action.showcart .counter.qty {
+                top: 1px;
+                left: 14px;
+                height: 17px;
+                min-width: 17px;
+                line-height: 2;
+                font-size: .9rem;
+                margin: 0;
+                padding: 0;
+            }
         }
     }
 
