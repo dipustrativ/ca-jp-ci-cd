@@ -16,8 +16,8 @@ $isVisibleProduct = $product->isVisibleInSiteVisibility();
 /** @var \Magento\Msrp\Helper\Data $helper */
 $helper = $this->helper(Magento\Msrp\Helper\Data::class);
 
-/** @var  \Carpetavenue\Productify\Helper\ProductionType $prodTypeHelper */
-$prodTypeHelper = $this->helper(\Carpetavenue\Productify\Helper\ProductionType::class);
+/** @var  \CarpetAvenue\Productify\Helper\ProductionType $prodTypeHelper */
+$prodTypeHelper = $this->helper(\CarpetAvenue\Productify\Helper\ProductionType::class);
 $isUnique = $prodTypeHelper->isProductUnique($product);
 
 $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinimalPriceLessMsrp($product);
