@@ -1,4 +1,4 @@
-# CarpetAvenue — Deploy Guide
+# CarpetAvenue JP — Deploy Guide
 
 Magento 2.4.9 in Docker. **One image, many roles.** This single file covers
 everything: how it works, the local dry-run, and every deploy path
@@ -28,22 +28,24 @@ in §10 can't bite CI). Server B pulls over the network from A's registry.
 > Simpler variant: if Dokploy runs the app on its **own** host, A and B are the
 > same machine. Everything below still applies — just one server.
 
-**One image, five roles.** `carpient` is built once and run as five services;
+**One image, five roles.** `carpetavenue-jp` is built once and run as five services;
 the command differs, the image does not:
 
 | Service | Command | Purpose |
 |---|---|---|
-| `app` | `php-fpm` | serves requests (nginx talks to it as `carpient-fpm:9000`) |
+| `app` | `php-fpm` | serves requests (nginx talks to it as `carpetavenue-jp-fpm:9000`) |
 | `upgrade` | `setup:upgrade` then exits | run-once per deploy: schema + module updates |
 | `static` | copies `pub/static` → volume | publishes compiled assets to the shared volume |
 | `cron` | `cron -f` | Magento cron; also drives message-queue consumers |
-| `nginx` | (separate `carpient-nginx` image) | web front, serves static/media, proxies to `app` |
+| `nginx` | (separate `carpetavenue-jp-nginx` image) | web front, serves static/media, proxies to `app` |
 
 **No secrets in the image.** `entrypoint.sh` renders `app/etc/env.php` from
 `env.php.template` on every container start, reading all config from environment
 variables (`getenv()`). Change a value = change the env var + restart, never a
 rebuild. Two build-time secrets (`auth.json`, `env.php.scd`) are passed as
-BuildKit secrets and never land in a layer.
+BuildKit secrets — which read from the *host path*, not the build context — and
+never land in a layer. Both are **also** in `.dockerignore`; that is what keeps
+`COPY . .` from copying them in anyway. Do not remove those two lines.
 
 **What ships in the image vs. what doesn't.** Code, `vendor` (prod only),
 compiled DI, and `pub/static` are baked in. Secrets, DB, and all hostnames are
@@ -66,28 +68,28 @@ docker buildx build \
   --secret id=composer_auth,src=auth.json \
   --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile \
-  -t registry.carpetavenue.net/carpient:latest \
-  -t registry.carpetavenue.net/carpient:v1 \
+  -t registry.carpetavenue.net/carpetavenue-jp:latest \
+  -t registry.carpetavenue.net/carpetavenue-jp:v1 \
   --push .
 
 # 2) The nginx image (config baked in; rebuild only when nginx config changes)
 #    NOTE: its v<N> sequence is INDEPENDENT of the Magento image's — nginx is
-#    rebuilt far less often, so e.g. carpient:v13 pairs with carpient-nginx:v5.
+#    rebuilt far less often, so e.g. carpetavenue-jp:v13 pairs with carpetavenue-jp-nginx:v5.
 docker buildx build \
   -f docker/Dockerfile.nginx \
-  -t registry.carpetavenue.net/carpient-nginx:latest \
-  -t registry.carpetavenue.net/carpient-nginx:v5 \
+  -t registry.carpetavenue.net/carpetavenue-jp-nginx:latest \
+  -t registry.carpetavenue.net/carpetavenue-jp-nginx:v5 \
   --push .
 ```
 
 The build context is `.` (the repo root **is** `src/`) and the Dockerfile is
 `docker/Dockerfile`. **Tag strategy:** always push `latest` (what servers pull)
 **and** an immutable `v<N>` (never re-used → your rollback target). Same image,
-two tags, one push. This applies to **both** images — `carpient-nginx` needs its
+two tags, one push. This applies to **both** images — `carpetavenue-jp-nginx` needs its
 own `v<N>` or nginx has no rollback target.
 
 **Which tag the servers actually pull** is set per environment:
-`IMAGE_TAG` → `carpient`, `NGINX_TAG` → `carpient-nginx` (see
+`IMAGE_TAG` → `carpetavenue-jp`, `NGINX_TAG` → `carpetavenue-jp-nginx` (see
 `docker-compose.yml` / `docker-compose.dokploy.yml`, and `.env.example`). Both
 default to `latest` when unset. Bump the matching variable in Dokploy →
 Environment after pushing a new `v<N>`, or the server keeps running the old one.
@@ -106,7 +108,7 @@ BuildKit keys layers on *content*, not timestamps, so if nothing in the build
 context changed since the last build, `COPY . .` hits cache and every step after
 it — `composer install`, `setup:di:compile`, `setup:static-content:deploy` — is
 reused. The new `v<N>` then resolves to the *same image ID* as the previous one
-(check with `docker images | grep carpient`). Before assuming the cache is at
+(check with `docker images | grep carpetavenue-jp`). Before assuming the cache is at
 fault, confirm your edit is actually in the context: `.dockerignore` excludes
 `vendor/`, `pub/static/`, `dev/` and most of `var/`, so changes there never reach
 the image.
@@ -125,18 +127,24 @@ To force a rebuild anyway, add one flag:
 
 ## 2. Local dry-run (prove it before any server)
 
-Run the exact production flow on your laptop. Uses the remote **test** DB (not
-prod). Site answers on `http://carpient.devs` (already in your `/etc/hosts`) and
-`http://localhost`, plain HTTP — no TLS, no certs locally.
+Run the exact production flow on your laptop. `docker/.env.local` points at the
+**local dev DB** (`ca_jp-db-1` via `host.docker.internal:3306`). Site answers on
+`http://carpetavenue-jp.devs` / `http://localhost`, plain HTTP.
+
+⚠️ **Stop the dev stack first** — it holds host `:80` and `:3306`:
 
 ```bash
-# 2.1 build + push a local tag
-docker login registry.carpetavenue.net
+docker compose -f ../compose.yaml down
+```
+
+```bash
+# 2.1 build a local tag. --load keeps it on this machine: no registry, no login.
 docker buildx build \
   --secret id=composer_auth,src=auth.json \
   --secret id=env_php_scd,src=docker/env.php.scd \
-  -f docker/Dockerfile -t registry.carpetavenue.net/carpient:local --push .
+  -f docker/Dockerfile -t registry.carpetavenue.net/carpetavenue-jp:local --load .
 # (local uses a plain nginx with mounted config — no nginx image build needed)
+# On Apple Silicon this builds arm64 — fine locally, NOT pushable to the server.
 
 # 2.2 boot the full stack
 IMAGE_TAG=local docker compose \
@@ -149,7 +157,7 @@ docker compose -f docker/docker-compose.local.yml logs -f upgrade
 
 ```bash
 # 2.4 load the site
-open http://carpient.devs            # or http://localhost
+open http://carpetavenue-jp.devs            # or http://localhost
 #   RabbitMQ UI: http://localhost:15672
 
 # 2.5 teardown (‑v also drops the volumes = clean slate)
@@ -184,6 +192,42 @@ entrypoint prints every resolved variable.
 sudo sysctl -w vm.max_map_count=262144
 echo 'vm.max_map_count=262144' | sudo tee /etc/sysctl.d/99-opensearch.conf   # persist
 ```
+
+#### Co-hosting with `carpient` on one server
+
+Yes — nothing collides. Containers are `carpetavenue-jp-*` vs `carpient-*`;
+networks and volumes are Dokploy-project-prefixed; `docker-compose.dokploy.yml`
+publishes no host port (Traefik routes to `nginx`); the registry is shared with a
+separate repo; `vm.max_map_count` is host-wide and already set.
+
+**RAM is the only real constraint.** `carpient` alone budgets ~10.6G (see the
+`cache` service comment in `docker-compose.dokploy.yml`). JP at those defaults
+would need another ~10G → a 24GB host. JP's playground profile instead needs
+**~5G**, so a **16GB** host carries both:
+
+| Knob | Where | Playground value |
+|---|---|---|
+| `OPENSEARCH_HEAP` | Dokploy env | `1g` (container ~1.6G) |
+| `VALKEY_MAXMEMORY` | Dokploy env | `512mb` |
+| `VALKEY_SESSION_MAXMEMORY` | Dokploy env | `128mb` |
+| `pm.max_children` | `docker/php/www.conf`, baked in | `8` (~1.6G) — already set |
+
+Check before deploying: `free -g` ≥ 16, `df -h` has ~10G free (two images +
+volumes), and `valkey-cli info stats | grep evicted_keys` stays 0 on **both**
+stacks afterwards.
+
+Two more same-host details:
+
+- **Path A only** publishes host `:80` — set `HTTP_PORT` on the second stack.
+  Path B publishes nothing; Traefik routes by domain.
+- **`docker/host/magento` installs as `magento-jp` / `magerun-jp`**, not plain
+  `magento` — carpient's copy of the same script owns that name.
+
+Benign but worth knowing: both stacks join the external `dokploy-network`, so
+the service aliases `app`, `cron`, `upgrade`, `nginx` exist twice on it. Nothing
+resolves those names — Magento uses `cache`/`queue`/`search` (on the private
+`magento_net` only) and `carpetavenue-jp-fpm`, and Traefik routes by container,
+not DNS. Don't add a service that resolves a bare `app` on that network.
 
 ### Path A — plain Docker server (pull image)
 
@@ -259,6 +303,13 @@ stack at the previous tag — no rebuild:
 
 ## 6. CI/CD — GitHub Actions builds & deploys (full setup)
 
+> **⚠️ CI IS OFF.** No runner is registered for `indexon/carpetavenue-jp` (the
+> Server A runner is repo-scoped to `indexon/carpient`), so the `push:` trigger
+> in `.github/workflows/build-deploy.yml` is commented out — with it on, every
+> push would queue forever. **Builds are manual (§1).** To enable: deploy
+> `docker/github-runner.compose.yml` on Server A (already pointed here), add the
+> secrets below, uncomment `push:`.
+
 **The flow:** push to `main` → GitHub triggers the workflow on **your build
 server** (a self-hosted runner) → it builds the Magento image → pushes
 `latest` + `v<run_number>` to the registry → POSTs the Dokploy webhook →
@@ -284,11 +335,11 @@ services:
     image: myoung34/github-runner:latest
     restart: unless-stopped
     environment:
-      REPO_URL:     https://github.com/indexon/carpient
+      REPO_URL:     https://github.com/indexon/carpetavenue-jp
       ACCESS_TOKEN: ${GH_PAT}          # GitHub PAT (repo scope) — Dokploy env
-      RUNNER_NAME:  carpient-build-1
+      RUNNER_NAME:  carpetavenue-jp-build-1
       RUNNER_SCOPE: repo
-      LABELS:       carpient-build      # matches runs-on: [self-hosted, carpient-build]
+      LABELS:       carpetavenue-jp-build      # matches runs-on: [self-hosted, carpetavenue-jp-build]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock   # build+push on the host daemon
 ```
@@ -301,8 +352,8 @@ services:
    never hand-paste a short-lived registration token.)
 2. Dokploy → **Create → Compose** → paste `docker/github-runner.compose.yml` →
    **Environment**: `GH_PAT=<the token>` → **Deploy**.
-3. Verify: GitHub → **Settings → Actions → Runners** shows **carpient-build-1**
-   as **● Idle** (green), label `carpient-build`.
+3. Verify: GitHub → **Settings → Actions → Runners** shows **carpetavenue-jp-build-1**
+   as **● Idle** (green), label `carpetavenue-jp-build`.
 
 **Why this shape:**
 - **Cost:** self-hosted = **zero GitHub Actions minutes** (GitHub bills only its
@@ -315,26 +366,26 @@ services:
   starve the registry/Dokploy.
 
 > Prefer a bare-metal install instead of a container? Run GitHub's
-> `./config.sh --url https://github.com/indexon/carpient --token <TOKEN> --labels
-> carpient-build --unattended` then `sudo ./svc.sh install && sudo ./svc.sh start`
+> `./config.sh --url https://github.com/indexon/carpetavenue-jp --token <TOKEN> --labels
+> carpetavenue-jp-build --unattended` then `sudo ./svc.sh install && sudo ./svc.sh start`
 > on Server A. Same result; the container path above is just less to maintain.
 
 1. GitHub repo → **Settings → Actions → Runners → New self-hosted runner** →
    pick **Linux**. GitHub shows a `./config.sh ... --url ... --token ...` block.
-2. On the build server, run that block, then **add the label** `carpient-build`
-   when prompted (or append `--labels carpient-build`). Example shape:
+2. On the build server, run that block, then **add the label** `carpetavenue-jp-build`
+   when prompted (or append `--labels carpetavenue-jp-build`). Example shape:
    ```bash
    mkdir actions-runner && cd actions-runner
    curl -o actions-runner.tar.gz -L <URL github shows>
    tar xzf actions-runner.tar.gz
-   ./config.sh --url https://github.com/indexon/carpient \
-     --token <TOKEN github shows> --labels carpient-build
+   ./config.sh --url https://github.com/indexon/carpetavenue-jp \
+     --token <TOKEN github shows> --labels carpetavenue-jp-build
    sudo ./svc.sh install && sudo ./svc.sh start   # run as a background service
    ```
 3. Verify: the runner shows **Idle / green** under Settings → Actions → Runners.
    Docker must be usable by the runner's user (`docker ps` works without sudo).
 
-The workflow targets this machine via `runs-on: [self-hosted, carpient-build]`.
+The workflow targets this machine via `runs-on: [self-hosted, carpetavenue-jp-build]`.
 
 ### Step 2 — Add the repository secrets
 
@@ -390,6 +441,9 @@ Template: `docker/.env.production.example`.
 | `VALKEY_HOST` `VALKEY_PORT` `VALKEY_PASSWORD` | cache db0 / page_cache db1 / sessions db2 |
 | `RABBITMQ_HOST` `_PORT` `_USER` `_PASSWORD` `_VHOST` | message queue |
 | `OPENSEARCH_HOST` `OPENSEARCH_PORT` | search engine |
+| `OPENSEARCH_HEAP` | JVM heap, default `2g`. `1g` when co-hosted with carpient |
+| `VALKEY_MAXMEMORY` `VALKEY_SESSION_MAXMEMORY` | defaults `2gb` / `256mb`; playground `512mb` / `128mb` |
+| `HTTP_PORT` | Path A only — host port for nginx, default `80` |
 | `MAGE_CRYPT_KEY` | **must equal** the `crypt/key` of the DB it decrypts |
 | `MAGE_GRAPHQL_ID_SALT` | GraphQL id salt |
 | `DEBUG_ENV` | `true` prints resolved env at startup (debug only) |
@@ -452,7 +506,7 @@ The SCD step now asserts `require.min.js` and `styles.min.css` exist, so drift
 fails the build instead of the deploy. Check any image directly:
 
 ```bash
-docker run --rm --entrypoint sh registry.carpetavenue.net/carpient:v<N> \
+docker run --rm --entrypoint sh registry.carpetavenue.net/carpetavenue-jp:v<N> \
   -c 'ls pub/static/adminhtml/Magento/backend/en_US/requirejs/'
 # want: require.min.js present
 ```
@@ -476,6 +530,8 @@ docker/
   docker-compose.build.yml   Path C — Dokploy builds from git
   github-runner.compose.yml  CI runner as a Dokploy container (§6)
   .env.production.example    runtime env template (copy to .env)
+  .env.local                 SECRET: local dry-run env (gitignored)
+  host/magento               host-side CLI wrapper; install as magento-jp (§3)
   nginx/                     nginx.conf, local conf, prod template
   php/                       php.ini, php-cli.ini, www.conf
   cron/magento-cron          cron table
@@ -483,7 +539,9 @@ docker/
 ```
 
 Named volumes: `magento_media`, `magento_var`, `magento_static`,
-`valkey_data`, `rabbitmq_data`, `opensearch_data`. `magento_static` is written
+`valkey_data`, `valkey_sessions` (Path B only), `rabbitmq_data`,
+`opensearch_data`. Compose prefixes them per project, so carpient's volumes of
+the same names are separate objects. `magento_static` is written
 by the `static` service and read-only in nginx; `magento_media` is shared
 read-write by app/cron and read-only in nginx.
 

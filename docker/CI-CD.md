@@ -1,4 +1,9 @@
-# CarpetAvenue — Fully automated build & deploy
+# CarpetAvenue JP — Fully automated build & deploy
+
+> **⚠️ NOT SET UP YET for this repo.** No runner is registered for
+> `indexon/carpetavenue-jp`, so the `push:` trigger in
+> `.github/workflows/build-deploy.yml` is commented out and builds are manual
+> (`docker/README.md` §1). This document is the procedure for turning it on.
 
 **Merge to `main` → both images build on Server A → push to the registry →
 Dokploy redeploys Server B.** No laptop, no manual step, no GitHub Actions
@@ -17,7 +22,7 @@ Related: `README.md` (deploy guide + env reference), `BACKLOG.md`.
 |---|---|
 | Build-based deployment (Docker image) | Images built once, pushed to `registry.carpetavenue.net`, pulled by Server B |
 | Build on **our** hardware, not GitHub's | Self-hosted runner on Server A. **Self-hosted runners cost zero Actions minutes** — GitHub only schedules the job |
-| Both images | `carpient` (Magento) **and** `carpient-nginx`, every run |
+| Both images | `carpetavenue-jp` (Magento) **and** `carpetavenue-jp-nginx`, every run |
 | `latest` **and** version tags | Each image gets `latest` + immutable `v<N>` |
 | Automatic | Push to `main` fires it; `workflow_dispatch` for manual runs |
 
@@ -29,8 +34,8 @@ git push main
 GitHub schedules the job (no GitHub compute used)
    ↓
 Self-hosted runner on SERVER A
-   ├── build docker/Dockerfile        → carpient:latest       + carpient:v<N>
-   └── build docker/Dockerfile.nginx  → carpient-nginx:latest  + carpient-nginx:v<N>
+   ├── build docker/Dockerfile        → carpetavenue-jp:latest       + carpetavenue-jp:v<N>
+   └── build docker/Dockerfile.nginx  → carpetavenue-jp-nginx:latest  + carpetavenue-jp-nginx:v<N>
    ↓
 push both to registry.carpetavenue.net  (Server A → its own registry)
    ↓
@@ -55,7 +60,7 @@ images share the same `N` because both are built every run.
 > This supersedes the "independent sequences" note in `README.md` §1. The nginx
 > image is `nginx:1.29-alpine` plus three `COPY`s — seconds to build, negligible
 > registry cost — and matching numbers remove the "which nginx pairs with which
-> app" guesswork. `carpient:v41` always pairs with `carpient-nginx:v41`.
+> app" guesswork. `carpetavenue-jp:v41` always pairs with `carpetavenue-jp-nginx:v41`.
 
 Re-running a workflow produces a **new** `N`. Tags stay immutable.
 
@@ -79,7 +84,7 @@ without headroom.
 
 ### 2. Get a runner registration token
 
-GitHub → repo **indexon/carpient** → **Settings → Actions → Runners → New
+GitHub → repo **indexon/carpetavenue-jp** → **Settings → Actions → Runners → New
 self-hosted runner** → **Linux**.
 
 GitHub shows a download URL and a `./config.sh --token <TOKEN>` line. **The token
@@ -88,7 +93,7 @@ expires in one hour** — use it now.
 > **No PAT needed.** This is the point of installing natively rather than via
 > `docker/github-runner.compose.yml`: the container re-registers on every restart
 > and therefore needs a long-lived Personal Access Token, which currently 404s on
-> `indexon/carpient` because of the org's SSO policy. A native install writes its
+> `indexon/carpetavenue-jp` because of the org's SSO policy. A native install writes its
 > credentials to disk once and survives restarts. See
 > [Appendix C](#appendix-c--container-runner-alternative) if you want the
 > container anyway.
@@ -98,22 +103,25 @@ expires in one hour** — use it now.
 On Server A, as a user in the `docker` group (verify with `docker ps` — it must
 work without `sudo`):
 
+⚠️ carpient's runner already owns `/opt/actions-runner` on Server A. Use a
+separate directory (and therefore a separate service) for this one:
+
 ```bash
-sudo mkdir -p /opt/actions-runner && sudo chown "$USER" /opt/actions-runner
-cd /opt/actions-runner
+sudo mkdir -p /opt/actions-runner-jp && sudo chown "$USER" /opt/actions-runner-jp
+cd /opt/actions-runner-jp
 
 curl -o actions-runner.tar.gz -L <URL GitHub shows>
 tar xzf actions-runner.tar.gz
 
-./config.sh --url https://github.com/indexon/carpient \
+./config.sh --url https://github.com/indexon/carpetavenue-jp \
   --token <TOKEN from step 2> \
-  --name carpient-build-1 \
-  --labels carpient-build \
+  --name carpetavenue-jp-build-1 \
+  --labels carpetavenue-jp-build \
   --unattended
 ```
 
-The label **`carpient-build`** must match exactly — the workflow targets it with
-`runs-on: [self-hosted, carpient-build]`.
+The label **`carpetavenue-jp-build`** must match exactly — the workflow targets it with
+`runs-on: [self-hosted, carpetavenue-jp-build]`.
 
 ### 4. Run it as a service
 
@@ -136,8 +144,8 @@ the network path before a 20-minute build depends on them.
 
 ### 6. ✅ Verify
 
-GitHub → **Settings → Actions → Runners** shows **carpient-build-1** as
-**● Idle** (green) with the label `carpient-build`.
+GitHub → **Settings → Actions → Runners** shows **carpetavenue-jp-build-1** as
+**● Idle** (green) with the label `carpetavenue-jp-build`.
 
 Not idle → `sudo ./svc.sh status` and `journalctl -u actions.runner.* -n 50`.
 
@@ -230,8 +238,8 @@ nginx image → webhook → summary.
 The job summary lists both images and both tags. Confirm in the registry:
 
 ```bash
-curl -su '<user>:<pass>' https://registry.carpetavenue.net/v2/carpient/tags/list
-curl -su '<user>:<pass>' https://registry.carpetavenue.net/v2/carpient-nginx/tags/list
+curl -su '<user>:<pass>' https://registry.carpetavenue.net/v2/carpetavenue-jp/tags/list
+curl -su '<user>:<pass>' https://registry.carpetavenue.net/v2/carpetavenue-jp-nginx/tags/list
 ```
 
 Both must show `latest` and the new `v<N>`.
@@ -304,7 +312,7 @@ so they are never collected — that is what makes rollback safe.
 If the Dokploy-native build experiment ran, its repository is dead weight:
 
 ```
-carpient/carpient-build-liah5s     ~1.2 GB, nothing uses it
+carpetavenue-jp/carpetavenue-jp-build-liah5s     ~1.2 GB, nothing uses it
 hello                              test artifact
 ```
 
@@ -343,7 +351,7 @@ deploy nothing.
 Find the `v<N>` for a given commit in the workflow run's job summary, or:
 
 ```bash
-curl -su '<user>:<pass>' https://registry.carpetavenue.net/v2/carpient/tags/list
+curl -su '<user>:<pass>' https://registry.carpetavenue.net/v2/carpetavenue-jp/tags/list
 ```
 
 ---
@@ -357,7 +365,7 @@ curl -su '<user>:<pass>' https://registry.carpetavenue.net/v2/carpient/tags/list
 | `on: push: branches: [main]` | merge = deploy |
 | `on: workflow_dispatch` | manual "Run workflow" button |
 | `concurrency: cancel-in-progress` | two pushes in a row → only the newer build runs; no registry race |
-| `runs-on: [self-hosted, carpient-build]` | pins to your runner. Zero GitHub minutes |
+| `runs-on: [self-hosted, carpetavenue-jp-build]` | pins to your runner. Zero GitHub minutes |
 | `VERSION: v${{ github.run_number }}` | the immutable tag, shared by both images |
 | `context: .` | repo root **is** the Magento root (`src/`), filtered by `.dockerignore` |
 | `secrets:` on the Magento build | `auth.json` + `env.php.scd` as BuildKit secrets, never in a layer |
@@ -395,11 +403,11 @@ to tracking which nginx pairs with which app. Not recommended.
 instead. Dokploy manages restarts and logs, and there is no OS-level install.
 
 **It requires a long-lived PAT** because it re-registers on every start. That PAT
-currently 404s on `indexon/carpient` due to org SSO. To use this path, first fix
+currently 404s on `indexon/carpetavenue-jp` due to org SSO. To use this path, first fix
 the token:
 
 - Classic PAT with `repo` scope → **Configure SSO → Authorize `indexon`**, or
-- Fine-grained token: resource owner `indexon`, repo `carpient`, permission
+- Fine-grained token: resource owner `indexon`, repo `carpetavenue-jp`, permission
   **Administration: Read/Write**
 
 Then Dokploy → **Create → Compose** → paste the file → Environment:
@@ -417,19 +425,19 @@ When CI is down and you need an image now.
 On Server A (native amd64, pushes over the local network):
 
 ```bash
-cd /opt/carpient-build && git pull       # clone it there first if absent
+cd /opt/carpetavenue-jp-build && git pull       # clone it there first if absent
 
 docker buildx build --progress=plain \
   --secret id=composer_auth,src=auth.json \
   --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile \
-  -t registry.carpetavenue.net/carpient:latest \
-  -t registry.carpetavenue.net/carpient:v<N> \
+  -t registry.carpetavenue.net/carpetavenue-jp:latest \
+  -t registry.carpetavenue.net/carpetavenue-jp:v<N> \
   --push .
 
 docker buildx build -f docker/Dockerfile.nginx \
-  -t registry.carpetavenue.net/carpient-nginx:latest \
-  -t registry.carpetavenue.net/carpient-nginx:v<N> \
+  -t registry.carpetavenue.net/carpetavenue-jp-nginx:latest \
+  -t registry.carpetavenue.net/carpetavenue-jp-nginx:v<N> \
   --push .
 ```
 
@@ -437,15 +445,15 @@ Pick `<N>` **above** the current `github.run_number` so CI does not later collid
 with it. Check both:
 
 ```bash
-curl -su '<user>:<pass>' https://registry.carpetavenue.net/v2/carpient/tags/list
+curl -su '<user>:<pass>' https://registry.carpetavenue.net/v2/carpetavenue-jp/tags/list
 ```
 
 The two secret files are gitignored, so `scp` them up once:
 
 ```bash
-scp auth.json          <server-a>:/opt/carpient-build/auth.json
-scp docker/env.php.scd <server-a>:/opt/carpient-build/docker/env.php.scd
-ssh <server-a> 'chmod 600 /opt/carpient-build/auth.json /opt/carpient-build/docker/env.php.scd'
+scp auth.json          <server-a>:/opt/carpetavenue-jp-build/auth.json
+scp docker/env.php.scd <server-a>:/opt/carpetavenue-jp-build/docker/env.php.scd
+ssh <server-a> 'chmod 600 /opt/carpetavenue-jp-build/auth.json /opt/carpetavenue-jp-build/docker/env.php.scd'
 ```
 
 Run under `tmux`/`nohup` — 10–20 minutes, and an SSH drop kills it.
@@ -463,7 +471,7 @@ Recorded so nobody re-evaluates them from scratch.
 
 | Approach | Why not |
 |---|---|
-| **Dokploy Application build** | Pushes `:latest` only — the tag is hardcoded as `${appName}:latest` in [`cluster/upload.ts`](https://github.com/Dokploy/dokploy/blob/canary/packages/server/src/utils/cluster/upload.ts). Path is always `<host>/<prefix>/<appName>`, so a flat `…/carpient:tag` is impossible. One Application builds one Dockerfile, so nginx needs a second. No `v<N>` = no rollback. |
+| **Dokploy Application build** | Pushes `:latest` only — the tag is hardcoded as `${appName}:latest` in [`cluster/upload.ts`](https://github.com/Dokploy/dokploy/blob/canary/packages/server/src/utils/cluster/upload.ts). Path is always `<host>/<prefix>/<appName>`, so a flat `…/carpetavenue-jp:tag` is impossible. One Application builds one Dockerfile, so nginx needs a second. No `v<N>` = no rollback. |
 | **Dokploy Build Server** | Applications-only ([#4148](https://github.com/Dokploy/dokploy/issues/4148) closed as not planned). Same tag limits. Also pointless here — Dokploy already builds on Server A because that is its own host. |
 | **Dokploy Compose build** (`docker-compose.build.yml`) | Builds on the runtime host and never pushes to a registry, so there is no image to roll back to. |
 | **Dokploy Server Job** | Correct tags, but cron-only with no documented manual trigger. No git-push trigger. |
@@ -476,7 +484,7 @@ Recorded so nobody re-evaluates them from scratch.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| Job stuck "Waiting for a runner" | Runner offline, or label mismatch | Step 6; label must be exactly `carpient-build` |
+| Job stuck "Waiting for a runner" | Runner offline, or label mismatch | Step 6; label must be exactly `carpetavenue-jp-build` |
 | `permission denied … docker.sock` | Runner user not in `docker` group | `sudo usermod -aG docker $USER`, restart the service |
 | `unauthorized` on push | `REGISTRY_USER`/`REGISTRY_PASS` wrong | Step 8; verify with `docker login` on Server A |
 | `composer install` auth failure | `COMPOSER_AUTH` truncated or malformed | Re-paste all of `auth.json` |
@@ -496,9 +504,9 @@ Recorded so nobody re-evaluates them from scratch.
 
 **Server A**
 - [ ] 1 — RAM/disk/cores headroom confirmed
-- [ ] 3–4 — runner installed with label `carpient-build`, running as a service
+- [ ] 3–4 — runner installed with label `carpetavenue-jp-build`, running as a service
 - [ ] 5 — `docker login registry.carpetavenue.net` succeeds
-- [ ] 6 — GitHub shows **carpient-build-1 ● Idle**
+- [ ] 6 — GitHub shows **carpetavenue-jp-build-1 ● Idle**
 
 **GitHub**
 - [ ] 7 — webhook URL tested by hand, triggers a Dokploy deploy

@@ -1,8 +1,9 @@
 # Image size — where the bytes go, and what is safe to strip
 
-Measured on `registry.carpetavenue.net/carpient:v21` (arm64, 12 store-view
-locales). Re-run the commands in [Measuring](#measuring) after any change —
-every number here is reproducible, none of it is estimated.
+Measured on the **`carpient` image `:v21`** (arm64, 12 locales) — not JP's. JP
+ships 2 locales (`ja_JP` + admin `en_US`), so every absolute number is lower;
+ratios and the "safe to strip" conclusions hold. Re-run [Measuring](#measuring)
+after the first JP build for real numbers.
 
 ## Baseline
 
@@ -22,7 +23,7 @@ stored compressed):
 ```
 pub/static   1.2G   ← 63% of the tree
   frontend/Magento/blank      530M
-  frontend/carpient/rugs      582M   (12 locales x 49M)
+  frontend/carpetavenue/rugs      582M   (12 locales x 49M)
   adminhtml/Magento/backend    58M
 vendor        497M
 generated      89M
@@ -95,15 +96,15 @@ runtime, so the running container is unaffected.
 ### 1. `pub/static/frontend/Magento/blank` — 530 MB
 
 SCD keeps ancestors of any deployed theme (`PackagePool::canDeployTheme`), so
-`Magento/blank` is deployed as `carpient/rugs`' parent even though no store view
+`Magento/blank` is deployed as `carpetavenue/rugs`' parent even though no store view
 resolves to it.
 
 Proof it is unused at runtime, strongest argument first:
 
 - **The build already decides which themes exist.** SCD runs with an explicit
-  include list — `--theme carpient/rugs --theme Magento/backend`. Whatever any
+  include list — `--theme carpetavenue/rugs --theme Magento/backend`. Whatever any
   database says, those are the only two themes deployed, so `Magento/blank` is
-  present *solely* as an ancestor of `carpient/rugs`. This holds independently of
+  present *solely* as an ancestor of `carpetavenue/rugs`. This holds independently of
   store config, which is what makes the strip safe.
 - **`blank` is a strict subset of `rugs`.** `blank/en_US` holds 2863 files,
   `rugs/en_US` holds 2933, and `comm -23` of the two file lists is **empty** —
@@ -112,7 +113,7 @@ Proof it is unused at runtime, strongest argument first:
   runtime asset URL only ever names the active theme.
 - **No store view resolves to it.** Production, verified 2026-08-22:
   `design/theme/theme_id` exists **only at default scope**, value `6` =
-  `carpient/rugs`, so it covers all 12 store views across the 3 websites. There
+  `carpetavenue/rugs`, so it covers all 12 store views across the 3 websites. There
   is no website- or store-scope override. `carpetavenue/rugs` (id `7`) is a
   leftover DB row with no files on disk, assigned nowhere.
 
@@ -243,7 +244,7 @@ Post-change sanity checks, all confirmed in the same dry-run:
 - The rewritten CSS reads `url("../Mageplaza_Core/css/owl.video.play.png")`,
   which resolves to the existing file in `rugs/<locale>/`.
 - `adminhtml/Magento/backend/en_US/hugerte` survives at 8.3 MB.
-- `frontend/carpient/rugs/en_US/hugerte` is gone.
+- `frontend/carpetavenue/rugs/en_US/hugerte` is gone.
 - All 12 locale directories intact: `da_DK de_DE en_US es_ES fi_FI fr_FR hu_HU
   it_IT nl_NL pl_PL pt_PT sv_SE`.
 - 5570 executable files still carry `+x`, `vendor/bin/*` included.
@@ -261,15 +262,15 @@ stage (~300 MB) and the mPDF font set (~80 MB).
 Total, and the per-layer attribution:
 
 ```bash
-docker images registry.carpetavenue.net/carpient
-docker history registry.carpetavenue.net/carpient:latest \
+docker images registry.carpetavenue.net/carpetavenue-jp
+docker history registry.carpetavenue.net/carpetavenue-jp:latest \
   --no-trunc --format '{{.Size}}\t{{.CreatedBy}}' | head -20
 ```
 
 Where the application bytes are:
 
 ```bash
-docker run --rm --entrypoint sh registry.carpetavenue.net/carpient:latest -c '
+docker run --rm --entrypoint sh registry.carpetavenue.net/carpetavenue-jp:latest -c '
   du -sh /var/www/html/* | sort -hr | head -12
   du -sh /var/www/html/pub/static/frontend/*/* /var/www/html/pub/static/adminhtml/*/*
 '
@@ -280,32 +281,32 @@ here means the `Magento/blank` strip is no longer safe as written**:
 
 ```bash
 # 1. New cross-theme references into a stripped theme?
-docker run --rm --entrypoint sh registry.carpetavenue.net/carpient:latest -c '
+docker run --rm --entrypoint sh registry.carpetavenue.net/carpetavenue-jp:latest -c '
   grep -rho "[^ (\"]*frontend/Magento/blank/[^ )\"]*" \
-    /var/www/html/pub/static/frontend/carpient 2>/dev/null | sort -u
+    /var/www/html/pub/static/frontend/carpetavenue 2>/dev/null | sort -u
 '
 # Expected: empty (the sed in the Dockerfile rewrote the only one).
 
 # 2. Blank still a strict subset of rugs?
-docker run --rm --entrypoint sh registry.carpetavenue.net/carpient:latest -c '
+docker run --rm --entrypoint sh registry.carpetavenue.net/carpetavenue-jp:latest -c '
   cd /var/www/html/pub/static/frontend
   ( cd Magento/blank/en_US && find . -type f | sort ) > /tmp/b
-  ( cd carpient/rugs/en_US && find . -type f | sort ) > /tmp/r
+  ( cd carpetavenue/rugs/en_US && find . -type f | sort ) > /tmp/r
   comm -23 /tmp/b /tmp/r
 '
 # Expected: empty.
 
 # 3. Did a frontend module start using the WYSIWYG?
-docker run --rm --entrypoint sh registry.carpetavenue.net/carpient:latest -c '
+docker run --rm --entrypoint sh registry.carpetavenue.net/carpetavenue-jp:latest -c '
   cd /var/www/html && grep -rl "wysiwygAdapter\|tinymce\|hugerte" \
     app/code/*/*/view/frontend vendor/*/*/view/frontend 2>/dev/null
 '
 # Expected: empty.
 
 # 4. Did the hardlink dedup actually survive into the shipped image?
-docker run --rm --entrypoint sh registry.carpetavenue.net/carpient:latest -c '
+docker run --rm --entrypoint sh registry.carpetavenue.net/carpetavenue-jp:latest -c '
   cd /var/www/html
-  stat -c "links=%h" pub/static/frontend/carpient/rugs/en_US/jquery.js
+  stat -c "links=%h" pub/static/frontend/carpetavenue/rugs/en_US/jquery.js
   du -sh pub/static
 '
 # Expected: links=13 (12 locales + adminhtml), pub/static ~78M.
@@ -318,7 +319,7 @@ Re-measure the true dedup ceiling if you ever want to revisit the numbers — th
 reports what is available without changing anything:
 
 ```bash
-docker run --rm --entrypoint sh registry.carpetavenue.net/carpient:latest -c '
+docker run --rm --entrypoint sh registry.carpetavenue.net/carpetavenue-jp:latest -c '
   apt-get update >/dev/null 2>&1 && \
   apt-get install -y --no-install-recommends hardlink >/dev/null 2>&1
   hardlink --dry-run --ignore-time /var/www/html 2>&1 | grep Saved
