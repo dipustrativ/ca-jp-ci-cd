@@ -65,6 +65,8 @@
         </button>
         <input type="hidden" value="" id="update_cart_action_container" data-cart-item-update=""/>
     </div>
+    <?= $block->getChildHtml('cart_trustpilot') ?>
+    <?= $block->getChildHtml('cart_iconusps') ?>
 </form>
 <?= $block->getChildHtml('checkout.cart.order.actions') ?>
 <?= $block->getChildHtml('shopping.cart.table.after') ?>

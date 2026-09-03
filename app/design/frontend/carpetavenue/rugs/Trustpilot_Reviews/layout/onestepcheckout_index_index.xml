@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+
+        <!-- Trustpilot horizontal review strip in the checkout header, beside the logo.
+             The header row + logo column (col-lg-4) come from
+             Mageplaza_Osc/layout/onestepcheckout_index_index.xml; this adds the second
+             column (col-lg-8) holding the same CMS block used on the cart page. -->
+        <referenceContainer name="mageplaza-osc.header.content.row" htmlTag="div" htmlClass="row">
+            <container name="trustpilot.mageplaza-osc.column" htmlTag="div" htmlClass="col-trustpilot col-xs-12 col-lg-8" after="-">
+                <block class="Magento\Cms\Block\Block"
+                       name="trustpilot.mageplaza-osc.horizontal.list">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">trustpilot-horizontal-list</argument>
+                    </arguments>
+                </block>
+            </container>
+        </referenceContainer>
+
+    </body>
+</page>

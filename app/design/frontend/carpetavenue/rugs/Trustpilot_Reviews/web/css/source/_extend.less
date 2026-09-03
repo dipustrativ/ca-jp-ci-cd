@@ -1,0 +1,69 @@
+//
+//  Trustpilot review strip in the one-step-checkout header
+//  _____________________________________________
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+
+  .onestepcheckout-index-index {
+    .trustpilot-widget {
+      margin-top: 30px;
+    }
+  }
+}
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+
+  .onestepcheckout-index-index {
+    .page-wrapper {
+      .page-header.custom-panel {
+        .header.content {
+          padding: 20px 0;
+          //  Base theme pins .header.content to height:60px, which clips the
+          //  taller Trustpilot strip. Let it grow to fit the row.
+          height: auto;
+
+          //  Logo (col-xs-7 col-lg-4) and the Trustpilot strip (col-trustpilot)
+          //  sit side by side on one row, vertically centred. The Mageplaza_Osc
+          //  common block forces every header column to flex:0 0 100% (stacked,
+          //  centred); these higher-specificity rules override that on desktop
+          //  only, so the mobile stacking is preserved.
+          .row {
+            flex-wrap: nowrap;
+            align-items: center;
+          }
+
+          //  Logo column: shrink to the logo, pinned left.
+          .col-xs-7 {
+            flex: 0 0 auto;
+            width: auto;
+            max-width: none;
+            text-align: left;
+          }
+
+          .logo {
+            margin: 0;
+            top: auto;
+            transform: none;
+          }
+
+          //  Trustpilot column: take the remaining width beside the logo.
+          .col-trustpilot {
+            flex: 1 1 auto;
+            width: auto;
+            max-width: none;
+            margin-top: 0;
+            text-align: left;
+          }
+        }
+      }
+    }
+  }
+}
