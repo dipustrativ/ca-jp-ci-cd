@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <!-- Trustpilot widget bootstrap: scans .trustpilot-widget nodes and injects the review iframes.
+             Without it the widget divs (e.g. CMS block trustpilot-home-list) render only the fallback link. -->
+        <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+                src_type="url" async="async"/>
+    </head>
+    <body>
+
+        <!-- ============ HEADER ============ -->
+
+        <!-- USP bar bound to CMS block -->
+        <referenceContainer name="header.panel">
+            <container name="header-usps-wrapper" htmlTag="div" htmlClass="header usps__wrapper">
+                <block class="Magento\Cms\Block\Block" name="header.usps">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">top_header_static-desktop</argument>
+                        <argument name="css_class" xsi:type="string">header usps</argument>
+                    </arguments>
+                </block>
+            </container>
+        </referenceContainer>
+
+        <!-- Relocate the panel wrapper (switchers/links) into a custom top panel -->
+        <referenceContainer name="page.wrapper">
+            <container name="header.panel.custom" htmlTag="div" before="-" htmlClass="page-header custom-panel"/>
+            <!-- Container for elements which need to break the content max-width
+                 (reference theme defines this in Evalent_SectionBlock; Productify
+                 moves the AJAX similar-products block here) -->
+            <container name="main.full"
+                       label="Full Width Content"
+                       htmlTag="div"
+                       htmlClass="content--full-width"
+                       after="main.content"/>
+        </referenceContainer>
+        <move element="header.panel.wrapper" destination="header.panel.custom"/>
+
+        <!-- Centered header wrapper: logo + search -->
+        <referenceContainer name="header-wrapper">
+            <container name="header-wrapper-center" htmlClass="header-wrapper__centered" htmlTag="div" before="-"/>
+        </referenceContainer>
+
+        <container name="logo.container" htmlTag="div" htmlClass="logo__container"/>
+        <move element="logo" destination="logo.container"/>
+        <move element="logo.container" destination="header-wrapper-center" before="-"/>
+
+        <!-- Search sits far left (icon toggle) -->
+        <move element="top.search" destination="header-wrapper" before="-"/>
+
+        <!-- Reset blank logo width so CSS controls it -->
+        <referenceBlock name="logo">
+            <arguments>
+                <argument name="logo_file" xsi:type="string">images/logo.svg</argument>
+                <argument name="logo_width" xsi:type="null"/>
+            </arguments>
+        </referenceBlock>
+
+        <!-- Mobile nav toggle in its own container -->
+        <container name="nav.toggle.container" htmlTag="div" htmlClass="toggle-nav__container">
+            <block name="nav.toggle" class="Magento\Framework\View\Element\Template"
+                   template="Magento_Theme::html/header/nav-toggle.phtml"/>
+        </container>
+        <move element="nav.toggle.container" destination="header-wrapper" before="header-wrapper-center"/>
+
+        <!-- Right-side actions group (account + wishlist + cart) -->
+        <referenceContainer name="header-wrapper">
+            <container name="header.actions" htmlTag="div" htmlClass="header-actions" after="header-wrapper-center">
+                <container name="header-customer-account" htmlTag="div" htmlClass="customer-account-header"/>
+            </container>
+        </referenceContainer>
+        <move element="top.links" destination="header-customer-account"/>
+        <move element="minicart" destination="header.actions" after="header-customer-account"/>
+
+        <!-- Sticky wrapper around header + navigation -->
+        <referenceContainer name="header.container">
+            <container name="sticky-wrapper" label="Header Sticky Wrapper" htmlTag="div" htmlClass="sticky wrapper"/>
+        </referenceContainer>
+        <move element="header-wrapper" destination="sticky-wrapper" after="-"/>
+        <move element="navigation.sections" destination="sticky-wrapper" after="-"/>
+
+        <!-- ============ FOOTER ============ -->
+
+        <referenceContainer name="footer">
+            <container name="footer.content.flex" htmlTag="div" htmlClass="container">
+                <container name="footer.footer-header" htmlTag="div" htmlClass="footer-header">
+                    <container name="footer-header-logo-container" htmlTag="div" htmlClass="footer-logo">
+                        <block class="Magento\Cms\Block\Block" name="footer-bottom-logo">
+                            <arguments>
+                                <argument name="block_id" xsi:type="string">footer-bottom-logo</argument>
+                            </arguments>
+                        </block>
+                    </container>
+                    <container name="footer-header-links-container" htmlTag="div" htmlClass="footer-header-links">
+                        <block class="Magento\Cms\Block\Block" name="footer-carpet-links">
+                            <arguments>
+                                <argument name="block_id" xsi:type="string">footer-carpet-links</argument>
+                            </arguments>
+                        </block>
+                    </container>
+                </container>
+                <container name="footer.divider" htmlTag="div" htmlClass="footer-divider"/>
+                <container name="footer.footer-grid" htmlTag="div" htmlClass="footer-grid">
+                    <container name="footer.footer-grid.section1" htmlTag="div" htmlClass="footer-column foo-col1">
+                        <container name="footer.footer-grid.section1.contact-info" htmlTag="div" htmlClass="contact-info">
+                            <block class="Magento\Cms\Block\Block" name="footer-customer-service">
+                                <arguments>
+                                    <argument name="block_id" xsi:type="string">footer-customer-service</argument>
+                                </arguments>
+                            </block>
+                        </container>
+                        <container name="footer.footer-grid.section1.social-links" htmlTag="div" htmlClass="social-links">
+                            <block class="Magento\Cms\Block\Block" name="footer-social-links">
+                                <arguments>
+                                    <argument name="block_id" xsi:type="string">footer-social-links</argument>
+                                </arguments>
+                            </block>
+                        </container>
+                    </container>
+                    <container name="footer.footer-grid.section2" htmlTag="div" htmlClass="footer-column foo-col2">
+                        <block class="Magento\Cms\Block\Block" name="footer-service-links">
+                            <arguments>
+                                <argument name="block_id" xsi:type="string">footer-service-links</argument>
+                            </arguments>
+                        </block>
+                        <container name="footer.footer-grid.section2.trustpilot-badge-container" htmlTag="div" htmlClass="trust-badges">
+                            <block class="Magento\Cms\Block\Block" name="footer-trustpilot-badge">
+                                <arguments>
+                                    <argument name="block_id" xsi:type="string">footer-trustpilot-badge</argument>
+                                </arguments>
+                            </block>
+                        </container>
+                    </container>
+                    <container name="footer.footer-grid.section3" htmlTag="div" htmlClass="footer-column foo-col3">
+                        <block class="Magento\Cms\Block\Block" name="footer-empty-links">
+                            <arguments>
+                                <argument name="block_id" xsi:type="string">footer-empty-links</argument>
+                            </arguments>
+                        </block>
+                    </container>
+                    <container name="footer.footer-grid.section4" htmlTag="div" htmlClass="footer-column foo-col4">
+                        <container name="footer.footer-grid.section4.payment-logo-container" htmlTag="div" htmlClass="footer-column payment-methods">
+                            <block class="Magento\Cms\Block\Block" name="footer-payment-logos">
+                                <arguments>
+                                    <argument name="block_id" xsi:type="string">footer-payment-logos</argument>
+                                </arguments>
+                            </block>
+                        </container>
+                        <container name="footer.footer-grid.section4.delivery-partner" htmlTag="div" htmlClass="shipping-logos">
+                            <block class="Magento\Cms\Block\Block" name="footer-delivery-partners">
+                                <arguments>
+                                    <argument name="block_id" xsi:type="string">footer-delivery-partners</argument>
+                                </arguments>
+                            </block>
+                        </container>
+                    </container>
+                </container>
+                <container name="footer.footer-bottom" htmlTag="div" htmlClass="footer-newsletter-bottom">
+                    <container name="footer.col.newsletter" htmlTag="div" htmlClass="col-footer footer-newsletter"/>
+                </container>
+            </container>
+        </referenceContainer>
+
+        <move element="form.subscribe" destination="footer.col.newsletter" before="-"/>
+        <referenceBlock name="form.subscribe" template="Magento_Newsletter::subscribe.phtml"/>
+
+        <referenceBlock name="footer_links" remove="true"/>
+
+        <!-- Copyright sits directly under <footer class="page-footer">, as a sibling
+             after <div class="footer content"> (core nests it inside). -->
+        <move element="copyright" destination="footer-container" after="footer"/>
+
+        <!-- Core's ifconfig="design/footer/report_bugs" defaults to 1, so removing the
+             block here is what actually keeps the "Report Bugs" link off the storefront. -->
+        <referenceBlock name="report.bugs" remove="true"/>
+
+        <!-- Remove compare (reference theme has no compare) -->
+        <referenceBlock name="catalog.compare.link" remove="true"/>
+        <referenceBlock name="catalog.compare.sidebar" remove="true"/>
+        <referenceBlock name="category.product.addto.compare" remove="true"/>
+        <referenceBlock name="catalogsearch.product.addto.compare" remove="true"/>
+        <referenceBlock name="crosssell.product.addto.compare" remove="true"/>
+        <referenceBlock name="related.product.addto.compare" remove="true"/>
+        <referenceBlock name="upsell.product.addto.compare" remove="true"/>
+        <referenceBlock name="view.addto.compare" remove="true"/>
+
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template"
+                   template="Magento_Theme::lazyload.phtml"
+                   after="-"
+                   name="lazyload.init" />
+        </referenceContainer>
+
+    </body>
+</page>
