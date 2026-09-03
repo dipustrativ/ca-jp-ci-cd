@@ -1,4 +1,4 @@
-# CarpetAvenue — Dokploy BUILDS the image itself from git (no registry, no CI).
+# CarpetAvenue JP — Dokploy BUILDS the image itself from git (no registry, no CI).
 #
 # Use this only if you don't want a build server + registry. Dokploy clones the
 # repo and runs `docker compose build`; `app` builds the image once, the other
@@ -69,9 +69,9 @@ services:
       retries: 10
     networks: [magento_net]
 
-  # The ONLY service that builds. Tags the image carpient:built; the others reuse it.
+  # The ONLY service that builds. Tags the image carpetavenue-jp:built; the others reuse it.
   app:
-    image: carpient:built
+    image: carpetavenue-jp:built
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -100,17 +100,17 @@ services:
       OPENSEARCH_PORT: ${OPENSEARCH_PORT:-9200}
       MAGE_CRYPT_KEY: ${MAGE_CRYPT_KEY}
       MAGE_GRAPHQL_ID_SALT: ${MAGE_GRAPHQL_ID_SALT}
-      DOMAIN: ${DOMAIN:-carpetavenue.net}
+      DOMAIN: ${DOMAIN:-playground.carpetavenue.jp}
       DEBUG_ENV: ${DEBUG_ENV:-false}
     volumes:
       - magento_media:/var/www/html/pub/media
       - magento_var:/var/www/html/var
     networks:
       magento_net:
-        aliases: [carpient-fpm]
+        aliases: [carpetavenue-jp-fpm]
 
   upgrade:
-    image: carpient:built
+    image: carpetavenue-jp:built
     command: >
       sh -c "chown -R www-data:www-data /var/www/html/var &&
       php bin/magento maintenance:enable &&
@@ -127,7 +127,7 @@ services:
     networks: [magento_net]
 
   static:
-    image: carpient:built
+    image: carpetavenue-jp:built
     command: sh -c "rm -rf /mnt/static/* && cp -a /var/www/html/pub/static/. /mnt/static/"
     restart: "no"
     depends_on:
@@ -137,7 +137,7 @@ services:
     networks: [magento_net]
 
   cron:
-    image: carpient:built
+    image: carpetavenue-jp:built
     command: cron -f
     restart: unless-stopped
     depends_on:
@@ -149,7 +149,7 @@ services:
     networks: [magento_net]
 
   nginx:
-    image: carpient-nginx:built
+    image: carpetavenue-jp-nginx:built
     build:
       context: ..
       dockerfile: docker/Dockerfile.nginx
