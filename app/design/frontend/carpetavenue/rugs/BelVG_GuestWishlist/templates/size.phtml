@@ -1,0 +1,34 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \BelVG\GuestWishlist\Block\Wishlist\Item\Column $block */
+
+/** @var \Magento\Wishlist\Model\Item $item */
+$item = $block->getItem();
+$product = $item->getProduct();
+
+/** @var \CarpetAvenue\ThemeContent\Helper\ThemeHelper $themeHelper */
+$themeHelper = $this->helper(\CarpetAvenue\ThemeContent\Helper\ThemeHelper::class);
+$configSizeAttrId = $themeHelper->getSizeAttributeId();
+?>
+<div class="product details product-item-details">
+    <div class="size">
+        <?php
+
+        // Checking size attributes
+        $sizeValue = '';
+        if ($product->getData('width') && $product->getData('length')) {
+            if ($product->getData('shape') != 20) {
+                $sizeValue = $product->getData('width') . ' x ' . $product->getData('length') . ' cm';
+            } else {
+                $sizeValue = "∅ " . $product->getData('width') . ' cm';
+            }
+        }
+
+        echo $sizeValue;
+        ?>
+    </div>
+</div>

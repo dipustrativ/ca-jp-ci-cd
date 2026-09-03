@@ -19,18 +19,18 @@ _.each(themes, function (theme, name) {
         'tasks': 'less:' + name
     };
 
-    // Magento's asset publisher (dev:source-theme:deploy) skips republishing
-    // a file that already exists under pub/static, so watching only the
-    // published copy (above) misses real source edits. Watch the actual
-    // source and force a republish + recompile — but clean only *.less
-    // (clean:<name>Less), not the whole theme dir (clean:<name>, used by
-    // exec:<name>), or every save would also delete published JS/fonts/etc.
+    // '<name>Src' watches the real theme sources under app/design instead of the
+    // published copy in pub/static. Magento's asset publisher skips a file that
+    // already exists at the destination, so once 'exec:<name>' has published a
+    // file, later edits under app/design are invisible to 'watch:<name>' — it
+    // would sit idle forever. Running exec before less republishes on each save.
+    // Path is derived from the theme entry, so renaming the theme in
+    // local-themes.js is enough; nothing here hardcodes a vendor.
     themeOptions[name + 'Src'] = {
         'files': [
-            'app/design/' + theme.area + '/' + theme.name + '/**/*.less',
-            'app/code/**/view/' + theme.area + '/web/css/source/**/*.less'
+            'app/design/' + theme.area + '/' + theme.name + '/**/*.less'
         ],
-        'tasks': ['clean:' + name + 'Less', 'exec:' + name + 'Deploy', 'less:' + name]
+        'tasks': ['exec:' + name, 'less:' + name]
     };
 });
 

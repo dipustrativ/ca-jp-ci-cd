@@ -1,0 +1,585 @@
+//
+//  Variables (from Evalent base theme, not defined in blank parent)
+//  _____________________________________________
+
+@font-size__header-icons: 2.8rem;
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+  .onestepcheckout-index-index {
+
+      main#maincontent {
+          background-color: transparent !important;
+      }
+
+    .page-wrapper {
+      .page-header.custom-panel {
+        display: block;
+        margin-bottom: 20px;
+        background: @color-white;
+
+        .header.content {
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+
+        .panel.wrapper {
+          display: none;
+          background: @color-white;
+        }
+      }
+    }
+
+    .osc-authentication-wrapper {
+      text-align: right;
+      padding: 0 10px;
+    }
+
+    input {
+      padding: 5px 10px;
+      height: unset;
+    }
+
+    .fieldset > .field:not(.choice) > .label {
+      text-align: left;
+    }
+
+    .page-header.custom-panel .page-main {
+      max-width: 100%;
+      width: 100%;
+    }
+
+    .header.content {
+      max-width: 100%;
+      width: 100%;
+      text-align: center;
+
+      .row {
+        width: 100%;
+        margin: 0;
+      }
+
+      [class*="col-"] {
+        width: 100%;
+        max-width: 100%;
+        float: none;
+        flex: 0 0 100%;
+        text-align: center;
+      }
+
+      .logo {
+        float: none;
+        margin: 0 auto;
+        position: relative;
+        display: inline-block;
+        top: 45%;
+        transform: translateY(-50%);
+
+        img {
+          height: 55px;
+          width: auto;
+        }
+      }
+    }
+
+    tr {
+      margin: 0;
+    }
+
+    .checkout-shipping-address,
+    .checkout-billing-address,
+    #checkout-step-shipping_method,
+    #checkout-step-payment,
+    .order-summary {
+      background: @color-white;
+    }
+
+    .checkout-billing-address {
+      padding-bottom: 1px;
+    }
+
+    .create-account-block,
+    .billing-address-same-as-shipping-block {
+      padding: 0 10px;
+    }
+
+    .step-title {
+      border-radius: 5px;
+      font-weight: @font-weight__heavier !important;
+      text-transform: none;
+      background-color: #dddddd;
+      color: #000 !important;
+
+
+      // Switchero fontawesome to pe-7-icon
+      .fa {
+        font-family: 'Pe-icon-7-stroke';
+        line-height: 0.9;
+      }
+      .fa-home:before {
+        content: '\e648';
+      }
+      .fa-truck:before {
+        content: '\e629';
+      }
+      .fa-credit-card:before {
+        content: '\e68c';
+      }
+      .fa-check-square:before {
+        content: '\e66c';
+      }
+    }
+
+    .opc-wrapper {
+      .field.choice {
+        padding-left: 10px;
+        &.create-account-checkbox {
+          padding: 0;
+        }
+      }
+    }
+
+    .table-checkout-shipping-method {
+      .col.col-carrier {
+        display: none;
+      }
+
+      .col {
+        &.col-price {
+            width: 45px;
+            padding-left: 0;
+            padding-right: 20px;
+        }
+      }
+
+      tr {
+        border-bottom: 1px solid #ccc;
+
+        &:last-of-type {
+          border: none;
+        }
+
+        td {
+          border: none;
+        }
+      }
+    }
+
+    #discount-form {
+      button {
+        padding: 7px 20px;
+        font-size: 1.2rem;
+        background: #666 !important;
+      }
+    }
+
+    .checkout-payment-method {
+      .payment-option-title {
+        .action-toggle {
+          display: block;
+          &:after {
+            float: right;
+          }
+        }
+      }
+
+      .payment-method-title {
+        padding: 20px 0 !important;
+        position: relative;
+
+        label[for="banktransfer"],
+        label[for="evinvoicepayment"] {
+          &:after {
+            content: "";
+            position: absolute;
+            top: 5px;
+            right: 0;
+            display: inline-block;
+            background-image: url('@{baseDir}images/BankTransferIc.png');
+            width: 60px;
+            height: 50px;
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: right center;
+          }
+
+          span {
+            padding-right: 60px;
+          }
+        }
+      }
+    }
+
+    #checkout-review-table {
+      thead {
+        background: #f4f4f4;
+
+        tr {
+          th:first-of-type {
+            text-align: left;
+          }
+        }
+      }
+
+      .button-action.remove {
+        background: none;
+        background-color: transparent !important;
+        text-indent: 0;
+
+        &:before {
+          font-family: 'Pe-icon-7-stroke';
+          content: '\e609';
+          color: #333;
+          font-size: 16px;
+        }
+
+        &:hover {
+          &:before {
+            color: @color-black;
+          }
+        }
+      }
+
+        .product-item-detail {
+            flex-wrap: wrap;
+        }
+    }
+
+    .table-totals {
+      .totals {
+        &.sub,
+        &.shipping.incl,
+        &-tax {
+          font-size: 1.1rem;
+          //background: #f4f4f4;
+        }
+
+        &.grand {
+          background: #f4f4f4;
+        }
+      }
+    }
+
+    .minicart-wrapper {
+      button.action.showcart {
+        padding: 0 10px;
+        &:before {
+          font-family: 'Pe-icon-7-stroke';
+          content: '\e66e';
+          line-height: 1.5;
+            .lib-font-size(@font-size__header-icons);
+        }
+      }
+    }
+
+    //
+    // Shipping methods logos
+    //__________________________
+
+    td[class*="shipping-method--matrixrate"] {
+      width: ~"calc(100% - 85px)";
+      padding: 13px 0 15px;
+
+      &:before {
+        content: "";
+        background: url("../images/shipping_methods/ups.png") no-repeat 0% center / contain;
+        padding-right: 5px;
+        height: 30px;
+        width: 30px;
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+        &.DHL {
+            &:before {
+                background: url("../images/shipping_methods/dhl.png") no-repeat 0% center / contain;
+                width: 50px;
+                box-sizing: border-box;
+                margin-left: -15px;
+                margin-right: 5px;
+            }
+        }
+
+        &.GLS, &.gls {
+            &:before {
+                background: url("../images/shipping_methods/gls.png") no-repeat 0% center / contain;
+                width: 50px;
+                box-sizing: border-box;
+                margin-left: -15px;
+                margin-right: 5px;
+            }
+        }
+
+      html[lang="ja"] &:before {
+        background: url("../images/shipping_methods/ups_sagawa-vertical.png") no-repeat 0% center / contain;
+        height: 45px;
+        width: 45px;
+      }
+    }
+
+    td.shipping-method--matrixrate_2010,
+    td.shipping-method--matrixrate_2011,
+    td.shipping-method--matrixrate_2013,
+    td.shipping-method--matrixrate_3243,
+    td.shipping-method--matrixrate_3362 {
+      &:before {
+        //background: url("../images/shipping_methods/ups_sagawa-vertical.png") no-repeat 0% center / contain;
+        //height: 45px;
+        //width: 45px;
+          display: none;
+      }
+    }
+
+    .checkout-container {
+      margin-bottom: 0;
+    }
+
+    .osc-cms-block {
+      margin-top: 0;
+
+      .agreements-block {
+        .lib-css(color, #666666);
+        .lib-font-size(12);
+
+        a {
+          text-decoration: underline;
+          .lib-css(color, #000);
+        }
+      }
+    }
+  }
+  .qty-wrapper {
+    .qty-wrap {
+      .input-text.update {
+        padding: 0;
+        height: 24px;
+      }
+    }
+  }
+
+  body.onestepcheckout-index-index {
+    background: #f5f5f5;
+  }
+
+  .back-to-cart {
+    &__wrapper {
+      padding: 0 10px;
+
+    }
+
+    &__link {
+      position: relative;
+      display: inline-block;
+      padding: 10px 15px;
+      border: 1px solid #c3c3c3;
+      .lib-vendor-prefix-border-radius(5px);
+      background: @color-white;
+      .lib-vendor-prefix-transition(background, 0.3s);
+
+      &:hover {
+        text-decoration: none;
+        background: #eee;
+      }
+
+      &:before {
+        position: absolute;
+        font-family: 'luma-icons';
+        content: '\e622';
+        transform: rotate(90deg);
+      }
+    }
+
+    &__label {
+      margin-left: 20px;
+      font-weight: @font-weight__bold;
+    }
+  }
+}
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+  .onestepcheckout-index-index {
+
+    .columns {
+      .column.main {
+        position: relative;
+      }
+    }
+
+    .back-to-cart {
+      &__wrapper {
+        position: absolute;
+        top: 118px;
+      }
+    }
+
+    #checkout {
+      .opc-estimated-wrapper {
+        margin-bottom: 85px;
+      }
+    }
+
+    #customer-email-fieldset {
+      margin-bottom: 14px;
+    }
+
+    .opc-wrapper {
+      .form-login,
+      .form-shipping-address,
+      .methods-shipping {
+        background: none;
+        padding: 20px 0;
+      }
+
+      .methods-shipping {
+        margin: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+
+      .checkout-shipping-address {
+        .step-title {
+          margin-bottom: 0;
+        }
+
+        #checkout-step-shipping {
+          padding-top: 0 !important;
+        }
+      }
+    }
+
+    .checkout-payment-method {
+      .payment-methods {
+        margin: 0;
+      }
+
+      .fieldset:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .payment-option.discount-code {
+      padding: 0;
+
+      .payment-option-content {
+        padding: 0 8px;
+      }
+    }
+
+    #checkout-step-shipping_method {
+      padding: 10px !important;
+    }
+
+    .opc-block-summary {
+      .items-in-cart {
+        & > .title {
+          margin: 0 10px 10px;
+          border: none;
+        }
+      }
+    }
+
+    .opc-wrapper {
+      .form-shipping-address {
+        padding-bottom: 0;
+      }
+
+      .create-account-block {
+        margin-top: -20px !important;
+      }
+    }
+  }
+}
+
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+  .onestepcheckout-index-index {
+    .payment-option.discount-code {
+      padding: 0 10px 15px 0;
+    }
+
+    .opc-block-summary {
+      padding: 20px;
+    }
+
+    .back-to-cart__wrapper {
+      margin-bottom: 20px;
+    }
+
+    .opc-wrapper {
+      .create-account-block {
+        margin-top: -20px;
+      }
+    }
+
+    #co-place-order-area {
+      .osc-place-order-wrapper {
+        float: right;
+        padding-right: 0;
+      }
+    }
+
+    .checkout-container {
+      margin-top: -25px;
+      position: relative;
+    }
+
+    .osc-authentication-wrapper {
+      position: absolute;
+      top: -20px;
+      right: 0;
+    }
+
+    .checkout-container {
+      margin-bottom: 0;
+    }
+
+    .osc-cms-block {
+
+      .agreements-block {
+        width: 66%;
+        margin-left: auto;
+      }
+    }
+  }
+}
+
+//
+//  Street address — helper notes + visible "Address Line 2" label
+//  ---------------------------------------------------------------
+.checkout-index-index {
+  .fieldset > .field.street {
+    > .control {
+      > .field.additional {
+        margin-top: 15px;
+
+        > .label {
+          clip: auto;
+          height: auto;
+          margin: 0 0 4px;
+          overflow: visible;
+          position: static;
+          width: auto;
+          display: block;
+          font-size: 12px;
+        }
+      }
+
+      .field-note {
+        color: #757575;
+        font-size: 12px;
+        margin-top: 4px;
+      }
+    }
+  }
+}

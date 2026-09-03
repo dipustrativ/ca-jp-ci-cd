@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Make the search results page match the category view: breadcrumbs pinned to
+ * page.top, no left sidebar, and the layered-navigation filters as a
+ * horizontal bar above the full-width product grid.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <attribute name="class" value="page-layout-fullwidth-filter"/>
+
+        <!-- Breadcrumbs above #maincontent, same as category view -->
+        <move element="breadcrumbs" destination="page.top" after="-"/>
+
+        <!-- Keep sidebar.main in the tree but empty, so main goes full width -->
+        <referenceContainer name="sidebar.main">
+            <block class="Magento\Framework\View\Element\Text" name="sidebar.dummy.block">
+                <arguments>
+                    <argument name="text" xsi:type="string"><![CDATA[<!-- keep -->]]></argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!-- Filters above the product grid -->
+        <move element="catalogsearch.leftnav" destination="content" before="-"/>
+
+        <!-- Drop the "Related search terms" recommendations block from the toolbar area -->
+        <referenceBlock name="search_recommendations" remove="true"/>
+    </body>
+</page>

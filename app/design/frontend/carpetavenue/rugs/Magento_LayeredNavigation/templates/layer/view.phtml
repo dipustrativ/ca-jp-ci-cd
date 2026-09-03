@@ -1,0 +1,212 @@
+<?php
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Layered navigation as a horizontal button bar — each attribute button opens
+ * the slide-out filter modal (right side) with that filter's section active.
+ * Matches the reference theme (Evalent/carpet view_slideout).
+ *
+ * @var $block \Magento\LayeredNavigation\Block\Navigation
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<?php if ($block->canShowBlock()) : ?>
+    <?php
+    $filters = $block->getFilters();
+    $activeFilters = $block->getLayer()->getState()->getFilters();
+    $filtered = count($activeFilters);
+
+    // Dimension sliders (Length = height2, Width = width2) are merged into a
+    // single "Size" section holding both range sliders. Order fixed to
+    // Length-then-Width to match the reference design.
+    $dimensionVars = ['height2', 'width2'];
+    $sections = [];
+    $sizeGroup = [];
+    $sizeSectionIdx = null;
+    foreach ($filters as $filter) {
+        if (!$filter->getItemsCount()) {
+            continue;
+        }
+        if (in_array($filter->getRequestVar(), $dimensionVars, true)) {
+            $sizeGroup[$filter->getRequestVar()] = $filter;
+            if ($sizeSectionIdx === null) {
+                $sizeSectionIdx = count($sections);
+                $sections[] = ['type' => 'size'];
+            }
+            continue;
+        }
+        $sections[] = ['type' => 'single', 'filter' => $filter];
+    }
+    $sizeFilters = [];
+    foreach ($dimensionVars as $dimVar) {
+        if (isset($sizeGroup[$dimVar])) {
+            $sizeFilters[] = $sizeGroup[$dimVar];
+        }
+    }
+    ?>
+    <div class="block filter" id="layered-filter-block">
+        <div class="block-title filter-title" data-role="title" data-count="<?= (int) $filtered ?>">
+            <strong><?= $escaper->escapeHtml(__('Shop By')) ?></strong>
+        </div>
+
+        <div class="block-content filter-content">
+            <?php foreach ($sections as $i => $section) :
+                $isSize = $section['type'] === 'size';
+                $btnMod = $isSize ? 'size' : $section['filter']->getRequestVar();
+                $btnLabel = $isSize ? __('Size') : __($section['filter']->getName());
+                ?>
+                <button type="button"
+                        class="button action button-filter button-filter--<?= $escaper->escapeHtmlAttr($btnMod) ?>"
+                        data-filter-tab="<?= (int) $i ?>"
+                        disabled>
+                    <?= $escaper->escapeHtml($btnLabel) ?>
+                </button>
+            <?php endforeach; ?>
+
+            <div id="filter-popup" style="display: none" class="transition-menus">
+                <div class="filter-options" id="narrow-by-list" data-role="content"
+                     data-mage-init='{"accordion":{"openedState":"active","collapsible":true,"active":false,"multipleCollapsible":false}}'>
+                    <?php foreach ($sections as $i => $section) :
+                        $isSize = $section['type'] === 'size';
+                        $itemMod = $isSize ? 'size' : $section['filter']->getRequestVar();
+                        $itemTitle = $isSize ? __('Size') : __($section['filter']->getName());
+                        ?>
+                        <div class="filter-options-item <?= $escaper->escapeHtmlAttr($itemMod) ?>"
+                             data-role="collapsible"
+                             data-filter-tab="<?= (int) $i ?>">
+                            <div data-role="title" role="heading" aria-level="3" class="filter-options-title"><?= $escaper->escapeHtml($itemTitle) ?></div>
+                            <div data-role="content" class="filter-options-content">
+                                <button type="button" class="filter-options-back">
+                                    <span><?= $escaper->escapeHtml(__('Back')) ?></span>
+                                </button>
+                                <h2 class="filter-options-content__title"><?= $escaper->escapeHtml($itemTitle) ?></h2>
+                                <?php if ($isSize) : ?>
+                                    <?php foreach ($sizeFilters as $dimFilter) : ?>
+                                        <div class="filter-dimension filter-dimension--<?= $escaper->escapeHtmlAttr($dimFilter->getRequestVar()) ?>">
+                                            <div class="filter-dimension__label"><?= $escaper->escapeHtml(__($dimFilter->getName())) ?></div>
+                                            <?= /* @noEscape */ $block->getChildBlock('renderer')->render($dimFilter) ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else : ?>
+                                    <?= /* @noEscape */ $block->getChildBlock('renderer')->render($section['filter']) ?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <div class="am_shopby_apply_filters">
+                    <div class="am-show-button -horizontal wrap">
+                        <a href="<?= $escaper->escapeUrl($block->getClearUrl()) ?>"
+                           class="button action clear filter-clear amshopby-button"><span><?= $escaper->escapeHtml(__('Clear')) ?></span></a>
+                        <button type="button" class="amshopby-button am-apply-close">
+                            <span><?= $escaper->escapeHtml(__('Show')) ?></span>
+                            <span class="am-items">(<?= (int) $block->getLayer()->getProductCollection()->getSize() ?>)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <?php if ($filtered) : ?>
+                <div class="filter-state-bar">
+                    <button type="button" class="open-filter-popup navicon-equalizer"><?= $escaper->escapeHtml(__('All filters')) ?></button>
+                    <?= $block->getChildHtml('state') ?>
+                    <div class="block-actions filter-actions">
+                        <a href="<?= $escaper->escapeUrl($block->getClearUrl()) ?>" class="action clear filter-clear"><span><?= $escaper->escapeHtml(__('Clear all')) ?></span></a>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <?php // Slide-out filter modal opener. Replaces the removed carpetavenueFilterModal
+          // module — uses core Magento_Ui modal (type: 'filter'). The filter buttons
+          // render disabled and are enabled here once the modal is wired. ?>
+    <script>
+        require([
+            'jquery',
+            'Magento_Ui/js/modal/modal',
+            'mage/accordion'
+        ], function ($, modal) {
+            'use strict';
+
+            var MODAL_OPTS = {
+                type: 'slide',
+                responsive: true,
+                innerScroll: true,
+                modalClass: 'filter-modal filter-drawer',
+                title: '<?= $escaper->escapeJs(__('Filter')) ?>',
+                buttons: []
+            };
+
+            // (Re)wire the drawer. Runs on first load AND after every AJAX filter
+            // apply/remove — that swap replaces #layered-filter-block / #filter-popup
+            // with fresh markup (buttons rendered disabled, no modal). Without a
+            // re-init the remaining filters go dead after you apply or clear one.
+            function initFilterModal() {
+                var $popup = $('.column.main #filter-popup');
+
+                if (!$popup.length || $popup.data('carpFilterReady')) {
+                    return;
+                }
+
+                // Core modal moves the previous #filter-popup into a <body>-level
+                // wrapper; drop stale drawers so duplicate ids don't pile up and
+                // openModal can't target the wrong (old) one. Its backdrop and the
+                // body scroll-lock are separate nodes/classes — clear them too, or
+                // the greyed overlay stays and blocks every click after an apply.
+                $('.modal-slide.filter-modal').remove();
+                $('.modals-overlay').remove();
+                $('body').removeClass('_has-modal').css('overflow', '');
+                $('html').css('overflow', '');
+
+                $popup.data('carpFilterReady', true);
+                $('#layered-filter-block').find('.button-filter').prop('disabled', false);
+
+                modal(MODAL_OPTS, $popup);
+            }
+
+            function activateTab(tab) {
+                if (tab === undefined || tab === null || tab === '') {
+                    return;
+                }
+                try {
+                    $('#narrow-by-list').accordion('activate', parseInt(tab, 10));
+                } catch (e) {
+                    // accordion may not be ready on the very first paint — ignore.
+                }
+            }
+
+            // Delegated on document so the handlers survive the AJAX DOM swap.
+            $(document)
+                .off('click.carpFilter')
+                .on('click.carpFilter', '.button-filter', function () {
+                    $('#filter-popup').modal('openModal');
+                    activateTab($(this).attr('data-filter-tab'));
+                })
+                .on('click.carpFilter', '.open-filter-popup, .filter-title', function () {
+                    $('#filter-popup').modal('openModal');
+                })
+                .on('click.carpFilter', '.filter-options-back', function () {
+                    var idx = $(this).closest('.filter-options-item').index();
+                    try {
+                        $('#narrow-by-list').accordion('deactivate', idx);
+                    } catch (e) {}
+                })
+                .on('click.carpFilter', '.am-apply-close', function () {
+                    $('#filter-popup').modal('closeModal');
+                });
+
+            // Defer so core finishes re-applying data-mage-init (price sliders,
+            // accordion) to the fresh popup before the modal moves it to <body>.
+            setTimeout(initFilterModal, 0);
+
+            if (!$(document).data('carpFilterBound')) {
+                $(document).data('carpFilterBound', true);
+                $(document).on('contentUpdated', function () {
+                    setTimeout(initFilterModal, 0);
+                });
+            }
+        });
+    </script>
+<?php endif; ?>

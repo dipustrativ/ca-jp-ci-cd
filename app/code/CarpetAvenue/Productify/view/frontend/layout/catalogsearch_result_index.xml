@@ -24,7 +24,11 @@
     <update handle="ajaxscroll"/>
     <body>
         <!-- Layered navigation renderers (merged CarpetAvenue_LayeredNavigation) -->
-        <referenceBlock name="catalogsearch.navigation.renderer" template="CarpetAvenue_Productify::layer/filter.phtml"/>
+        <referenceBlock name="catalogsearch.navigation.renderer" template="CarpetAvenue_Productify::layer/filter.phtml">
+            <arguments>
+                <argument name="category_image_view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\CategoryImages</argument>
+            </arguments>
+        </referenceBlock>
         <referenceBlock name="catalogsearch.navigation.state" template="CarpetAvenue_Productify::layer/state.phtml"/>
 
         <referenceContainer name="after.body.start">

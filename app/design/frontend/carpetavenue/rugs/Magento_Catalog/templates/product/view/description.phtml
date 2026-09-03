@@ -1,0 +1,26 @@
+<?php
+/**
+ * Get Product Information
+ */
+$product = $block->getProduct();
+$description = "";
+
+if (null !== $product->getDescription()) {
+    $desc = strip_tags($product->getDescription());
+    $truncated = (strlen($desc) > 260) ? mb_substr($desc, 0, 260, "utf-8") . '...' . "<a href='#' class='product-read-more' data-attr='readmore'>" . __('Read more') . "</a>" : $desc;
+    $description = $truncated;
+}
+?>
+<h3>
+    <?= __("Description"); ?>
+</h3>
+<div class="product-short_description">
+    <?php echo $description; ?>
+</div>
+<script type="text/x-magento-init">
+     {
+        "[data-attr='readmore']": {
+          "Magento_Catalog/js/read-more-product": {}
+        }
+      }
+</script>

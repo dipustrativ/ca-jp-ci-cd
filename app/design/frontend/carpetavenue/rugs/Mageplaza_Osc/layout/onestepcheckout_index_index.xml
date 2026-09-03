@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="header.panel.custom">
+            <container name="mageplaza-osc.header.wrapper" htmlTag="div" htmlClass="page-main">
+                <container name="mageplaza-osc.header.container" htmlTag="div" before="page.main.title" htmlClass="header content" after="-">
+                    <container name="mageplaza-osc.header.content.row" htmlTag="div" htmlClass="row">
+
+                        <!-- Logo here -->
+                        <container name="mageplaza-osc.header.col1" htmlTag="div" htmlClass="col-xs-7 col-lg-4" before="-" />
+
+                    </container>
+                </container>
+            </container>
+        </referenceContainer>
+
+        <move element="logo" destination="mageplaza-osc.header.col1" before="-" />
+        <referenceBlock name="page.main.title" remove="true" />
+
+        <!-- Adding back to shop button -->
+        <referenceBlock name="content">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="osc.custom.back-to-cart"
+                   template="Mageplaza_Osc::back-to-cart.phtml"
+                   before="checkout.root"/>
+        </referenceBlock>
+
+        <!-- Moving newsletter subscribe -->
+        <referenceBlock name="checkout.root">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="checkout" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="steps" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="shipping-step" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                <item name="shippingAddress" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="shipping-address-fieldset" xsi:type="array">
+                                                            <item name="children" xsi:type="array">
+                                                                <item name="newsletter" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Mageplaza_Osc/js/view/review/addition/newsletter</item>
+                                                                    <item name="sortOrder" xsi:type="string">40</item>
+                                                                    <item name="config" xsi:type="array">
+                                                                        <item name="componentDisabled" xsi:type="helper" helper="Mageplaza\Osc\Helper\Data::isDisabledNewsletter"/>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                        <!-- Remove order comment block -->
+                                                        <item name="shippingAdditional" xsi:type="array">
+                                                            <item name="children" xsi:type="array">
+                                                                <item name="place-order-comment" xsi:type="array">
+                                                                    <item name="config" xsi:type="array">
+                                                                        <item name="componentDisabled" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="sidebar" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="place-order-information-left" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                <item name="addition-information" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="newsletter" xsi:type="array">
+                                                            <item name="component" xsi:type="string">Mageplaza_Osc/js/view/review/addition/newsletter</item>
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="componentDisabled" xsi:type="boolean">true</item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+
+    </body>
+</page>

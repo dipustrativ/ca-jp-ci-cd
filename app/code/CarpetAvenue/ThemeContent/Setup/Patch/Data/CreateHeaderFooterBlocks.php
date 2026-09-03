@@ -83,52 +83,51 @@ HTML,
             'footer-carpet-links' => [
                 'title' => 'Footer: Carpet links',
                 'content' => <<<'HTML'
-<h3>Carpet Avenue</h3>
+<h3>カーペットアベニュー</h3>
 <ul>
-<li><a href="/carpets/about">About Us</a></li>
-<li><a href="/imprint">Imprint</a></li>
+<li><a href="/subete-no-jutan/about">当社について</a></li>
+<li><a href="/imprint">法規に基づく表記</a></li>
 </ul>
 HTML,
             ],
             'footer-customer-service' => [
                 'title' => 'Footer: Customer service',
                 'content' => <<<'HTML'
-<h3>Need Help?</h3>
-<p>Our Customer Service team will be happy to assist you!</p>
-<p>&nbsp;</p>
-<p>Our opening hours (CET): <br>Monday - Friday: 9 am - 5 pm<br>Saturday: 10 am - 4 pm<br>Sunday &amp; Public holidays: Closed</p>
-<p>Telephone: +49 40 228 988 59</p>
-<p>E-mail: <a href="mailto:info@carpetavenue.com">info@carpetavenue.com</a></p>
-<p>&nbsp;</p>
+<h3>お困りですか？</h3>
+<p>日本語対応のサポートチームがお手伝いいたします</p>
+<p>営業時間: 10:00~18:00</p>
+<p>定休日：定休日 : 水曜日、（夏季、年末年始休業）</p>
+<p>メール: <a href="mailto:info@carpetavenue.jp">info@carpetavenue.jp</a></p>
 HTML,
             ],
             'footer-social-links' => [
                 'title' => 'Footer Social Links',
                 'content' => <<<'HTML'
-<p class="footer-social"><a href="https://www.facebook.com/FindYourCarpet" target="_blank" rel="noopener"><img src="{{media url="wysiwyg/fb_inv_new.png"}}" alt="Facebook"></a><a href="https://www.instagram.com/carpetavenue" target="_blank" rel="noopener"><img src="{{media url="wysiwyg/insta_inv_new.png"}}" alt="Instagram"></a><a href="https://www.youtube.com/@carpetavenue" target="_blank" rel="noopener"><img src="{{media url="wysiwyg/youtube_inv_new.png"}}" alt="YouTube"></a></p>
+<p class="footer-social"><a href="https://www.facebook.com/people/Carpet-Avenue-japan/61563834092159/" target="_blank" rel="noopener"><img src="{{media url="wysiwyg/fb_inv.png"}}" alt="Facebook"></a><a href="https://www.instagram.com/carpetavenue_japan" target="_blank" rel="noopener"><img src="{{media url="wysiwyg/insta_inv.png"}}" alt="Instagram"></a><a href="https://www.youtube.com/@carpetavenue" target="_blank" rel="noopener"><img src="{{media url="wysiwyg/youtube_inv.png"}}" alt="YouTube"></a></p>
 HTML,
             ],
             'footer-service-links' => [
                 'title' => 'Footer: Service links',
                 'content' => <<<'HTML'
-<h3>Service</h3>
+<h3>サービス</h3>
 <ul>
-<li><a href="/terms-conditions">Terms &amp; Conditions</a></li>
-<li><a href="/faq">FAQ</a></li>
-<li><a href="/privacy-cookie-policy">Privacy &amp; Cookie Policy</a></li>
-<li><a href="/tips-for-buying-your-carpet">Tips for buying your carpet</a></li>
-<li><a href="/carpet-care">Carpet care</a></li>
-<li><a href="/wash-repair">Wash &amp; Repair</a></li>
-<li><a href="/contact">Contact</a></li>
-<li><a href="/showroom">Showroom</a></li>
+<li><a href="/catalogue-2026">ニューカタログ 2026</a></li>
+<li><a href="/terms-conditions">ご利用規約</a></li>
+<li><a href="/faq">よくある質問</a></li>
+<li><a href="/privacy-cookie-policy">プライバシー・Cookie（クッキー）ポリシー</a></li>
+<li><a href="/tips-for-buying-your-carpet">購入の際のポイント</a></li>
+<li><a href="/carpet-care">絨毯のお手入れ</a></li>
+<li><a href="/wash-repair">クリーニングと修理</a></li>
+<li><a href="/contact">お問い合わせ</a></li>
+<li><a href="/showroom">カーペットアベニュージャパンショールーム</a></li>
 </ul>
 HTML,
             ],
             'footer-trustpilot-badge' => [
                 'title' => 'Footer Customer Loyalty',
                 'content' => <<<'HTML'
-<h3>Customer Loyalty</h3>
-<p><a href="https://uk.trustpilot.com/review/carpetavenue.com" target="_blank" rel="noopener"><img src="{{view url="images/icons/Trustpilot_brandmark.png"}}" alt="Trustpilot badge" width="150" height="37"></a></p>
+<h3>顧客ロイヤルティ</h3>
+<p><a href="https://jp.trustpilot.com/review/carpetavenue.jp" target="_blank" rel="noopener"><img src="{{view url="images/icons/Trustpilot_brandmark.png"}}" alt="Trustpilot badge" width="150" height="37"></a></p>
 HTML,
             ],
             'footer-empty-links' => [
@@ -138,18 +137,17 @@ HTML,
             'footer-payment-logos' => [
                 'title' => 'Footer: Payment logos',
                 'content' => <<<'HTML'
-<h3>Payment Methods</h3>
-<p><img src="{{media url="badges/SE.png"}}" alt="Payment methods" width="290" height="95"></p>
-<div class="footer-extra-pay"><img src="{{media url="wysiwyg/Apple_Pay-White-Logo_new.png"}}" alt="Apple Pay" width="64" height="20"> <img style="padding: 12px 20px;" src="{{media url="wysiwyg/swish_logo_white_new.png"}}" alt="Swish" width="64" height="20"></div>
+<h3>お支払方法</h3>
+<p><img src="https://cdn.carpetavenue.net/media/badges/unnamed.png" alt="Payment methods" width="291" height="95"></p>
 HTML,
             ],
             'footer-delivery-partners' => [
                 'title' => 'Footer: Delivery partners',
                 'content' => <<<'HTML'
-<h3>We ship with</h3>
+<h3>配送方法</h3>
 <div class="row footer-ship-row">
-<div class="col-xs-2 col-md-3"><img src="{{media url="badges/175px-UPS_Logo_Shield_2017.svg.png"}}" alt="UPS" width="66" height="107"></div>
-<div class="col-xs-5 col-md-6" style="padding-top: 5px;"><img src="{{media url="badges/DHL_logo_rgb.png"}}" alt="DHL" width="174" height="39"></div>
+<div class="col-xs-2 col-md-3"><img src="https://cdn.carpetavenue.net/media/badges/175px-UPS_Logo_Shield_2017.svg.png" alt="UPS"></div>
+<div class="col-xs-5 col-md-6" style="padding-top: 5px;"><img src="https://cdn.carpetavenue.net/media/badges/6a1fa9dc9b25c8e37df8f9094af1388afa477267c7d7cc988126a40d80f85dab.jpeg" alt="Sagawa" width="100" height="23"></div>
 </div>
 HTML,
             ],

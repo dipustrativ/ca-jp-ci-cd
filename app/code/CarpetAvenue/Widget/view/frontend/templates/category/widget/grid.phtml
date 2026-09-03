@@ -6,23 +6,15 @@
         <h2 class="widget_category-maincategory-name">
             <?php echo __($block->getMainCategory()->getName()) ?>
         </h2>
-
-        <?php if ($mainCategory = $block->getMainCategory()): ?>
-            <div class="widget_category-btn-holder">
-                <a href="<?= $block->escapeUrl($mainCategory->getUrl()) ?>" class="widget_category-show-all"><?= $block->escapeHtml(__("Show All")) ?></a>
-            </div>
-        <?php endif; ?>
     </div>
     <div class="category-grid new-layout widget_category-grid">
         <?php foreach ($block->getSubCategories() as $category): ?>
             <?php $categoryUrl = !empty($category->getCustomUrl()) ? $category->getCustomUrl() : $category->getUrl(); ?>
             <div class="new-layout new-widget_category-item">
                 <a href="<?= $categoryUrl ?>">
-                    <?php if ($thumbnail = $category->getThumbnail()):?>
-                        <div class="new-widget_category-image">
-                            <img src="<?= $block->getImageUrl($thumbnail, 200, 200) ?>" alt="<?= $category->getName() ?>">
-                        </div>
-                    <?php endif; ?>
+                    <div class="new-widget_category-image">
+                        <img src="<?= $block->escapeUrl($block->getCategoryImageUrl($category)) ?>" alt="<?= $block->escapeHtmlAttr($category->getName()) ?>">
+                    </div>
 
                     <span class="new-widget_category-title">
                         <?php echo $category->getName(); ?>

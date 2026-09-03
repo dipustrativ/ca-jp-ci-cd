@@ -1,0 +1,1550 @@
+// PDP styles extracted from the reference carpetavenue theme (Evalent/carpet Magento_Catalog/_extend.less) — category/listing rules intentionally omitted.
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+
+  //
+  //  Product Page: General
+  //  _____________________________________________
+
+  .catalog-product-view {
+    overflow-x: hidden;
+
+    .page-main {
+      padding-top: 20px;
+    }
+
+    // Tilde font fix on knot density
+    .height-fix {
+      position: relative;
+      top: 3px;
+    }
+
+    // Hide swatch tooltip title
+    .swatch-option-tooltip .title {
+      display: none;
+    }
+
+    // Hide selected color swatch title
+    .swatch-attribute.config_color .swatch-attribute-selected-option {
+      display: none;
+    }
+
+    // Hide size atttribute on configurable product page
+    &.page-product-configurable .size-product__attribute {
+        display: none;
+      }
+
+    .product-info-main {
+      .product-info-price {
+
+        .special-price {
+          margin-left: 10px;
+        }
+
+        .price-box {
+
+          .normal-price {
+            /* Swap order of old price and normal price */
+            & + .old-price {
+              margin-right: 15px;
+              order: -1;
+            }
+          }
+
+        }
+      }
+    }
+
+    .product-info-main,
+    .product-options-bottom {
+      .price-box .price-wrapper .price {
+        font-weight: 600;
+        line-height: 36px;
+      }
+    }
+
+      .main {
+          .product-info-details {
+
+              .product-short_description + .product.attribute.description > .value {
+                  max-height: 0;
+                  overflow: hidden;
+                  transition: max-height 0.5s;
+              }
+
+              .product-short_description.expanded + .product.attribute.description > .value {
+                  max-height: 1000px;
+              }
+
+              .product.attribute.description > .value {
+                  column-count: auto;
+              }
+
+              & > .product.attribute.description,
+              & > .additional-attributes-wrapper {
+                  padding: 0 0;
+              }
+
+              & > .additional-attributes-wrapper:last-child {
+                  border-radius: 5px;
+                  background: #eee;
+
+                  form {
+                      padding: 20px;
+                  }
+              }
+
+          }
+      }
+  }
+
+  .catalog-product-view {
+    .column {
+      &.main {
+        padding-bottom: 0;
+      }
+    }
+
+    .content--full-width {
+      .block-page-section {
+        padding: 0;
+        //border: 0;
+
+        .page-main {
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+      }
+    }
+  }
+
+
+  .product-bottom_holder {
+    .products-grid {
+      background: #fff;
+      padding: 13px;
+      padding-bottom: 0px;
+      border: 1px solid #e0e0e0;
+      .lib-css(border-radius, @button__border-radius);
+    }
+  }
+
+  //
+  //  Product Page: Fotorama
+  //  _____________________________________________
+
+  .fotorama__nav__shaft {
+    .fotorama__thumb {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 98%;
+    }
+
+    .fotorama__thumb-border {
+      border: 1px solid @button-primary__background;
+      background-image: none;
+      border-radius: 5px;
+    }
+  }
+
+  //
+  //  Product Page: Cross Sell
+  //  _____________________________________________
+
+    .column {
+      &.main {
+        .block {
+          &.crosssell, &.similar {
+            margin: 0;
+            width: 100%;
+              float: none;
+                padding: 0;
+                .title {
+                  color: #000;
+                  margin-top: 30px;
+                  text-align: center;
+            }
+          }
+        }
+      }
+    }
+
+    //  AJAX similar-products block is moved to the full-width container
+    //  (main.full) — the .column.main rule above no longer reaches it,
+    //  and its own .page-main class re-caps the width. Restore full width.
+    .content--full-width .catalog-product-similar-ajax {
+      .block.similar {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        float: none;
+
+        .title {
+          color: #000;
+          margin-top: 30px;
+          text-align: center;
+        }
+      }
+    }
+
+    //  Inset the whole similar block by the page gutter, the way live does.
+    //  It sits in the full-width container, so without this the grid ran edge
+    //  to edge while the rest of the page was inset — and only the title
+    //  carried an ad-hoc 15px, so title and grid did not even line up.
+    .catalog-product-similar-ajax {
+      padding-left: @layout-indent__width;
+      padding-right: @layout-indent__width;
+
+      .block-title.title {
+        padding: 0;
+      }
+    }
+
+    //  Recently-viewed is moved into the same full-width container (see
+    //  CarpetAvenue_Productify catalog_product_view.xml) but never got the
+    //  gutter, so its title and grid started at x=0 while the similar block
+    //  above it — and every other section — started at the page indent.
+    .content--full-width .block-viewed-products-grid {
+      padding-left: @layout-indent__width;
+      padding-right: @layout-indent__width;
+    }
+
+  //
+  //  Product Page
+  //  _____________________________________________
+
+
+  .info-media,
+  .info-bargain {
+    padding-top: 11px;
+    .lib-font-size(12px);
+
+    .MagicToolboxContainer + & {
+      padding-left: 0;
+      margin: auto;
+      text-align: center;
+    }
+  }
+
+    // Hide media info on anti-slip and stain remover product page
+    .catalog-product-view.product-anti-slip, .catalog-product-view[class*="-cae25"] {
+        .info-media {
+            display: none;
+        }
+    }
+
+  .lib-font-face(
+    @family-name: 'Admin Icons',
+    @font-path: '@{baseDir}fonts/admin-icons/admin-icons',
+    @font-weight: normal,
+    @font-style: normal
+  );
+
+  .info-bargain {
+    .message {
+
+      &.message-warning {
+        color: #eb5202;
+
+        &:before {
+          content: '\e623';
+          font-family: 'Admin Icons';
+          font-size: 1.9rem;
+          font-style: normal;
+          font-weight: 400;
+          margin-right: 10px;
+        }
+      }
+
+      & > strong,
+      & > span,
+      & > div {
+        display: inline-block;
+        vertical-align: super;
+        .lib-font-size(14);
+      }
+    }
+  }
+
+
+  .catalog-product-view {
+
+    .product.media {
+      position: relative;
+    }
+
+    .breadcrumbs {
+      margin-left: 20px;
+      padding-left: 0;
+
+      .item {
+        &:nth-last-child(2) {
+          &:after {
+            display: none;
+          }
+        }
+
+        &.product {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .product-ups-list {
+    margin-top: 30px;
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .product-add-form {
+    .product-social-links {
+      .action {
+        &.towishlist {
+          &:before {
+            width: 30px;
+            .lib-font-size(30px);
+            line-height: normal;
+          }
+        }
+        &.tocompare {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .product-read-more {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+  }
+
+  .box-tocart {
+    margin: 0;
+    flex-basis: 50%;
+    min-width: 310px;
+    margin-right: 5px;
+
+    .input-text {
+      &.qty {
+        width: 58px;
+        height: 58px;
+        //margin-top: 15px;
+        .lib-font-size(20px);
+      }
+    }
+    .action {
+      &.tocart {
+        margin: 0;
+      }
+    }
+    .fieldset {
+      .lib-vendor-prefix-display(flex);
+      align-items: center;
+      margin: 0;
+    }
+  }
+
+  .product-info-main .box-tocart .actions,
+  .product-options-bottom .box-tocart .actions {
+    padding-top: 0 !important;
+  }
+
+  .product-info-main .product-addto-links,
+  .product-options-bottom .product-addto-links {
+    margin: 0;
+  }
+
+  .product-info-main .box-tocart,
+  .product-options-bottom .box-tocart {
+    margin: 0;
+  }
+
+  .product-social-links {
+    margin: 0;
+    width: auto;
+    flex-grow: 1;
+    //padding: 10px;
+    padding-left: 0;
+
+    .action.towishlist, .action.tocompare {
+      margin-right: 0;
+      text-transform: none;
+      font-weight: 300;
+      color: #000;
+      letter-spacing: 0;
+      .lib-font-size(16px);
+    }
+
+    //  Bare heart, no button chrome — matches carpetavenue.jp, where this link
+    //  is 35x28 with no padding, radius or background in any state.
+    //
+    //  Magento's blank theme styles `.product-info-main .action.towishlist` as a
+    //  grey secondary button (#f2f2f2, 1px #cdcdcd, 5px radius, #e2e2e2 on
+    //  hover). Zeroing only `background`/`border` left the radius behind and let
+    //  the fill return on :hover/:focus, so the heart sat in a grey rounded box.
+    //  The radius mattered twice over: when `.active` hides the glyph the box
+    //  collapses to 10x10, and a 5px radius on that is a grey circle sitting
+    //  under the offset SVG heart.
+    .action.towishlist {
+      background: none;
+      border: 0;
+      border-radius: 0;
+      margin: 0 10px;
+      margin-top: 0 !important;
+      padding: 0;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background: none;
+        border: 0;
+        box-shadow: none;
+      }
+    }
+  }
+
+  .catalog-product-view {
+
+    .tocompare {
+      display: none;
+    }
+
+    .product-addto-links {
+      .lib-vendor-prefix-display(flex);
+      align-items: center;
+      height: 100%;
+    }
+
+    .main {
+
+      .size-product__attribute {
+        .lib-font-size(20px);
+        margin-bottom: 20px;
+      }
+
+      .product-short_description {
+        //.lib-font-size(16px);
+      }
+
+      .product-bottom_holder {
+        margin-left: ~"calc(50% - 50vw)";
+        margin-right: ~"calc(50% - 50vw)";
+        background: #f8f8f8;
+        padding: 3.6rem 0;
+        border-top: 1px solid #CECECE;
+        //border-bottom: 1px solid #cecece;
+        width: 100vw;
+        box-sizing: border-box;
+        margin-top: 40px;
+
+        .detailed {
+          margin-bottom: 80px;
+        }
+
+        > .block {
+          margin-left: auto;
+          margin-right: auto;
+          max-width: @layout__max-width;
+          padding-left: @layout-indent__width;
+          padding-right: @layout-indent__width;
+          box-sizing: border-box;
+        }
+
+        .items {
+          margin-left: auto;
+          margin-right: auto;
+          max-width: 85%; //@layout__max-width;
+          padding-left: @layout-indent__width;
+          padding-right: @layout-indent__width;
+          box-sizing: border-box;
+
+          .item.content {
+            border-color: #d1d1d1;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+          }
+
+          .item.title {
+            > .switch {
+              margin: 0 10px 0 0;
+              border-top-left-radius: 5px;
+              border-top-right-radius: 5px;
+              border-color: #d1d1d1;
+              background: #ffffff;
+            }
+          }
+
+          .item.title.active {
+            > .switch {
+              border-top-left-radius: 5px;
+              border-top-right-radius: 5px;
+              font-weight: bold;
+            }
+          }
+        }
+      }
+
+      .page-title-wrapper {
+        h1 {
+          font-weight: bold;
+          margin-bottom: 5px;
+            .lib-font-size(25px);
+        }
+      }
+
+      .product-info-main {
+
+        .stock {
+          margin: 0;
+        }
+
+        .product-info-price {
+          border-bottom: 0;
+          margin-top: 30px;
+          margin-bottom: 15px;
+          .lib-vendor-prefix-display(flex);
+          flex-wrap: wrap;
+
+          .price-retail_price {
+            .lib-vendor-prefix-display(flex);
+            .lib-font-size(16px);
+            width: 100%;
+
+            .price {
+              margin-left: 5px;
+              text-decoration: line-through;
+            }
+          }
+
+          .price-box {
+            .lib-vendor-prefix-display(flex);
+            color: #2d8e3c;
+            padding-bottom: 0;
+            width: auto;
+            transition: color 0.5s;
+
+            &.price--sold {
+              color: #bbb;
+            }
+
+            .special-price {
+              order: 1;
+              margin-left: 10px;
+            }
+
+            .old-price {
+              text-decoration: line-through;
+
+              .price-container {
+
+                .price {
+                  .lib-font-size(23px);
+                  color: #A8A8A8;
+                }
+
+                > span.price-label {
+                  display: none;
+                }
+              }
+            }
+
+            .price-container {
+              .price {
+                .lib-font-size(28px);
+              }
+            }
+          }
+        }
+
+        .product-info-stock-sku {
+          padding: 0;
+          .lib-vendor-prefix-display(flex);
+          margin-bottom: 20px;
+          text-align: left;
+          float: unset;
+
+          > div {
+            .lib-css(border-radius, @button__border-radius);
+            padding: 8px 20px;
+            background: #eee;
+            border: 0;
+            color: #000000;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-weight: 400;
+            text-transform: none;
+            text-shadow: 1px 1px 0px #fff;
+          }
+        }
+
+        .product-add-form {
+          padding-top: 0;
+
+          form {
+            .lib-vendor-prefix-display(flex);
+            align-items: center;
+            flex-wrap: wrap;
+
+            .field.qty {
+              margin: 0 0 10px;
+              label {
+                display: none;
+              }
+            }
+
+            .actions {
+              margin-left: 10px;
+              flex-grow: 1;
+
+              &.unique {
+                margin-left: 0;
+              }
+
+              .tocart {
+                width: 100%;
+                flex-basis: 70%;
+                margin-right: 10px;
+                font-weight: 300;
+                .lib-font-size(16px);
+                position: relative;
+                height: 58px;
+                margin-bottom: 0;
+
+                span {
+                  line-height: 11px;
+
+                  &:before {
+                    margin-right: 10px;
+                    font-family: 'Pe-icon-7-stroke';
+                    content: "\e66e";
+                    position: relative;
+                    .lib-font-size(30px);
+                    top: 6px;
+                    left: -4px;
+                    margin-top: 0;
+                    display: inline-block;
+                  }
+                }
+
+                  &.out-of-stock {
+                      pointer-events: none;
+                      background: #bbbbbb;
+                      .lib-css(color, #000);
+                      .lib-font-size(22);
+                      border: 0;
+                      font-weight: 700;
+
+                      span:before {
+                          display: none;
+                      }
+                  }
+              }
+            }
+          }
+
+        }
+      }
+    }
+
+      .availability.only.unique {
+          .lib-font-size(18);
+          .lib-css(color, #b32e27);
+          margin-bottom: 10px;
+          font-weight: 500;
+          margin-top: -10px;
+          margin-bottom: 20px;
+
+          span {
+              text-align: center;
+              border-bottom: 1px solid #b32e27;
+              height: 21px;
+              padding: 0 3px 0px 3px;
+              display: inline-block;
+          }
+      }
+
+      .product-options-bottom {
+          .lib-vendor-prefix-display(flex);
+          align-items: center;
+          flex-wrap: wrap;
+
+          .box-tocart {
+              margin-top: 0;
+          }
+      }
+  }
+
+  // Custom flag attribute (PDP occurrences only)
+  .product-item {
+    &__price {
+      &--discount {
+        color: #2d8e3c;
+        font-size: 2.8rem;
+        //margin-left: 20px;
+        margin-left: 0;
+        line-height: 1.3;
+        flex-basis: 100%;
+      }
+    }
+    &__flag {
+      &--discount {
+        position: absolute;
+        background: url('@{baseDir}images/catalog_flags/discount.svg');
+        z-index: 2;
+        padding: 1.2rem;
+        background-size: 100%;
+        background-repeat: no-repeat;
+        line-height: 1.1;
+        width: 39px;
+        color: @color-white;
+        font-weight: @font-weight__bold;
+        font-size: 1.5rem;
+          top: 0;
+
+          .product-info-main > & {
+              position: relative;
+          }
+
+          .product.item & {
+              top: 0px;
+          }
+      }
+    }
+  }
+
+  .product.item {
+
+    // Sold badge
+    .sold-caption {
+      background: red;
+      color: white;
+      margin: 5px auto 0;
+      padding: 5px 10px;
+      box-sizing: border-box;
+      display: inline-block;
+
+      & + .product-item-similar {
+        margin: 5px auto 0;
+      }
+    }
+
+    .product-item-similar a {
+      text-decoration: none;
+      border-bottom: 1px solid;
+    }
+
+    .product-item-similar a::after {
+      content: " >";
+      margin-left: 4px;
+    }
+  }
+
+  /*
+   * Out of stock styling
+   */
+  button#product-addtocart-button.disabled {
+    opacity: 1;
+    font-weight: 700;
+    border: 0;
+    .lib-css(background, #bbb);
+    .lib-css(color, #000);
+    .lib-font-size(22);
+
+    span {
+      &:before {
+        display: none;
+      }
+    }
+  }
+
+  .action.similar {
+    .lib-font-size(22);
+    width: 100%;
+    text-align: center;
+    margin-top: @indent__s;
+  }
+
+  // Hide wishlist icon
+
+  .box-tocart.out-of-stock ~ .product-social-links {
+    .towishlist {
+      display: none;
+    }
+  }
+}
+
+//
+//  Mobile XS
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__s) {
+
+  .product-info-price > *:nth-child(2) {
+    padding-left: 10px;
+  }
+
+  .catalog-product-view {
+    // With smaller header - below
+    .page-header {
+      margin-bottom: 10px;
+    }
+    .breadcrumbs {
+      margin: 0;
+
+      .items {
+        font-size: 1rem;
+      }
+      .item {
+        &:after {
+          margin: 0 7px;
+          line-height: 1.8;
+          font-size: 0.8rem;
+        }
+
+        &.product {
+          display: none;
+        }
+      }
+    }
+    .page-wrapper {
+      .page-main {
+        padding-top: 0;
+      }
+    }
+    // With smaller header - above
+
+    .columns {
+      .main {
+        .product-info-main {
+          .product-info-price {
+            .price-retail_price {
+              padding-left: 10px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+
+  .catalog-product-view {
+
+    .block.widget .block-title strong {
+      .lib-font-size(18px);
+    }
+
+    .fotorama__active .fotorama__dot {
+      background-color: @button-primary__background;
+      border-color: @button-primary__background;
+    }
+
+    .product.media {
+      .product-item__flag--discount {
+        left: 0;
+      }
+    }
+
+    .columns {
+
+      .main {
+
+        .size-product__attribute {
+          .lib-font-size(20px);
+          margin-bottom: 15px;
+        }
+
+        .product-info-main {
+          .price-box {
+            .price-container {
+              > span {
+                margin-bottom: 0;
+              }
+            }
+          }
+          .product-info-price {
+            .price-retail_price {
+              .lib-font-size(17px);
+              margin-top: 5px;
+            }
+          }
+        }
+
+        .product-short_description {
+          //.lib-font-size(16px);
+        }
+
+        .product.data.items #additional,
+        .product-info-details {
+          border-bottom: 0px solid #cccccc;
+
+
+            .oeko-tex {
+                &--step, &--standard {
+                    display: inline-block;
+                    width: 49%;
+                }
+            }
+
+        }
+
+        .product-bottom_holder {
+          margin-top: 0;
+          padding-bottom: 0;
+
+          .detailed {
+            margin-bottom: 35px;
+          }
+          .items {
+
+            .item.content {
+              margin-top: -11px;
+              border: 1px solid #d1d1d1;
+              border-top: 0;
+              position: relative;
+              margin-bottom: 10px;
+            }
+
+            .item.title {
+              margin-bottom: 10px;
+
+              > .switch {
+                border: 1px solid #d1d1d1;
+                margin: 0;
+                border-radius: 5px;
+              }
+            }
+
+            .item.title.active {
+              > .switch {
+                border: 1px solid #d1d1d1;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+
+      .product.data.items #additional,
+      .product-info-details {
+
+          .attribute.oeko-tex {
+              margin-top: 20px;
+          }
+
+      }
+  }
+
+  .catalog-product-view {
+    .page-main {
+      .product-ups-list {
+        margin-top: 15px;
+        margin-bottom: 25px;
+      }
+
+      .main {
+        .product-info-main {
+          .product-info-price {
+            margin-top: 15px;
+            margin-bottom: 15px;
+          }
+        }
+      }
+    }
+  }
+
+  .catalog-product-view .page-main {
+
+      .trustpilot-widget.micro-combo {
+          display: none;
+      }
+
+    .product-addto-links {
+      .lib-vendor-prefix-display(flex);
+      align-items: center;
+      height: 100%;
+    }
+
+    .main {
+
+      .size-product__attribute {
+        .lib-font-size(16px);
+        margin-bottom: 10px;
+      }
+
+      .product-short_description {
+        //display: none;
+      }
+
+      .page-title-wrapper {
+        h1 {
+          .lib-font-size(20px);
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+      }
+
+      .product-info-main {
+        .product-info-price {
+          .price-box {
+            .old-price {
+              font-size: 1.8rem;
+
+              .price-container {
+                .price {
+                  .lib-font-size(19px);
+                }
+
+                > span.price-label {
+                  display: none;
+                }
+              }
+            }
+
+            .price-container {
+              .price {
+                .lib-font-size(21px);
+              }
+            }
+          }
+        }
+
+        .product-info-stock-sku {
+          .lib-vendor-prefix-display(flex);
+          padding: 0;
+          margin-bottom: 20px;
+          text-align: left;
+
+          > div {
+            .lib-css(border-radius, @button__border-radius);
+            padding: 8px 20px;
+            background: #eee;
+            border: 0;
+            color: #000000;
+            margin-right: 10px;
+            font-weight: 400;
+            text-transform: none;
+            text-shadow: 1px 1px 0px #fff;
+          }
+        }
+
+        .product-add-form {
+          padding-top: 0;
+
+          form {
+            .lib-vendor-prefix-display(flex);
+            align-items: center;
+            flex-wrap: wrap;
+
+            .product-social-links {
+              .lib-font-size(15px);
+              margin: 0;
+              padding: 0;
+
+              .action {
+                margin-right: 4%;
+                text-transform: none;
+                font-weight: 300;
+                color: #000;
+                letter-spacing: 0;
+                .lib-font-size(16px);
+
+                &:before {
+                  //.lib-font-size(22px);
+                  //width: 22px;
+                  line-height: normal;
+                }
+              }
+            }
+
+            .field.qty {
+              margin: 0;
+
+              label {
+                display: none;
+              }
+            }
+
+            .actions {
+              .tocart {
+                width: 100%;
+                flex-basis: 70%;
+                margin-right: 10px;
+                font-weight: 300;
+                .lib-font-size(16px);
+                position: relative;
+                height: 58px;
+              }
+            }
+          }
+
+          .box-tocart {
+            flex-basis: 80%;
+            min-width: unset;
+            width: ~"calc(100% - 50px)";
+            max-width: 350px;
+
+            .input-text {
+              &.qty {
+                width: 58px;
+                height: 58px;
+                .lib-font-size(20px);
+              }
+            }
+
+            .action {
+              &.tocart {
+                margin: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  #product_addtocart_form {
+    .product-options-bottom {
+      flex-basis: 100%;
+    }
+  }
+}
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+
+  .product {
+    &.attribute {
+      &.description {
+        .value {
+          column-count: 2;
+          column-gap: 20px;
+        }
+      }
+    }
+  }
+
+    .catalog-product-view {
+        .product-add-form + .block.widget {
+            margin-bottom: 0;
+        }
+    }
+
+    .product-item {
+        &__flag {
+            &--discount {
+                .product.item & {
+                    top: 20px;
+                }
+            }
+        }
+    }
+
+    // Trustpilot widget on PDP (extracted from the generic .page-main rule)
+    .page-main {
+        .trustpilot-widget.micro-combo {
+
+            .catalog-product-view & {
+                position: relative !important;
+                top: 0;
+                left: 0;
+                display: block !important;
+                margin: 0;
+
+                iframe {
+                    height: 45px !important;
+                }
+            }
+        }
+    }
+
+  //
+  //  Desktop - Product Page: Top Columns
+  //  _____________________________________________
+
+  .catalog-product-view {
+
+    .info-bargain {
+      padding-left: 28%;
+    }
+
+      .product-info-main > .info-bargain {
+          padding: 5px 0;
+      }
+
+    .product.media {
+        .info-media {
+            text-align: center;
+        }
+
+        .mz-gallery-container {
+            & > .product-item__flag--discount {
+                left: 45%;
+            }
+            &.stacked-grid {
+                & > .product-item__flag--discount {
+                    left: -15px;
+                }
+            }
+
+            .mz-gallery-placeholder > .product-item__flag--discount {
+                left: 10%;
+            }
+        }
+    }
+
+    .breadcrumbs {
+      .item.product {
+        display: none;
+      }
+    }
+
+    .main {
+        .lib-vendor-prefix-display(flex);
+      flex-wrap: wrap;
+
+      .product.media {
+        width: 65%;
+        order: -1;
+        margin-right: 3%;
+      }
+
+        .product-info-details {
+            width: 65%;
+            margin-right: 3%;
+            .lib-vendor-prefix-display(flex);
+            flex-direction: column;
+            justify-content: space-between;
+            align-content: center;
+        }
+
+      .product-info-main {
+        width: 32%;
+        order: 0;
+          position: sticky;
+          top: 155px;
+          padding-bottom: 250px;
+          margin-bottom: auto;
+
+        .product-info-price {
+          .price-box {
+            .old-price {
+              font-size: 2.75rem;
+            }
+
+          }
+        }
+
+      .product-item {
+          &__flag {
+              &--discount {
+                  top: 20px;
+              }
+          }
+      }
+
+      }
+    }
+
+      &.page-layout-1column {
+          .column.main {
+              width: 100%;
+              margin: 0 auto;
+          }
+          .breadcrumbs {
+              max-width: 100%;
+              padding-left: 0;
+              padding-right: 0;
+          }
+      }
+
+      .product.data.items #additional,
+      .product-info-details {
+
+
+              .oeko-tex {
+
+                  &.attribute {
+                      padding: 0 0 20px;
+                  }
+
+                  img {
+                      vertical-align: middle;
+                  }
+                  &--step, &--standard {
+                      display: inline-block;
+                      width: 16.5%;
+                      border: 2px solid #bbbbbb;
+                      padding: 5px;
+                      box-sizing: border-box;
+                  }
+              }
+
+
+      }
+
+      // Widgets
+      .block-viewed-products-grid {
+          margin-bottom: 0;
+
+          .products.products-crosssell {
+              margin-bottom: 20px;
+          }
+      }
+
+      .page-main.widget > .block {
+          margin-bottom: 0px;
+      }
+
+      .block-products-list.grid {
+          .products.products-grid {
+              margin-bottom: 0;
+          }
+      }
+
+
+  }
+
+    table#product-attribute-specs-table {
+        margin-top: 20px;
+    }
+
+}
+
+.vat-incl,
+.vat-excl {
+    font-size: 1.5rem;
+    display: none;
+}
+.product-info-main .product-info-price .price-box .old-price .price-container {
+    & > span.vat-incl, & > span.vat-excl {
+        font-size: 1.5rem;
+        display: none;
+    }
+}
+
+.product-info-main .product-info-price .price-box .price-container > span {
+    display: inline;
+}
+
+//
+//  PDP wishlist heart icon — Luma glyph; blank parent theme ships none.
+//  Font-face for 'luma-icons' already declared in theme _extend.less.
+//  _____________________________________________
+
+& when (@media-common = true) {
+    .product-social-links .action.towishlist {
+        &:before {
+            .ca-icon("\e642");
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            margin-right: 5px;
+        }
+    }
+}
+
+//
+//  PDP buttons — green add-to-cart with cart icon,
+//  icon-only wishlist heart (matches reference design)
+//  _____________________________________________
+
+& when (@media-common = true) {
+    .catalog-product-view {
+
+        //  Green add-to-cart with cart glyph
+        .box-tocart .action.tocart {
+            background: #2d8e3c;
+            border-color: #2d8e3c;
+            color: @color-white;
+            border-radius: 4px;
+            width: 100%;
+
+            &:hover {
+                background: darken(#2d8e3c, 5%);
+                border-color: darken(#2d8e3c, 5%);
+            }
+
+            &:before {
+                //font-family: 'luma-icons';
+                //content: '\e611';
+                //.lib-font-size(24px);
+                //display: inline-block;
+                //vertical-align: middle;
+                //margin-right: 10px;
+                //line-height: normal;
+            }
+
+            &.disabled {
+                background: #bbb;
+                border-color: #bbb;
+            }
+        }
+
+        //  Wishlist: icon-only heart, no text
+        .product-social-links .action.towishlist {
+            line-height: 35px !important;
+            &:before {
+                .ca-icon("\e642");
+                color: @color-black;
+                margin-right: 0;
+            }
+
+            > span {
+                .lib-visually-hidden();
+            }
+        }
+    }
+}
+
+//
+//  Wishlist heart active state — PDP plus product cards (PLP grids, CMS/widget
+//  carousels, related/similar sliders). belvg.guestwishlist adds .active to the
+//  add-to-wishlist link when the product is already in the wishlist. Wrapper
+//  classes differ per context (.product-item, .ev-product-item, …), so key off
+//  the link itself: hide the context's own glyph and draw like.svg instead.
+//  Geometry matches carpetavenue.jp — 16px centred in the card's 35px pill,
+//  30px hanging off the origin of the zero-width PDP link.
+//  _____________________________________________
+& when (@media-common = true) {
+
+    .action.towishlist.active {
+        //  Drop whatever heart glyph the context draws; the SVG replaces it.
+        &:before {
+            display: none;
+        }
+
+        &:after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            transform: translate(-50%, -50%);
+            background: url('@{baseDir}images/icons/like.svg') no-repeat 0 0;
+            background-size: 100% auto;
+        }
+    }
+
+    //  Cards carry the blank-theme glyph via
+    //  `.product-item-actions .actions-secondary > .action:before`, which beats
+    //  a plain `.active` selector — repeat the hide at that depth or the
+    //  outline heart stays visible behind the SVG.
+    .product-item-actions .actions-secondary > .action.towishlist.active {
+        //  The label span is visually hidden (absolute), so the glyph was the
+        //  pill's only in-flow content — without a height it collapses to 0.
+        //  Matches the blank-theme `width: 35px; line-height: 35px` pill.
+        height: 35px !important;
+        line-height: 35px !important;
+
+        &:before {
+            display: none;
+        }
+    }
+
+    //  PDP link is inline and zero-width, so the heart hangs off its origin
+    //  rather than centring in a pill.
+    .product-social-links .action.towishlist {
+        position: relative;
+
+        &.active:after {
+            top: 0;
+            left: 0;
+            width: 30px;
+            height: 30px;
+            transform: translateY(-50%);
+        }
+    }
+}
+//
+//  PDP top spacing — sit the gallery tight under the breadcrumb (match base;
+//  drop the ~40px gap from breadcrumb margin-bottom + page-main padding-top)
+//  _____________________________________________
+& when (@media-common = true) {
+    .catalog-product-view {
+        .page-main {
+            padding-top: 0;
+        }
+        .breadcrumbs {
+            margin-bottom: 8px;
+        }
+    }
+}
+
+//
+//  PDP delivery-time line (shown before availability)
+//  _____________________________________________
+& when (@media-common = true) {
+    .catalog-product-view .availability.delivery-time {
+        list-style: none;
+        font-size: 1.6rem;
+        font-weight: 700;
+        border: 1px solid #ccc;
+        padding: 3px;
+        width: fit-content;
+        margin: 0 0 25px;
+
+        //  The blank theme's `ul li` margin (0 0 10px) left the text flush
+        //  against the left border and hanging off the top of the box.
+        //  carpetavenue.jp resets it to an even 5px, which is what makes the
+        //  frame sit evenly around the text.
+        li {
+            margin: 5px;
+        }
+    }
+}
+
+//
+//  PDP price — hide the "特別価格" (Special Price) label
+//  _____________________________________________
+& when (@media-common = true) {
+    .catalog-product-view .product-info-main .product-info-price .price-box .special-price .price-label {
+        display: none;
+    }
+}
+
+//
+//  PDP info header — SKU | EAN line
+//  _____________________________________________
+& when (@media-common = true) {
+    .catalog-product-view {
+        .product-sku-ean {
+            font-size: 13px;
+            line-height: 1.4;
+            color: #767676;
+            margin-bottom: 8px;
+
+            &__sep {
+                margin: 0 6px;
+                color: #cccccc;
+            }
+
+            &__value {
+                color: #333333;
+            }
+        }
+    }
+}

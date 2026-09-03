@@ -1,0 +1,1137 @@
+//
+//  CarpetAvenue Rugs — category product grid (lightweight, matches reference)
+//  _____________________________________________
+
+@ca-price:                        #7c232e;
+@ca-green:                        #2C8E3B;
+@product-item__hover__box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+//
+//  Bold product names site-wide (matches base; blank parent doesn't set it)
+//  _____________________________________________
+.page-wrapper .product-item-name,
+.page-wrapper .product.name a {
+    font-weight: @font-weight__bold;
+}
+
+.subcategory-card span{
+    color: #333333;
+}
+
+//
+//  Full-width grid — no left sidebar; filters sit above the grid
+//  _____________________________________________
+.page-layout-2columns-left.page-layout-fullwidth-filter {
+    .column.main {
+        width: 100%;
+        padding-left: 0;
+    }
+
+    //  Empty sidebar collapses
+    .sidebar.sidebar-main,
+    .sidebar.sidebar-additional {
+        display: none;
+    }
+
+    //  Floating "scroll to filter" helper — redundant (filters already on top)
+    .wrap-filter-top-button {
+        display: none;
+    }
+
+    //  Layered navigation as a horizontal button bar — every button opens the
+    //  slide-out filter modal (see .modal-slide.filter-modal below)
+    .block.filter {
+        margin-bottom: 20px;
+
+        .block-title.filter-title {
+            display: none;
+        }
+
+        .block-content.filter-content {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: stretch;
+            gap: 0px;
+        }
+
+        //  Hidden until the filter-modal widget moves it into the modal
+        #filter-popup {
+            display: none;
+        }
+
+        button.button-filter {
+            position: relative;
+            flex: 1 1 auto;
+            min-width: 130px;
+            background: #fff;
+            font-size: 1.4rem;
+            text-align: center;
+            cursor: pointer;
+            flex-grow: 1;
+            margin: 0 5px;
+            box-sizing: border-box;
+            border: 1px solid #505050;
+            line-height: 26px;
+            vertical-align: middle;
+            padding: 10px 20px;
+            border-radius: 0;
+
+            &:first-child{
+                margin-left: 0;
+            }
+
+            &:after {
+                content: '\e622';
+                font-family: 'luma-icons';
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 16px;
+                font-weight: normal;
+            }
+
+            &:hover {
+                background: #f2f2f2;
+                border-color: #c6c6c6;
+                color: #333;
+            }
+        }
+
+        //  Active filters row: "All filters" opener + chips + clear
+        .filter-state-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 14px;
+            width: 100%;
+
+            button.open-filter-popup {
+                flex-shrink: 0;
+                margin: 0;
+                padding: 0;
+                border: 0;
+                background: none;
+                color: #333;
+                font-weight: 600;
+                text-transform: uppercase;
+                cursor: pointer;
+
+                &:before {
+                    margin-right: 10px;
+                    .lib-css(color, #888);
+                    .lib-font-size(20);
+                    vertical-align: middle;
+                }
+            }
+
+            .am-filter-chips,
+            .filter-actions {
+                margin: 0;
+            }
+        }
+    }
+}
+
+//
+//  Modal close icon — swap the blank theme's glyph for the luma one.
+//  Must stay at the top level: nested under .modal-slide.filter-modal these
+//  compile to `.filter-modal .modal-slide .action-close`, which needs a
+//  .modal-slide *inside* .modal-inner-wrap. It is the ancestor, so nothing
+//  matches. Magento sets the same selectors in lib/_modals.less; the theme
+//  loads later, so equal specificity is enough to win.
+//  _____________________________________________
+.modal-custom,
+.modal-popup,
+.modal-slide {
+    .action-close {
+        padding: 15px;
+
+        &:before {
+            content: '\e616';
+            font-family: 'luma-icons';
+        }
+    }
+}
+
+//
+//  Filter slide-out modal (right side) — matches reference theme
+//  _____________________________________________
+.modal-slide.filter-modal {
+    left: 0;
+
+    &:not(._show) .modal-inner-wrap {
+        transform: translateX(100%);
+    }
+
+    .modal-inner-wrap {
+        position: relative; // anchor for the bottom apply bar
+        height: 100%;       // so the absolute apply bar pins to the viewport bottom
+    }
+
+    &._inner-scroll .modal-content {
+        overflow-y: auto;
+        height: 100%;
+        padding: 0 0 70px; // keep last options clear of the apply bar
+        box-sizing: border-box;
+    }
+
+    .modal-header {
+        position: relative;
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+
+        .modal-title {
+            position: absolute;
+            left: 25%;
+            right: 25%;
+            top: 25%;
+            bottom: 25%;
+            margin: auto;
+            padding: 0;
+            border: 0;
+            text-align: center;
+            .lib-font-size(25);
+        }
+    }
+
+    .action-close {
+        left: auto;
+        right: 0;
+
+        &:before {
+            .lib-css(color, #333);
+            .lib-font-size(20);
+            line-height: 40px;
+        }
+    }
+
+    #filter-popup {
+        .filter-options {
+            display: block;
+            margin: 0;
+        }
+
+        .filter-options-item {
+            position: relative;
+            display: block;
+            margin: 0;
+            border: 0;
+
+            &:after {
+                content: '';
+                display: block;
+                position: absolute;
+                width: 100%;
+                height: 1px;
+                border-bottom: 1px solid #ccc;
+            }
+        }
+
+        .filter-options-title {
+            position: relative;
+            margin: 0;
+            .lib-font-size(15);
+            font-weight: 700;
+            text-transform: none;
+            cursor: pointer;
+
+            &:after {
+                content: '\e900';
+                font-family: 'nav-icons';
+                position: absolute;
+                right: 0;
+                top: auto;
+                .lib-font-size(20);
+            }
+        }
+
+        //  Each filter's options slide in as a full-height panel over the list.
+        //  position:fixed resolves against the transformed .modal-inner-wrap,
+        //  so the panel fills the modal, not the viewport.
+        .filter-options-content {
+            //  !important because Magento's accordion widget inlines
+            //  `display: none` when the option group is collapsed; the panel has
+            //  to stay in flow for the slide transition.
+            display: flex !important;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 20px 20px 80px; // bottom space for the apply bar
+            background: #e8e8e8;
+            z-index: 99;
+            transform: translate(100vw);
+            transition: transform 0.1s;
+            //  Column layout so the option list can take whatever height is left
+            //  under the title and scroll *inside* the white card, the way live
+            //  does. Live gets there by setting a pixel height on the list from
+            //  JS; flex needs no measuring and survives a taller title.
+            //  The panel itself must not scroll, or the card scrolls out of view
+            //  and the pinned クリア / 表示 bar ends up floating over the list.
+            flex-direction: column;
+            max-height: 100vh;
+            overflow: hidden;
+            -webkit-overflow-scrolling: touch;
+            .lib-font-size(16);
+
+            &:before {
+                content: '';
+                display: block;
+                position: absolute;
+                width: 100%;
+                height: 100px;
+                left: 0;
+                right: 0;
+                top: 0;
+                background: #fff;
+                z-index: 0;
+            }
+        }
+
+        .filter-options-content__title {
+            flex: 0 0 auto;
+            display: inline-block;
+            position: relative;
+            transform: translateY(-20px);
+            width: 65%;
+            margin: 0 auto;
+            padding: 15px 20px;
+            text-align: center;
+            line-height: 1;
+            font-size: 2rem;
+            font-weight: 700;
+            box-sizing: border-box;
+            margin-top: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-options-item.active .filter-options-content {
+            transform: translate(0);
+        }
+
+        //  Out of flow, so the title centres on its own line and the option list
+        //  below can flex to the remaining height. In flow it was an inline
+        //  sibling of the title, which blocked the column layout.
+        button.filter-options-back {
+            display: inline-block;
+            position: absolute;
+            top: 28px;
+            left: 0;
+            z-index: 2;
+            margin: 0;
+            border: 0;
+            border-radius: 0;
+            background: #e8e8e8;
+            padding: 15px 20px;
+
+            &:before {
+                content: '\e901';
+                font-family: 'nav-icons';
+                margin-right: 10px;
+            }
+        }
+
+        //  Option rows: white cards on the grey panel — label left, count right,
+        //  green border on hover/selected (reference "パターン" list design).
+        //  Takes the height left under the title and scrolls its own rows, so
+        //  the white card always reaches down to the apply bar instead of ending
+        //  wherever the list happens to stop. `min-height: 0` is what lets a
+        //  flex item shrink below its content and actually scroll.
+        .am-filter-items {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            position: relative;
+            background: #fff;
+            padding: 10px 10px;
+
+
+            .am-filter-item {
+                position: relative; // anchor for the selected tick
+                background: #fff;
+                margin: 0px;
+                padding: 0 5px 0;
+                border: 2px solid transparent;
+                border-bottom: 1px solid #ccc !important;
+
+                &:hover {
+                    border-color: #429a3c !important;
+                    border-width: 2px !important;
+                }
+
+                &.-disabled {
+                    opacity: 0.5;
+                }
+
+                //  Selected rows get a tick at the top-left, the way live marks
+                //  them with its `.amshopby-choice` element. Our layered nav
+                //  renders no checkbox — the JS only adds `-selected` and flips
+                //  `aria-checked` — so it is drawn here.
+                //
+                //  Two pseudos, mirroring live: a white 20x20 square (:before)
+                //  so the mark stays legible over a dark rug thumbnail, and the
+                //  check itself (:after) as two rotated borders. Live uses a
+                //  base64 SVG on a white background; borders avoid carrying the
+                //  blob and can't fail to load.
+                &.-selected {
+                    &:before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        z-index: 2;
+                        width: 20px;
+                        height: 20px;
+                        background: #fff;
+                    }
+
+                    &:after {
+                        content: '';
+                        position: absolute;
+                        top: 5px;
+                        left: 5px;
+                        z-index: 3;
+                        width: 10px;
+                        height: 5px;
+                        border-left: 2px solid #000;
+                        border-bottom: 2px solid #000;
+                        transform: rotate(-45deg);
+                    }
+
+                    .am-filter-label,
+                    .count {
+                        color: #3a6fb0;
+                    }
+                }
+            }
+
+            //  No horizontal padding — live's row link is `padding: 0`, so the
+            //  thumbnail sits against the card edge and the count against the
+            //  right. Our 16px inset pulled both inwards and read as a narrower
+            //  card. Vertical padding stays: it sets the row height.
+            .am-filter-link {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                padding: 14px 0;
+                color: #333;
+                text-decoration: none;
+                box-sizing: border-box;
+            }
+
+            //  Reference text list shows no checkbox; keep swatch when present.
+            .am-filter-checkbox {
+                display: none;
+            }
+
+            //  Square corners — live's thumbnails are not rounded.
+            .am-filter-swatch {
+                flex: 0 0 auto;
+                width: 28px;
+                height: 28px;
+                margin-right: 12px;
+                background-size: cover;
+                background-position: center;
+            }
+
+            .am-filter-label {
+                flex: 1 1 auto;
+                text-align: left;
+            }
+
+            .count {
+                flex: 0 0 auto;
+                margin-left: 12px;
+                color: #888;
+                font-size: 1.3rem;
+                font-weight: 500;
+            }
+
+            //  Category filter ("カテゴリ"): landscape category thumbnail per row
+            //  plus a pill-style count, matching the reference design. Wins over
+            //  the 28px swatch above via the extra .am-filter--cat class.
+            &.am-filter--cat {
+                .am-filter-swatch {
+                    width: 92px;
+                    height: 64px;
+                    margin-right: 16px;
+                }
+
+                .count {
+                    padding: 3px 10px;
+                    border-radius: 6px;
+                    background: #f0f0f0;
+                    color: #666;
+                }
+            }
+
+            //  Colour filter ("色"): larger circular colour swatch per row plus a
+            //  pill-style count, same row/card design as the category list.
+            &.am-filter--color {
+                display: block; // override the Carpient swatch grid — one row each
+
+                .am-filter-item {
+                    margin: 0;
+                }
+
+                .am-filter-link {
+                    flex-direction: row;
+                }
+
+                .am-filter-swatch {
+                    width: 40px;
+                    height: 40px;
+                    margin-right: 16px;
+                    border-radius: 50%;
+                    border: 1px solid #e0e0e0;
+                    background-size: cover;
+                    background-color: #fff;
+                }
+
+                .am-filter-label {
+                    flex: 1 1 auto;
+                    text-align: left;
+                    font-size: 1.4rem;
+                }
+
+                .count {
+                    display: inline-block;
+                    padding: 3px 10px;
+                    border-radius: 6px;
+                    background: #f0f0f0;
+                    color: #666;
+                }
+            }
+
+            //  Every other attribute filter (production type, size, shape, …):
+            //  same single-row card design as colour — undo the Carpient grid /
+            //  pill-button layouts so they read as label-left, count-pill-right
+            //  rows. Category keeps its own landscape-thumbnail design above.
+            &.am-filter--production_type,
+            &.am-filter--size_group,
+            &.am-filter--shape {
+                display: block; // undo Carpient's grid
+
+                .am-filter-item {
+                    margin: 0;
+                }
+
+                .am-filter-link {
+                    justify-content: space-between;
+                    height: auto;
+                    padding: 14px 16px;
+                    border: 0;
+                    border-radius: 0;
+                    text-align: left;
+
+                    &:hover {
+                        background: none;
+                    }
+                }
+
+                //  Any option icon (e.g. shape) sits left like the colour swatch.
+                .am-filter-swatch {
+                    width: 40px;
+                    height: 40px;
+                    margin-right: 16px;
+                    background-size: contain;
+                }
+
+                .am-filter-label {
+                    flex: 1 1 auto;
+                    text-align: left;
+                    font-size: 1.4rem;
+                }
+
+                //  Carpient hides the count for these; bring it back as a pill.
+                .count {
+                    display: inline-block;
+                    padding: 3px 10px;
+                    border-radius: 6px;
+                    background: #f0f0f0;
+                    color: #666;
+                }
+
+                //  Drop the filled-pill selected state; the row's green border
+                //  (shared card style) already signals selection.
+                .am-filter-item.-selected .am-filter-link {
+                    background: none;
+                    color: #333;
+                }
+            }
+
+            //  These counts show a bare number in the pill, no parentheses.
+            &.am-filter--cat .count,
+            &.am-filter--color .count,
+            &.am-filter--production_type .count,
+            &.am-filter--size_group .count,
+            &.am-filter--shape .count {
+                &:before,
+                &:after {
+                    content: none;
+                }
+            }
+        }
+
+        .am-price-slider {
+            position: relative;
+            background: #fff;
+            margin: 10px 0;
+            padding: 12px 10px;
+        }
+
+        //  "Size" section groups Length + Width sliders, each under its own label.
+        .filter-dimension {
+            margin: 0 0 24px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            &__label {
+                margin: 6px 0 8px;
+                font-size: 1.6rem;
+                font-weight: 700;
+                line-height: 1.2;
+                text-transform: none;
+            }
+
+            .am-price-slider {
+                margin: 0;
+            }
+        }
+    }
+
+    //  Bottom-pinned apply bar: Clear + Show (matches base Amasty apply button)
+    .am_shopby_apply_filters {
+        position: absolute;
+        bottom: 0;
+        top: auto;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 100; // above the slide-in option panels (z-index 99)
+
+        .am-show-button {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            margin-bottom: 0;
+            padding: 15px 5px;
+            background: #fff;
+            box-shadow: none;
+        }
+
+        //  Black "apply" / outlined "clear", 40px tall at 16px/600 — the values
+        //  carpetavenue.jp renders. Ours was a green fill at 12px padding.
+        .amshopby-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 45%;
+            height: 40px;
+            margin: 0;
+            padding: 0 10px;
+            border-radius: 0;
+            box-sizing: border-box;
+            background: #000;
+            border: 1px solid #000;
+            color: #fff;
+            .lib-font-size(16);
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+
+            > span {
+                width: auto;
+            }
+
+            .am-items {
+                margin-left: 5px;
+            }
+
+            //  Live greys the apply button out while nothing is selected — it is
+            //  a real `<button disabled>` at 50% opacity, which is why it reads
+            //  grey rather than black in the reference design.
+            &:disabled,
+            &[disabled] {
+                opacity: 0.5;
+                pointer-events: none;
+            }
+
+            //  Our layered nav never disables the button, so mirror the same two
+            //  states off the selection itself: dimmed while nothing is ticked,
+            //  green once something is. `:has()` reads the panel's state from the
+            //  bar, which sits in the same modal.
+            &:not(.filter-clear) {
+                opacity: 0.5;
+            }
+
+            &.filter-clear.action.clear {
+                border-radius: 0;
+                border-color: #000;
+                background: #fff;
+                .lib-css(color, #000);
+                opacity: 1;
+            }
+        }
+    }
+}
+
+//  Apply turns green the moment a filter is ticked — live's enabled state
+//  (#429a3c). Kept out of the block above because it has to qualify the modal,
+//  not the button: `:has()` lets the bar react to the panel's selection without
+//  the layered-nav JS having to touch the button.
+.modal-slide.filter-modal:has(.am-filter-item.-selected) {
+    .am_shopby_apply_filters .amshopby-button:not(.filter-clear) {
+        background: #429a3c;
+        border-color: #429a3c;
+        opacity: 1;
+    }
+}
+
+//
+//  Bottom category description — Read more / Read less (parity with base)
+//  _____________________________________________
+.toggle-readmore {
+    position: relative;
+
+    & > .content {
+        position: relative;
+        overflow: hidden;
+        transition: max-height 0.5s;
+    }
+
+    &:not(.toggle-readmore--expand) {
+        & > .content:after {
+            content: "";
+            display: block;
+            height: 50px;
+            width: 100%;
+            top: 6ch;
+            position: absolute;
+            background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 0)), to(#ffffff));
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #ffffff);
+        }
+    }
+
+    &.category-description:not(.toggle-readmore--expand) {
+        & > .content {
+            max-height: 11ch;
+        }
+    }
+
+    &--expand {
+        & > .content {
+            max-height: 2000px;
+        }
+    }
+}
+
+.product-read-more {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+//  Bottom category-view-holder layout (parity with base)
+.category-view-holder {
+    position: relative;
+}
+
+.catalog-category-view,
+.catalogsearch-result-index {
+    .column.main > .category-view-holder.category-view {
+        .page-title-wrapper {
+            position: relative;
+            .lib-css(color, #333);
+            left: auto;
+            bottom: auto;
+
+            h1 {
+                text-shadow: none;
+            }
+        }
+
+        .category-image.cover {
+            display: none;
+
+            .image {
+                display: block;
+                height: auto;
+                max-width: 100%;
+                object-fit: cover;
+                border-radius: 0;
+            }
+        }
+    }
+}
+
+//  Page title sizing across category, similar-products and search pages
+.catalog-category-view,
+.similar-products-view,
+.catalogsearch-result-index {
+    .page-title-wrapper .page-title {
+        font-size: 2rem;
+    }
+}
+
+//  Desktop: holder becomes a flex row with a small 150px thumbnail
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .catalog-category-view,
+    .catalogsearch-result-index {
+        .column.main > .category-view-holder.category-view {
+            display: flex;
+            align-items: flex-start;
+
+            .category-image.cover {
+                display: block;
+                margin-right: 20px;
+                flex: 0 0 auto;
+
+                .image {
+                    max-width: 150px;
+                    height: 150px;
+                    width: 150px;
+                }
+            }
+
+            .category-description {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+        }
+    }
+}
+
+//
+//  Grid wrapper
+//  _____________________________________________
+.catalog-category-view,
+.catalogsearch-result-index,
+.catalog-product-view .catalog-product-similar-ajax {
+
+    .products {
+        margin: 18px 0;
+    }
+
+    .products-grid .product-items {
+        .product-item {
+            .lib-font-size(14px);
+            margin-bottom: 20px;
+            line-height: 1.1;
+            letter-spacing: normal;
+            vertical-align: top;
+
+            //  Card — centered, matching the CategoryProductView widget card.
+            .product-item-info {
+                position: relative;
+                width: auto;
+                text-align: center;
+
+                //  Hover lift, matching carpetavenue.jp. The negative margin
+                //  cancels the padding + border (20px total), so the card grows
+                //  outward by 20px on every side without reflowing the grid.
+                //  No transition — live applies it instantly, and animating
+                //  only the shadow leaves it trailing the box.
+                &:hover {
+                    background: @color-white;
+                    border: 1px solid #e6e6e6;
+                    border-radius: 5px;
+                    box-shadow: @product-item__hover__box-shadow;
+                    margin: -20px;
+                    padding: 19px;
+                    z-index: 9;
+                    overflow: hidden;
+
+                    //  The 19px padding pushes this element's padding box out
+                    //  by 19px on every side, and that padding box is the
+                    //  containing block for the absolutely positioned flag and
+                    //  wishlist heart — so both slid diagonally on hover.
+                    //  carpetavenue.jp compensates the offsets rather than the
+                    //  box (it ships `top: 39px` on the hovered flag); same
+                    //  numbers here, plus the two the flag/heart also need.
+                    .product-item__flag--discount {
+                        top: 20px + 19px;
+                        left: 19px;
+                    }
+
+                    .product-item-actions .towishlist {
+                        top: 10px + 19px;
+                        right: 10px + 19px;
+                    }
+                }
+            }
+
+            .product-item-photo {
+                display: block;
+                width: 280px;
+                max-width: 100%;
+                margin: 0 auto;
+            }
+
+            //  Portrait rug image — constrain width; Magento's inline
+            //  aspect-ratio (560/750) drives the height, so no padding hack.
+            .product-image-container {
+                display: block;
+                width: 280px;
+                max-width: 100%;
+                margin: 0 auto;
+            }
+
+            .product-image-photo {
+                margin: 0 auto;
+            }
+
+            .product-item-details {
+                position: static;
+                padding: 12px 10px 16px;
+            }
+
+            //  Name
+            .product-item-name {
+                .lib-font-size(16px);
+                font-weight: @font-weight__bold;
+                margin: 0 0 4px;
+
+                .product-item-link {
+                    color: @primary__color;
+                }
+            }
+
+            //  Size line
+            .size {
+                .lib-font-size(13px);
+                color: #7d7d7d;
+                margin-bottom: 6px;
+            }
+
+            //  Price — centered, no label (matches the widget card), sale colouring
+            .price-box.price-final_price {
+                margin: 6px 0 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-wrap: wrap;
+
+                .price-label {
+                    display: none;
+                }
+
+                .price-container .price {
+                    .lib-font-size(16px);
+                    font-weight: @font-weight__bold;
+                    color: @ca-price;
+                }
+
+                .special-price {
+                    order: 1;
+
+                    .price-wrapper .price {
+                        color: @ca-price;
+                    }
+                }
+
+                .old-price {
+                    margin: 0 8px 0 0;
+                    text-decoration: line-through;
+
+                    .price-container .price {
+                        color: #7d7d7d;
+                        font-weight: @font-weight__regular;
+                        .lib-font-size(14px);
+                    }
+                }
+            }
+
+            //  Add-to-cart / wishlist actions
+            .product-item-inner {
+                border: 0;
+                box-shadow: none;
+            }
+
+            .product-item-actions {
+                margin: 10px 0 0;
+
+                .tocart {
+                    .lib-css(border-radius, @button__border-radius);
+                    .lib-font-size(13px);
+                    line-height: 1;
+                    padding: 10px 15px;
+                    white-space: nowrap;
+                }
+
+                .towishlist {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    z-index: 2;
+                    margin: 0;
+                    font-size: 0;
+                    background: rgba(255, 255, 255, 0.95);
+                    border-radius: 50px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.13);
+
+                    //  Reveal only while the card is hovered.
+                    opacity: 0;
+                    visibility: hidden;
+                    transition: opacity 0.25s ease, visibility 0.25s ease;
+
+                    &:before {
+                        line-height: 29px;
+                    }
+                }
+            }
+
+            .product-item-info:hover .towishlist {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            //  Touch devices have no hover — keep it visible.
+            @media (hover: none) {
+                .towishlist {
+                    opacity: 1;
+                    visibility: visible;
+                }
+            }
+        }
+    }
+}
+
+//
+//  Discount flag — maroon ribbon (top-left)
+//  _____________________________________________
+.product-item__flag--discount {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    width: 39px;
+    padding: 1.2rem;
+    line-height: 1.1;
+    color: @color-white;
+    font-weight: @font-weight__bold;
+    .lib-font-size(15px);
+    //  Green ribbon. `discount_1.svg` is the maroon variant — carpetavenue.jp
+    //  ships both and overrides to the green one via admin CSS; we point the
+    //  theme straight at it.
+    background: url('@{baseDir}images/catalog_flags/discount.svg') no-repeat;
+    background-size: 100%;
+}
+
+//
+//  Sold badge
+//  _____________________________________________
+.sold-caption {
+    display: inline-block;
+    margin: 5px auto 0;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    background: #d00;
+    color: @color-white;
+    .lib-font-size(13px);
+}
+
+//
+//  Filter modal — mobile
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .modal-slide.filter-modal {
+        padding: 0;
+
+        #filter-popup {
+            //  Mobile puts it top-right (live: 10px in from the panel edge).
+            button.filter-options-back {
+                top: 17px;
+                left: auto;
+                right: 10px;
+            }
+
+            .filter-options-title {
+                padding: 10px 40px 10px 10px;
+            }
+
+            .filter-options-content__title {
+                margin-top: 10px;
+            }
+
+            .filter-options-item:after {
+                margin-left: -10px;
+            }
+        }
+    }
+}
+
+
+
+//
+//  Filter modal — desktop: 30% wide panel docked right
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .modal-slide.filter-modal {
+        left: 70%;
+        right: 0;
+
+        #filter-popup {
+            //  Desktop keeps it top-left, flush with the panel edge (live: 28px).
+            button.filter-options-back {
+                top: 28px;
+                left: 0;
+                right: auto;
+            }
+
+            .filter-options-title {
+                padding: 20px 40px 20px 10px;
+            }
+
+            .filter-options-item {
+                padding: 0 25px;
+
+                &:after {
+                    margin-left: -25px;
+                }
+
+                &:hover {
+                    background: #f2f2f2;
+                }
+            }
+        }
+    }
+}
+
+//
+//  Desktop grid — 5 products per row (matches reference)
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+    .page-products {
+        .products-grid {
+            .product-item {
+                width: calc(~'(100% - 8%) / 5');
+
+                &:nth-child(4n + 1) {
+                    margin-left: 2%;
+                }
+
+                &:nth-child(5n + 1) {
+                    margin-left: 0;
+                }
+            }
+        }
+    }
+}
+
+@import "_product-view";
+@import "_carpient";
+@import "_slider";

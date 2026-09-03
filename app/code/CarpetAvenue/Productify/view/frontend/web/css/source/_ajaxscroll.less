@@ -8,14 +8,20 @@
             border-radius: 5px;
             background: #2c8e3b;
             color: #fff;
-            padding: 10px 20px;
+            padding: 13px 44px;
+            font-size: 15px;
             position: relative;
             margin: 0 auto;
             display: inline-block;
             width: auto;
 
             &:hover {
+                //  Restate the white — the theme's global `a:hover` sets #333 at
+                //  the same specificity as `.ias-trigger a` and loads after this
+                //  module's CSS, so the label goes dark without it.
+                color: #fff;
                 text-decoration: none;
+                background: #24762f;
             }
         }
 
@@ -27,6 +33,15 @@
 
         &.ias-trigger-next {
             margin-bottom: 40px;
+
+            .ias-count {
+                display: block;
+                text-align: center;
+                color: #333;
+                font-size: 14px;
+                line-height: 1.4;
+                margin: 0 auto 12px;
+            }
 
             .toolbar-amount {
                 display: block;
@@ -52,15 +67,17 @@
             }
 
             .progressbar {
-                background: #ccc;
+                background: #d6d6d6;
                 height: 8px;
-                width: 25%;
-                margin: 0 auto 10px;
+                width: 100%;
+                max-width: 700px;
+                margin: 0 auto 20px;
 
                 &__fill {
-                    background: #333;
+                    background: #9b9b9b;
                     display: block;
                     height: 100%;
+                    transition: width .3s ease;
                 }
             }
         }

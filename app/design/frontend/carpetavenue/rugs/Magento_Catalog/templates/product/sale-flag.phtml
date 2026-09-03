@@ -1,0 +1,14 @@
+<?php
+/** @var Magento\Catalog\Block\Product\View $block */
+
+/** @var Magento\Framework\Pricing\Helper\Data $priceHelper */
+$product = $block->getProduct();
+
+/* Determine if product is on sale */
+$regularPrice = $product->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\RegularPrice::PRICE_CODE)->getAmount()->getValue();
+$finalPrice = $product->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)->getAmount()->getValue();
+
+if ($regularPrice !== $finalPrice) :
+    $discountPercentage = round(100 * (1 - ($finalPrice / $regularPrice)), 0, PHP_ROUND_HALF_UP); ?>
+    <div class="product-item__flag--discount"><?= '-' . $block->escapeHtml($discountPercentage) . '%'?></div>
+<?php endif; ?>

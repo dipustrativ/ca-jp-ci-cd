@@ -1,0 +1,45 @@
+// Core variables and mixins
+//default breakpoints
+
+@s-break: @screen__s;
+@m-break: @screen__m;
+@l-break: @screen__l;
+@xl-break: @screen__xl;
+//default sizings
+@col-names: sm, md, lg;
+@col-breaks: @s-break, @m-break, @l-break;
+
+//  Grid
+@defaultGridGap: 30px;
+
+@half-gutter-width:	15px;
+@gutter-compensation: -15px;
+@outer-margin: 2rem;
+@grid-columns: 12;
+
+
+
+.row {
+  box-sizing: border-box;
+  .lib-vendor-prefix-display(flex);
+  .lib-vendor-prefix-flex-direction(row);
+  .lib-vendor-prefix-flex-wrap(wrap);
+  margin-right: @gutter-compensation;
+  margin-left: @gutter-compensation;
+}
+
+.row.reverse {
+  .row-reverse();
+}
+.col.reverse {
+  .col-reverse();
+}
+
+.makegrid(xs);
+
+.for-each(@col-breaks);
+.-each(@breakpoint) {
+  @media only screen and (min-width: @breakpoint) {
+    .makegrid(extract(@col-names, @i));
+  }
+}

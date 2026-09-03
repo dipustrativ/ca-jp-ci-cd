@@ -43,22 +43,20 @@ class InstallSchema implements InstallSchemaInterface
         $installer->startSetup();
         $connection = $installer->getConnection();
 
+        // NOTE: The original code renamed Mageplaza_Osc's `osc_delivery_time` column into
+        // `mp_delivery_information` when the latter was missing. Osc and DeliveryTime are two
+        // independent features that happen to touch delivery time (Osc writes `osc_delivery_time`
+        // in its own observer), so that rename steals/destroys Osc's live column. On a fresh
+        // co-install it left `osc_delivery_time` non-existent, breaking Osc at runtime and making
+        // the sales_order data-exporter mview trigger reference a phantom column. DeliveryTime must
+        // only ensure its own column exists and leave Osc's alone.
         $salesOrder = $installer->getTable('sales_order');
         if (!$connection->tableColumnExists($salesOrder, 'mp_delivery_information')) {
-            if ($connection->tableColumnExists($salesOrder, 'osc_delivery_time')) {
-                $connection->changeColumn(
-                    $salesOrder,
-                    'osc_delivery_time',
-                    'mp_delivery_information',
-                    ['type' => Table::TYPE_TEXT]
-                );
-            } else {
-                $connection->addColumn(
-                    $salesOrder,
-                    'mp_delivery_information',
-                    ['type' => Table::TYPE_TEXT, 'visible' => false, 'comment' => 'Mageplaza Delivery Time']
-                );
-            }
+            $connection->addColumn(
+                $salesOrder,
+                'mp_delivery_information',
+                ['type' => Table::TYPE_TEXT, 'visible' => false, 'comment' => 'Mageplaza Delivery Time']
+            );
         }
 
         $installer->endSetup();

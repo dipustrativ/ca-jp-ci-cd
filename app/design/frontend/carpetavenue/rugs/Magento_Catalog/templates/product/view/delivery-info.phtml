@@ -1,0 +1,15 @@
+<?php
+/**
+ * PDP delivery / shipping estimate, shown before the availability line in the
+ * buy box. Text is translated per store view (ja_JP: ドイツから2-4営業日以内の発送).
+ *
+ * @var $block \Magento\Catalog\Block\Product\View
+ */
+$_product = $block->getProduct();
+if ($_product === null || !$_product->isSaleable()) {
+    return;
+}
+?>
+<ul class="availability delivery-time">
+    <li><?= $block->escapeHtml(__('Shipped from Germany within 2-4 business days')) ?></li>
+</ul>

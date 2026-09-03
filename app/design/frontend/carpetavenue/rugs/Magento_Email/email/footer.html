@@ -1,0 +1,56 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject {{trans "Footer"}} @-->
+<!--@vars {
+"var store.getFrontendName()":"Store Name"
+} @-->
+
+                    <!-- End Content -->
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<table class="footer-wrapper" style="width: 100%;">
+    <tr>
+        <td class="footer">
+            <table style="width: 100%; background-color: #4a4e53; color: #ffffff; text-align: center;" align="center">
+                <tr>
+                    <td style="padding: 30px 15px 10px;">
+                        <span><a href="{{store direct_url='contact'}}" style="color:#ffffff;">{{trans 'Contact email'}}</a></span>
+                        &nbsp;|&nbsp;
+                        <span><a href="{{store direct_url='privacy-cookie-policy'}}" style="color:#ffffff;">{{trans 'Privacy Policy'}}</a></span>
+                        &nbsp;|&nbsp;
+                        <span><a href="{{store direct_url='terms-conditions'}}" style="color:#ffffff;">{{trans 'Terms & Conditions'}}</a></span>
+                        &nbsp;|&nbsp;
+                        <span><a href="{{store direct_url='carpets/about'}}" style="color:#ffffff;">{{trans 'About Us'}}</a></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 15px 30px;">
+                        <p>
+                            Carpet Avenue GmbH, Brooktorkai 10, D-20457 {{trans 'Hamburg'}}, {{trans 'Germany'}}
+                            <br/>
+                            {{trans 'Email imprint'|raw}}
+                        </p>
+                    </td>
+                </tr>
+                {{depend is_newsletter}}
+                    <tr>
+                        <td style="padding: 0 15px 30px;" class="unsubscribe">
+                            {{trans 'To unsubscribe click <a href=%url_unsubscribe>here</a>' url_unsubscribe=$subscriber.getUnsubscriptionLink()|raw}}
+                        </td>
+                    </tr>
+                {{/depend}}
+
+            </table>
+        </td>
+    </tr>
+</table>
+<!-- End wrapper table -->
+</body>

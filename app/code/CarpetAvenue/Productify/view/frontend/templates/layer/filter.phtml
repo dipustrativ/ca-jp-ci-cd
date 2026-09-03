@@ -11,6 +11,10 @@
 $viewModel = $block->getData('product_layer_view_model');
 // Optional (Carpient_Filter): per-option image swatch renderer.
 $optionImages = $block->getData('option_image_view_model');
+// Optional (CarpetAvenue_Productify): category thumbnail renderer for the "cat"
+// filter. Sourced from the category entity, so it never collides with option
+// swatch IDs the way $optionImages would.
+$categoryImages = $block->getData('category_image_view_model');
 
 $sliderFilter = null;
 foreach ($filterItems as $item) {
@@ -47,7 +51,6 @@ foreach ($filterItems as $item) {
             </div>
         </div>
         <div data-role="slider" class="am-price-slider-track"></div>
-        <div data-role="ticks" class="am-price-ticks"></div>
     </div>
     <?php return; ?>
 <?php endif; ?>
@@ -65,13 +68,20 @@ if ($firstItem && method_exists($firstItem, 'getFilter')
 // space and collide (e.g. category "Patina" #29 hitting shape "Round" #29's
 // swatch). Only look up images for real attribute-option filters, not "cat".
 $supportsOptionImages = $optionImages !== null && $attrCode !== '' && $attrCode !== 'cat';
+$isCategoryFilter = $attrCode === 'cat';
 ?>
 <ol class="items am-filter-items<?= $attrCode !== '' ? ' am-filter--' . $escaper->escapeHtmlAttr($attrCode) : '' ?>">
     <?php foreach ($filterItems as $filterItem): ?>
         <?php
         $isSelected = method_exists($filterItem, 'isSelected') && $filterItem->isSelected();
         $isDisabled = !$isSelected && $filterItem->getCount() === 0;
-        $optionImageUrl = $supportsOptionImages ? $optionImages->getUrl((int) $filterItem->getValue()) : null;
+        if ($isCategoryFilter && $categoryImages !== null) {
+            $optionImageUrl = $categoryImages->getUrl((int) $filterItem->getValue());
+        } elseif ($supportsOptionImages) {
+            $optionImageUrl = $optionImages->getUrl((int) $filterItem->getValue());
+        } else {
+            $optionImageUrl = null;
+        }
         ?>
         <li class="item am-filter-item<?= $isSelected ? ' -selected' : '' ?><?= $isDisabled ? ' -disabled' : '' ?><?= $optionImageUrl ? ' -has-image' : '' ?>">
             <?php if ($isDisabled): ?>

@@ -497,6 +497,8 @@
     //  ---------------------------------------------
     &-display--fullscreen {
       // Stretch container outside bounds of parent
+      margin-left: calc(~"-100% / 2 + ( 100% - " @layout__width-xs-indent * 2 ~" ) / 2") !important;
+      margin-right: calc(~"-100% / 2 + ( 100% - " @layout__width-xs-indent * 2 ~" ) / 2") !important;
         max-width: @layout-page__max-width;
 
       & > div {
@@ -845,6 +847,13 @@
     .hidden-m {
       display: none;
     }
+
+      &-display--fullscreen {
+          // Stretch container outside bounds of parent
+          margin-left: calc(~"-100% / 2 + ( 100% - " @layout-indent__width * 2 ~" ) / 2") !important;
+          margin-right: calc(~"-100% / 2 + ( 100% - " @layout-indent__width * 2 ~" ) / 2") !important;
+
+      }
   }
   //
   //  Flex row negative margins (desktop)
@@ -855,4 +864,16 @@
   //  ---------------------------------------------
   #banner-lib.margins-mixin(margin-top--desktop, top);
   #banner-lib.margins-mixin(margin-bottom--desktop, bottom);
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__xl) {
+
+  //
+  //  Fullscreen
+  //  ---------------------------------------------
+  .ev-banners-display--fullscreen {
+    // Stretch container outside bounds of parent
+      margin-left: calc(~"-100% / 2 + ( 100% - " @layout-indent__width * 2 ~" ) / 2") !important;
+      margin-right: calc(~"-100% / 2 + ( 100% - " @layout-indent__width * 2 ~" ) / 2") !important;
+  }
 }

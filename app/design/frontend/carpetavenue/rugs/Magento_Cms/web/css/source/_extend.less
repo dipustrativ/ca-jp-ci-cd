@@ -1,0 +1,21 @@
+@import "_carpets_overview.less";
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .cms-page-view {
+        &.page-layout-1column {
+            .column.main {
+                width: 100%;
+                margin: 0 auto;
+
+                & > p,
+                & > ul {
+                    width: 75ch;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,54 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php
+/**
+ * Category view template
+ *
+ * @var $block \Magento\Catalog\Block\Category\View
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+// phpcs:disable Generic.WhiteSpace.ScopeIndent.IncorrectExact
+// phpcs:disable Magento2.Security.LanguageConstruct.DirectOutput
+?>
+<?php
+$_helper    = $this->helper(Magento\Catalog\Helper\Output::class);
+$_category  = $block->getCurrentCategory();
+$_imgHtml   = '';
+$_catImgPath = '/media/catalog/category/';
+$thumbnail = $_category->getData('thumbnail');
+$_imgUrl = $_category->getImageUrl();
+$_finalUrl = $_imgUrl ? $_imgUrl : $thumbnail;
+
+if($_finalUrl == $thumbnail) {
+    $_finalUrl = $_catImgPath . $thumbnail;
+}
+
+if($_finalUrl == $_catImgPath) {
+    $_finalUrl = "";
+}
+
+if ($_finalUrl && $_finalUrl != "") {
+    $_imgMobile = $_category->getMobileImage();
+    $_imgHtml = '<div class="category-image cover">'
+        . '<picture>'
+        . '<source media="(max-width: 767px)" srcset="'.($_imgMobile ? $_catImgPath.$_imgMobile : $block->escapeUrl($_finalUrl)).'">'
+        . '<img src="'
+        . $block->escapeUrl($_finalUrl)
+        . '" alt="'
+        . $block->escapeHtmlAttr($_category->getName())
+        . '" title="'
+        . $block->escapeHtmlAttr($_category->getName())
+        . '" class="image" />'
+        . '</picture>'
+        . $block->getChildHtml()
+        . '</div>';
+    $_imgHtml = $_helper->categoryAttribute($_category, $_imgHtml, 'image');
+    /* @noEscape */ echo $_imgHtml;
+}
+?>
+

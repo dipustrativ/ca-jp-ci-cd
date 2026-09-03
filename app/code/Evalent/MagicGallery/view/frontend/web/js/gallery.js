@@ -266,6 +266,15 @@ define([
             this.sliderElement.removeClass('_block-content-loading');
 
             this.sliderElement.addClass(this.GALLERY_CLASS);
+
+            // Build the slide markup into the DOM BEFORE initializing slick.
+            // Slicking an empty element and then slickAdd-ing breaks on mobile:
+            // when a responsive breakpoint (<=769px) is active at init, the slick
+            // instance silently rejects every slickAdd, so the main image never
+            // renders on phones. Initializing slick with the slides already present
+            // avoids that broken state.
+            this.appendSlides();
+
             this.sliderElement.slick(this.config.sliderSettings.options);
 
             if (this.config.imagePopup.imagePopupStatus) {
@@ -276,8 +285,6 @@ define([
                 }
             }
 
-            // Add slides
-            this.addSlides();
             this.initThumbs();
         },
 
@@ -300,17 +307,44 @@ define([
          * @returns {boolean}
          */
         imageModalPopup: function (event, config) {
-            var self = this;
-            let slickClass = this.config.thumbsSettings.options.slidesToShow < 10 ?
-                ".slick-slide-wrap.slick-slide.slick-current:not(.slick-video-slide)" :
-                ".slick-slide";
+            //  Bind and index on the elements that actually carry the fancybox
+            //  `href`: the slide wrapper from buildSlide() and the thumbnail
+            //  anchors from addThumbs().
+            //
+            //  The old selector keyed off `thumbsSettings.slidesToShow < 10` and
+            //  fell back to bare `.slick-slide`. That class only lands on our
+            //  wrapper when the wrapper is a direct child of the slider; when
+            //  slick nests it, `.slick-slide` is an outer div with no href, so
+            //  fancybox cannot resolve an image and falls back to inline content
+            //  — the slide then renders the slick box instead of the picture
+            //  (small, off-centre, close button pushed below). Only the two main
+            //  slides were affected, since the thumbnails are anchors that always
+            //  carry their own href.
+            var ITEMS = '.slick-slide-wrap:not(.slick-cloned):not(.slick-video-slide),' +
+                        ' .mz-gallery-thumbs a.thumb';
 
-            $(document).on(event, slickClass, function(e) {
-                let slickVisibleLinks = self.config.thumbsSettings.options.slidesToShow < 10 ?
-                    ".slick-slide-wrap:not(.slick-cloned):not(.slick-video-slide)" :
-                    ".slick-slide:not(.slick-cloned)";
-                var visibleLinks = $(slickVisibleLinks);
-                $.fancybox.open( visibleLinks, config, visibleLinks.index( this ) );
+            $(document).on(event, ITEMS, function () {
+                //  One entry per image, in document order. Desktop keeps slides
+                //  0-1 in the main slider and the rest as thumbs; mobile puts
+                //  every image in the slider *and* still builds thumbs, so
+                //  de-duplicate on href or the gallery lists them twice.
+                var seen = {},
+                    items = $(ITEMS).filter(function () {
+                        var href = this.getAttribute('href');
+
+                        if (!href || seen[href]) {
+                            return false;
+                        }
+                        seen[href] = true;
+
+                        return true;
+                    }),
+                    hrefs = items.map(function () {
+                        return this.getAttribute('href');
+                    }).get(),
+                    start = hrefs.indexOf(this.getAttribute('href'));
+
+                $.fancybox.open(items, config, start < 0 ? 0 : start);
 
                 return false;
             });
@@ -319,22 +353,46 @@ define([
         /**
          *
          */
-        addSlides: function () {
-            var self = this;
-            $.each(this.config.data, function (index, imageData) {
-                var _className = (self.isVideo(imageData)) ? 'slick-video-slide' : '',
-                    _hrefLink = (self.isVideo(imageData)) ? imageData['videoUrl'] : imageData['full'],
-                    _fancyBox = (self.config.imagePopup.imagePopupStatus) ? 'href="' + _hrefLink + '"' : '',
-                    _dataType = imageData.provider == "youtube" ? 'data-type="iframe"' : 'data-type="' + imageData['type'] + '"',
-                    // Use the full-resolution image for the main stage (crisp);
-                    // fall back to the medium if full is missing. Videos keep their thumb.
-                    _mainSrc = (self.isVideo(imageData)) ? imageData['img'] : (imageData['full'] || imageData['img']),
-                    _slide = '<' + (imageData.provider == "youtube" ? 'div data-fancybox data-type="iframe"' : 'div') + ' class="slick-slide-wrap '+ _className + (imageData.provider == "youtube" ? ' iframe' : '') + '" data-data-index="' + index + '" ' + _fancyBox + ' ><img width="'+self.config.image_width+'" height="'+self.config.image_height+'" ' + _dataType + ' src="' + _mainSrc + '"/></' + (imageData.provider == "youtube" ? 'a' : 'div') + '>';
+        /**
+         * Builds one slide's markup.
+         */
+        buildSlide: function (imageData, index) {
+            var _isYoutube = imageData.provider == "youtube",
+                _className = (this.isVideo(imageData)) ? 'slick-video-slide' : '',
+                _hrefLink = (this.isVideo(imageData)) ? imageData['videoUrl'] : imageData['full'],
+                _fancyBox = (this.config.imagePopup.imagePopupStatus) ? 'href="' + _hrefLink + '"' : '',
+                _dataType = _isYoutube ? 'data-type="iframe"' : 'data-type="' + imageData['type'] + '"';
 
-                // Single-image carousel (matches carpient.com): add every slide on all
-                // breakpoints. Thumbnails below drive navigation via syncThumbs().
-                self.sliderElement.slick('slickAdd', _slide);
+            //  `data-type` belongs on the slide element, not the inner <img> —
+            //  fancybox reads it off the item it is handed. Without it a plain
+            //  <div> item falls back to inline content, so the lightbox renders
+            //  the slick wrapper at its inline width instead of the image: small,
+            //  off-centre, close button pushed below it. addThumbs() already puts
+            //  it on the <a>, which is why only the two main slides broke —
+            //  appendSlides() keeps indexes 0-1 here and sends the rest to thumbs.
+            return '<div ' + (_isYoutube ? 'data-fancybox ' : '') +
+                'class="slick-slide-wrap ' + _className + (_isYoutube ? ' iframe' : '') + '"' +
+                ' data-data-index="' + index + '" ' + _fancyBox + ' ' + _dataType + '>' +
+                '<img width="' + this.config.image_width + '" height="' + this.config.image_height + '"' +
+                ' src="' + imageData['img'] + '"/>' +
+                '</div>';
+        },
+
+        /**
+         * Appends the slide markup to the main slider element (call BEFORE slick init).
+         * Mobile shows every slide; desktop keeps the first two (the rest live in the
+         * thumbnail rail).
+         */
+        appendSlides: function () {
+            var self = this;
+            var html = '';
+            $.each(this.config.data, function (index, imageData) {
+                if (!self.isMobile() && index >= 2) {
+                    return;
+                }
+                html += self.buildSlide(imageData, index);
             });
+            this.sliderElement.append(html);
         },
 
         /**
@@ -346,75 +404,18 @@ define([
             this.thumbsElement = $('<div/>', {'class': this.THUMBS_CLASS});
             this.sliderElement.parent().find('.mz-gallery-thumbs-wrap').append(this.thumbsElement);
 
-            // The thumbnail strip is a plain horizontal, scrollable flex row
-            // (styled in gallery.phtml) rather than a nested slick slider —
-            // slickAdd into an empty slider does not reliably render, and a flat
-            // strip matches the carpient.com gallery exactly.
+            if(!jQuery.isEmptyObject(this.config.thumbsSettings)) {
+                this.thumbsElement.slick(this.config.thumbsSettings.options);
+            }
 
             // Make thumbnails
             this.addThumbs();
-
-            // Wire thumbnail strip <-> main slider (click to navigate + active state)
-            this.syncThumbs();
 
             // Thumbnails expand button
             $('.mz-gallery-thumbs--expand__btn').on("click", function () {
                $('.mz-gallery-thumbs').toggleClass("expand");
                $(this).hide(500);
             });
-        },
-
-        /**
-         * Link the thumbnail strip to the main slider: clicking a thumb moves the
-         * main image, and the current main image highlights + scrolls its thumb
-         * into view. Matches the carpient.com gallery behaviour.
-         */
-        syncThumbs: function () {
-            var self = this,
-                $thumbs = this.thumbsElement;
-
-            if (!$thumbs || !$thumbs.length) {
-                return;
-            }
-
-            // Click a thumb -> navigate the main slider (don't follow the href).
-            $thumbs.on('click', '.thumb', function (e) {
-                e.preventDefault();
-                var idx = $(this).data('index');
-                if (typeof idx === 'undefined') {
-                    idx = $thumbs.find('.thumb').index(this);
-                }
-                self.sliderElement.slick('slickGoTo', idx);
-            });
-
-            // Main slider changes -> highlight the matching thumb and keep it visible.
-            this.sliderElement.on('afterChange', function (e, slick, current) {
-                self.setActiveThumb(current);
-            });
-
-            // Initial highlight.
-            this.setActiveThumb(0);
-        },
-
-        /**
-         * Highlights the thumbnail for the given slide index.
-         */
-        setActiveThumb: function (index) {
-            var $thumbs = this.thumbsElement;
-
-            if (!$thumbs || !$thumbs.length) {
-                return;
-            }
-
-            var $active = $thumbs.find('.thumb').removeClass('thumb--active')
-                .filter('[data-index="' + index + '"]').addClass('thumb--active');
-
-            // Keep the active thumb centred within the scrollable strip.
-            if ($active.length) {
-                var strip = $thumbs[0],
-                    el = $active[0];
-                strip.scrollLeft = el.offsetLeft - (strip.clientWidth / 2) + (el.clientWidth / 2);
-            }
         },
 
         /**
@@ -427,10 +428,11 @@ define([
                     _hrefLink = (self.isVideo(imageData)) ? imageData['videoUrl'] : imageData['full'],
                     _fancyBox = (self.config.imagePopup.imagePopupStatus) ? 'href="' + _hrefLink + '"' : '',
                     _dataType = imageData.provider == "youtube" ? 'data-type="iframe"' : 'data-type="' + imageData['type'] + '"',
-                     _thumb = '<a class="thumb ' + _className + '" href="javascript:void(0)" data-index="' + index + '" ' + _dataType + '><img width="320" height="280" src="' + imageData['thumb'] + '"/></a>';
+                     _thumb = '<a class="thumb ' + _className + '"' + _fancyBox + ' ' + _dataType + '><img width="320" height="280" src="' + imageData['thumb'] + '"/></a>';
 
-                // One thumb per image so the strip maps 1:1 onto the main slider.
-                self.thumbsElement.append(_thumb);
+                if(index > 1) {
+                    self.thumbsElement.slick('slickAdd', _thumb);
+                }
             });
         },
 
@@ -438,22 +440,23 @@ define([
          *
          */
         reInitSlider: function () {
-            var slick = this.sliderElement.slick('getSlick'),
-                slides = slick.$slides;
+            // Rebuild the main slider from scratch: unslick, clear, re-append the
+            // slides, then slick again. Same reason as initSlider — going back to an
+            // empty slick and slickAdd-ing breaks under the mobile responsive
+            // breakpoint. Re-slicking with slides already in the DOM is reliable.
+            this.sliderElement.slick('unslick');
+            this.sliderElement.empty();
+            this.appendSlides();
+            this.sliderElement.slick(this.config.sliderSettings.options);
 
-            // Remove main slider slides
-            while (slides.length !== 0) {
-                this.sliderElement.slick('slickRemove', --slides.length);
+            // Thumbs are unaffected by the breakpoint bug (they render fine); just
+            // clear and repopulate them.
+            var slickThumbs = this.thumbsElement.slick('getSlick'),
+                thumbs = slickThumbs.$slides;
+            while (thumbs.length !== 0) {
+                this.thumbsElement.slick('slickRemove', --thumbs.length);
             }
-
-            // Thumbs are a plain strip (not slick) — just clear and rebuild.
-            if (this.thumbsElement) {
-                this.thumbsElement.empty();
-            }
-
-            this.addSlides();
             this.addThumbs();
-            this.setActiveThumb(0);
         },
 
         /**

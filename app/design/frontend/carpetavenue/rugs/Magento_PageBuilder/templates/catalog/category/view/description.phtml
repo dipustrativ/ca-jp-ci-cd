@@ -1,0 +1,81 @@
+<?php
+/**
+ * Category description with Read more / Read less toggle.
+ *
+ * Overrides Magento_PageBuilder::catalog/category/view/description.phtml — the
+ * PageBuilder page_layout forces the category.description block onto this
+ * template, so the read-more behaviour has to live here (a theme layout
+ * referenceBlock template swap does not win over PageBuilder's page_layout).
+ *
+ * @var $block \Magento\Catalog\Block\Category\View
+ */
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+$readmoreLimit = 650;
+$readmoreText  = __('Read more');
+$readlessText  = __('Read less');
+?>
+<?php if ($description = $block->getCurrentCategory()->getDescription()) : ?>
+    <?php
+    $descriptionHtml = $this->helper(Magento\Catalog\Helper\Output::class)->categoryAttribute(
+        $block->getCurrentCategory(),
+        $description,
+        'description'
+    );
+    $needsReadMore = strlen($description) > $readmoreLimit;
+    ?>
+    <div class="category-description<?= $needsReadMore ? ' toggle-readmore' : '' ?>">
+        <?= $block->getChildHtml() ?>
+        <div class="content">
+            <?php if (stripos($description, 'data-appearance') === false) : ?>
+                <div data-content-type="row" data-appearance="contained" data-element="main">
+                    <div data-enable-parallax="0" data-parallax-speed="0.5" data-background-images="{}" data-element="inner"
+                         style="justify-content: flex-start; display: flex; flex-direction: column;
+                         background-position: left top; background-size: cover; background-repeat: no-repeat;
+                         background-attachment: scroll; border-style: none; border-width: 1px; border-radius: 0px;
+                         margin: 0px 0px 10px; padding: 10px;">
+                        <div data-content-type="html" data-appearance="default" data-element="main"
+                             style="border-style: none; border-width: 1px; border-radius: 0px; margin: 0px; padding: 0px;">
+                            <?= /* @noEscape */ $descriptionHtml; ?>
+                        </div>
+                    </div>
+                </div>
+            <?php else : ?>
+                <?= /* @noEscape */ $descriptionHtml; ?>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($needsReadMore) : ?>
+            <span class="action read-more toggle-readmore__expand read-more-link product-read-more"><?= $block->escapeHtml($readmoreText) ?></span>
+            <span class="action read-more toggle-readmore__expand read-less-link product-read-more" style="display: none;"><?= $block->escapeHtml($readlessText) ?></span>
+        <?php endif; ?>
+    </div>
+
+    <?php if ($needsReadMore) : ?>
+        <script type="text/javascript">
+            require(['jquery'], function ($) {
+                var readmore = true;
+                $(document).ready(function () {
+                    var $catDescription = $('.category-description.toggle-readmore');
+                    var $expandBtn = $catDescription.find('.action.toggle-readmore__expand');
+
+                    if ($catDescription.length && $expandBtn.length) {
+                        $(document).on('click', '.category-description.toggle-readmore .action.toggle-readmore__expand', function () {
+                            $catDescription.toggleClass('toggle-readmore--expand');
+                            $(this).toggleClass('expanded');
+                            if (readmore) {
+                                $('.read-less-link').show();
+                                $('.read-more-link').hide();
+                                readmore = false;
+                            } else {
+                                $('.read-more-link').show();
+                                $('.read-less-link').hide();
+                                readmore = true;
+                            }
+                        });
+                    }
+                });
+            });
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

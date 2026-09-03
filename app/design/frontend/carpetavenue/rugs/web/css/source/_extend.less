@@ -1,0 +1,1723 @@
+//
+//  CarpetAvenue Rugs — header + footer styles (self-contained, lightweight)
+//  _____________________________________________
+
+@import '_navicons';
+
+//  Flexbox grid (.row / col-xs-* / col-lg-*) + grid mixins.
+//  Cart item template (Magento_Checkout/templates/cart/item/default.phtml)
+//  depends on these classes. Ported from base Evalent/carpet.
+@import '_utilities_extend';
+@import '_grid';
+
+//  Luma icon font — used for the menu caret (\e622) and navicon-check,
+//  matching the reference theme (whose parent was Luma).
+@font-face {
+    font-family: 'luma-icons';
+    src: url('../fonts/Luma-Icons/Luma-Icons.woff2') format('woff2'),
+        url('../fonts/Luma-Icons/Luma-Icons.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@import url("https://use.typekit.net/efx1kyl.css");
+@import url("https://use.typekit.net/rti6vhi.css");
+@import url("https://use.typekit.net/euq4luf.css");
+
+//  Thin outline icon font (header icons)
+@font-face {
+    font-family: 'Pe-icon-7-stroke';
+    src: url('@{baseDir}fonts/Pe-icon-7-stroke.woff') format('woff'),
+         url('@{baseDir}fonts/Pe-icon-7-stroke.ttf') format('truetype'),
+         url('@{baseDir}fonts/Pe-icon-7-stroke.svg#Pe-icon-7-stroke') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+.ca-icon(@content) {
+    font-family: 'Pe-icon-7-stroke';
+    content: @content;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@ca-black:       #050505;
+@ca-green-check: #30af31;
+@ca-footer-txt:  #cccccc;
+@ca-max-width:   2440px;
+
+//  proxima-nova renders at weight 500 as the base text weight on carpetavenue.jp
+//  (measured on .page-header, footer links and the newsletter title). Magento's
+//  blank sets 400, which reads noticeably lighter across the whole storefront.
+body {
+    font-weight: 500;
+}
+
+._keyfocus *:focus, input:not([disabled]):focus, textarea:not([disabled]):focus, select:not([disabled]):focus {
+    background-color: #f1f1f1 !important;
+    border: 1px solid #a2a2a2 !important;
+    box-shadow: none !important;
+}
+
+a, .alink {
+    color: #333;
+    text-decoration: none;
+}
+
+a:hover, .alink:hover {
+    color: #333333;
+    text-decoration: underline;
+}
+
+//
+//  USP announcement bar
+//  _____________________________________________
+.header.usps__wrapper {
+    background: @ca-black;
+    color: #ffffff;
+
+    .top-static-content {
+        max-width: @ca-max-width;
+        margin: 0 auto;
+        padding: 8px 20px;
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 28px;
+        }
+
+        li {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            margin: 0px;
+        }
+
+        .navicon-check:before {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 15px;
+            line-height: inherit;
+            font-family: 'luma-icons' !important;
+            content: '\e610';
+            color: @ca-green-check;
+            font-weight: 800;
+            margin-right: 7px;
+        }
+    }
+}
+
+//
+//  Custom top panel (relocated panel wrapper: USP + switchers)
+//  _____________________________________________
+.page-header.custom-panel {
+    margin: 0;
+    z-index: 100;
+    background: @ca-black;
+    color: #ffffff;
+
+    .panel.wrapper {
+        background: @ca-black;
+    }
+
+    .panel.header {
+        max-width: @ca-max-width;
+        width: 100%;
+        margin: 0 auto;
+        padding: 9px 32px 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0;   //  space-between already separates USP from the switcher; a
+                  //  gap here only inset the USP row off its gutter
+
+        //  Magento's skip-to-content link is a 1px-wide flex child here. Take it
+        //  out of the flow rather than hiding it — keyboard users still need it,
+        //  and it reveals itself on focus.
+        > .action.skip {
+            position: absolute;
+        }
+    }
+
+    //  USP list — left
+    .header.usps__wrapper {
+        background: transparent;
+        flex: 1 1 auto;
+
+        .top-static-content {
+            max-width: none;
+            margin: 0;
+            padding: 0;
+
+            ul {
+                justify-content: flex-start;
+                gap: 6px 24px;
+            }
+
+            li {
+                font-size: 1.2rem;
+                font-weight: 300;
+            }
+        }
+    }
+
+    //  Language switcher — right
+    .switcher {
+        flex: 0 0 auto;
+        color: #ffffff;
+
+        > .label,
+        .switcher-trigger,
+        .switcher-trigger strong {
+            color: #ffffff;
+        }
+
+        strong {
+            font-size: 1.3rem;
+        }
+
+        //  Dropdown — open to the left, dark text on light background
+        .switcher-options {
+            .switcher-dropdown,
+            ul.dropdown {
+                left: 0;
+                right: auto;
+
+                &:before,
+                &:after {
+                    left: 12px;
+                    right: auto;
+                }
+
+                a {
+                    color: #333333;
+
+                    &:hover {
+                        color: #000000;
+                    }
+                }
+            }
+        }
+    }
+}
+
+//  Override luma default `.panel.wrapper .switcher .options ul.dropdown { right: 0 }`
+.page-header.custom-panel .panel.wrapper .switcher .options ul.dropdown {
+    left: 0;
+    right: auto;
+}
+
+//
+//  Header layout
+//  _____________________________________________
+@ca-header-icon-size: 3rem;
+
+.page-header {
+    background: #ffffff;
+    border-bottom: 0;
+    margin-bottom: 0px;
+
+    //  3 flex zones: search (left, 1fr) · logo (absolute, true center) · actions (right, 1fr)
+    .header.content {
+        max-width: @ca-max-width;
+        margin: 0 auto;
+        padding: 5px 20px;
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        column-gap: 0px;
+        position: relative;
+        height: 60px;
+        z-index: 9;
+    }
+}
+
+//  Center — logo (absolutely centred so search expansion can't shift it)
+.header-wrapper__centered {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 0;
+    text-align: center;
+    pointer-events: none;
+    z-index: 99;
+
+    .logo {
+        pointer-events: auto;
+    }
+
+    .logo__container {
+        padding-top: 0;
+    }
+
+    .logo {
+        display: inline-block;
+        float: none;
+        margin: 0 auto;
+        max-width: 100%;
+        width: 16.667vw;
+        min-width: 210px;
+        color: @ca-black;   //  stop Magento's link blue reaching currentColor icons
+
+        img {
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            margin: auto;
+        }
+    }
+}
+
+//  Right — actions group (equal side zone → logo stays centred)
+.header-actions {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+//  Vertically centre every header item on one line
+.page-header .header.content {
+    > * {
+        align-self: center;
+    }
+
+    .toggle-nav__container,
+    .block-search,
+    .header-actions,
+    .customer-account-header,
+    .customer-account-header .header.links,
+    .minicart-wrapper {
+        display: flex;
+        align-items: center;
+    }
+
+    //  Icons: no stray line-height / offsets
+    .nav-toggle,
+    .nav-toggle:before,
+    .block-search .block-title,
+    .block-search .block-title:before,
+    .header.links > li,
+    .header.links > li > a,
+    .header.links > li > a:before,
+    .action.showcart,
+    .action.showcart:before {
+        line-height: 1;
+        margin-top: 0;
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .minicart-wrapper .action.showcart:before,
+    .header.links > li > a:before,
+    .block-search .block-title:before,
+    .nav-toggle:before {
+        display: block;
+        top: 0;
+    }
+}
+
+//  Left — search icon that expands inline on click (equal side zone)
+.block-search {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    position: relative;
+    margin: 0;
+    padding: 0 !important;
+    width: auto;
+    max-width: 100%;
+
+    //  Magnifier / close trigger (always visible)
+    .block-title {
+        position: relative;
+        margin: 0;
+        display: flex;
+        text-decoration: none;
+        cursor: pointer;
+
+
+        strong {
+            font-size: 0;
+            line-height: 1;
+        }
+
+        &:before {
+            .ca-icon("\e618");
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 28px;
+            line-height: 33px;
+            color: #757575;
+            content: '\e615';
+            font-family: 'luma-icons';
+            vertical-align: middle;
+            display: inline-block;
+            font-weight: 400;
+            overflow: hidden;
+            speak: none;
+            text-align: center;
+        }
+        &:hover:before {
+            color: #333;
+        }
+    }
+
+    //  No "Advanced Search" link
+    .action.advanced {
+        display: none;
+    }
+
+    //  Field hidden until active
+    .block-content {
+        display: none;
+    }
+
+    //  Active: trigger becomes an X, field expands inline
+    &.active {
+        justify-self: start;
+        width: 100%;
+        max-width: 35%;
+
+        .block-title:before {
+            //content: "\e680";
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 28px;
+            line-height: 33px;
+            color: #757575;
+            content: '\e616';
+            font-family: 'luma-icons';
+            vertical-align: middle;
+            display: inline-block;
+            font-weight: 400;
+            overflow: hidden;
+            speak: none;
+            text-align: center;
+        }
+
+        .block-title:hover:before{
+            color: #333;
+        }
+
+        .block-content {
+            display: block;
+            flex: 1 1 auto;
+            position: static;
+            width: 100%;
+            margin: 0;
+        }
+
+        .form.minisearch {
+            margin: 0;
+        }
+
+        .field.search {
+            position: relative;
+            margin: 0;
+
+            //  MageWorx autocomplete dropdown. The module ships
+            //  `left: -85px; width: 350px`, sized for a narrow stock search box,
+            //  which hangs the panel off the left of our full-width header field.
+            //  Live pins it to the field instead, so it lines up under the input
+            //  and matches its width.
+            #searchsuite-autocomplete {
+                left: 0;
+                width: 100%;
+
+                //  Section heading ("Suggested", "類似検索", …) — live uses #f4f4f4
+                //  at weight 600; the body's base 500 reads too light here.
+                .title {
+                    background: #f4f4f4;
+                    font-weight: 600;
+                }
+            }
+
+            //  Magnifier inside the field
+            .label {
+                position: absolute !important;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: auto !important;
+                height: auto !important;
+                margin: 0 !important;
+                clip: auto !important;
+                z-index: 2;
+                pointer-events: none;
+
+                &:before {
+                    .ca-icon("\e618");
+                    font-size: 2.2rem;
+                    color: #7a7a7a;
+                }
+
+                span {
+                    display: none;
+                }
+            }
+
+            .control {
+                margin: 0;
+                padding: 0;
+                border-top: 0;
+            }
+
+            input {
+                position: static;
+                left: auto;
+                margin: 0;
+                width: 100%;
+                padding: 24px;
+                padding-left: 45px;
+                padding-right: 0;
+                border-radius: 5px;
+                border: 1px solid #d1d1d1;
+                background: #efefef;
+                font-size: 16px !important;
+                height: 50px;
+            }
+        }
+
+        .actions {
+            display: none;
+        }
+    }
+}
+
+//  Right — account / wishlist / cart icons (inside .header-actions flex)
+.customer-account-header,
+.minicart-wrapper {
+    flex: 0 0 auto;
+}
+
+//  No greeting text in the header
+.page-header .greet.welcome {
+    display: none;
+}
+
+//  Account links -> single person icon (hide text + extra links)
+.customer-account-header .header.links {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    .greet.welcome,
+    .authorization-link,
+    .compare,
+    .link.wishlist ~ .link.wishlist {
+        display: none;
+    }
+
+    > li {
+        margin: 0;
+    }
+
+    > li:first-child{
+        padding: 0 20px;
+    }
+
+    li.link.wishlist{
+        padding: 0 20px;
+    }
+
+
+    a {
+        display: inline-block;
+        font-size: 0;
+        line-height: 1;
+        color: @ca-black;
+        text-decoration: none;
+    }
+    a:hover{
+        text-decoration: none;
+    }
+
+    //  My Account (first) -> person (SVG icon)
+    > li:first-child > a:before {
+        font-family: 'Pe-icon-7-stroke';
+        font-size: 2.8rem;
+        display: block;
+        line-height: .3;
+        content: "\e605";
+    }
+
+    //  Wish list -> heart. Outline while the list is empty, filled once it has
+    //  items — same swap carpetavenue.jp does, where the empty state is keyed
+    //  off BelVG's `.no-display` class.
+    //
+    //  Here the marker is Magento's own counter: the header link only renders
+    //  `.counter.qty` when `wishlist().counter` is set, and Knockout inserts
+    //  and removes it as items come and go, so `:has()` follows the state
+    //  live with no JS. The counter itself is 0x0 (the link is `font-size: 0`),
+    //  so it only ever acts as a flag.
+    .link.wishlist > a {
+        position: relative;
+
+        &:before {
+            .ca-icon("\e642");
+            font-size: @ca-header-icon-size;
+        }
+
+        &:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: @ca-header-icon-size;
+            height: @ca-header-icon-size;
+            transform: translate(-50%, -50%);
+            background: url('@{baseDir}images/icons/like.svg') no-repeat 0 0;
+            background-size: 100%;
+            opacity: 0;
+            transition: opacity .5s;
+        }
+
+        &:has(.counter.qty) {
+            //  Hide the outline by colour, not by dropping `content` — the link
+            //  is `font-size: 0` with an absolutely positioned `:after`, so the
+            //  glyph box is the only thing giving it height. Emptying it
+            //  collapses the link to 0x0 and the icon row shifts.
+            &:before {
+                color: transparent;
+            }
+
+            &:after {
+                opacity: 1;
+            }
+        }
+    }
+}
+
+//  Wishlist merged into the header heart icon: hide BelVG's standalone
+//  "My Wish List" link. The heart click opens the mini-wishlist modal
+//  (see js/header-wishlist-merge.js). #mini-wishlist-modal is relocated to a
+//  body-level modal on init, so hiding this wrapper does not break it.
+.wish.wrapper {
+    display: none;
+}
+
+//  Cart icon
+.minicart-wrapper {
+    margin-left: 0px !important;
+    .action.showcart {
+        position: relative;
+        height: auto;
+        padding: 15px 30px 15px 15px;
+        border-radius: 5px;
+        box-sizing: border-box;
+        border: 0;
+        color: #333;
+        height: 50px;
+        background: none;
+
+        &:before {
+            content: '\e66e';
+            font-family: 'Pe-icon-7-stroke';
+            position: relative;
+            font-size: 2.8rem;
+            line-height: normal;
+            color: #000;
+            margin: 0;
+            vertical-align: top;
+            display: inline-block;
+            font-weight: 400;
+            overflow: hidden;
+            speak: none;
+            text-align: center;
+            top: -5px !important;
+        }
+
+        .counter.qty {
+            top: -6px;
+            min-width: 18px;
+            height: 24px;
+            line-height: 24px;
+            padding: 0 4px;
+            font-size: 1rem;
+            background: @ca-price;
+            color: #000;
+            border-radius: 9px;
+        }
+
+        //  Subtotal appended to the icon by minicart-mixin — hidden, like base.
+        .subtotal-label {
+            display: none;
+        }
+    }
+    .action.active{
+        &:before{
+            content: '\e66e' !important;
+            font-family: 'Pe-icon-7-stroke' !important;
+            position: relative;
+            font-size: 2.8rem !important;
+            line-height: normal !important;
+            color: #000;
+            margin: 0;
+            vertical-align: top;
+            display: inline-block;
+            font-weight: 400 !important;
+            overflow: hidden;
+            speak: none;
+            text-align: center;
+        }
+
+    }
+
+
+    //  Cart has items → stay plain (no button), red badge on top-right with
+    //  white number — matches base Evalent/carpet cart icon.
+    &.has-items {
+        .action.showcart {
+            border: 1px solid #2b8d3a;
+            background: #2b8d3a;
+            color: #fff;
+            line-height: 28px;
+
+            &:before {
+                color: #fff;
+            }
+
+            .counter.qty {
+                position: absolute;
+                top: 3px;
+                left: 38px;
+                background: #fff;
+                border-radius: 10em;
+                color: #000;
+            }
+
+            .counter-number {
+                text-shadow: none;
+                font-size: 13px;
+            }
+
+            &:hover{
+                &:before{
+                    color: #ffffff !important;
+                }
+            }
+
+            &:focus{
+                &:before{
+                    color: #ffffff !important;
+                }
+            }
+        }
+    }
+}
+
+.toggle-nav__container {
+    display: none;
+    flex: 0 0 auto;
+
+    .nav-toggle {
+        position: relative;
+        top: auto;
+        left: auto;
+        margin: 0;
+    }
+}
+
+//
+//  Sticky header wrapper
+//  _____________________________________________
+.sticky.wrapper {
+    width: 100%;
+    background: #ffffff;
+
+    &.sticky-pin {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 99;
+    }
+}
+
+//
+//  Main navigation (dark bar)
+//  _____________________________________________
+.navigation {
+    background: @ca-black;
+    max-width: none;
+
+    .megamenu__backdrop-wrapper{
+
+        .megamenu__backdrop-container{
+            background: #ffffff;
+        }
+    }
+
+    .level0 > .level-top {
+        color: #ffffff;
+
+        &:hover,
+        &.ui-state-focus {
+            color: #ffffff;
+        }
+    }
+}
+
+//
+//  Footer
+//  _____________________________________________
+.page-footer {
+    background: @ca-black;
+    color: #ffffff;
+    margin-top: 40px;
+
+    .footer.content {
+        max-width: @ca-max-width;
+        margin: 0 auto;
+        padding: 50px 32px 0;
+        border-top: 0;
+        background: #0a0a0a;   //  live footer sits one step lighter than the page
+
+        .footer-logo p {
+            margin: 0px;
+        }
+        .footer-column h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        .footer-column p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #cccccc;
+            margin-bottom: 12px;
+        }
+    }
+
+    a {
+        color: #ffffff;
+        text-decoration: none;
+        transition: color 0.3s;
+
+        &:hover {
+            color: #ffffff;
+        }
+    }
+
+    h3 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0 0 12px;
+        color: #ffffff;
+        letter-spacing: 0.04em;
+    }
+
+    p {
+        font-size: 1.4rem;
+        line-height: 1.6;
+        color: @ca-footer-txt;
+        margin-bottom: 12px;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+            margin-bottom: 10px !important;
+
+            a {
+                color: #cccccc;
+                text-decoration: none;
+                font-size: 14px;
+                transition: color 0.3s;
+            }
+            a:hover, a:focus{
+                color: #ffffff;
+            }
+
+
+        }
+    }
+}
+
+.footer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 40px;
+
+    .footer-logo img {
+        height: 40px;
+        width: auto;
+    }
+
+    .footer-header-links {
+        display: flex;
+        gap: 30px;
+
+        h3 {
+            display: none;
+        }
+
+        ul {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        a {
+            font-size: 1.4rem;
+        }
+    }
+}
+
+.footer-divider {
+    display: none;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    margin-bottom: 40px;
+
+    .footer-column {
+        margin-bottom: 0;
+    }
+}
+
+.contact-info {
+    font-size: 1.4rem;
+    line-height: 1.8;
+    color: @ca-footer-txt;
+}
+
+.social-links{
+    margin-top: 20px;
+}
+
+.social-links,
+.footer-social {
+    display: flex;
+    gap: 15px;
+    a {
+        width: 40px;
+        height: 40px;
+        background: #333;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.3s;
+
+        &:hover {
+            background: #555;
+        }
+    }
+
+    img {
+        height: 40px;
+        width: auto;
+    }
+}
+
+.trust-badges{
+    margin-top: 22px;
+}
+.trust-badges img {
+    height: 40px;
+    width: auto;
+    margin-top: 10px;
+}
+
+.payment-methods {
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .footer-extra-pay {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+}
+
+.shipping-logos {
+    margin-top: 15px;
+
+    .footer-ship-row {
+        display: flex;
+        align-items: center;
+        gap: 0px;
+        margin-top: 25px;
+    }
+
+    img {
+        max-height: 50px;
+        width: auto;
+        max-width: 100px;
+    }
+}
+
+//
+//  Newsletter (footer)
+//  _____________________________________________
+.footer-newsletter-bottom {
+    display: flex;
+    justify-content: flex-start;
+    position: relative;
+    bottom: 70px;
+
+    .footer-newsletter {
+        text-align: left;
+        margin-top: 0px;
+        width: 100%;
+    }
+
+    .block.newsletter {
+        width: 377px;   //  live constrains the block; full width stretched the rule
+        max-width: 100%;
+        float: unset !important;
+        margin-bottom: 20px;
+
+        .title{
+            margin-bottom: 5px !important;
+            display: block;
+            font-size: 2rem;
+        }
+        .title strong {
+            color: #ffffff;
+            letter-spacing: .04em;
+            font-size: 2rem;
+        }
+
+        .description {
+            font-size: 1.4rem;
+            color: @ca-footer-txt;
+            margin-bottom: 1.5em;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .form.subscribe {
+            -webkit-display: flex;
+            -moz-display: flex;
+            -ms-display: flex;
+            display: flex;
+        }
+
+        .field{
+            margin-right: 10px;
+            .control:before{
+                display: none;
+            }
+        }
+
+        input {
+            height: 36px !important;
+            width: 223px;
+            padding: 0 20px;
+            border: 1px solid #c2c2c2;
+            background: #ffffff;
+            color: #000000;   //  was #ffffff — typed text was invisible on the white field
+            margin: 0px;
+            border-radius: 0px;
+
+            &::placeholder {
+                color: #333333;
+            }
+        }
+
+        .action{
+            width: fit-content;
+            margin-left: 10px !important;
+            float: left;
+
+        }
+
+        .action.subscribe {
+            color: #484545 !important;
+            background: #d8d6d0 !important;
+            padding: 10px 20px !important;
+            border: 0;
+            border-radius: 0;
+            margin-left: -1px;
+            white-space: nowrap;
+            font-weight: 600;
+
+            &:hover {
+                background: #e0e0e0;
+                color: #1a1a1a;
+            }
+        }
+    }
+}
+
+.copyright {
+    background: @ca-black;
+    border-top: 1px solid #333;
+    color: #ffffff;
+    text-align: center;
+    display: block;
+    padding: 20px 20px 30px;
+    //  The min-width:769px block below gives this width: 100%; without
+    //  border-box the horizontal padding overflows the viewport.
+    box-sizing: border-box;
+}
+
+//
+//  Scroll-to-top button
+//  _____________________________________________
+.button-go_top {
+    display: none;
+    position: fixed;
+    right: 25px;
+    bottom: 55px;
+    z-index: 100;
+    width: 49px;
+    height: 49px;
+    border-radius: 50%;
+    padding: 0;
+    background: @ca-black;
+    border-color: @ca-black;
+    color: #ffffff;
+
+    &:hover,
+    &:focus {
+        background: #333333;
+        border-color: #333333;
+        color: #ffffff;
+    }
+
+    .arrow.up:before {
+        content: "\2191";
+        font-size: 1.8rem;
+    }
+}
+
+//
+//  Desktop — center wide sections at page max-width (matches reference)
+//  _____________________________________________
+@media (min-width: 769px) {
+    main#maincontent,
+    .page-wrapper > .page-bottom,
+    .content--full-width,
+    .copyright,
+    .page-header.custom-panel .panel.header,
+    header.page-header .header.content {
+        max-width: @ca-max-width;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .page-header.custom-panel .switcher {
+        float: right;
+        margin-left: 15px;
+        margin-right: -6px;
+        order: 1;
+    }
+
+    //  Keep the language switcher only in the custom top panel,
+    //  not in the header content / navigation rows.
+    .page-header .header.content .switcher,
+    .page-header .sticky.wrapper .switcher,
+    .page-header .nav-sections .switcher {
+        display: none;
+    }
+}
+
+//
+//  Responsive
+//  _____________________________________________
+@media (max-width: 991px) {
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+
+    .footer-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .footer-newsletter-bottom {
+        bottom: 18px;
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    .navigation {
+        background: #fff;
+        box-sizing: border-box;
+    }
+
+    .navigation.megamenu > ul {
+        padding-top: 10px !important;
+    }
+    .navigation a, .navigation a:hover {
+        color: #575757 !important;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .nav-sections-item-title a{
+        color: #333;
+        text-decoration: none;
+    }
+
+
+    .page-header.custom-panel {
+        display: none;
+    }
+
+    .header.usps__wrapper .top-static-content ul {
+        justify-content: flex-start;
+    }
+
+    .customer-account-header .header.links {
+        gap: 0;
+    }
+
+    //  Mobile header: toggle + search (left) · logo (center) · heart + cart (right)
+    .page-header .header.content {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        column-gap: 0 !important;
+        padding: 10px 15px;
+        height: auto;
+        min-height: 50px;
+    }
+
+    .toggle-nav__container {
+        display: block;
+        order: 0;
+        flex: 0 0 auto;
+        justify-self: auto;
+
+        .nav-toggle:before {
+            font-size: 2.8rem;
+            color: #000;
+        }
+    }
+
+    .block-search {
+        order: 1;
+        flex: 0 0 auto;
+        justify-self: auto;
+        margin-left: 12px;
+        margin-top: 0px !important;
+
+        .block-title:before {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 22px;
+            line-height: 28px;
+            color: #757575;
+            content: '\e615';
+            font-family: 'luma-icons';
+            margin: 0 10px 0 0;
+            vertical-align: middle;
+            display: inline-block;
+            font-weight: 400;
+            overflow: hidden;
+            speak: none;
+            text-align: center;
+        }
+
+        &.active {
+            flex: 1 1 auto;
+            max-width: none;
+            margin-left: 10px;
+            gap: 0px;
+
+            .block-title:before{
+                font-size: 22px;
+                line-height: 28px;
+            }
+
+            .field.search input{
+                position: absolute;
+                top: -21px;
+                left: 0;
+                right: 10px;
+                width: calc(100vw - 100px);
+                padding: 5px 20px;
+                background: #fff !important;
+                height: 40px;
+                z-index: 999;
+            }
+        }
+    }
+
+    //  Stays absolutely centred, same as desktop, so the logo sits on the true
+    //  viewport centre rather than centring in whatever space the icons leave.
+    //  The logo needs an EXPLICIT width here: the img inside carries
+    //  max-width: 100%, so an auto-width inline-block resolves to 0 and the
+    //  whole logo silently disappears.
+    .header-wrapper__centered {
+        order: 2;
+        min-width: 0;
+        text-align: center;
+        padding: 0 8px;
+        //  Reserve both icon groups (~121px each side at the narrowest) plus a
+        //  little clearance, so the centred logo shrinks instead of colliding.
+        max-width: ~"calc(100% - 190px)";
+
+        .logo {
+            width: 225px;
+            min-width: auto;
+
+        }
+    }
+
+    //  Grows to fill the row so the icons reach the right edge on their own —
+    //  the centred logo is out of flow and cannot push them there.
+    .header-actions {
+        order: 3;
+        flex: 1 1 auto;
+        gap: 8px;
+        padding-right: 0px;
+
+        //  Glyph sizes match carpetavenue.jp mobile: 25px heart, 30px cart.
+        //  The heart needs the full desktop selector — the @ca-header-icon-size
+        //  rule at line ~545 is (0,5,2) and beats a plainer one.
+        .customer-account-header .header.links .link.wishlist > a {
+            &:before {
+                width: 2.5rem;
+                height: 2.5rem;
+                font-size: 2.5rem;
+                color: #333;
+            }
+
+            //  Keep the filled heart the same size as the outline it replaces.
+            &:after {
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+        }
+
+        .action.showcart:before {
+            width: 3rem;
+            height: 3rem;
+            font-size: 3rem;
+            //  Desktop pulls the glyph up 5px with !important; live sits it at +2.
+            top: 2px !important;
+        }
+
+        //  Desktop reserves 30px right of the cart for the qty badge. On mobile
+        //  that dead space drags the whole icon group left, into the logo.
+        //  Height matches live's 40px, down from the desktop 50px.
+        .action.showcart {
+            padding: 2px;
+            height: 40px;
+        }
+        .minicart-wrapper{
+            margin-top: 0px !important;
+
+            //  Live leaves the cart a plain black glyph when it has items — the
+            //  green filled button is a desktop-only treatment.
+            &.has-items .action.showcart {
+                background: none;
+                border: 0;
+                line-height: 28px;
+
+                &:before {
+                    color: #000;
+                }
+            }
+
+            //  Must repeat `.has-items .action.showcart` — the desktop badge rule
+            //  (line ~604) is .minicart-wrapper.has-items .action.showcart .counter.qty
+            //  (0,6,0) and outguns a plainer selector, so top/left never applied.
+            &.has-items .action.showcart .counter.qty {
+                position: absolute;
+                top: 5px;
+                left: 20px;
+                width: 17px;
+                min-width: 17px;
+                height: 17px;
+                line-height: 18px;
+                font-size: .9rem;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                text-align: center;
+                background: @ca-price;
+                border-radius: 90px;
+
+                .counter-number {
+                    font-size: .9rem;
+                    color: @color-white;
+                    text-shadow: none;
+                }
+            }
+        }
+    }
+
+    //  No account/person icon on mobile — keep wishlist heart
+    .customer-account-header .header.links > li:first-child {
+        display: none;
+    }
+
+    .customer-account-header .header.links li.link.wishlist {
+        padding: 0 0px;
+    }
+
+    .foo-col3 {
+        display: none;
+    }
+
+    //  Footer drops to a 15px gutter on mobile (desktop keeps 32px)
+    .page-footer {
+        padding: 40px 0 20px;
+
+        .footer.content {
+            padding: 0 15px;
+        }
+    }
+
+    .footer-grid{
+        margin-bottom: 20px;
+    }
+
+    .footer-newsletter-bottom{
+        bottom: 0;
+    }
+
+    .footer-newsletter-bottom .block.newsletter {
+        .title,
+        .title strong {
+            font-size: 1.8rem;
+        }
+
+        input {
+            font-size: 1.2rem;
+        }
+    }
+
+    .copyright{
+        padding-bottom: 0px;
+    }
+}
+
+@media (max-width: 575px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+//
+//  Nav sections — ported from reference theme (Evalent/carpet)
+//  _____________________________________________
+
+//  Mobile
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .nav-sections {
+        z-index: 99999;
+
+        &-item-title {
+            padding-top: 14px;
+        }
+
+        .greet.welcome {
+            .not-logged-in {
+                display: none;
+            }
+        }
+
+        .switcher {
+            position: relative;
+
+            &-trigger {
+                strong:after {
+                    top: 0;
+                }
+            }
+
+            .switcher-options {
+                .switcher-option {
+                    &:before {
+                        top: 1px;
+                    }
+                }
+            }
+        }
+    }
+
+    .page-wrapper {
+        div[aria-controls="store.menu"],
+        div[aria-controls="store.links"],
+        div[aria-controls="store.settings"] {
+            &:before {
+                font-family: 'Pe-icon-7-stroke';
+                font-size: 2.5rem;
+                display: block;
+                line-height: 1;
+            }
+        }
+
+        div[aria-controls="store.menu"]:before {
+            content: "\e636";
+        }
+
+        div[aria-controls="store.links"]:before {
+            content: "\e605";
+        }
+
+        div[aria-controls="store.settings"]:before {
+            content: "\e654 \e68c";
+        }
+    }
+}
+
+//  Desktop
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .nav-sections {
+        width: 100%;
+        .lib-vendor-prefix-order(3);
+        margin-bottom: 10px;
+
+        &.sticky {
+            margin: 0 auto;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 98;
+        }
+    }
+
+    .page-header {
+        .sections {
+            &.nav-sections {
+                background: @ca-black;
+                .lib-vendor-prefix-flex-wrap(wrap);
+                align-items: center;
+                padding: 0;
+                margin-bottom: 0;
+
+                .nav-sections-items {
+                    box-sizing: border-box;
+                    max-width: @ca-max-width;
+                    width: 100%;
+                    margin-left: auto;
+                    margin-right: auto;
+                    padding: 0 20px;
+
+                    .navigation {
+                        background: @ca-black;
+                    }
+                }
+            }
+        }
+    }
+
+    .navigation {
+        font-weight: 600;
+        font-size: 1.6rem;
+        max-width: none;
+
+        .level0 {
+            margin-right: 20px;
+            margin-top: 7px;
+            margin-bottom: 7px;
+
+            &.parent {
+                & > .level-top {
+                    padding-left: 0;
+
+                    //  Blank's icon font draws \e622 as a hairline chevron —
+                    //  invisible at this size. Use Luma's icon font (shipped
+                    //  in this theme) so the caret matches the reference.
+                    & > .ui-menu-icon {
+                        &:after {
+                            content: '\e622';
+                            font-family: 'luma-icons' !important;
+                            font-size: 10px;
+                        }
+                    }
+                }
+            }
+
+            &.has-active {
+                & > .level-top {
+                    border-color: #c1c1c1;
+                    font-weight: @font-weight__bold;
+                }
+            }
+        }
+    }
+}
+
+//
+//  Full-bleed "fullscreen" banner
+//  ------------------------------------------------
+//  Evalent_Banner's base rule only caps the banner's max-width; the banner still
+//  sits inside the centered, padded `.page-main` (max-width 1440px, 15px side
+//  padding on mobile / 20px from @screen__m up), so `ev-banners-display--fullscreen`
+//  never reaches the container edges. Pull it out across that side padding so the
+//  image spans the full content width — same technique the carpient/rugs theme uses,
+//  with this theme's own padding values. Compound selector beats the base rule's
+//  single-class specificity.
+//
+.ev-banners.ev-banners-display--fullscreen {
+    // Stretch container outside the bounds of its padded parent
+    margin-left: calc(~"-100% / 2 + ( 100% - " 15px * 2 ~" ) / 2") !important;
+    margin-right: calc(~"-100% / 2 + ( 100% - " 15px * 2 ~" ) / 2") !important;
+
+    .ev-banners__content__button{
+        border-radius: 0;
+        padding: 5px 20px;
+        box-sizing: border-box;
+        font-weight: 800;
+        border-color: #fff;
+        background-color: #fff;
+        color: #000;
+        border: 0;
+        -o-transition: background-color .25s,color .25s;
+        -moz-transition: background-color .25s,color .25s;
+        -webkit-transition: background-color .25s, color .25s;
+        transition: background-color .25s, color .25s;
+    }
+
+    @media (min-width: @screen__m) {
+        margin-left: calc(~"-100% / 2 + ( 100% - " 20px * 2 ~" ) / 2") !important;
+        margin-right: calc(~"-100% / 2 + ( 100% - " 20px * 2 ~" ) / 2") !important;
+    }
+}
+
+//  PageBuilder wraps this banner in a `text` content-type and leaves stray
+//  whitespace/empty <p> siblings around it (a `<p>\n</p>` before the banner
+//  adds the gap at the top). They aren't descendants and aren't `:empty`
+//  (the newline is a text node), so target them by adjacency to the banner:
+//  the <p> immediately before (:has) and every <p> after it in the block.
+[data-content-type="text"] > p:has(+ .ev-banners),
+[data-content-type="text"] > .ev-banners ~ p {
+    display: none !important;
+}
+
+//  Mobile — drop the long description, show the CTA button instead (matches
+//  the compact banner design). The button ships with `hidden-xs`, which the
+//  banner module hides below @screen__m; override that here.
+@media (max-width: @screen__m) {
+    .ev-banners-display--fullscreen {
+        .ev-banners__content__description {
+            display: none !important;
+        }
+
+        .ev-banners__content__button.hidden-xs {
+            display: inline-block !important;
+        }
+    }
+}
+
+//
+//  "Why this price" pricing-features section (home-section-n1-e1 CMS block)
+//  ------------------------------------------------
+.ca-pricing-features-wrapper {
+    border-bottom: 1px solid #d1d1d1;
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+}
+
+.ca-pricing-features-container {
+    max-width: 2440px;
+    margin: 40px auto 0;
+}
+
+.ca-pricing-features-title {
+    text-align: center;
+    font-weight: 800 !important;
+    margin-bottom: 30px !important;
+    color: #000;
+    font-size: 23px !important;
+}
+
+
+.ca-pricing-feature-heading {
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.ca-pricing-feature-text {
+    font-size: 16px;
+    line-height: 20px;
+    color: #333;
+}
+
+@media (min-width: 769px) {
+    .ca-pricing-features-title {
+        margin-bottom: 20px !important;
+        font-size: 37px !important;
+    }
+
+    .ca-pricing-scroll {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 40px;
+    }
+}
+
+.ca-pricing-feature-card {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 10px;
+    align-items: center;
+}
+
+//  Mobile — swipeable horizontal snap-scroll instead of a stacked column
+@media (max-width: 768px) {
+    .ca-pricing-scroll {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        gap: 16px;
+        padding-bottom: 8px;
+
+        //  Hide the scrollbar (still swipeable)
+        scrollbar-width: none;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    .ca-pricing-card {
+        flex: 0 0 85%;
+        scroll-snap-align: start;
+    }
+}
+
+//
+//  Evalent_Banner overlay — the module ships `padding: 15px 20px` on a
+//  content-box element sized to its card, so the caption box renders 40px
+//  wider than the banner it sits on and pushes the page into horizontal
+//  scroll. Corrected here rather than in the module.
+//  _____________________________________________
+.ev-banner__overlay-content .bottom-banner {
+    box-sizing: border-box;
+    max-width: 100%;
+}

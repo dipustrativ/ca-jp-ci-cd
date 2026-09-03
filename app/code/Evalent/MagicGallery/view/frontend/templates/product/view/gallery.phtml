@@ -9,7 +9,7 @@ $_product     = $block->getProduct();
 $_customVideo = $_product->getData('custom_youtube_video');
 $_galleryJson = $block->getGalleryImagesJson();
 ?>
-<div class="mz-gallery-container">
+<div class="mz-gallery-container stacked-grid">
     <div class="mz-gallery-placeholder gallery-placeholder _block-content-loading" data-gallery-role="gallery-placeholder">
     </div>
     <?= $block->getChildHtml('magicgallery_inner'); ?>
@@ -51,15 +51,25 @@ $_galleryJson = $block->getGalleryImagesJson();
                         "options": {
                             "autoplay": false,
                             "autoplaySpeed": 1000,
-                            "slidesToShow": 1,
+                            "slidesToShow": 2,
                             "slidesToScroll": 1,
                             "dots": false,
-                            "arrows": true,
+                            "arrows": false,
                             "infinite": false,
                             "fade": false,
                             "vertical": false,
-                            "draggable": true,
-                            "swipeToSlide": true
+                            "draggable": false,
+                            "swipeToSlide": false,
+                            "responsive": [{
+                                "breakpoint": 769,
+                                "settings": {
+                                    "slidesToShow": 1,
+                                    "dots": false,
+                                    "arrows": true,
+                                    "draggable": true,
+                                    "swipeToSlide": true
+                                }
+                            }]
                         }
                     },
                     "imagePopup": {
@@ -76,15 +86,15 @@ $_galleryJson = $block->getGalleryImagesJson();
                     },
                     "thumbsSettings": {
                         "options": {
-                            "slidesToShow": 6,
+                            "slidesToShow": 10,
                             "slidesToScroll": 1,
                             "autoplay": false,
                             "focusOnSelect": false,
                             "dots": false,
-                            "arrows": true,
+                            "arrows": false,
                             "infinite": false,
-                            "draggable": true,
-                            "swipeToSlide": true,
+                            "draggable": false,
+                            "swipeToSlide": false,
                             "vertical": false,
                             "responsive": [{
                                 "breakpoint": 800,
@@ -92,9 +102,9 @@ $_galleryJson = $block->getGalleryImagesJson();
                                     "vertical": false,
                                     "arrows": false,
                                     "dots": false,
-                                    "swipeToSlide": true,
+                                    "swipeToSlide": false,
                                     "slidesToScroll": 1,
-                                    "slidesToShow": 4
+                                    "slidesToShow": 1
                                 }
                             }]
                         }
@@ -374,6 +384,212 @@ $_galleryJson = $block->getGalleryImagesJson();
 </script>
 <!-- end Right side Y-axis _aivz image -->
 
+<!-- _aivz grid (mobile + desktop) -->
+<style>
+    /* Base — applies everywhere so we can debug easily */
+    .mz-aivz-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        margin: 8px 0 15px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .mz-aivz-grid__item {
+        position: relative;
+        width: 100%;
+        padding-bottom: 85%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        cursor: pointer;
+    }
+
+    /* Mobile: smaller grid so product title stays visible */
+    @media (max-width: 768px) {
+        .mz-gallery-thumbs-wrap,
+        .mz-gallery-thumbs--expand { display: none !important; }
+
+        .mz-aivz-grid {
+            gap: 4px;
+            margin: 6px 0 10px;
+        }
+
+        .mz-aivz-grid__item {
+            padding-bottom: 76%;
+            background-position: center center;
+        }
+    }
+
+    /* Desktop: bigger tiles, hover effect */
+    @media (min-width: 769px) {
+        .mz-aivz-grid {
+            gap: 12px;
+            margin: 15px 0 20px;
+        }
+        .mz-aivz-grid__item {
+            display: none;
+            border-radius: 4px;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .mz-aivz-grid__item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+    }
+
+    /* Optional: 3 columns on very wide screens */
+    /*
+    @media (min-width: 1200px) {
+        .mz-aivz-grid { grid-template-columns: 1fr 1fr 1fr; }
+    }
+    */
+</style>
+
+<script>
+    require(['jquery'], function ($) {
+        'use strict';
+
+        function buildAivzGrid() {
+            var $container = $('.mz-gallery-container').first();
+            if (!$container.length) {
+                console.log('[aivz-grid] no .mz-gallery-container yet');
+                return false;
+            }
+            // already built? bail
+            if ($container.next('.mz-aivz-grid').length) return true;
+
+            var images = window.mzGalleryData || [];
+            if (!images.length) {
+                console.log('[aivz-grid] mzGalleryData empty');
+                return false;
+            }
+
+            var picks = [];
+            images.forEach(function (img) {
+                var t = img.thumb || img.img || img.full || '';
+                if (t.indexOf('_aivz') !== -1) picks.push(img);
+            });
+
+            console.log('[aivz-grid] picks found:', picks.length);
+            if (!picks.length) return true; // nothing to show, but we're "done"
+
+            var isMobileGrid = window.innerWidth <= 768;
+
+            // If mobile and only 1 AIVZ image, fill second slot with a non-AIVZ image (exclude first image and AIVZ)
+            if (isMobileGrid && picks.length === 1) {
+                var aivzUrl = picks[0].full || picks[0].img || picks[0].thumb || '';
+                for (var i = 1; i < images.length; i++) {
+                    var t = images[i].thumb || images[i].img || images[i].full || '';
+                    // Only add non-AIVZ images that don't match the AIVZ image URL
+                    if (t.indexOf('_aivz') === -1 && t !== aivzUrl) {
+                        picks.push(images[i]);
+                        break;
+                    }
+                }
+            }
+
+            if (isMobileGrid) { picks = picks.slice(0, 2); }
+
+            // Snapshot full gallery at build time — immune to later mzGalleryData changes
+            var gallerySnapshot = images.slice();
+
+            var $grid = $('<div class="mz-aivz-grid"></div>');
+            // Store snapshot on grid element so click handler never needs window.mzGalleryData
+            $grid.data('aivz-gallery', gallerySnapshot);
+
+            $.each(picks, function (i, img) {
+                var src     = img.thumb || img.img || img.full;
+                var fullSrc = img.full  || img.img || img.thumb;
+
+                // Resolve gallery index at build time — reliable, no race condition at click
+                var imgKey = (fullSrc + '').split('/').pop().split('?')[0];
+                var galleryIndex = -1;
+                for (var j = 0; j < gallerySnapshot.length; j++) {
+                    var s = (gallerySnapshot[j].full || gallerySnapshot[j].img || gallerySnapshot[j].thumb || '') + '';
+                    if (s.indexOf(imgKey) !== -1) { galleryIndex = j; break; }
+                }
+
+                $('<a class="mz-aivz-grid__item" href="javascript:void(0)" role="button"></a>')
+                    .attr('data-full', fullSrc)
+                    .attr('data-index', galleryIndex)
+                    .css('background-image', 'url("' + src + '")')
+                    .appendTo($grid);
+            });
+
+            // IMPORTANT: insert AFTER the gallery container, not inside it.
+            $container.after($grid);
+
+            $grid.on('click', '.mz-aivz-grid__item', function () {
+                var $item       = $(this);
+                var $g          = $item.closest('.mz-aivz-grid');
+                var gallery     = $g.data('aivz-gallery') || window.mzGalleryData || [];
+                var targetIndex = parseInt($item.attr('data-index'), 10);
+
+                if (isNaN(targetIndex) || targetIndex < 0) return;
+
+                // Primary: open fancybox directly at targetIndex — no flash, works all devices
+                if ($.fancybox && typeof $.fancybox.open === 'function') {
+                    var items = [];
+                    $.each(gallery, function (i, img) {
+                        items.push({ src: img.full || img.img || img.thumb, type: 'image' });
+                    });
+                    $.fancybox.open(items, {
+                        loop: false,
+                        thumbs: {
+                            autoStart: true,
+                            axis: window.innerWidth <= 768 ? 'x' : 'y'
+                        },
+                        buttons: ['slideShow', 'fullScreen', 'close']
+                    }, targetIndex);
+                    return;
+                }
+
+                // Fallback: navigate slick to target slide instantly, then trigger click
+                var $sliderD = $('[data-gallery-role="gallery-placeholder"] .slick-initialized').first();
+                if ($sliderD.length) {
+                    $sliderD.slick('slickGoTo', targetIndex, true);
+                }
+                $(document).one('afterShow.fb', function (e, instance) {
+                    if (instance.current && instance.current.index !== targetIndex) {
+                        instance.jumpTo(targetIndex, 0);
+                    }
+                });
+                var $targetSlide = $('[data-gallery-role="gallery-placeholder"] .slick-slide:not(.slick-cloned)[data-slick-index="' + targetIndex + '"]');
+                var $triggerEl = $targetSlide.find('a[data-fancybox]').first();
+                if (!$triggerEl.length) {
+                    $triggerEl = $('[data-gallery-role="gallery-placeholder"] .slick-slide:not(.slick-cloned) a[data-fancybox]').first();
+                }
+                if (!$triggerEl.length) {
+                    $triggerEl = $('[data-gallery-role="gallery-placeholder"] a').first();
+                }
+                if ($triggerEl.length) {
+                    $triggerEl[0].click();
+                }
+            });
+
+            return true;
+        }
+
+        $(function () {
+            var tries = 0;
+            var t = setInterval(function () {
+                if (buildAivzGrid() || tries++ > 30) clearInterval(t);
+            }, 200);
+        });
+
+        // Rebuild only on meaningful width changes
+        var lastWidth = window.innerWidth;
+        $(window).on('resize', function () {
+            if (Math.abs(window.innerWidth - lastWidth) > 80) {
+                lastWidth = window.innerWidth;
+                $('.mz-aivz-grid').remove();
+                buildAivzGrid();
+            }
+        });
+    });
+</script>
+<!-- end _aivz grid -->
 
 <style>
     @media (max-width: 768px) {
@@ -397,6 +613,7 @@ $_galleryJson = $block->getGalleryImagesJson();
             width: 36px !important;
             height: 36px !important;
             background: rgba(0, 0, 0, 0.25) !important;
+            border-radius: 50% !important;
             padding: 0 !important;
             z-index: 10;
             top: 50%;
@@ -407,7 +624,7 @@ $_galleryJson = $block->getGalleryImagesJson();
         .mz-gallery-container .slick-next::before {
             content: '' !important;
             display: block !important;
-            width: 7px !important;
+            width: 10px !important;
             height: 10px !important;
             border-top: 2px solid #fff !important;
             border-right: 2px solid #fff !important;
@@ -431,8 +648,26 @@ $_galleryJson = $block->getGalleryImagesJson();
             pointer-events: none !important;
         }
 
+        /* Slide counter — pill overlay at bottom-center of image */
         .mz-gallery-container {
             position: relative;
+        }
+
+        .mz-slide-counter {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9;
+            background: rgba(255, 255, 255, 0.92);
+            color: #222;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1;
+            padding: 6px 14px;
+            border-radius: 20px;
+            pointer-events: none;
+            white-space: nowrap;
         }
 
         .product-info-main {
@@ -441,35 +676,13 @@ $_galleryJson = $block->getGalleryImagesJson();
     }
 </style>
 
-<!-- Slide counter "n / total" overlay on the main image (all breakpoints) -->
-<style>
-    .mz-gallery-container .mz-main-slider {
-        position: relative;
-    }
-    .mz-gallery-container .mz-slide-counter {
-        position: absolute;
-        bottom: 12px;
-        right: 12px;
-        z-index: 9;
-        background: rgba(255, 255, 255, 0.9);
-        color: #222;
-        font-size: 13px;
-        font-weight: 500;
-        line-height: 1;
-        padding: 5px 12px;
-        border-radius: 5px;
-        pointer-events: none;
-        white-space: nowrap;
-        line-height: 2.4rem;
-        border: 1px solid rgb(12 12 12 / 15%);
-    }
-</style>
-
 <script>
     require(['jquery'], function ($) {
         'use strict';
 
         function initMobileCounter() {
+            if (window.innerWidth > 768) return true;
+
             var $slider = $('.mz-gallery-container .slick-initialized').first();
             if (!$slider.length) return false;
             if ($slider.data('mob-counter-init')) return true;
@@ -479,8 +692,7 @@ $_galleryJson = $block->getGalleryImagesJson();
             if (total <= 1) return true;
 
             var $counter = $('<div class="mz-slide-counter">1 / ' + total + '</div>');
-            // Overlay on the main image itself (not below the thumb strip).
-            $slider.append($counter);
+            $slider.closest('.mz-gallery-container').append($counter);
 
             $slider.on('afterChange.mobcounter', function (e, slick, current) {
                 $counter.text((current + 1) + ' / ' + total);
@@ -498,149 +710,43 @@ $_galleryJson = $block->getGalleryImagesJson();
     });
 </script>
 
+<!-- product-info-details into the right column, under the buy box -->
+<script>
+    require(['jquery'], function ($) {
+        'use strict';
+
+        $(function () {
+            var $details = $('.product-info-details');
+            var $main = $('.product-info-main');
+
+            if (!$details.length || !$main.length) return;
+            // already moved into the buy-box column
+            if ($details.closest('.product-info-main').length) return;
+
+            var $upsList = $('.product-ups-list');
+            if ($upsList.length) {
+                $upsList.after($details.detach());
+            } else {
+                $main.append($details.detach());
+            }
+        });
+    });
+</script>
+<!-- end product-info-details reorder -->
 
 <style>
+    @media (min-width: 769px) {
+        .catalog-product-view .main .product-info-details {
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 30px;
+        }
+    }
+
     @media (max-width: 768px) {
         .catalog-product-view .product-info-main .trustpilot-widget {
             display: none !important;
         }
     }
-</style>
 
-<!-- Thumbnail strip below the main image (matches carpient.com) -->
-<style>
-    /* Stack the main image on top, thumbnail strip directly below it. */
-    .mz-gallery-container {
-        display: flex;
-        flex-direction: column;
-    }
-    .mz-gallery-container .mz-gallery-placeholder,
-    .mz-gallery-container .loading-mask {
-        order: 1;
-        width: 100%;
-    }
-    .mz-gallery-container .mz-gallery-thumbs-wrap {
-        order: 2;
-        width: 100%;
-        margin-top: 12px;
-        /* Override the module's mobile rule that hides the strip. */
-        display: block !important;
-    }
-
-    /* The old slick "Show more" toggle is unused with the scrollable strip. */
-    .mz-gallery-container .mz-gallery-thumbs--expand {
-        display: none !important;
-    }
-
-    /* Horizontal, scrollable thumbnail strip */
-    .mz-gallery-container .mz-gallery-thumbs {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: 10px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 2px;
-        scrollbar-width: thin;
-        scrollbar-color: #121212 transparent;
-        scroll-behavior: smooth;
-        line-height: 0;
-    }
-
-    .mz-gallery-container .mz-gallery-thumbs .thumb {
-        display: block;
-        flex: 0 0 auto;
-        width: 88px;
-        box-sizing: border-box;
-        border: 1px solid #eeeeee;
-        border-radius: 4px;
-        overflow: hidden;
-        cursor: pointer;
-        opacity: 0.7;
-        transition: opacity 0.2s, border-color 0.2s;
-    }
-
-    .mz-gallery-container .mz-gallery-thumbs .thumb img {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-
-    .mz-gallery-container .mz-gallery-thumbs .thumb:hover {
-        opacity: 1;
-    }
-
-    .mz-gallery-container .mz-gallery-thumbs .thumb.thumb--active {
-        opacity: 1;
-        border-color: #666666;
-    }
-
-    @media (max-width: 768px) {
-        .mz-gallery-container .mz-gallery-thumbs .thumb {
-            width: 64px;
-        }
-    }
-
-    /* ══════════════════════════════════════════
-       DESKTOP — main image single, with arrows
-    ══════════════════════════════════════════ */
-    @media (min-width: 769px) {
-        .mz-gallery-container { position: relative; }
-
-        .mz-gallery-container .mz-main-slider .slick-slide-wrap {
-            cursor: zoom-in;
-            text-align: center;
-        }
-        /* Full-res image, but capped so the gallery stays a sensible size. */
-        .mz-gallery-container .mz-main-slider .slick-slide-wrap img {
-            width: auto;
-            height: auto;
-            max-width: 100%;
-            max-height: 620px;
-            margin: 0 auto;
-            display: inline-block;
-        }
-
-        /* CSS chevron arrows on the main image */
-        .mz-gallery-container .mz-main-slider > .slick-prev,
-        .mz-gallery-container .mz-main-slider > .slick-next {
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            background: rgba(255, 255, 255, 0.9) !important;
-            border-radius: 5px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-            z-index: 10;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        .mz-gallery-container .mz-main-slider > .slick-prev { left: 15px; }
-        .mz-gallery-container .mz-main-slider > .slick-next { right: 15px; }
-
-        .mz-gallery-container .mz-main-slider > .slick-prev::before,
-        .mz-gallery-container .mz-main-slider > .slick-next::before {
-            content: '' !important;
-            display: block;
-            width: 7px;
-            height: 12px;
-            border-top: 2px solid #222;
-            border-right: 2px solid #222;
-            background: none !important;
-            opacity: 1;
-        }
-        .mz-gallery-container .mz-main-slider > .slick-prev::before {
-            transform: rotate(-135deg) translate(-2px, 2px);
-        }
-        .mz-gallery-container .mz-main-slider > .slick-next::before {
-            transform: rotate(45deg) translate(-2px, 2px);
-        }
-
-        .mz-gallery-container .mz-main-slider > .slick-prev.slick-disabled,
-        .mz-gallery-container .mz-main-slider > .slick-next.slick-disabled {
-            opacity: 0.35 !important;
-            cursor: default;
-            pointer-events: none;
-        }
-    }
 </style>

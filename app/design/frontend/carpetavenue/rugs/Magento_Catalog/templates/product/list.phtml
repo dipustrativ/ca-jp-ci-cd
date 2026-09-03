@@ -1,0 +1,182 @@
+<?php
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Lightweight category product grid — visual parity with the reference
+ * carpetavenue theme, without its custom modules (ThemeHelper, QtyHelper,
+ * DynamicSimilarProducts, Core\URL). Uses only core Catalog APIs.
+ *
+ * @var $block \Magento\Catalog\Block\Product\ListProduct
+ * @var $escaper \Magento\Framework\Escaper
+ */
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+
+use Magento\Catalog\Pricing\Price\FinalPrice;
+use Magento\Catalog\Pricing\Price\RegularPrice;
+
+$_productCollection = $block->getLoadedProductCollection();
+$_helper = $this->helper(Magento\Catalog\Helper\Output::class);
+
+// Hover second-image (parity with product widget)
+$hoverHelper = $this->helper(CarpetAvenue\Core\Helper\Product::class);
+$hoverImageMapper = [];
+if ($hoverHelper->isEnableListHoverImage()) {
+    $hoverImageMapper = $hoverHelper->getProductSecondImage($_productCollection->getAllIds(), false);
+}
+?>
+<?php if (!$_productCollection->count()) : ?>
+    <div class="message info empty">
+        <span><?= $block->escapeHtml(__('We can\'t find products matching the selection.')) ?></span>
+    </div>
+<?php else : ?>
+    <?= $block->getToolbarHtml() ?>
+    <?= $block->getAdditionalHtml() ?>
+    <?php
+    if ($block->getMode() == 'grid') {
+        $viewMode = 'grid';
+        $imageDisplayArea = 'category_page_grid';
+        $showDescription = false;
+        $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+    } else {
+        $viewMode = 'list';
+        $imageDisplayArea = 'category_page_list';
+        $showDescription = true;
+        $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::FULL_VIEW;
+    }
+    $pos = $block->getPositioned();
+    ?>
+    <div class="products wrapper <?= /* @noEscape */ $viewMode ?> products-<?= /* @noEscape */ $viewMode ?>">
+        <ol class="products list items product-items">
+            <?php /** @var \Magento\Catalog\Model\Product $_product */ ?>
+            <?php foreach ($_productCollection as $_product) : ?>
+                <li class="item product product-item">
+                    <div class="product-item-info" data-container="product-<?= /* @noEscape */ $viewMode ?>">
+                        <?php
+                        $productImage = $block->getImage($_product, $imageDisplayArea, ['class' => 'product-image-photo']);
+                        if ($pos != null) {
+                            $position = ' style="left:' . $productImage->getWidth() . 'px;'
+                                . 'top:' . $productImage->getHeight() . 'px;"';
+                        }
+
+                        /* Discount flag — regular vs final price */
+                        $_priceInfo = $_product->getPriceInfo();
+                        $regularPrice = $_priceInfo->getPrice(RegularPrice::PRICE_CODE)->getAmount()->getValue();
+                        $finalPrice = $_priceInfo->getPrice(FinalPrice::PRICE_CODE)->getAmount()->getValue();
+                        ?>
+                        <?php if ($regularPrice && $regularPrice > $finalPrice) : ?>
+                            <?php $discountPercentage = round(100 * (1 - ($finalPrice / $regularPrice)), 0); ?>
+                            <div class="product-item__flag--discount"><?= '-' . (int) $discountPercentage . '%' ?></div>
+                        <?php endif; ?>
+
+                        <a href="<?= $block->escapeUrl($_product->getProductUrl()) ?>"
+                           class="product photo product-item-photo"
+                           tabindex="-1"
+                           <?php $hoverSrc = $hoverImageMapper[$_product->getId()] ?? ''; if ($hoverSrc): ?>data-hover-image="<?= $block->escapeUrl($hoverSrc) ?>"<?php endif; ?>>
+                            <?= $productImage->toHtml() ?>
+                        </a>
+
+                        <div class="product details product-item-details">
+                            <strong class="product name product-item-name">
+                                <a class="product-item-link"
+                                   href="<?= $block->escapeUrl($_product->getProductUrl()) ?>">
+                                    <?= /* @noEscape */ $_helper->productAttribute($_product, $_product->getName(), 'name') ?>
+                                </a>
+                            </strong>
+
+                            <?php
+                            // Size line — width x length cm, or ∅ diameter for round rugs (shape == 20)
+                            $sizeValue = '';
+                            if ($_product->getData('width') && $_product->getData('length')) {
+                                if ($_product->getData('shape') != 20) {
+                                    $sizeValue = $_product->getData('width') . ' x ' . $_product->getData('length') . ' cm';
+                                } else {
+                                    $sizeValue = '∅ ' . $_product->getData('width') . ' cm';
+                                }
+                            }
+                            ?>
+                            <?php if ($sizeValue) : ?>
+                                <div class="size"><?= $block->escapeHtml($sizeValue) ?></div>
+                            <?php endif; ?>
+
+                            <?= $block->getReviewsSummaryHtml($_product, $templateType) ?>
+
+                            <?php if ($_product->isSaleable()) : ?>
+                                <?= /* @noEscape */ $block->getProductPrice($_product) ?>
+                            <?php endif; ?>
+
+                            <?= $block->getProductDetailsHtml($_product) ?>
+
+                            <div class="product-item-inner">
+                                <div class="product actions product-item-actions"<?= ($pos && strpos($pos, $viewMode . '-actions')) ? $block->escapeHtmlAttr($position) : '' ?>>
+                                    <div data-role="add-to-links"
+                                         class="actions-secondary"<?= ($pos && strpos($pos, $viewMode . '-secondary')) ? $block->escapeHtmlAttr($position) : '' ?>>
+                                        <?php if ($addToBlock = $block->getChildBlock('addto')) : ?>
+                                            <?= $addToBlock->setProduct($_product)->getChildHtml() ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <?php if (!$_product->isSaleable()) : ?>
+                                <span class="sold-caption"><?= $block->escapeHtml(__('Sold')) ?></span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ol>
+    </div>
+    <?= $block->getChildBlock('toolbar')->setIsBottom(true)->toHtml() ?>
+    <?php if ($hoverHelper->isEnableListHoverImage()) : ?>
+        <script>
+            (function () {
+                // Hover image swap — never touch data-original (owned by lazyload);
+                // use an _isHovered flag so bubbling child events don't re-trigger.
+                function getLink(el) {
+                    return el && el.closest ? el.closest('.product-item-photo[data-hover-image]') : null;
+                }
+                document.addEventListener('mouseenter', function (e) {
+                    var a = getLink(e.target);
+                    if (!a || a._isHovered) return;
+                    a._isHovered = true;
+                    var img = a.querySelector('img');
+                    if (!img) return;
+                    if (!a._origSrc) {
+                        a._origSrc = img.getAttribute('data-original') || img.src;
+                    }
+                    var hoverUrl = a.dataset.hoverImage;
+                    if (a._hoverReady) {
+                        img.src = hoverUrl;
+                    } else {
+                        var pre = new Image();
+                        pre.onload = function () {
+                            a._hoverReady = true;
+                            if (a._isHovered) { img.src = hoverUrl; }
+                        };
+                        pre.src = hoverUrl;
+                    }
+                }, true);
+                document.addEventListener('mouseleave', function (e) {
+                    var a = getLink(e.target);
+                    if (!a) return;
+                    if (a.contains(e.relatedTarget)) return;
+                    a._isHovered = false;
+                    var img = a.querySelector('img');
+                    if (!img || !a._origSrc) return;
+                    img.src = a._origSrc;
+                }, true);
+            }());
+        </script>
+    <?php endif; ?>
+    <?php if (!$block->isRedirectToCartEnabled()) : ?>
+        <script type="text/x-magento-init">
+        {
+            "[data-role=tocart-form], .form.map.checkout": {
+                "catalogAddToCart": {
+                    "product_sku": "<?= $block->escapeJs($_product->getSku()) ?>"
+                }
+            }
+        }
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

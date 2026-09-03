@@ -1,0 +1,45 @@
+<div class="size_sku_attribute-wrapper">
+    <div class="size-attribute">
+        <?php
+        $_product = $block->getProduct();
+
+        // Checking size attributes
+        $isRound = false;
+        $sizeValue = '';
+
+        if ($_product->getData('shape') == 20) {
+            $isRound = true;
+        }
+        if ($_product->getData('width') && $_product->getData('length')) {
+            if (!$isRound) {
+                $sizeValue = $_product->getData('width') . ' x ' . $_product->getData('length') . ' cm';
+            } else {
+                $sizeValue = "∅ " . $_product->getData('width') . ' cm';
+            }
+        }
+
+        echo $sizeValue;
+        ?>
+    </div>
+    <div class="sku-attribute">
+        <?= $block->escapeHtml($_product->getSku()) ?>
+    </div>
+</div>
+<style>
+    @media (max-width: 800px) {
+        .size_sku_attribute-wrapper {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+    .size_sku_attribute-wrapper {
+        display: flex;
+        gap: 50px;
+    }
+
+    .sku-attribute {
+        font-size: 16px;
+        font-weight: 500;
+        margin-top: 3px;
+    }
+</style>

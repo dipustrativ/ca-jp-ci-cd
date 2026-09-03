@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fe64cc09dd1a399c6380ef82182fc824",
+    "content-hash": "076d5bab80533956331292d68246c7d4",
     "packages": [
         {
             "name": "2tvenom/cborencode",
@@ -19430,6 +19430,41 @@
             "time": "2025-12-11T10:52:59+00:00"
         },
         {
+            "name": "magentoj/language-ja_jp",
+            "version": "1.1.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/magento/language-ja_JP.git",
+                "reference": "7254eab8c21be8a6cdfd3b374a962dd9bb13bd3c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/magento/language-ja_JP/zipball/7254eab8c21be8a6cdfd3b374a962dd9bb13bd3c",
+                "reference": "7254eab8c21be8a6cdfd3b374a962dd9bb13bd3c",
+                "shasum": ""
+            },
+            "require": {
+                "magento/framework": "*"
+            },
+            "type": "magento2-language",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OSL-3.0",
+                "AFL-3.0"
+            ],
+            "description": "This module provides the Japanese translations of UI strings for Adobe Commerce 2.4.8",
+            "support": {
+                "issues": "https://github.com/magento/language-ja_JP/issues",
+                "source": "https://github.com/magento/language-ja_JP/tree/push"
+            },
+            "time": "2025-04-21T05:39:47+00:00"
+        },
+        {
             "name": "mageplaza/module-core",
             "version": "1.5.17",
             "source": {
@@ -26363,6 +26398,52 @@
                 }
             ],
             "time": "2026-02-04T18:08:13+00:00"
+        },
+        {
+            "name": "trustpilot/module-reviews",
+            "version": "2.6.580",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/trustpilot/plugin-magento2.git",
+                "reference": "82711801a4e449674677d73223a502409b1f6434"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/trustpilot/plugin-magento2/zipball/82711801a4e449674677d73223a502409b1f6434",
+                "reference": "82711801a4e449674677d73223a502409b1f6434",
+                "shasum": ""
+            },
+            "require": {
+                "magento/framework": ">=100.0.20",
+                "magento/module-admin-notification": ">=100.0.7",
+                "magento/module-backend": ">=100.0.12",
+                "magento/module-catalog": ">=100.0.17",
+                "magento/module-checkout": ">=100.0.16",
+                "magento/module-configurable-product": ">=100.0.12",
+                "magento/module-eav": ">=100.0.12",
+                "magento/module-sales": ">=100.0.16",
+                "magento/module-store": ">=100.0.9",
+                "psr/log": ">=1.0.0"
+            },
+            "type": "magento2-module",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ],
+                "psr-4": {
+                    "Trustpilot\\Reviews\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OSL-3.0"
+            ],
+            "description": "The Trustpilot Review extension makes it simple and easy for merchants to collect reviews from their customers to power their marketing efforts, increase sales conversion, build their online reputation and draw business insights.",
+            "support": {
+                "issues": "https://github.com/trustpilot/plugin-magento2/issues",
+                "source": "https://github.com/trustpilot/plugin-magento2/tree/2.6.580"
+            },
+            "time": "2023-01-18T09:08:04+00:00"
         },
         {
             "name": "tubalmartin/cssmin",

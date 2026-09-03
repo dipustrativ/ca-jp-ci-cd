@@ -1,0 +1,13 @@
+<?php
+/** @var \Magento\Wishlist\Model\Item $item */
+$item = $block->getItem();
+$product = $item->getProduct();
+?>
+
+<?php if ($product->getData("carpient")): ?>
+<div class="carpient-tag">
+    <span class="noselect"></span>
+    <img src="<?= $this->getViewFileUrl('media/images/Carpient_tag.svg') ?>" alt="Carpient logo tag" width="105" height="15" />
+</div>
+
+<?php endif; ?>
