@@ -415,6 +415,11 @@ return [
                 'css' => [
                     'minify_files' => '1'
                 ]
+            ],
+            'payment' => [
+                'adyen_abstract' => [
+                    'payment_methods_active' => '1'
+                ]
             ]
         ]
     ]
