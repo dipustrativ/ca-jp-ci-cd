@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "076d5bab80533956331292d68246c7d4",
+    "content-hash": "677f196236defd5150e33fa511be0e17",
     "packages": [
         {
             "name": "2tvenom/cborencode",
@@ -19568,53 +19568,6 @@
                 "source": "https://github.com/mageplaza/magento-2-smtp/tree/v4.7.22"
             },
             "time": "2026-05-22T03:32:57+00:00"
-        },
-        {
-            "name": "mageworx/module-searchsuiteautocomplete",
-            "version": "2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mageworx/search-suite-autocomplete.git",
-                "reference": "bcf5b2ba1c3f44527d6a6d1f1336c89a5f49ecf4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mageworx/search-suite-autocomplete/zipball/bcf5b2ba1c3f44527d6a6d1f1336c89a5f49ecf4",
-                "reference": "bcf5b2ba1c3f44527d6a6d1f1336c89a5f49ecf4",
-                "shasum": ""
-            },
-            "require": {
-                "magento/framework": ">=100.0.0 <104",
-                "magento/module-catalog": ">=100.0.0 <105",
-                "magento/module-search": ">=100.0.0 <102"
-            },
-            "type": "magento2-module",
-            "autoload": {
-                "files": [
-                    "registration.php"
-                ],
-                "psr-4": {
-                    "MageWorx\\SearchSuiteAutocomplete\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0"
-            ],
-            "authors": [
-                {
-                    "name": "MageWorx",
-                    "email": "support@mageworx.com",
-                    "homepage": "https://www.mageworx.com",
-                    "role": "Technical Support"
-                }
-            ],
-            "description": "Search Suite Autocomplete extension by MageWorx for Magento 2",
-            "support": {
-                "issues": "https://github.com/mageworx/search-suite-autocomplete/issues",
-                "source": "https://github.com/mageworx/search-suite-autocomplete/tree/v2.2.0"
-            },
-            "time": "2023-05-17T13:12:31+00:00"
         },
         {
             "name": "marc-mabe/php-enum",
