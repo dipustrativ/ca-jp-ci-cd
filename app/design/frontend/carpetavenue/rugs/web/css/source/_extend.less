@@ -779,7 +779,6 @@ a:hover, .alink:hover {
 .page-footer {
     background: @ca-black;
     color: #ffffff;
-    margin-top: 40px;
 
     .footer.content {
         max-width: @ca-max-width;
@@ -1252,18 +1251,38 @@ a:hover, .alink:hover {
             margin-left: 10px;
             gap: 0px;
 
-            .block-title:before{
-                font-size: 22px;
-                line-height: 28px;
+            //  No X on mobile — the magnifier inside the field closes the search
+            //  instead (see Magento_Theme/web/js/theme.js). Desktop keeps its X.
+            .block-title {
+                display: none;
             }
 
+            .field.search .label{
+                z-index: 99999;
+                left: 8px;
+                //  Overrides the decorative `pointer-events: none` above; this is
+                //  the close button here, and the only thing JS can bind to.
+                pointer-events: auto;
+                cursor: pointer;
+
+                &:before{
+                    top: -1px;
+                    position: relative;
+                    font-weight: 800;
+                    color: #333;
+                }
+            }
+
+            //  Width is measured from the field's left edge — 15px header padding
+            //  + 28px nav toggle + 10px margin above = 53px, less 15px to match the
+            //  header's right padding. Re-check if any of those three change.
             .field.search input{
                 position: absolute;
                 top: -21px;
                 left: 0;
                 right: 10px;
-                width: calc(100vw - 100px);
-                padding: 5px 20px;
+                width: calc(100vw - 68px);
+                padding: 5px 10px 5px 35px;
                 background: #fff !important;
                 height: 40px;
                 z-index: 999;
@@ -1602,8 +1621,8 @@ a:hover, .alink:hover {
     }
 
     @media (min-width: @screen__m) {
-        margin-left: calc(~"-100% / 2 + ( 100% - " 20px * 2 ~" ) / 2") !important;
-        margin-right: calc(~"-100% / 2 + ( 100% - " 20px * 2 ~" ) / 2") !important;
+        margin-left: calc(~"-100% / 2 + ( 100% - " 32px * 2 ~" ) / 2") !important;
+        margin-right: calc(~"-100% / 2 + ( 100% - " 32px * 2 ~" ) / 2") !important;
     }
 }
 
@@ -1721,3 +1740,89 @@ a:hover, .alink:hover {
     box-sizing: border-box;
     max-width: 100%;
 }
+
+//Home page css
+
+.carpetfinder-widget {
+    margin-left: -32px;
+    margin-right: -32px;
+    margin-top: 10px;
+    margin-bottom: 0px;
+
+    .carpetfinder__filteroptions a{
+        display: block;
+        font-weight: 700;
+        background: #fff;
+        border: 2px solid #050505;
+        padding: .7em 2em;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 0;
+        transition: all .5s;
+        font-weight: 700;
+
+        &:hover{
+            background: #000;
+            color: #fff;
+            text-decoration: none;
+        }
+        &:focus{
+            background: #000;
+            color: #fff;
+            text-decoration: none;
+        }
+
+    }
+}
+
+.cta-banner-wrapper {
+    margin: 0px !important;
+    max-width: 100% !important;
+    padding: 0px !important;
+}
+
+.page-main .widget_category-maincategory-name {
+    margin-bottom: 0;
+}
+
+.block-categories-list.grid .block-title {
+    margin-bottom: 3rem;
+}
+
+.block.widget.block-categories-list.grid {
+    margin-bottom: 3rem;
+}
+
+.products-grid .product-items {
+    .ev-product-item{
+        padding: 0 15px !important;
+    }
+}
+
+.ev-product-item .secondary-addto-links.actions-secondary{
+    opacity: 1;
+    visibility: visible;
+}
+
+.products-grid .product-item-inner {
+    display: none;
+}
+
+.products-grid .product-item-info:hover .product-item-inner {
+    display: block;
+}
+
+.cms-home .new-layout-2025.margin-bottom-35 {
+    margin-bottom: 0px !important;
+}
+
+.block-page-section .page-main{
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.block-products-list.grid .products-grid .product-items .ev-product-item .product-item-details {
+    padding: 0px;
+    margin-top: 17px;
+}
+
