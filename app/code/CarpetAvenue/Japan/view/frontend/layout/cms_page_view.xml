@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <!-- Declare the carpetfinder block on CMS pages so the widget can render it in content -->
+    <update handle="carpet_finder"/>
+</page>

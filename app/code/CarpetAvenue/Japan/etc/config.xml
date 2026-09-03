@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <japan>
+            <carpet_finder>
+                <enabled>1</enabled>
+                <step_price_enabled>1</step_price_enabled>
+                <step_size_enabled>1</step_size_enabled>
+                <mobile_hide>0</mobile_hide>
+            </carpet_finder>
+        </japan>
+    </default>
+</config>

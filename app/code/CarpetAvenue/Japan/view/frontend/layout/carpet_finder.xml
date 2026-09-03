@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <!--
+        Declares the "carpetfinder" block tree but does NOT place it in output.
+        A consuming handle renders it (home page moves it into "content"; other
+        CMS pages render it in place through the "Carpet Finder block" widget).
+    -->
+    <block name="carpetfinder"
+           class="CarpetAvenue\Japan\Block\CarpetFinder"
+           ifconfig="japan/carpet_finder/enabled">
+        <block name="carpetfinder.step.price"
+               class="CarpetAvenue\Japan\Block\CarpetFinder\PriceStep"
+               template="CarpetAvenue_Japan::steps/price.phtml"
+               ifconfig="japan/carpet_finder/step_price_enabled">
+            <action method="setData">
+                <argument name="key" xsi:type="string">priority</argument>
+                <argument name="value" xsi:type="number">0</argument>
+            </action>
+            <container name="carpetfinder.step.price.content" as="step_content">
+                <container htmlClass="carpetfinder__title-wrapper" htmlTag="div">
+                    <block class="Magento\Framework\View\Element\Text">
+                        <arguments>
+                            <argument translate="true" name="text" xsi:type="string">Find your Carpet</argument>
+                        </arguments>
+                    </block>
+                </container>
+                <container htmlClass="carpetfinder__question-wrapper" htmlTag="div">
+                    <block class="Magento\Framework\View\Element\Text">
+                        <arguments>
+                            <argument translate="true" name="text" xsi:type="string">My carpet should cost:</argument>
+                        </arguments>
+                    </block>
+                </container>
+            </container>
+        </block>
+
+        <block name="carpetfinder.step.size"
+               class="CarpetAvenue\Japan\Block\CarpetFinder\SizeStepHome"
+               template="CarpetAvenue_Japan::steps/size_home.phtml"
+               ifconfig="japan/carpet_finder/step_size_enabled">
+            <action method="setData">
+                <argument name="key" xsi:type="string">priority</argument>
+                <argument name="value" xsi:type="number">0</argument>
+            </action>
+            <container name="carpetfinder.step.size_group.content" as="step_content">
+                <container htmlClass="carpetfinder__question-wrapper" htmlTag="div">
+                    <block class="Magento\Framework\View\Element\Text">
+                        <arguments>
+                            <argument translate="true" name="text" xsi:type="string">What size would suit your room?</argument>
+                        </arguments>
+                    </block>
+                </container>
+            </container>
+        </block>
+    </block>
+</page>
