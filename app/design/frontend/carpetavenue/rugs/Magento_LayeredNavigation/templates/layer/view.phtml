@@ -166,6 +166,38 @@
                 modal(MODAL_OPTS, $popup);
             }
 
+            // Below @screen__m the sort/filter row, the active-filter chips and
+            // the product count stack as one column (live's mft-row1/2/3), and
+            // "clear all" rides the count row. That puts the chips and the
+            // clear link on different rows of the *toolbar*, while they render
+            // together in .filter-state-bar inside .block.filter — the
+            // toolbar's sibling. Flex `order` cannot reach across containers,
+            // so both are re-parented and the emptied bar is hidden by CSS.
+            // Driven by matchMedia so a resize puts them back rather than
+            // leaving them in the wrong place. 767px = @screen__m - 1, the
+            // width the theme's mobile block uses; keep the two in step.
+            var mobileFilter = window.matchMedia('(max-width: 767px)');
+
+            function placeStateBar() {
+                var $bar = $('.column.main .filter-state-bar'),
+                    $chips = $('.column.main .am-filter-chips'),
+                    $actions = $('.column.main .filter-actions'),
+                    $target = mobileFilter.matches
+                        ? $('.column.main .toolbar-products').first()
+                        : $bar;
+
+                // No active filters means no bar at all — nothing to place.
+                if (!$bar.length || !$chips.length || !$target.length) {
+                    return;
+                }
+
+                if (!$chips.parent().is($target)) {
+                    // Appended in this order so the desktop bar's DOM order is
+                    // chips-then-clear; CSS `order` positions them either way.
+                    $target.append($chips).append($actions);
+                }
+            }
+
             function activateTab(tab) {
                 if (tab === undefined || tab === null || tab === '') {
                     return;
@@ -200,12 +232,17 @@
             // Defer so core finishes re-applying data-mage-init (price sliders,
             // accordion) to the fresh popup before the modal moves it to <body>.
             setTimeout(initFilterModal, 0);
+            placeStateBar();
 
             if (!$(document).data('carpFilterBound')) {
                 $(document).data('carpFilterBound', true);
                 $(document).on('contentUpdated', function () {
                     setTimeout(initFilterModal, 0);
+                    // The AJAX apply swaps .column.main, so both the bar and the
+                    // toolbar come back fresh and unparented.
+                    placeStateBar();
                 });
+                mobileFilter.addEventListener('change', placeStateBar);
             }
         });
     </script>

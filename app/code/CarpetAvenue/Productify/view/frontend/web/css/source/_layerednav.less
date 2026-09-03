@@ -159,7 +159,7 @@
             .ui-slider-range {
                 position: absolute;
                 height: 100%;
-                background: @color-gray20;
+                background: @ca-green;
             }
 
             //  Matches base theme "-improved" Amasty slider handles
@@ -187,33 +187,40 @@
         }
     }
 
-    //  Blank sets `.filter .filter-current .item { margin-bottom: 10px }`, which
-    //  made the row taller than the pills and dropped the FILTER label and
-    //  "Clear all" below the chip text. Needs the extra class to out-rank it.
-    .filter .am-filter-chips .items .am-chip {
-        margin: 0;
+    //  Blank sets `.filter-current .item { margin-bottom: 10px }` later in the
+    //  bundle, which made the row taller than the chips and dropped the "all
+    //  filters" label and "clear" below the chip text. Qualified by both of the
+    //  container's own classes rather than an ancestor `.filter`, so it still
+    //  out-ranks blank wherever the bar is parented — the mobile layout moves it
+    //  into the product toolbar.
+    .am-filter-chips.filter-current .items .am-chip {
+        margin: 0 5px 0 0;
     }
 
+    //  Chip design mirrors carpetavenue.jp: a white 40px pill with a light
+    //  blue-grey outline, the option's swatch on the left, and the remove "×"
+    //  pinned to the right edge rather than sitting in the flow.
     .am-filter-chips {
         margin: 0 0 10px;
 
         .items {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin: 0;
+            margin: 0 0 0 -5px;
             padding: 0;
             list-style: none;
         }
 
         .am-chip {
+            position: relative; // anchor for the remove "×"
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 7px 14px;
-            border: 0;
-            border-radius: 999px;
-            background: @color-gray95;
+            height: 40px;
+            padding: 4px 5px 4px 8px;
+            border: 1px solid #c7cfe4;
+            border-radius: 10px;
+            background: @color-white;
+            box-sizing: border-box;
             font-size: 1.4rem;
             line-height: 1.2;
 
@@ -222,10 +229,31 @@
                 .lib-visually-hidden();
             }
 
+            //  Round in the chip, square in the filter panel — live's own split.
+            .am-chip-swatch {
+                flex: 0 0 auto;
+                width: 30px;
+                height: 30px;
+                margin-right: 10px;
+                border-radius: 50%;
+                background-color: @color-white;
+                background-size: contain;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
+
+            //  Room for the pinned "×".
+            .am-chip-value {
+                margin-right: 20px;
+                color: #050505;
+            }
+
             .am-chip-remove {
                 display: inline-flex;
-                width: 14px;
-                height: 14px;
+                position: absolute;
+                right: 8px;
+                width: 12px;
+                height: 12px;
                 align-items: center;
                 justify-content: center;
                 color: @color-gray20 !important;

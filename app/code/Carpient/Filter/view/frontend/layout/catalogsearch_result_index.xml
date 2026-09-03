@@ -7,7 +7,15 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="catalog.navigation.renderer">
+        <!-- On search the blocks are catalogsearch.navigation.*, not
+             catalog.navigation.* — the old name matched nothing here, so search
+             results rendered every option without its swatch. -->
+        <referenceBlock name="catalogsearch.navigation.renderer">
+            <arguments>
+                <argument name="option_image_view_model" xsi:type="object">Carpient\Filter\ViewModel\OptionImages</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="catalogsearch.navigation.state">
             <arguments>
                 <argument name="option_image_view_model" xsi:type="object">Carpient\Filter\ViewModel\OptionImages</argument>
             </arguments>

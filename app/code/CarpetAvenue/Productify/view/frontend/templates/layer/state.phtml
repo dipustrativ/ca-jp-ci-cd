@@ -7,13 +7,36 @@
  * @var \Magento\LayeredNavigation\Block\Navigation\State $block
  */
 $activeFilters = $block->getActiveFilters();
+// Optional (Carpient_Filter): per-option image swatch renderer.
+$optionImages = $block->getData('option_image_view_model');
+// Optional (CarpetAvenue_Productify): category thumbnail renderer for the "cat"
+// filter, kept separate because category entity IDs share the numeric space
+// with attribute option IDs and would collide. Same split as layer/filter.phtml.
+$categoryImages = $block->getData('category_image_view_model');
 ?>
 <?php if (!empty($activeFilters)): ?>
     <div class="filter-current am-filter-chips" data-count="<?= count($activeFilters) ?>">
         <ol class="items">
             <?php foreach ($activeFilters as $filterItem): ?>
-                <li class="item am-chip">
+                <?php
+                $filter = $filterItem->getFilter();
+                $attrCode = method_exists($filter, 'getRequestVar') ? (string) $filter->getRequestVar() : '';
+
+                if ($attrCode === 'cat') {
+                    $swatchUrl = $categoryImages !== null
+                        ? $categoryImages->getUrl((int) $filterItem->getValue())
+                        : null;
+                } elseif ($optionImages !== null && $attrCode !== '') {
+                    $swatchUrl = $optionImages->getUrl((int) $filterItem->getValue());
+                } else {
+                    $swatchUrl = null;
+                }
+                ?>
+                <li class="item am-chip<?= $attrCode !== '' ? ' am-chip--' . $block->escapeHtmlAttr($attrCode) : '' ?>">
                     <span class="am-chip-name"><?= $block->escapeHtml(__($filterItem->getName())) ?>:</span>
+                    <?php if ($swatchUrl): ?>
+                        <span class="am-chip-swatch" style="background-image:url('<?= $block->escapeUrl($swatchUrl) ?>')" aria-hidden="true"></span>
+                    <?php endif; ?>
                     <span class="am-chip-value"><?= $block->escapeHtml($block->stripTags($filterItem->getLabel())) ?></span>
                     <a class="action remove am-chip-remove"
                        href="<?= $block->escapeUrl($filterItem->getRemoveUrl()) ?>"

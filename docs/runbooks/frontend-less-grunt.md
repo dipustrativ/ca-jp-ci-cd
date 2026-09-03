@@ -88,16 +88,29 @@ docker exec -it carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && npx grunt wa
 
 Leave it running. Save any `.less` under
 `app/design/frontend/carpetavenue/rugs/**` → full `exec:rugs` + `less:rugs` cycle
-in ~2.5s. Verified: host edits do reach the container's inotify through the
+in ~3-4s. Verified: host edits do reach the container's inotify through the
 macOS bind mount.
 
-In developer mode the page links `css/styles-m.css` with no `version<ts>/`
-prefix, so a normal reload picks up the new CSS. Hard-reload (⌘⇧R) if you have an
-aggressive disk cache.
+**Full-page cache has to be off** for a save to reach the browser:
+
+```bash
+docker exec carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && php bin/magento cache:disable full_page && php bin/magento cache:flush"
+```
+
+The page links `css/styles-m.css` under a `/static/version<ts>/` prefix even in
+developer mode. The prefix comes from `pub/static/deployed_version.txt`, which
+`clean:rugs` deletes and Magento rewrites on the next *uncached* render. With FPC
+on, that render never happens: the cached HTML keeps the old prefix, the browser
+keeps that URL in its disk cache, and grunt reports "2 stylesheets created" while
+nothing changes on screen. `php bin/magento cache:flush` after each save is the
+alternative. Re-enable with `cache:enable full_page` when done.
+
+Hard-reload (⌘⇧R) if you still see the old CSS. Nothing else in `pub/static` is
+disturbed by a save — see the `clean:rugs` note below.
 
 ## How the theme is wired into grunt
 
-Three files, all of them things that have broken before:
+Four files, all of them things that have broken before:
 
 - **`grunt-config.json`** → `{"themes": "dev/tools/grunt/configs/local-themes"}`.
   This is the only thing that points grunt at our theme list.
@@ -113,6 +126,21 @@ Three files, all of them things that have broken before:
   (see below). The rest of the grunt configs are stock Adobe; `exec`, `less`,
   `clean` and `watch` auto-generate a target per theme alias, which is where
   `exec:rugs` / `less:rugs` / `clean:rugs` / `watch:rugs` come from for free.
+- **`dev/tools/grunt/configs/clean.js`** — the per-theme `clean:<name>` target is
+  narrowed to the published `.less` files plus their `var/view_preprocessed`
+  mirror. Stock wiped `pub/static/frontend/carpetavenue/rugs/ja_JP/**` entirely,
+  so a single LESS save deleted every published `.js`, image and font too, plus
+  `pub/static/deployed_version.txt`, and only the LESS came back — `exec:<theme>`
+  is `clean:<theme> && dev:source-theme:deploy --type=less`, nothing more.
+  `requirejs-config.js` went with them, and that file is only rewritten during an
+  *uncached* page render, so with full-page cache on every request 404'd it
+  (served as `text/plain`, which the browser refuses) and the entire requirejs
+  graph failed. Two parts of the target are **not** optional. `var/view_preprocessed`
+  holds the preprocessed copies of `styles-m.less` and every `_extend.less`, and a
+  republish reuses them if they survive. `pub/static/deployed_version.txt` is what
+  moves the `/static/version<ts>/` prefix; keep it and the browser never refetches
+  the recompiled CSS. Stock also listed `path.tmpLess`/`path.tmpSource` — Magento
+  2.1 paths that match nothing in 2.4.
 
 ## Rules that are easy to get wrong
 
@@ -174,7 +202,30 @@ curl -sk -o /dev/null -w "%{http_code}\n" \
 In DevTools the Styles pane should then name the `.less` file. If it still names
 `styles-m.css`, source maps are off in Settings → Preferences → Sources.
 
+Nothing outside the theme's `.less` files should move on a save:
+
+```bash
+docker exec carpetavenue-jp-phpfpm-1 sh -c "ls /var/www/html/pub/static/frontend/carpetavenue/rugs/ja_JP/requirejs-config.js"
+curl -sk -o /dev/null -w "%{http_code}\n" \
+  https://carpetavenue-jp.devs/static/frontend/carpetavenue/rugs/ja_JP/requirejs-config.js
+# -> 200, with full_page cache enabled
+```
+
 ## History
+
+2026-09-03: `clean:rugs` narrowed (see above). Until then every LESS save wiped
+the whole published theme dir — 421 paths, all published JS included — so the
+workflow required `cache:disable full_page` and left the storefront's requirejs
+graph dead between saves. Verified after the change with full-page cache on: two
+consecutive edits compiled into `styles-m.css`, `requirejs-config.js` untouched,
+`requirejs-config.js` and `.css.map` both 200. The first cut of that change also
+dropped `deployed_version.txt` from the target and this document claimed
+developer mode serves CSS without a version prefix — both wrong. It does, so the
+browser kept the cached stylesheet and recompiles appeared to do nothing.
+`deployed_version.txt` is back in the target, and the FPC-off instruction is back
+too: deleting that file only moves the prefix on an *uncached* render, so with FPC
+on the recompile still never reaches the browser. The original instruction was
+right for a different reason (JS deletion) than the one that still applies.
 
 Before 2026-08-30 this document described theme `carpient/rugs` at locale
 `en_US` in container `carpient-phpfpm-1`, and claimed `carpetavenue/rugs` was "a
