@@ -1,9 +1,9 @@
 ---
 name: build-image
-description: Build and push the CarpetAvenue Magento production image (registry.carpetavenue.net/carpient) with the correct next v<N> tag. Use when asked to "build image", "build and push", "push v<N>", "release image", "build nginx image", or to do a local dry-run of the production stack. Skips re-reading docker/README.md.
+description: Build and push the CarpetAvenue Magento production image (registry.carpetavenue.net/carpetavenue-jp) with the correct next v<N> tag. Use when asked to "build image", "build and push", "push v<N>", "release image", "build nginx image", or to do a local dry-run of the production stack. Skips re-reading docker/README.md.
 ---
 
-# Build & push the carpient image
+# Build & push the carpetavenue-jp image
 
 One image, five roles (app/upgrade/static/cron). Build context is the repo root
 (`src/`). Full background: `docker/README.md` — do **not** read it for a routine
@@ -15,7 +15,8 @@ build; everything needed is here.
 ls -la auth.json docker/env.php.scd && docker version --format '{{.Server.Version}}'
 ```
 
-Both secret files must exist (gitignored, BuildKit secrets, never land in a layer).
+Both secret files must exist. They are gitignored **and** in `.dockerignore`;
+BuildKit reads them from the host path, so they never land in a layer.
 Missing → stop and tell the user; they cannot be regenerated from the repo.
 
 ## 2. Pick the tag
@@ -26,7 +27,7 @@ Tags are immutable — never reuse a `v<N>`. If user gave no number, list existi
 CREDS=$(echo "registry.carpetavenue.net" | docker-credential-osxkeychain get)
 U=$(echo "$CREDS" | python3 -c "import sys,json;print(json.load(sys.stdin)['Username'])")
 P=$(echo "$CREDS" | python3 -c "import sys,json;print(json.load(sys.stdin)['Secret'])")
-curl -s -u "$U:$P" https://registry.carpetavenue.net/v2/carpient/tags/list --max-time 25
+curl -s -u "$U:$P" https://registry.carpetavenue.net/v2/carpetavenue-jp/tags/list --max-time 25
 ```
 
 Next tag = highest `vN` + 1. (Creds live in the macOS keychain, not
@@ -42,14 +43,18 @@ docker buildx build \
   --secret id=composer_auth,src=auth.json \
   --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile \
-  -t registry.carpetavenue.net/carpient:latest \
-  -t registry.carpetavenue.net/carpient:v<N> \
+  -t registry.carpetavenue.net/carpetavenue-jp:latest \
+  -t registry.carpetavenue.net/carpetavenue-jp:v<N> \
   --push .
 ```
 
 Always push **both** `latest` (what servers pull) and the immutable `v<N>`
 (rollback anchor). Use `run_in_background: true`; poll the log tail, do not
 stream it into context.
+
+⚠️ **On Apple Silicon add `--platform linux/amd64`** — the servers are amd64 and
+a native arm64 push produces an image they cannot run (`exec format error`).
+Cross-building is slow; prefer building on Server A.
 
 Force a rebuild (only when asked — an all-`CACHED` build is normally correct,
 see Gotchas):
@@ -68,15 +73,19 @@ Separate image, no secrets, fast. Skip it for normal app builds.
 
 ```bash
 docker buildx build -f docker/Dockerfile.nginx \
-  -t registry.carpetavenue.net/carpient-nginx:latest --push .
+  -t registry.carpetavenue.net/carpetavenue-jp-nginx:latest --push .
 ```
 
 ## 5. Local dry-run (only if asked to test before deploying)
 
 ```bash
+# --load, not --push: local tag stays on this machine, no registry, no login.
 docker buildx build --secret id=composer_auth,src=auth.json \
   --secret id=env_php_scd,src=docker/env.php.scd \
-  -f docker/Dockerfile -t registry.carpetavenue.net/carpient:local --push .
+  -f docker/Dockerfile -t registry.carpetavenue.net/carpetavenue-jp:local --load .
+
+# ⚠️ stop the dev stack first — it holds host :80 and :3306
+docker compose -f ../compose.yaml down
 
 IMAGE_TAG=local docker compose -f docker/docker-compose.local.yml \
   --env-file docker/.env.local up -d
@@ -85,7 +94,7 @@ docker compose -f docker/docker-compose.local.yml logs -f upgrade   # want: "Upg
 docker compose -f docker/docker-compose.local.yml down -v
 ```
 
-Site: `http://carpient.devs` / `http://localhost` (plain HTTP, no TLS locally).
+Site: `http://carpetavenue-jp.devs` / `http://localhost` (plain HTTP, no TLS locally).
 
 ## 6. Deploy after push
 
@@ -104,7 +113,7 @@ Dokploy environment → Redeploy. Only touch the server if the user asks.
 - Every step `CACHED` = nothing in the context changed; BuildKit keys on content,
   not mtime, so `COPY . .` hits cache and di:compile/SCD are skipped. The new
   `v<N>` is then the same image ID as the last one (`docker images | grep
-  carpient`). Check the edit isn't in a `.dockerignore`d path (`vendor/`,
+  carpetavenue-jp`). Check the edit isn't in a `.dockerignore`d path (`vendor/`,
   `pub/static/`, `dev/`, most of `var/`) before blaming the cache.
 - `docker buildx build` on the laptop pushes over Traefik; a `499`/`504` mid-push
   is a Traefik timeout, not a bad image (fix in `docker/README.md` §10). CI on

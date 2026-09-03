@@ -79,13 +79,13 @@ RUN php -d memory_limit=4G bin/magento setup:di:compile 2>&1 | tee /tmp/di-compi
 #   docker buildx build --build-arg STATIC_LOCALES="en_US de_DE sv_SE" ...
 ARG STATIC_LOCALES=""
 
-# Themes baked into pub/static. carpient/rugs is the live frontend theme;
+# Themes baked into pub/static. carpetavenue/rugs is the live frontend theme;
 # Magento/luma is dead weight × every locale.
 #
 # --theme is an INCLUDE list (PackagePool::canDeployTheme), so Magento/backend
 # MUST be listed too — production mode never builds static on demand, and
 # without it the admin panel loads with no CSS/JS. Magento/blank still deploys
-# as carpient/rugs' parent; SCD keeps ancestors of deployed packages.
+# as carpetavenue/rugs' parent; SCD keeps ancestors of deployed packages.
 #
 # SCD needs real DB creds — swap in SCD env.php, deploy static, restore build env.php.
 # Single RUN: BuildKit snapshots final state only — real creds never persist in a layer.
@@ -98,7 +98,7 @@ ARG STATIC_LOCALES=""
 RUN --mount=type=secret,id=env_php_scd \
     cp /run/secrets/env_php_scd app/etc/env.php && \
     php -d memory_limit=4G bin/magento setup:static-content:deploy -f \
-        --theme carpient/rugs --theme Magento/backend \
+        --theme carpetavenue/rugs --theme Magento/backend \
         ${STATIC_LOCALES} --jobs="$(nproc)" && \
     cp docker/env.php.build app/etc/env.php && \
     test -f pub/static/adminhtml/Magento/backend/en_US/requirejs/require.min.js && \
@@ -134,11 +134,14 @@ RUN set -eux; \
 # 1. Repoint the ONE cross-theme url() before deleting the parent theme. A
 #    Mageplaza LESS @import emitted an absolute-from-pub/static path; the same
 #    PNG already exists in rugs' own tree. Locale-agnostic on purpose.
-# 2. Magento/blank (~530M): deployed only as carpient/rugs' SCD ancestor. No
-#    store view resolves to it (1 website, website-scope theme_id=5=carpient/rugs)
-#    and blank/en_US is a strict SUBSET of rugs/en_US — 0 files exist only in
-#    blank. Fallback is flattened at deploy time; runtime URLs name the active
-#    theme only.
+# 2. Magento/blank (~530M): deployed only as carpetavenue/rugs' SCD ancestor. No
+#    store view resolves to it — this install is 1 website (`ca_jp`) / 1 store
+#    view (`jp`) with design/theme/theme_id at DEFAULT scope = 5 =
+#    carpetavenue/rugs, and no website- or store-scope override. blank/en_US is
+#    also a strict SUBSET of rugs/en_US. Fallback is flattened at deploy time;
+#    runtime URLs name the active theme only.
+#    ⚠️ theme_id is per-database — re-read it from the SCD DB after any restore,
+#    never carry the number between environments.
 # 3. *.map (~59M): source maps, DevTools-only. 37 of 39 sourceMappingURL
 #    comments are already dangling in the shipped image.
 # 4. hugerte (~99M): the ADMIN WYSIWYG, copied into the frontend theme by SCD
@@ -147,8 +150,8 @@ RUN set -eux; \
 #    not the library. The adminhtml copy is untouched — the editor needs it.
 RUN set -eux; \
     sed -i 's|\.\./\.\./\.\./\.\./\.\./frontend/Magento/blank/[a-z][a-z]_[A-Z][A-Z]/|../|g' \
-        pub/static/frontend/carpient/rugs/*/css/*.css; \
-    ! grep -rq 'frontend/Magento/blank/' pub/static/frontend/carpient; \
+        pub/static/frontend/carpetavenue/rugs/*/css/*.css; \
+    ! grep -rq 'frontend/Magento/blank/' pub/static/frontend/carpetavenue; \
     rm -rf pub/static/frontend/Magento/blank; \
     find pub/static -name '*.map' -delete; \
     rm -rf pub/static/frontend/*/*/*/hugerte

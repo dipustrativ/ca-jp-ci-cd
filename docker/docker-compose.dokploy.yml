@@ -1,8 +1,8 @@
-# CarpetAvenue — Dokploy production, PULL a pre-built image (recommended path).
+# CarpetAvenue JP — Dokploy production, PULL a pre-built image (recommended path).
 #
 # Every service is a pulled image — zero host bind-mounts, so Dokploy needs no
-# git repo. CI (or you) builds carpient + carpient-nginx and pushes to the
-# registry; Dokploy pulls and restarts. Only the carpient image changes between
+# git repo. CI (or you) builds carpetavenue-jp + carpetavenue-jp-nginx and pushes to the
+# registry; Dokploy pulls and restarts. Only the carpetavenue-jp image changes between
 # code deploys; nginx + infra images are effectively fixed.
 #
 # Dokploy setup (see docker/README.md §Dokploy-pull):
@@ -15,7 +15,7 @@ services:
 
   cache:
     image: valkey/valkey:9-alpine
-    container_name: carpient-cache
+    container_name: carpetavenue-jp-cache
     restart: unless-stopped
     # cache db0 + page_cache db1 only; sessions are in the `sessions` service.
     # allkeys-lru evicts tag->id SETS as readily as data, and a lost tag set makes
@@ -47,7 +47,7 @@ services:
 
   sessions:
     image: valkey/valkey:9-alpine
-    container_name: carpient-sessions
+    container_name: carpetavenue-jp-sessions
     restart: unless-stopped
     # Sessions only (db2). Magento's session handler sets a TTL on every key, so
     # volatile-lru drops the oldest idle session under pressure — never a cache
@@ -74,7 +74,7 @@ services:
 
   queue:
     image: rabbitmq:4.2-management-alpine
-    container_name: carpient-queue
+    container_name: carpetavenue-jp-queue
     restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
@@ -91,11 +91,13 @@ services:
 
   search:
     image: opensearchproject/opensearch:3
-    container_name: carpient-search
+    container_name: carpetavenue-jp-search
     restart: unless-stopped
     environment:
       discovery.type: single-node
-      OPENSEARCH_JAVA_OPTS: "-Xms2g -Xmx2g"
+      # 2g is the carpient sizing. Co-hosted on the same VPS as carpient, set
+      # OPENSEARCH_HEAP=1g — JP is one locale and playground traffic.
+      OPENSEARCH_JAVA_OPTS: "-Xms${OPENSEARCH_HEAP:-2g} -Xmx${OPENSEARCH_HEAP:-2g}"
       DISABLE_SECURITY_PLUGIN: "true"
       DISABLE_INSTALL_DEMO_CONFIG: "true"
     volumes:
@@ -118,8 +120,8 @@ services:
   # a persistent volume and this deploy step has to restore it — read the note
   # in docker/env.php.template first.
   upgrade:
-    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient:${IMAGE_TAG:-latest}
-    container_name: carpient-upgrade
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
+    container_name: carpetavenue-jp-upgrade
     command: >
       sh -c "chown -R www-data:www-data /var/www/html/var &&
       php bin/magento maintenance:enable &&
@@ -152,15 +154,15 @@ services:
       OPENSEARCH_PORT: ${OPENSEARCH_PORT:-9200}
       MAGE_CRYPT_KEY: ${MAGE_CRYPT_KEY}
       MAGE_GRAPHQL_ID_SALT: ${MAGE_GRAPHQL_ID_SALT}
-      DOMAIN: ${DOMAIN:-carpetavenue.net}
+      DOMAIN: ${DOMAIN:-playground.carpetavenue.jp}
       DEBUG_ENV: ${DEBUG_ENV:-false}
     volumes:
       - magento_var:/var/www/html/var
     networks: [magento_net, dokploy-network]   # dokploy-network: reach the internal Dokploy MySQL
 
   app:
-    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient:${IMAGE_TAG:-latest}
-    container_name: carpient-app
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
+    container_name: carpetavenue-jp-app
     restart: unless-stopped
     depends_on:
       upgrade: { condition: service_completed_successfully }
@@ -172,12 +174,12 @@ services:
       - magento_var:/var/www/html/var
     networks:
       magento_net:
-        aliases: [carpient-fpm]
+        aliases: [carpetavenue-jp-fpm]
       dokploy-network:                         # reach the internal Dokploy MySQL
 
   static:
-    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient:${IMAGE_TAG:-latest}
-    container_name: carpient-static
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
+    container_name: carpetavenue-jp-static
     command: sh -c "rm -rf /mnt/static/* && cp -a /var/www/html/pub/static/. /mnt/static/"
     restart: "no"
     depends_on:
@@ -187,8 +189,8 @@ services:
     networks: [magento_net]
 
   cron:
-    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient:${IMAGE_TAG:-latest}
-    container_name: carpient-cron
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
+    container_name: carpetavenue-jp-cron
     command: cron -f
     restart: unless-stopped
     depends_on:
@@ -201,8 +203,8 @@ services:
 
   # Baked-config nginx (no bind-mounts). Traefik (Dokploy Domain tab) fronts it.
   nginx:
-    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient-nginx:${NGINX_TAG:-latest}
-    container_name: carpient-nginx
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp-nginx:${NGINX_TAG:-latest}
+    container_name: carpetavenue-jp-nginx
     restart: unless-stopped
     depends_on:
       - app
@@ -229,7 +231,7 @@ services:
   # are all regenerable — see docker/README.md §11.
   backup:
     image: offen/docker-volume-backup:v2
-    container_name: carpient-backup
+    container_name: carpetavenue-jp-backup
     restart: unless-stopped
     environment:
       BACKUP_CRON_EXPRESSION: "0 3 * * *"

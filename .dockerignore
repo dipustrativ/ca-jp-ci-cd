@@ -24,7 +24,11 @@ generated/code
 generated/metadata
 .DS_Store
 *.log
+# Build-time secrets. Both are passed with --secret (BuildKit reads them from
+# the host path, NOT the context), so excluding them here does not affect the
+# build — it only keeps them out of `COPY . .` and therefore out of the image.
 auth.json
+docker/env.php.scd
 docker/certs
 docker/.env
 docker/.env.local

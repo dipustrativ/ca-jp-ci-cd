@@ -2,6 +2,9 @@
 
 How to diagnose and fix "cache is not working" on the Dokploy production stack.
 
+> ⚠️ Written against the `carpient` stack. Procedure applies; findings, dates and
+> hostnames are that deployment's.
+
 **Read §1 before deploying anything.** The config changes in §2 were made from a
 static review of this repo — no production runtime data was available at the time.
 They are correct hardening, but they are not proven to be *your* bug. §1 is how you
@@ -58,15 +61,15 @@ correction in §2.
 Container names on Dokploy are generated. Find them:
 
 ```bash
-docker ps --format '{{.Names}}\t{{.Image}}' | grep -Ei 'carpient|valkey'
+docker ps --format '{{.Names}}\t{{.Image}}' | grep -Ei 'carpetavenue-jp|valkey'
 ```
 
 Then set them once:
 
 ```bash
-APP=<carpient-...-app-1>
-CRON=<carpient-...-cron-1>
-VK=<carpient-...-cache-1>
+APP=<carpetavenue-jp-...-app-1>
+CRON=<carpetavenue-jp-...-cron-1>
+VK=<carpetavenue-jp-...-cache-1>
 VKPASS=<VALKEY_PASSWORD from Dokploy env>
 ```
 
@@ -209,7 +212,7 @@ so they need a rebuild. The compose change applies on redeploy alone.
 # 1. Build + push (from a machine with the repo + auth.json)
 docker buildx build --secret id=composer_auth,src=auth.json \
   --secret id=env_php_scd,src=docker/env.php.scd \
-  -f docker/Dockerfile -t registry.carpetavenue.net/carpient:<next-tag> --push .
+  -f docker/Dockerfile -t registry.carpetavenue.net/carpetavenue-jp:<next-tag> --push .
 
 # 2. Dokploy → set IMAGE_TAG=<next-tag> → Redeploy
 # 3. After it settles
@@ -229,7 +232,7 @@ Config being correct is not proof. These two are.
 docker exec $VK valkey-cli -a "$VKPASS" info stats | grep evicted_keys
 
 # B. FPC must actually serve. Second request should be dramatically faster.
-URL=https://carpient.carpetavenue.net/
+URL=https://playground.carpetavenue.jp/
 curl -sS -o /dev/null -w 'cold %{time_starttransfer}s\n' "$URL"
 curl -sS -o /dev/null -w 'warm %{time_starttransfer}s\n' "$URL"
 ```

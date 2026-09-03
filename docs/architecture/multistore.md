@@ -1,12 +1,16 @@
 # Multistore — store code in the URL path
 
+> ⚠️ **JP is single-website, single-store-view** (`ca_jp` / `jp` / `ja_JP`). The
+> 12-store-view layout below is `carpient`'s and does not exist here — kept
+> because the mechanism is what JP would use to add one.
+
 Store views are selected by the first path segment, using Magento's native
 `web/url/use_store`. **No webserver configuration is involved.**
 
 ```
 website base   /en/ (default) /de/ /es/ /fr/ /it/ /hu/ /nl/ /pl/ /pt/ /fi/
 website ca_dk  /dk/                                    /admin  unaffected
-website ca_se  /se/ — on its own domain, carpient-se.carpetavenue.net
+website ca_se  /se/ — on its own domain, se.playground.carpetavenue.jp
 ```
 
 Store views on one website share cart, customer accounts and base currency; only
@@ -49,7 +53,7 @@ The manual equivalent of every step is below, in order.
 
 2. **Removed every store-scope URL override.** A previous attempt had left
    `base_url` *and* `base_link_url` on store `de` pointing at
-   `https://carpient.devs/de/`. Under `use_store` Magento appends the code on
+   `https://carpetavenue-jp.devs/de/`. Under `use_store` Magento appends the code on
    top of those, producing `/de/de/`.
 
    ```sql
@@ -81,8 +85,8 @@ The manual equivalent of every step is below, in order.
 That is the whole setup. Final state:
 
 ```
-default   web/unsecure/base_url                https://carpient.devs/
-default   web/secure/base_url                  https://carpient.devs/
+default   web/unsecure/base_url                https://carpetavenue-jp.devs/
+default   web/secure/base_url                  https://carpetavenue-jp.devs/
 default   web/url/use_store                    1
 default   catalog/seo/category_canonical_tag   1
 default   catalog/seo/product_canonical_tag    1
@@ -93,7 +97,7 @@ stores/11 (se)  general/locale/code            sv_SE
 Base URLs stay at **default scope only**; Magento appends the code at runtime
 (`Store::_updatePathUseStoreView()`). Static and media need no pinning — that
 method applies to link-type URLs only, so `/static/` and `/media/` stay at the
-root automatically. Theme is not set per store view; all inherit `Carpient Rugs`
+root automatically. Theme is not set per store view; all inherit `CarpetAvenue Rugs`
 from website scope.
 
 ## Rules that are easy to get wrong
@@ -110,7 +114,7 @@ from website scope.
   or any root-level category `url_key`.
 - **Set URLs in the DB, never `env.php`.** Do not use `config:set --lock-env`:
   `app/etc/env.php` is gitignored and the local hostname differs per machine
-  (`carpient.devs` vs `carpient.test`).
+  (`carpetavenue-jp.devs` vs `carpetavenue-jp.test`).
 - **Flush the cache before trusting the store switcher.** Its links live in
   `block_html`/FPC; stale entries show doubled prefixes like `/es/de/` and look
   exactly like a config bug.
@@ -130,13 +134,13 @@ rules as steps.
 ```bash
 for u in "" en/ de/ se/ de/all-carpets se/all-carpets admin; do
   printf "%-20s " "/$u"
-  curl -sk -o /tmp/o.html -w "HTTP %{http_code}  " "https://carpient.devs/$u"
+  curl -sk -o /tmp/o.html -w "HTTP %{http_code}  " "https://carpetavenue-jp.devs/$u"
   grep -o 'lang="[a-zA-Z-]*"' /tmp/o.html | head -1
 done
 
-curl -sk https://carpient.devs/de/ | grep -c 'carpient.devs/de/de/'      # 0
-curl -sk https://carpient.devs/de/ | grep -c 'carpient.devs/de/static/'  # 0
-curl -sk https://carpient.devs/all-carpets | grep -o 'rel="canonical" href="[^"]*"'
+curl -sk https://carpetavenue-jp.devs/de/ | grep -c 'carpetavenue-jp.devs/de/de/'      # 0
+curl -sk https://carpetavenue-jp.devs/de/ | grep -c 'carpetavenue-jp.devs/de/static/'  # 0
+curl -sk https://carpetavenue-jp.devs/all-carpets | grep -o 'rel="canonical" href="[^"]*"'
 ```
 
 Expected: `/` and `/en/` → `lang="en"`, `/de/` → `lang="de"`, `/se/` →
@@ -213,8 +217,8 @@ wildcard include matches nothing on the local docker-magento stack, which has no
 `$MAGE_RUN_*` map — that is what keeps the shared `nginx.conf` portable.
 
 The domain's store views leave the main domain when its base URL is set:
-`https://carpient.carpetavenue.net/se/…` redirects to
-`https://carpient-se.carpetavenue.net/se/…`. The `/se/` prefix survives on the
+`https://playground.carpetavenue.jp/se/…` redirects to
+`https://se.playground.carpetavenue.jp/se/…`. The `/se/` prefix survives on the
 dedicated domain, because `use_store` is default-scope only (above); the root of
 that domain serves `se` unprefixed as the website's default store view — the same
 two-URL situation English has, covered by the canonical tags.
