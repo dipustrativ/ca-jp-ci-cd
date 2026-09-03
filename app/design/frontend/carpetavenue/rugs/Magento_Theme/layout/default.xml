@@ -5,6 +5,12 @@
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <!-- Trustpilot widget bootstrap: scans .trustpilot-widget nodes and injects the review iframes.
+             Without it the widget divs (e.g. CMS block trustpilot-home-list) render only the fallback link. -->
+        <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+                src_type="url" async="async"/>
+    </head>
     <body>
 
         <!-- ============ HEADER ============ -->
