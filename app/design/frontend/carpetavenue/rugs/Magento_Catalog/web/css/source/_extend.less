@@ -1167,6 +1167,26 @@
                 .lib-css(color, #000);
                 .lib-font-size(18);
             }
+
+            //  Applied-filter count. Rendered only when there is one, so no
+            //  hidden-when-zero state is needed. `min-width` with side padding
+            //  keeps a single digit circular and lets 10+ grow into a pill.
+            .open-filter-popup__badge {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 auto;
+                min-width: 22px;
+                height: 22px;
+                padding: 0 6px;
+                border-radius: 999px;
+                background: #000;
+                box-sizing: border-box;
+                .lib-css(color, #fff);
+                .lib-font-size(13);
+                font-weight: 600;
+                line-height: 13px;
+            }
         }
 
         //  Active-filter chips: their own full-width row directly under the
@@ -1188,7 +1208,60 @@
             //  Chips keep their width instead of squeezing to fit, which is
             //  what pushes the line past the container and makes it scroll.
             .am-chip {
-                flex: 0 0 auto;
+                flex: 0 0 auto !important;
+                position: relative;
+                padding: 0 30px 0 10px !important;
+                background: #000 !important;
+                border: 0 !important;
+                border-radius: 999px !important;
+                white-space: nowrap !important;
+                list-style: none;
+                width: auto !important;
+                max-width: none !important;
+                display: -webkit-flex;
+                display: -ms-flexbox;
+                display: flex;
+                display: flex !important;
+                flex-direction: row;
+                flex-wrap: nowrap !important;
+                align-items: center;
+                min-height: 30px;
+                height: auto;
+
+                .am-chip-value {
+                    color: #ffffff;
+                    display: -webkit-inline-flex !important;
+                    display: -ms-inline-flexbox !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                .am-chip-remove {
+                    color: #ffffff !important;
+                    position: absolute;
+                    right: 10px;
+                    top: 0;
+                    bottom: 0;
+                    left: auto;
+                    width: 18px;
+                    height: 100%;
+                    margin: auto;
+                    background: 0 0 !important;
+                    display: -webkit-flex;
+                    display: -ms-flexbox;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .am-chip-swatch {
+                    margin-right: 6px;
+                    margin-left: -8px;
+                    width: 22px;
+                    height: 22px;
+                    border: 2px solid #fff !important;
+                    background-color: transparent;
+                }
             }
         }
 
