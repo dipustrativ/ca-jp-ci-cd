@@ -43,7 +43,10 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # --- STEP 1: Dependencies (cached unless composer files change) ---
+# patches/ must come along: composer's post-install-cmd runs
+# patches/apply-patches.sh, so without it `composer install` exits 127.
 COPY composer.json composer.lock ./
+COPY patches ./patches
 
 # auth.json via BuildKit secret — never lands in an image layer
 RUN --mount=type=secret,id=composer_auth,target=/var/www/html/auth.json \
