@@ -20,16 +20,29 @@
             </container>
         </referenceContainer>
 
-        <!-- CMS-block containing icon usps visible below cart item list -->
-        <container name="checkout.cart.bottom.container" htmlTag="div" htmlClass="icon-usps__wrapper">
-            <block class="Magento\Cms\Block\Block" name="icon.usps" after="-">
-                <arguments>
-                    <argument xsi:type="string" name="block_id">icon-usps</argument>
-                </arguments>
-            </block>
-        </container>
-
-        <move element="checkout.cart.bottom.container" destination="checkout.cart.container" after="-" />
+        <!-- Trustpilot review list + icon-usps trust badges inside the cart form
+             (.form-cart, the 65% left column), below the item list + actions.
+             Rendered through dedicated cart_trustpilot / cart_iconusps slots in
+             cart/form.phtml so they sit inside the column and scroll with it, never
+             spanning full-width under the sticky cart-summary. -->
+        <referenceBlock name="checkout.cart.form">
+            <container name="checkout.cart.trustpilot.container" as="cart_trustpilot"
+                       htmlTag="div" htmlClass="cart-trustpilot__wrapper">
+                <block class="Magento\Cms\Block\Block" name="trustpilot.cart.horizontal.list">
+                    <arguments>
+                        <argument xsi:type="string" name="block_id">trustpilot-horizontal-list</argument>
+                    </arguments>
+                </block>
+            </container>
+            <container name="checkout.cart.bottom.container" as="cart_iconusps"
+                       htmlTag="div" htmlClass="icon-usps__wrapper">
+                <block class="Magento\Cms\Block\Block" name="icon.usps">
+                    <arguments>
+                        <argument xsi:type="string" name="block_id">icon-usps</argument>
+                    </arguments>
+                </block>
+            </container>
+        </referenceBlock>
 
         <!-- Crosssell heading. Uses the default Magento_Catalog product/list/items.phtml template -->
         <referenceBlock name="checkout.cart.crosssell">

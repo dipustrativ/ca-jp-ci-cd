@@ -458,12 +458,26 @@
     }
 
     // Icon USPs strip (cart page only)
+    // The CMS block can render the three badges directly, or (when authored in
+    // admin) wrapped in a PageBuilder `[data-content-type]` / `.icon-usps` div.
+    // Make whichever element directly wraps the badges a 3-column flex row so
+    // they never fall back to vertical block flow.
     .checkout-cart-index {
-        .icon-usps__wrapper {
+        .icon-usps__wrapper,
+        .icon-usps__wrapper > [data-content-type],
+        .icon-usps__wrapper > .icon-usps {
             .lib-vendor-prefix-display(flex);
+            gap: 15px;
+            width: 100%;
+        }
+        .icon-usps__wrapper > [data-content-type],
+        .icon-usps__wrapper > .icon-usps {
+            flex: 1;
         }
         .icon-usps__container {
             .lib-vendor-prefix-display(flex);
+            flex: 1;
+            align-items: center;
             line-height: 1.2;
             max-height: 130px;
             background: #ededed;
@@ -471,12 +485,14 @@
             color: #3b3b3b;
             font-weight: 700;
 
-            img, p {
+            img, svg, p {
                 margin: auto;
             }
 
-            img {
-                max-width: 20%;
+            img, svg {
+                width: 20%;
+                max-width: 48px;
+                height: auto;
             }
             p {
                 max-width: 60%;
@@ -768,6 +784,19 @@
                 margin: 5px 0;
             }
         }
+        // Stack the badges vertically on small screens (inner wrapper too).
+        .icon-usps__wrapper > [data-content-type],
+        .icon-usps__wrapper > .icon-usps {
+            .lib-vendor-prefix-flex-direction(column);
+        }
+
+        // Trustpilot list stacks above the badges (order 4, same as badges;
+        // DOM order keeps it first), full width on small screens.
+        .cart-trustpilot__wrapper {
+            .lib-vendor-prefix-order(4);
+            width: 100%;
+            margin: 20px 0 10px;
+        }
 
         // Title
         .page-title {
@@ -930,10 +959,14 @@
             width: 100%;
         }
 
-        // Summary
+        // Summary — pinned while the left column (items + Trustpilot + USP
+        // badges) scrolls. top clears the pinned .sticky.wrapper header.
         .cart-summary {
             padding: 25px;
             width: 34%;
+            position: sticky;
+            top: 100px;
+            align-self: flex-start;
         }
 
         // Items
@@ -963,9 +996,21 @@
                 height: 100%;
             }
 
+            // Badge row: 3 badges side by side, full content width below the cart.
             &__wrapper {
                 .lib-vendor-prefix-display(flex);
-                width: 63%;
+                width: 100%;
+                margin-top: 40px;
+            }
+        }
+
+        // Trustpilot review list above the badges, full width, top-spaced.
+        .cart-trustpilot__wrapper {
+            width: 100%;
+            margin-top: 40px;
+
+            .trustpilot-widget {
+                margin: 0;
             }
         }
     }
