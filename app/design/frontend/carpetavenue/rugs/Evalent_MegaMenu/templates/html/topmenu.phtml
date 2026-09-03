@@ -89,6 +89,11 @@ $additionalDataShow = (int) $coreHelper->getConfig("catalog/navigation/show_hide
            nesting (verified: nested drill panels = 0), so the documented
            "nested fixed panel anchoring" concern does not apply. */
         .navigation.megamenu .submenu {
+            /* !important is load-bearing: core renders every submenu <ul> with
+               an inline style="display:none;", which only !important can beat.
+               And it must stay `block` — the panel hides by being pushed
+               off-screen with transform below, because display is not
+               animatable and `none` would kill the slide transition. */
             display: block !important;
             position: fixed !important;
             top: 0 !important;

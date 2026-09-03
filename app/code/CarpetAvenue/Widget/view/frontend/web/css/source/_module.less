@@ -1183,6 +1183,12 @@
                 //  Discount flag stays above the hover image (z-index 2).
                 .product-item__flag--discount {
                     z-index: 999;
+
+                    //  Maroon ribbon on the widget cards. carpetavenue.jp
+                    //  serves `discount_1.svg` (#7c232e) here and keeps the
+                    //  green `discount.svg` on category pages — both verified
+                    //  live — so override the theme's green only in this scope.
+                    background-image: url('../images/catalog_flags/discount_1.svg');
                 }
 
                 //  Same 280px box as the image container below — the hover
@@ -1239,34 +1245,38 @@
                     margin: 0 auto;
                 }
 
+                //  Details block spacing/typography below is measured off
+                //  carpetavenue.jp's homepage widget: the vertical rhythm comes
+                //  from the name + size margins, not from padding on the wrapper.
                 .product-item-details {
                     position: static;
-                    padding: 12px 10px 16px;
+                    padding: 0;
                 }
 
                 //  Name
                 .product-item-name {
                     .lib-font-size(16px);
                     font-weight: @font-weight__bold;
-                    margin: 0 0 4px;
+                    margin: 5px 0;
 
                     .product-item-link {
                         color: @primary__color;
                     }
                 }
 
-                //  Size line — match category grid .product-item-size
+                //  Size line
                 .size {
-                    font-size: 1.1rem;
+                    .lib-font-size(14px);
+                    color: #333;
                     display: block;
-                    margin-bottom: 6px;
+                    margin-bottom: 5px;
                 }
 
                 //  Price — centered, sale colouring. Match plain `.price-box`
                 //  too: the recently-viewed widget omits the `.price-final_price`
                 //  modifier the similar/related carousels carry.
                 .price-box {
-                    margin: 6px 0 0;
+                    margin: 0;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -1290,13 +1300,13 @@
                     }
 
                     .old-price {
-                        margin: 0 8px 0 0;
+                        margin: 0 5px 0 0;
                         text-decoration: line-through;
 
                         .price-container .price {
-                            color: #7d7d7d;
+                            color: #666;
                             font-weight: @font-weight__regular;
-                            .lib-font-size(14px);
+                            .lib-font-size(12px);
                         }
                     }
                 }
@@ -1356,10 +1366,12 @@
 
             //  5 per row. Recently-viewed items are plain .product-item (no
             //  col-md-2 class), so width them directly too.
+            //  15px gutter matches carpetavenue.jp (not the 10px the theme's
+            //  col-* grid defaults to), so the card lands on live's width.
             .ev-product-item,
             .product-item {
                 box-sizing: border-box;
-                padding: 0 10px;
+                padding: 0 15px;
                 max-width: 20%;
                 flex-basis: 20%;
             }
@@ -1574,15 +1586,37 @@
     }
 }
 
-//  Card hover shadow for the product widgets — parity with the catalog list
-//  (@product-item__hover__box-shadow: 0 10px 15px rgba(0,0,0,0.1)). The second
-//  image on hover is handled by a JS src-swap in items.phtml / sku_slider.phtml
-//  (data-hover-image), the same mechanism the catalog list uses.
-.ev-product-item .product-item-info {
-    transition: box-shadow 0.2s ease;
-
+//  Card hover lift for the product widgets — parity with the catalog list
+//  (theme Magento_Catalog/_extend.less) and with carpetavenue.jp, where the
+//  homepage widget card measures: bg #fff, 1px #e6e6e6, radius 5px,
+//  margin -20px, padding 19px, z-index 9, overflow hidden. The negative margin
+//  cancels padding + border (20px total) so the card grows outward without
+//  reflowing the grid. No transition — live applies it instantly, and
+//  animating only the shadow leaves it trailing the box.
+//  The second image on hover is handled by a JS src-swap in items.phtml /
+//  sku_slider.phtml (data-hover-image), the same mechanism the catalog list uses.
+//  The recently-viewed widget renders plain .product-item, so name its block
+//  too rather than relying on .ev-product-item.
+.ev-product-item .product-item-info,
+.block-viewed-products-grid .product-item-info {
     &:hover {
+        background: #fff;
+        border: 1px solid #e6e6e6;
+        border-radius: 5px;
         box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        margin: -20px;
+        padding: 19px;
+        z-index: 9;
+        overflow: hidden;
+
+        //  Absolute offsets resolve against .product-item-info's padding box,
+        //  so the 19px the card gains here would pull the badge up and left.
+        //  Add it back (live does the same) and the badge stays put on hover.
+        //  As a margin, not top/left: the badge's base offset is 20px on
+        //  desktop but 0 on mobile, and a relative shift is right for both.
+        .product-item__flag--discount {
+            margin: 19px 0 0 19px;
+        }
     }
 }
 
@@ -1613,15 +1647,6 @@
 //  .secondary-addto-links wrapper, and it prints size BEFORE the name), so give
 //  it the same catalog-card behaviour explicitly.
 .block-viewed-products-grid {
-    //  Hover box-shadow (parity with .ev-product-item cards).
-    .product-item-info {
-        transition: box-shadow 0.2s ease;
-
-        &:hover {
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-        }
-    }
-
     //  Reorder details: name first, then size, then price/actions.
     .product-item-details {
         display: flex;
