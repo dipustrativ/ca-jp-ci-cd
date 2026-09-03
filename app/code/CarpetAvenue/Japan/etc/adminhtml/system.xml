@@ -34,5 +34,23 @@
                 </field>
             </group>
         </section>
+        <!--
+            Swap the receipt email-template fields to a guarded source model. These
+            Evalent_InvoicePaymentMods fields live in the `payment` section, which
+            Magento\Paypal clones per country; the core source model throws
+            UnexpectedTemplateIdValueException for every country clone lacking a
+            declared default template, crashing the Payment Methods page.
+            See CarpetAvenue\Japan\Model\Config\Source\Email\ReceiptTemplate.
+        -->
+        <section id="payment">
+            <group id="evinvoicepayment">
+                <field id="email_template_receipt">
+                    <source_model>CarpetAvenue\Japan\Model\Config\Source\Email\ReceiptTemplate</source_model>
+                </field>
+                <field id="email_template_receipt_guest">
+                    <source_model>CarpetAvenue\Japan\Model\Config\Source\Email\ReceiptTemplate</source_model>
+                </field>
+            </group>
+        </section>
     </system>
 </config>
