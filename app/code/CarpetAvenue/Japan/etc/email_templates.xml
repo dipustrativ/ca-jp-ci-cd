@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Declares the receipt email templates under the ids the Evalent_InvoicePaymentMods
+ * config fields actually resolve to.
+ *
+ * The module's own email_templates.xml registers the ids with a stray "de_"
+ * (payment_de_evinvoicepayment_email_template_receipt) — a leftover from a German
+ * store variant — while the admin field path is payment/evinvoicepayment/... and the
+ * sending code (Plugin/Model/Order/Email/Container/InvoiceIdentity) reads that same
+ * non-"de_" path. The Email\Template source model derives its default-option id from
+ * the field path, looks it up in the merged email-templates config and, finding no
+ * "payment_evinvoicepayment_..." id, throws UnexpectedTemplateIdValueException when the
+ * Sales > Payment Methods config section renders. Declaring the matching ids here
+ * (additive, no core/vendor edit) resolves the label lookup and keeps sending intact.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="payment_evinvoicepayment_email_template_receipt" label="Receipt" file="receipt.html" type="html" module="Evalent_InvoicePaymentMods" area="frontend"/>
+    <template id="payment_evinvoicepayment_email_template_receipt_guest" label="Receipt (Guest)" file="receipt.html" type="html" module="Evalent_InvoicePaymentMods" area="frontend"/>
+</config>

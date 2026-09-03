@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <general>
+            <country>
+                <allow>JP</allow>
+                <default>JP</default>
+            </country>
+        </general>
+        <checkoutmodsjp>
+            <payment_buttons>
+                <banktransfer_enabled>1</banktransfer_enabled>
+            </payment_buttons>
+        </checkoutmodsjp>
+    </default>
+</config>

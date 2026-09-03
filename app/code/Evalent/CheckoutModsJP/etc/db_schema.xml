@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <!-- Add column to "sales_order" -->
+    <table name="sales_order">
+        <column xsi:type="varchar" name="shipping_firstname_jp" nullable="true" length="255" comment="Shipping Firstname Jp"/>
+        <column xsi:type="varchar" name="shipping_lastname_jp" nullable="true" length="255" comment="Shipping Lastname Jp"/>
+        <column xsi:type="varchar" name="billing_firstname_jp" nullable="true" length="255" comment="Billing Firstname Jp"/>
+        <column xsi:type="varchar" name="billing_lastname_jp" nullable="true" length="255" comment="Billing Lastname Jp"/>
+    </table>
+    <!-- Add column to "quote" -->
+    <table name="quote">
+        <column xsi:type="varchar" name="shipping_firstname_jp" nullable="true" length="255" comment="Shipping Firstname Jp"/>
+        <column xsi:type="varchar" name="shipping_lastname_jp" nullable="true" length="255" comment="Shipping Lastname Jp"/>
+        <column xsi:type="varchar" name="billing_firstname_jp" nullable="true" length="255" comment="Billing Firstname Jp"/>
+        <column xsi:type="varchar" name="billing_lastname_jp" nullable="true" length="255" comment="Billing Lastname Jp"/>
+    </table>
+</schema>

@@ -31,7 +31,6 @@
         "magentoj/language-ja_jp": "^1.1",
         "mageplaza/module-core": "^1.5",
         "mageplaza/module-smtp": "^4.7",
-        "mageworx/module-searchsuiteautocomplete": "^2.2",
         "mpdf/mpdf": "^8.3",
         "trustpilot/module-reviews": "^2.6",
         "webshopapps/module-matrixrate": "^20.5"
@@ -95,5 +94,14 @@
     ],
     "extra": {
         "magento-force": "override"
+    },
+    "scripts": {
+        "apply-patches": "bash patches/apply-patches.sh",
+        "post-install-cmd": [
+            "@apply-patches"
+        ],
+        "post-update-cmd": [
+            "@apply-patches"
+        ]
     }
 }
