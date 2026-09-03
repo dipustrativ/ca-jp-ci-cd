@@ -131,11 +131,16 @@ Run the exact production flow on your laptop. `docker/.env.local` points at the
 **local dev DB** (`ca_jp-db-1` via `host.docker.internal:3306`). Site answers on
 `http://carpetavenue-jp.devs` / `http://localhost`, plain HTTP.
 
-⚠️ **Stop the dev stack first** — it holds host `:80` and `:3306`:
+⚠️ **Free the two clashing host ports — but leave `ca_jp-db-1` running**, it is
+the DB this dry-run connects to. `docker compose -f ../compose.yaml down` would
+take it with everything else:
 
 ```bash
-docker compose -f ../compose.yaml down
+docker stop ca_jp-app-1 ca_jp-rabbitmq-1   # :80 and :15672
 ```
+
+`ca_jp-db-1` (:3306) only clashes if you add `--profile localdb`, which replaces
+the dev DB with a throwaway one — then stop it too and set `DB_HOST=db`.
 
 ```bash
 # 2.1 build a local tag. --load keeps it on this machine: no registry, no login.
