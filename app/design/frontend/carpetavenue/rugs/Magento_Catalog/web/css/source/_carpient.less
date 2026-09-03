@@ -232,13 +232,39 @@
 
 & when (@media-common = true) {
     .page-products .breadcrumbs {
-        margin-left: 20px;
+        margin-left: 32px;
         padding-left: 0;
     }
 
     // Grid/list view switcher not used on category pages
     .page-products .toolbar .modes {
         display: none;
+    }
+
+    // Sorter: live's compact select — 32px tall, 1px #ccc, 5px radius. Blank's
+    // form sizing made ours 48px. The asc/desc toggle beside it is not part of
+    // that design (live renders no .sorter-action at all); `display: none` drops
+    // it from the tab order too, so nothing is left focusable but invisible.
+    .page-products .toolbar .toolbar-sorter {
+        .sorter-label {
+            .lib-css(color, #333);
+        }
+
+        .sorter-options {
+            height: 32px;
+            margin: 0 5px 0 7px;
+            padding: 4px 15px 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #fff;
+            line-height: 20px;
+            .lib-font-size(14);
+            .lib-css(color, #000);
+        }
+
+        .sorter-action {
+            display: none;
+        }
     }
 
     // "Show X per page" limiter not used on category pages. Second

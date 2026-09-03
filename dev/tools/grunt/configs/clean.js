@@ -11,6 +11,22 @@ var themes = require('../tools/files-router').get('themes'),
 var themeOptions = {};
 
 _.each(themes, function(theme, name) {
+    // Scoped to the published .less sources — the only thing 'exec:<name>'
+    // (clean + dev:source-theme:deploy) puts back. Stock wiped the whole
+    // published theme dir, so one LESS save also deleted every .js
+    // (requirejs-config.js with it), image and font, killing all storefront JS
+    // until an uncached page render rebuilt them — which is why 'watch:<name>Src'
+    // used to need full_page cache off. var/view_preprocessed mirrors the
+    // pub/static path and holds the preprocessed copies of these files; it has
+    // to go with them or the republish reuses stale output. Magento 2.4 no
+    // longer uses path.tmpLess/tmpSource (2.1-era paths, they match nothing).
+    //
+    // deployedVersion stays in: this store does serve CSS under a
+    // /static/version<ts>/ prefix even in developer mode, and that prefix only
+    // moves when the file is gone. Leave it and the browser keeps the cached
+    // stylesheet after every save — the recompile lands and nothing changes on
+    // screen. Magento rewrites it on the next request, and it takes no JS with
+    // it, which was the actual problem with the stock wipe.
     themeOptions[name] = {
         "force": true,
         "files": [
@@ -18,10 +34,8 @@ _.each(themes, function(theme, name) {
                 "force": true,
                 "dot": true,
                 "src": [
-                    "<%= path.tmp %>/cache/**/*",
-                    "<%= combo.autopath(\""+name+"\", path.pub ) %>**/*",
-                    "<%= combo.autopath(\""+name+"\", path.tmpLess) %>**/*",
-                    "<%= combo.autopath(\""+name+"\", path.tmpSource) %>**/*",
+                    "<%= combo.autopath(\""+name+"\", path.pub ) %>**/*.less",
+                    "var/view_preprocessed/<%= combo.autopath(\""+name+"\", path.pub ) %>**/*",
                     "<%= path.deployedVersion %>"
                 ]
             }

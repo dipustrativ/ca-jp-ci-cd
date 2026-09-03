@@ -12,5 +12,11 @@
                 <argument name="option_image_view_model" xsi:type="object">Carpient\Filter\ViewModel\OptionImages</argument>
             </arguments>
         </referenceBlock>
+        <!-- Same swatch inside the active-filter chips (layer/state.phtml). -->
+        <referenceBlock name="catalog.navigation.state">
+            <arguments>
+                <argument name="option_image_view_model" xsi:type="object">Carpient\Filter\ViewModel\OptionImages</argument>
+            </arguments>
+        </referenceBlock>
     </body>
 </page>

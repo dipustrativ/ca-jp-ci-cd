@@ -29,7 +29,11 @@
                 <argument name="category_image_view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\CategoryImages</argument>
             </arguments>
         </referenceBlock>
-        <referenceBlock name="catalogsearch.navigation.state" template="CarpetAvenue_Productify::layer/state.phtml"/>
+        <referenceBlock name="catalogsearch.navigation.state" template="CarpetAvenue_Productify::layer/state.phtml">
+            <arguments>
+                <argument name="category_image_view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\CategoryImages</argument>
+            </arguments>
+        </referenceBlock>
 
         <referenceContainer name="after.body.start">
             <block class="CarpetAvenue\Productify\Block\BfCache\Init" name="productify.bfcache.init.search" template="CarpetAvenue_Productify::bfcache/init.phtml"/>

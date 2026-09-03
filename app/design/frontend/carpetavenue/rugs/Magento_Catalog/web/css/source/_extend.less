@@ -97,38 +97,70 @@
                 color: #333;
             }
         }
+    }
 
-        //  Active filters row: "All filters" opener + chips + clear
-        .filter-state-bar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px 14px;
-            width: 100%;
+    //  Active filters row: chips, then "clear", with the "all filters" opener
+    //  docked to the far right — live's order. The markup emits the opener
+    //  first, so the three are re-ordered here rather than in the template
+    //  (live does the same with `flex-direction: row-reverse`).
+    //
+    //  Deliberately NOT nested under .block.filter: below @screen__m
+    //  layer/view.phtml re-parents this bar into the product toolbar, and these
+    //  rules have to follow it. The mobile block overrides only what differs
+    //  there (padding, rules, the opener).
+    .filter-state-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        width: 100%;
+        padding: 5px 5px 7px;
+        border-bottom: 1px solid #ccc;
+        background: #fff;
+        box-sizing: border-box;
 
-            button.open-filter-popup {
-                flex-shrink: 0;
-                margin: 0;
-                padding: 0;
-                border: 0;
-                background: none;
-                color: #333;
-                font-weight: 600;
-                text-transform: uppercase;
-                cursor: pointer;
+        .am-filter-chips {
+            order: 1;
+            margin: 0;
+        }
 
-                &:before {
-                    margin-right: 10px;
-                    .lib-css(color, #888);
-                    .lib-font-size(20);
-                    vertical-align: middle;
-                }
+        .filter-actions {
+            order: 2;
+            margin: 0 5px;
+        }
+
+        button.open-filter-popup {
+            order: 3;
+            flex-shrink: 0;
+            margin-left: auto;
+            padding: 15px;
+            border: 0;
+            background: none;
+            color: #333;
+            font-weight: 400;
+            text-transform: none;
+            cursor: pointer;
+
+            &:hover{
+                background: #f2f2f2;
             }
 
-            .am-filter-chips,
-            .filter-actions {
-                margin: 0;
+            &:active{
+                box-shadow: none !important;
             }
+
+            &:before {
+                margin-right: 10px;
+                .lib-css(color, #888);
+                .lib-font-size(20);
+                vertical-align: middle;
+            }
+        }
+
+        //  Underlined black text link, not a button (live).
+        .filter-clear.action.clear {
+            padding: 4px 11px;
+            .lib-css(color, #000);
+            text-decoration: underline;
         }
     }
 }
@@ -335,32 +367,30 @@
             }
         }
 
-        //  Option rows: white cards on the grey panel — label left, count right,
-        //  green border on hover/selected (reference "パターン" list design).
-        //  Takes the height left under the title and scrolls its own rows, so
-        //  the white card always reaches down to the apply bar instead of ending
-        //  wherever the list happens to stop. `min-height: 0` is what lets a
-        //  flex item shrink below its content and actually scroll.
+        //  Option rows: one white card per option, floating on the grey panel —
+        //  label left, count pill right, green border on hover. That is live's
+        //  layout for every attribute; カテゴリ is its single exception and
+        //  collapses back into one white box further down (&.am-filter--cat).
+        //  The list takes the height left under the title and scrolls its own
+        //  rows down to the apply bar; `min-height: 0` is what lets a flex item
+        //  shrink below its content and actually scroll.
         .am-filter-items {
             flex: 1 1 auto;
             min-height: 0;
             overflow-y: auto;
             position: relative;
-            background: #fff;
-            padding: 10px 10px;
-
+            background: transparent;
+            padding: 0;
 
             .am-filter-item {
                 position: relative; // anchor for the selected tick
                 background: #fff;
-                margin: 0px;
-                padding: 0 5px 0;
+                margin: 0 0 10px;
+                padding: 5px;
                 border: 2px solid transparent;
-                border-bottom: 1px solid #ccc !important;
 
                 &:hover {
-                    border-color: #429a3c !important;
-                    border-width: 2px !important;
+                    border-color: #429a3c;
                 }
 
                 &.-disabled {
@@ -404,21 +434,21 @@
 
                     .am-filter-label,
                     .count {
-                        color: #3a6fb0;
+                        color: #1979c3;
                     }
                 }
             }
 
-            //  No horizontal padding — live's row link is `padding: 0`, so the
-            //  thumbnail sits against the card edge and the count against the
-            //  right. Our 16px inset pulled both inwards and read as a narrower
-            //  card. Vertical padding stays: it sets the row height.
+            //  Live's row link: `padding: 0 7px 0 0` on a 44px row, so the
+            //  swatch sits against the card's left padding and the count pill
+            //  7px in from the right.
             .am-filter-link {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
                 width: 100%;
-                padding: 14px 0;
+                min-height: 44px;
+                padding: 0 7px 0 0;
                 color: #333;
                 text-decoration: none;
                 box-sizing: border-box;
@@ -429,160 +459,147 @@
                 display: none;
             }
 
-            //  Square corners — live's thumbnails are not rounded.
+            //  Square corners — live's thumbnails and icons are not rounded.
             .am-filter-swatch {
                 flex: 0 0 auto;
-                width: 28px;
-                height: 28px;
-                margin-right: 12px;
-                background-size: cover;
+                width: 30px;
+                height: 30px;
+                margin-right: 10px;
+                background-size: contain;
                 background-position: center;
             }
 
             .am-filter-label {
                 flex: 1 1 auto;
+                margin-right: 5px;
                 text-align: left;
+                .lib-font-size(16);
+                color: #494949;
             }
 
+            //  Live's count pill, on every list: bare number, no parentheses
+            //  (the module's base style adds them).
             .count {
                 flex: 0 0 auto;
                 margin-left: 12px;
-                color: #888;
-                font-size: 1.3rem;
-                font-weight: 500;
-            }
+                padding: 0 5px;
+                border-radius: 5px;
+                background: #e7e7e7;
+                color: #464646;
+                .lib-font-size(12);
 
-            //  Category filter ("カテゴリ"): landscape category thumbnail per row
-            //  plus a pill-style count, matching the reference design. Wins over
-            //  the 28px swatch above via the extra .am-filter--cat class.
-            &.am-filter--cat {
-                .am-filter-swatch {
-                    width: 92px;
-                    height: 64px;
-                    margin-right: 16px;
-                }
-
-                .count {
-                    padding: 3px 10px;
-                    border-radius: 6px;
-                    background: #f0f0f0;
-                    color: #666;
-                }
-            }
-
-            //  Colour filter ("色"): larger circular colour swatch per row plus a
-            //  pill-style count, same row/card design as the category list.
-            &.am-filter--color {
-                display: block; // override the Carpient swatch grid — one row each
-
-                .am-filter-item {
-                    margin: 0;
-                }
-
-                .am-filter-link {
-                    flex-direction: row;
-                }
-
-                .am-filter-swatch {
-                    width: 40px;
-                    height: 40px;
-                    margin-right: 16px;
-                    border-radius: 50%;
-                    border: 1px solid #e0e0e0;
-                    background-size: cover;
-                    background-color: #fff;
-                }
-
-                .am-filter-label {
-                    flex: 1 1 auto;
-                    text-align: left;
-                    font-size: 1.4rem;
-                }
-
-                .count {
-                    display: inline-block;
-                    padding: 3px 10px;
-                    border-radius: 6px;
-                    background: #f0f0f0;
-                    color: #666;
-                }
-            }
-
-            //  Every other attribute filter (production type, size, shape, …):
-            //  same single-row card design as colour — undo the Carpient grid /
-            //  pill-button layouts so they read as label-left, count-pill-right
-            //  rows. Category keeps its own landscape-thumbnail design above.
-            &.am-filter--production_type,
-            &.am-filter--size_group,
-            &.am-filter--shape {
-                display: block; // undo Carpient's grid
-
-                .am-filter-item {
-                    margin: 0;
-                }
-
-                .am-filter-link {
-                    justify-content: space-between;
-                    height: auto;
-                    padding: 14px 16px;
-                    border: 0;
-                    border-radius: 0;
-                    text-align: left;
-
-                    &:hover {
-                        background: none;
-                    }
-                }
-
-                //  Any option icon (e.g. shape) sits left like the colour swatch.
-                .am-filter-swatch {
-                    width: 40px;
-                    height: 40px;
-                    margin-right: 16px;
-                    background-size: contain;
-                }
-
-                .am-filter-label {
-                    flex: 1 1 auto;
-                    text-align: left;
-                    font-size: 1.4rem;
-                }
-
-                //  Carpient hides the count for these; bring it back as a pill.
-                .count {
-                    display: inline-block;
-                    padding: 3px 10px;
-                    border-radius: 6px;
-                    background: #f0f0f0;
-                    color: #666;
-                }
-
-                //  Drop the filled-pill selected state; the row's green border
-                //  (shared card style) already signals selection.
-                .am-filter-item.-selected .am-filter-link {
-                    background: none;
-                    color: #333;
-                }
-            }
-
-            //  These counts show a bare number in the pill, no parentheses.
-            &.am-filter--cat .count,
-            &.am-filter--color .count,
-            &.am-filter--production_type .count,
-            &.am-filter--size_group .count,
-            &.am-filter--shape .count {
                 &:before,
                 &:after {
                     content: none;
                 }
             }
+
+            //  Swatch attributes — colour ("色") and shape ("形"), which get
+            //  the identical row: cards 5px apart (the plain label lists use
+            //  10px), a bordered square chip indented 35px from the card edge,
+            //  and the tick sitting in that gutter instead of the corner,
+            //  centred on the row. Live keeps a wider icon box on 形; one row
+            //  design for both is what this store wants, and it also keeps the
+            //  labels aligned while the shape icons are still unset.
+            //  A chosen option's chip outline goes white so it disappears
+            //  against the card, exactly as live marks a selection.
+            &.am-filter--color,
+            &.am-filter--shape {
+                .am-filter-item {
+                    margin-bottom: 5px;
+                }
+
+                //  The renderer emits `.am-filter-checkbox` in place of the
+                //  swatch when an option has no uploaded image. The modal hides
+                //  it everywhere else; here it keeps the chip's footprint but
+                //  none of its outline, so every label starts at the same x
+                //  whether the image exists yet or not.
+                .am-filter-swatch,
+                .am-filter-checkbox {
+                    display: block;
+                    width: 30px;
+                    height: 30px;
+                    margin: 5px 10px 5px 35px;
+                    border: 0;
+                    background: none;
+                }
+
+                //  border-box so the outlined chip and the borderless
+                //  placeholder occupy the same 30px, keeping every label in one
+                //  column whether the option has an image or not.
+                .am-filter-swatch {
+                    border: 1px solid #dadada;
+                    box-sizing: border-box;
+                    background-size: contain;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                }
+
+                .am-filter-item.-selected {
+                    &:before {
+                        top: 50%;
+                        left: 3px;
+                        margin-top: -10px;
+                    }
+
+                    &:after {
+                        top: 50%;
+                        left: 8px;
+                        margin-top: -3px;
+                    }
+
+                    .am-filter-swatch {
+                        border-color: #fff;
+                    }
+                }
+            }
+
+            //  Category ("カテゴリ") is live's one exception to the card list: a
+            //  single white box whose rows are split by hairlines, each row a
+            //  landscape category thumbnail. Wins over the base card style via
+            //  the extra .am-filter--cat class.
+            &.am-filter--cat {
+                background: #fff;
+                padding: 10px;
+
+                .am-filter-item {
+                    margin: 0;
+                    padding: 0 5px;
+                    border-bottom: 1px solid #ccc;
+
+                    &:last-child {
+                        border-bottom: 0;
+                    }
+
+                    //  This hairline divider and the shared `:hover
+                    //  { border-color }` above carry equal specificity, so the
+                    //  later one won and the hover box lost its bottom edge.
+                    //  Restate it here as live does: a full 2px green frame.
+                    &:hover {
+                        border-bottom: 2px solid #429a3c;
+                    }
+                }
+
+                .am-filter-link {
+                    padding: 14px 0;
+                }
+
+                .am-filter-swatch {
+                    width: 92px;
+                    height: 64px;
+                    margin-right: 16px;
+                    background-size: cover;
+                }
+            }
         }
 
+        //  Range sliders (価格 / サイズ) keep a white card on the grey panel —
+        //  live's `.amshopby-slider-wrapper` metrics.
         .am-price-slider {
             position: relative;
             background: #fff;
-            margin: 10px 0;
-            padding: 12px 10px;
+            margin: 0 0 15px;
+            padding: 5px 15px 15px;
         }
 
         //  "Size" section groups Length + Width sliders, each under its own label.
@@ -1045,18 +1062,199 @@
 }
 
 //
+//  Filter entry point — mobile
+//
+//  Live drops the attribute button bar below @screen__m and shows a two-up row
+//  instead: [ sort | Filter ], hairline above and below, product count on its
+//  own line underneath. Its markup lives in the product toolbar, which already
+//  holds the sorter and the count — the opener is rendered there too (see the
+//  theme's product/list/toolbar.phtml), so the whole row is one flex container
+//  and `order` alone arranges it. Everything is percentage- and flex-based with
+//  `min-width: 0`, so it holds down to 320px without the halves overflowing.
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+
+    //  Four classes (both body-level) so this beats the media-common
+    //  `display: block !important` in _carpient.less regardless of the order
+    //  the two files' media blocks land in.
+    .page-layout-fullwidth-filter.page-products .toolbar.toolbar-products {
+        display: flex !important;
+        flex-wrap: wrap;
+        align-items: stretch;
+        margin: 16px 0 10px;
+        padding: 0;
+        border-top: 1px solid #e0e0e0;
+
+        .toolbar-sorter {
+            order: 1;
+            position: relative; // anchor for the chevron
+            display: flex;
+            align-items: center;
+            flex: 1 1 50%;
+            min-width: 0;      // lets the half shrink instead of overflowing
+            margin: 0;
+            padding: 4px 16px;
+            //  The two halves carry the row's bottom rule between them, so it
+            //  is there whether or not a chips row follows.
+            border-right: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
+            box-sizing: border-box;
+
+            //  Own chevron: the select's native arrow is suppressed so the mark
+            //  sits at the half's right edge, not against the option text.
+            &:after {
+                content: '';
+                position: absolute;
+                right: 16px;
+                top: 50%;
+                width: 8px;
+                height: 8px;
+                border-right: 2px solid #333;
+                border-bottom: 2px solid #333;
+                transform: translateY(-75%) rotate(45deg);
+                pointer-events: none;
+            }
+
+            //  "Sort By" is implied by the row itself on mobile.
+            .sorter-label {
+                display: none;
+            }
+
+            .sorter-options {
+                width: 100%;
+                min-width: 0;
+                height: 32px;
+                margin: 0;
+                padding: 0 26px 0 0;
+                border: 0;
+                border-radius: 0;
+                background: none;
+                .lib-font-size(16);
+                -webkit-appearance: none;
+                appearance: none;
+            }
+        }
+
+        .open-filter-popup--mobile {
+            order: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1 1 50%;
+            min-width: 0;
+            height: 40px;
+            margin: 0;
+            padding: 9px 14px;
+            border: 0;
+            border-bottom: 1px solid #e0e0e0;
+            border-radius: 0;
+            background: none;
+            font-weight: 600;
+            .lib-font-size(16);
+            .lib-css(color, #000);
+
+            &:hover,
+            &:focus,
+            &:active {
+                background: none;
+                box-shadow: none;
+                .lib-css(color, #000);
+            }
+
+            &:before {
+                margin: 0;
+                .lib-css(color, #000);
+                .lib-font-size(18);
+            }
+        }
+
+        //  Active-filter chips: their own full-width row directly under the
+        //  sort/filter row (live's mft-row2), on ONE line that scrolls sideways.
+        //  Live never wraps them, however many are applied.
+        .am-filter-chips {
+            order: 3;
+            flex: 1 0 100%;
+            min-width: 0;
+            margin: 10px 0 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+
+            .items {
+                flex-wrap: nowrap;
+                padding-left: 5px;
+            }
+
+            //  Chips keep their width instead of squeezing to fit, which is
+            //  what pushes the line past the container and makes it scroll.
+            .am-chip {
+                flex: 0 0 auto;
+            }
+        }
+
+        //  Count and "clear all" share the last row, clear pushed right by the
+        //  count's flex-grow (live's mft-row3).
+        .toolbar-amount {
+            order: 4;
+            flex: 1 1 auto;
+            margin: 0;
+            padding: 10px 0 4px;
+            text-align: left;
+            .lib-font-size(14);
+        }
+
+        .filter-actions {
+            order: 5;
+            flex: 0 0 auto;
+            margin: 0;
+            padding: 10px 0 4px;
+            text-align: right;
+        }
+    }
+
+    //  The attribute buttons and the desktop "all filters" opener are what the
+    //  sort/filter row replaces, and layer/view.phtml has re-parented the chips
+    //  and the clear link into the toolbar — so nothing in .block.filter is
+    //  wanted here. The bar keeps its (now empty) shell and the desktop opener,
+    //  hence hiding it rather than the block.
+    .page-layout-2columns-left.page-layout-fullwidth-filter .block.filter {
+        margin-bottom: 0;
+
+        button.button-filter,
+        .filter-state-bar {
+            display: none;
+        }
+    }
+}
+
+//
 //  Filter modal — mobile
 //  _____________________________________________
 .media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
     .modal-slide.filter-modal {
         padding: 0;
 
+        //  Live's drawer title is a medium weight, not blank's light.
+        .modal-header .modal-title {
+            font-weight: 500;
+        }
+
         #filter-popup {
+            //  10px gutters on the attribute list, matching live's 480px rows in
+            //  a 500px drawer. The option panels are position:fixed, so this
+            //  only insets the list, and the pinned apply bar resolves against
+            //  .modal-inner-wrap rather than here.
+            padding: 0 10px;
+
             //  Mobile puts it top-right (live: 10px in from the panel edge).
             button.filter-options-back {
                 top: 17px;
                 left: auto;
                 right: 10px;
+            }
+
+            .filter-options-item {
+                padding-bottom: 10px;
             }
 
             .filter-options-title {
@@ -1067,8 +1265,17 @@
                 margin-top: 10px;
             }
 
+            //  Full-bleed divider. The list is inset 10px, so the line has to
+            //  reach back out over both gutters or it stops short of the right
+            //  edge; live gets the same result from a statically positioned
+            //  item whose :after resolves against the drawer instead. `bottom`
+            //  pins it to the row's base — left at its static position it sat
+            //  above the row's 10px padding, so the gap under the line was
+            //  wider than the one above it.
             .filter-options-item:after {
                 margin-left: -10px;
+                width: ~'calc(100% + 20px)';
+                bottom: 4px;
             }
         }
     }
@@ -1080,6 +1287,12 @@
 //  Filter modal — desktop: 30% wide panel docked right
 //  _____________________________________________
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+
+    //  Desktop keeps the attribute button bar, so the mobile opener has no job.
+    .toolbar-products .open-filter-popup--mobile {
+        display: none;
+    }
+
     .modal-slide.filter-modal {
         left: 70%;
         right: 0;

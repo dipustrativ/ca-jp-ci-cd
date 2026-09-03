@@ -79,32 +79,34 @@ instead of `styles-m.css`) and a watch loop, so you don't redeploy static conten
 on every save:
 
 ```bash
-docker exec -it carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && npx grunt watch:rugs"
+docker exec -it carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && npx grunt watch:rugsSrc"
 ```
 
-`watch:rugs`, never bare `grunt watch` (two targets fight over livereload port
-35729). The target is defined in `dev/tools/grunt/configs/local-themes.js`
-(`carpetavenue/rugs`, `ja_JP`). Requires developer mode and a one-time
-`npm install` + `grunt exec:rugs` inside the container — full setup, gotchas and
-verification in `docs/runbooks/frontend-less-grunt.md`.
+`watch:rugsSrc`, never bare `grunt watch` (two targets fight over livereload port
+35729) and never `watch:rugs` (stock target — watches only the published copy, so
+it sits idle on `app/design` edits). The theme is defined in
+`dev/tools/grunt/configs/local-themes.js` (`carpetavenue/rugs`, `ja_JP`). Requires
+developer mode and a one-time `npm install` + `grunt exec:rugs` inside the
+container — full setup, gotchas and verification in
+`docs/runbooks/frontend-less-grunt.md`.
 
-**Turn full-page cache off before starting the watch loop** — otherwise all
-storefront JS dies on your first LESS save:
+**Turn full-page cache off before starting the watch loop**, and leave it off:
 
 ```bash
 docker exec carpetavenue-jp-phpfpm-1 sh -c "cd /var/www/html && php bin/magento cache:disable full_page && php bin/magento cache:flush"
 ```
 
-Why: this repo's `watch.js` adds a `<name>Src` target that runs `exec:rugs` on
-every `.less` save under `app/design` (so watch sees source edits at all).
-Magento's `exec:<theme>` is `grunt clean:<theme> && bin/magento
-dev:source-theme:deploy`, and `clean.js` deletes `pub/static/**/*.js` and
-`deployed_version.txt` — taking `requirejs-config.js` with it. That file is
-virtual: `static.php` cannot resolve it, and Magento only rewrites it during an
-*uncached* page render. With FPC on, that render never happens, so every request
-404s — served as `text/plain`, so the browser refuses the script and the whole
-requirejs graph fails. With FPC off it regenerates on the next reload, every
-time. Re-enable with `cache:enable full_page` when done.
+This store links CSS under `/static/version<ts>/` even in developer mode. The
+prefix comes from `pub/static/deployed_version.txt`, which `clean:<theme>`
+deletes and Magento rewrites on the next *uncached* render — so with FPC on the
+cached HTML keeps pointing at the old prefix and the browser keeps serving the
+stylesheet you just recompiled. `cache:flush` after every save works too; off is
+less to remember. Re-enable with `cache:enable full_page` when done.
+
+`clean.js` scopes the per-theme target to the published `.less` files, their
+`var/view_preprocessed` copies, and `deployed_version.txt` — nothing else. Stock
+wiped the whole published theme dir, taking every `.js` (`requirejs-config.js`
+included) with it, which killed all storefront JS between saves.
 
 ## Lint / static analysis / tests
 

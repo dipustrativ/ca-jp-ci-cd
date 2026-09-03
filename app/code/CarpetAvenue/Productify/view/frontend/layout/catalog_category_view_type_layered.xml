@@ -11,7 +11,11 @@
                 <argument name="category_image_view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\CategoryImages</argument>
             </arguments>
         </referenceBlock>
-        <referenceBlock name="catalog.navigation.state" template="CarpetAvenue_Productify::layer/state.phtml"/>
+        <referenceBlock name="catalog.navigation.state" template="CarpetAvenue_Productify::layer/state.phtml">
+            <arguments>
+                <argument name="category_image_view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\CategoryImages</argument>
+            </arguments>
+        </referenceBlock>
         <referenceContainer name="before.body.end">
             <block class="Magento\Framework\View\Element\Template" name="carpetavenue.layerednav.ajax" template="CarpetAvenue_Productify::ajax/init.phtml">
                 <arguments>

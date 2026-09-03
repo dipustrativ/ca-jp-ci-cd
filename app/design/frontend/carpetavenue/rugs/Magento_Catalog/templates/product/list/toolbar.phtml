@@ -1,0 +1,39 @@
+<?php
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Copy of Magento_Catalog::product/list/toolbar.phtml with one addition: the
+ * mobile filter opener. Below @screen__m the attribute button bar is replaced by
+ * live's two-up row — [ sort | Filter ] with the product count underneath — and
+ * that row needs the sorter and the opener inside one flex container. The sorter
+ * only exists here, so the button is rendered here too; docking it with JS would
+ * leave it in the wrong container after a resize. Styles live in the theme's
+ * Magento_Catalog/web/css/source/_extend.less (mobile toolbar block); the click
+ * is handled by the delegated `.open-filter-popup` binding in
+ * Magento_LayeredNavigation::layer/view.phtml.
+ *
+ * @var $block \Magento\Catalog\Block\Product\ProductList\Toolbar
+ */
+?>
+<?php if ($block->getCollection()->getSize()) :?>
+    <?php $widget = $this->helper(\Magento\Framework\Json\Helper\Data::class)->jsonDecode($block->getWidgetOptionsJson());
+        $widgetOptions = $this->helper(\Magento\Framework\Json\Helper\Data::class)->jsonEncode($widget['productListToolbarForm']);
+    ?>
+    <div class="toolbar toolbar-products" data-mage-init='{"productListToolbarForm":<?= /* @noEscape */ $widgetOptions ?>}'>
+        <?php if ($block->getIsBottom()): ?>
+            <?= $block->getPagerHtml() ?>
+            <?= $block->fetchView($block->getTemplateFile('Magento_Catalog::product/list/toolbar/limiter.phtml')) ?>
+        <?php else: ?>
+            <?php if ($block->isExpanded()): ?>
+                <?= $block->fetchView($block->getTemplateFile('Magento_Catalog::product/list/toolbar/viewmode.phtml')) ?>
+            <?php endif ?>
+            <?= $block->fetchView($block->getTemplateFile('Magento_Catalog::product/list/toolbar/amount.phtml')) ?>
+            <?php if ($block->isExpanded()): ?>
+                <?= $block->fetchView($block->getTemplateFile('Magento_Catalog::product/list/toolbar/sorter.phtml')) ?>
+            <?php endif ?>
+            <button type="button" class="open-filter-popup open-filter-popup--mobile navicon-equalizer">
+                <?= $block->escapeHtml(__('Filter')) ?>
+            </button>
+        <?php endif ?>
+    </div>
+<?php endif ?>
