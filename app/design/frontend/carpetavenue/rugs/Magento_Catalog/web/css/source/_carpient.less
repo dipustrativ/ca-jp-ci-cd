@@ -248,4 +248,16 @@
     .page-products .products.wrapper ~ .toolbar .field.limiter {
         display: none;
     }
+
+    // Infinite scroll (ajaxscroll) blanket-hides every .toolbar with an inline
+    // display:none (see Productify AjaxScroll init.phtml, hide_toolbar). Re-show
+    // the TOP toolbar so the product count + sorter stay usable; keep the BOTTOM
+    // toolbar hidden — it only holds the native pager, which infinite scroll
+    // replaces. !important is required to beat the JS-set inline style.
+    .page-products .toolbar.toolbar-products {
+        display: block !important;
+    }
+    .page-products .products.wrapper ~ .toolbar.toolbar-products {
+        display: none !important;
+    }
 }
