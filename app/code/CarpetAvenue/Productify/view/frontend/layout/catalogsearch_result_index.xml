@@ -34,6 +34,13 @@
                 <argument name="category_image_view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\CategoryImages</argument>
             </arguments>
         </referenceBlock>
+        <!-- Applied-filter count for the mobile filter button's badge (see the
+             theme's product/list/toolbar.phtml). -->
+        <referenceBlock name="product_list_toolbar">
+            <arguments>
+                <argument name="filter_config" xsi:type="object">CarpetAvenue\Productify\LayeredNavigation\ViewModel\FilterConfig</argument>
+            </arguments>
+        </referenceBlock>
 
         <referenceContainer name="after.body.start">
             <block class="CarpetAvenue\Productify\Block\BfCache\Init" name="productify.bfcache.init.search" template="CarpetAvenue_Productify::bfcache/init.phtml"/>

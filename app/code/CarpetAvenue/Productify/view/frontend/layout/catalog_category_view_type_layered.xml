@@ -16,6 +16,14 @@
                 <argument name="category_image_view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\CategoryImages</argument>
             </arguments>
         </referenceBlock>
+        <!-- Applied-filter count for the mobile filter button's badge (see the
+             theme's product/list/toolbar.phtml). Only wired on the layered
+             handles, so listings without filters render no badge. -->
+        <referenceBlock name="product_list_toolbar">
+            <arguments>
+                <argument name="filter_config" xsi:type="object">CarpetAvenue\Productify\LayeredNavigation\ViewModel\FilterConfig</argument>
+            </arguments>
+        </referenceBlock>
         <referenceContainer name="before.body.end">
             <block class="Magento\Framework\View\Element\Template" name="carpetavenue.layerednav.ajax" template="CarpetAvenue_Productify::ajax/init.phtml">
                 <arguments>

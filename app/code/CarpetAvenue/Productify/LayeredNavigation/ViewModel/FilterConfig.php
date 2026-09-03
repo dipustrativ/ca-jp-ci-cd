@@ -29,6 +29,16 @@ class FilterConfig implements ArgumentInterface
         return $this->config->isAjaxEnabled();
     }
 
+    /**
+     * Number of applied filter values, for the mobile filter button's badge.
+     * Counts values rather than attributes, so it always matches the number of
+     * chips on screen — which is what carpetavenue.jp badges.
+     */
+    public function getAppliedFilterCount(): int
+    {
+        return count($this->layerResolver->get()->getState()->getFilters());
+    }
+
     public function getJsonConfig(): string
     {
         return $this->json->serialize([
