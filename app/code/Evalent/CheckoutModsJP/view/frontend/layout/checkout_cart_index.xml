@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Evalent_CheckoutModsJP::css/payment-icons.css"/>
+    </head>
+    <body>
+        <referenceContainer name="methods">
+            <referenceBlock name="checkout.cart.methods.onepage.bottom">
+                <action method="setTemplate">
+                    <argument name="template" xsi:type="string">Evalent_CheckoutModsJP::onepage/link.phtml</argument>
+                </action>
+            </referenceBlock>
+        </referenceContainer>
+    </body>
+</page>

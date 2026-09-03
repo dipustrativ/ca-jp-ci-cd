@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!--
+        Mageplaza's own router (sort order 1) resolves /onestepcheckout first, so we
+        override the class to intercept the /banktransfer and /other button URLs.
+    -->
+    <preference for="Mageplaza\Osc\Controller\Router"
+                type="Evalent\CheckoutModsJP\Overwrite\Mageplaza\Osc\Controller\Router"/>
+</config>

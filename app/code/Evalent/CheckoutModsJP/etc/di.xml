@@ -1,0 +1,41 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Mageplaza\Osc\Block\Checkout\LayoutProcessor">
+        <plugin name="add_custom_name_field_checkout_form" type="Evalent\CheckoutModsJP\Plugin\Checkout\LayoutProcessor"
+                sortOrder="10"/>
+    </type>
+    <type name="Magento\Checkout\Model\ShippingInformationManagement">
+        <plugin name="save_to_quote_table_attributes_jp" type="Evalent\CheckoutModsJP\Plugin\Quote\SaveToQuote"
+                sortOrder="10"/>
+    </type>
+
+    <!-- Cart "proceed to checkout" buttons (bank transfer / other methods) -->
+    <preference for="Magento\Checkout\Block\Onepage\Link"
+                type="Evalent\CheckoutModsJP\Overwrite\Block\Onepage\Link"/>
+
+    <!-- Every checkout entry point (minicart, cart sidebar, onepage link) lands on the cart page -->
+    <type name="Magento\Checkout\Block\Cart\Sidebar">
+        <plugin name="jp_after_get_checkout_url_cart_sidebar" type="Evalent\CheckoutModsJP\Plugin\Block\AfterGetCheckoutUrl"/>
+    </type>
+    <type name="Magento\Checkout\Block\Cart">
+        <plugin name="jp_after_get_checkout_url_cart" type="Evalent\CheckoutModsJP\Plugin\Block\AfterGetCheckoutUrl"/>
+    </type>
+    <type name="Magento\Checkout\Block\Onepage\Link">
+        <plugin name="jp_after_get_checkout_url_onepage_link" type="Evalent\CheckoutModsJP\Plugin\Block\AfterGetCheckoutUrl"/>
+    </type>
+
+    <!-- Custom logger: writes daily file var/log/carpetavenue/checkout/sanitize-YYYY-MM-DD.log -->
+    <virtualType name="Evalent\CheckoutModsJP\Logger\SanitizeAddressLogger"
+                 type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Evalent\CheckoutModsJP\Logger\Handler\SanitizeAddress</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Evalent\CheckoutModsJP\Observer\SanitizeAddressFields">
+        <arguments>
+            <argument name="logger" xsi:type="object">Evalent\CheckoutModsJP\Logger\SanitizeAddressLogger</argument>
+        </arguments>
+    </type>
+</config>

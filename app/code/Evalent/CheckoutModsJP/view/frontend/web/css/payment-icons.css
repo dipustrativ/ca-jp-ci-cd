@@ -1,0 +1,32 @@
+.payment-icons-strip {
+    margin-top: 14px;
+}
+.payment-icons-strip .payment-icons-heading {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.4rem;
+    color: #333;
+}
+.payment-icons-strip .payment-icons-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+.payment-icons-strip .payment-icons-list > li {
+    margin: 0;
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dddddd;
+}
+.payment-icons-strip .payment-icons-list img {
+    display: block;
+    width: 48px;
+    height: auto;
+    object-fit: contain;
+}
