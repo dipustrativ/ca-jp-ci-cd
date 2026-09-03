@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
+    <extension_attributes for="Magento\Quote\Api\Data\AddressInterface">
+        <attribute code="shipping_lastname_jp" type="string" />
+        <attribute code="shipping_firstname_jp" type="string" />
+        <attribute code="billing_lastname_jp" type="string" />
+        <attribute code="billing_firstname_jp" type="string" />
+    </extension_attributes>
+    <extension_attributes for="Magento\Checkout\Api\Data\ShippingInformationInterface">
+        <attribute code="shipping_lastname_jp" type="string" />
+        <attribute code="shipping_firstname_jp" type="string" />
+        <attribute code="billing_lastname_jp" type="string" />
+        <attribute code="billing_firstname_jp" type="string" />
+    </extension_attributes>
+</config>

@@ -1,0 +1,78 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var $block \Evalent\CheckoutModsJP\Overwrite\Block\Onepage\Link */
+$magePlazaEnabled = $block->isMagePlazaOnestepEnabled();
+?>
+<?php if ($block->isPossibleOnepageCheckout()) :?>
+    <?php if ($magePlazaEnabled) :?>
+
+        <?php if ($block->bankTransferEnabled()) :?>
+            <button type="button"
+                    data-role="proceed-to-checkout"
+                    title="<?= $block->escapeHtmlAttr(__('Proceed with Bank Transfer')) ?>"
+                    data-mage-init='{
+                            "Magento_Checkout/js/proceed-to-checkout":{
+                                "checkoutUrl":"<?= $block->escapeJs($block->escapeUrl($block->getUrl('onestepcheckout', ['banktransfer' => 1]))) ?>"
+                            }
+                        }'
+                    class="action primary banktransfer checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
+                <?php if ($block->isDisabled()) :?>
+                    disabled="disabled"
+                <?php endif; ?>>
+                <span><?= $block->escapeHtml(__('Proceed with Bank Transfer')) ?></span>
+            </button>
+            </li>
+            <li class="item">
+        <?php endif; ?>
+
+        <button type="button"
+                data-role="proceed-to-checkout"
+                title="<?= $block->escapeHtmlAttr(__('Proceed with Other Payment Methods')) ?>"
+                data-mage-init='{
+                        "Magento_Checkout/js/proceed-to-checkout":{
+                            "checkoutUrl":"<?= $block->escapeJs($block->escapeUrl($block->getUrl('onestepcheckout', ['other' => 1]))) ?>"
+                        }
+                    }'
+                class="action primary banktransfer other-methods checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
+            <?php if ($block->isDisabled()) :?>
+                disabled="disabled"
+            <?php endif; ?>>
+            <span><?= $block->escapeHtml(__('Proceed with Other Payment Methods')) ?></span>
+        </button>
+
+    <?php else :?>
+
+        <button type="button"
+                data-role="proceed-to-checkout"
+                title="<?= $block->escapeHtmlAttr(__('Proceed to Checkout')) ?>"
+                class="action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
+            <?php if ($block->isDisabled()) :?>
+                disabled="disabled"
+            <?php endif; ?>>
+            <span><?= $block->escapeHtml(__('Proceed to Checkout')) ?></span>
+        </button>
+
+    <?php endif; ?>
+
+    <?php if ($block->isIconStripEnabled() && ($icons = $block->getPaymentIcons())) :?>
+        <div class="payment-icons-strip">
+            <?php if ($heading = $block->getIconHeading()) :?>
+                <span class="payment-icons-heading"><?= $block->escapeHtml($heading) ?></span>
+            <?php endif; ?>
+            <ul class="payment-icons-list">
+                <?php foreach ($icons as $icon) :?>
+                    <li>
+                        <img src="<?= $block->escapeUrl($icon['url']) ?>"
+                             alt="<?= $block->escapeHtmlAttr($icon['label']) ?>"
+                             width="40" height="26" loading="lazy"/>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+
+<?php endif; ?>

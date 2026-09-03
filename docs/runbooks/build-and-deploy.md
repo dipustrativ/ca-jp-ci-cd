@@ -6,8 +6,8 @@ Two images, independent version sequences:
 
 | Image | Rebuild when | Roles it runs as |
 |---|---|---|
-| `registry.carpetavenue.net/carpient` | any PHP, theme, config or `composer.json` change | app, upgrade, static, cron |
-| `registry.carpetavenue.net/carpient-nginx` | only when nginx config changes | nginx |
+| `registry.carpetavenue.net/carpetavenue-jp` | any PHP, theme, config or `composer.json` change | app, upgrade, static, cron |
+| `registry.carpetavenue.net/carpetavenue-jp-nginx` | only when nginx config changes | nginx |
 
 Tags are **immutable** — never reuse a `v<N>`. Always push `latest` too; that is
 what a fresh server pulls.
@@ -29,8 +29,8 @@ Next free tag:
 CREDS=$(echo "registry.carpetavenue.net" | docker-credential-osxkeychain get)
 U=$(echo "$CREDS" | python3 -c "import sys,json;print(json.load(sys.stdin)['Username'])")
 P=$(echo "$CREDS" | python3 -c "import sys,json;print(json.load(sys.stdin)['Secret'])")
-curl -s -u "$U:$P" https://registry.carpetavenue.net/v2/carpient/tags/list       --max-time 25
-curl -s -u "$U:$P" https://registry.carpetavenue.net/v2/carpient-nginx/tags/list --max-time 25
+curl -s -u "$U:$P" https://registry.carpetavenue.net/v2/carpetavenue-jp/tags/list       --max-time 25
+curl -s -u "$U:$P" https://registry.carpetavenue.net/v2/carpetavenue-jp-nginx/tags/list --max-time 25
 ```
 
 Credentials are in the macOS keychain (`credsStore: osxkeychain`), not
@@ -45,8 +45,8 @@ docker buildx build \
   --secret id=composer_auth,src=auth.json \
   --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile \
-  -t registry.carpetavenue.net/carpient:latest \
-  -t registry.carpetavenue.net/carpient:v<N> \
+  -t registry.carpetavenue.net/carpetavenue-jp:latest \
+  -t registry.carpetavenue.net/carpetavenue-jp:v<N> \
   --push .
 ```
 
@@ -54,10 +54,14 @@ nginx image — seconds, no secrets, **only if nginx config changed**:
 
 ```bash
 docker buildx build -f docker/Dockerfile.nginx \
-  -t registry.carpetavenue.net/carpient-nginx:latest \
-  -t registry.carpetavenue.net/carpient-nginx:v<M> \
+  -t registry.carpetavenue.net/carpetavenue-jp-nginx:latest \
+  -t registry.carpetavenue.net/carpetavenue-jp-nginx:v<M> \
   --push .
 ```
+
+⚠️ **Apple Silicon:** add `--platform linux/amd64` to both builds. A native
+arm64 push gives the server `exec format error`. Local-only test build? Use
+`--load` instead of `--push` and skip the registry entirely.
 
 Done = `pushing manifest` for both tags, exit 0.
 
@@ -80,33 +84,37 @@ will roll back.
 Same thing over SSH, when the UI is not an option — still set the UI values
 afterwards:
 
+`carpetavenue-jp-app-fj43zo` below is a placeholder — Dokploy generates the
+suffix when the app is created. Get the real one with
+`ls /etc/dokploy/compose/`.
+
 ```bash
 ssh magento@<origin-ip>
-sudo sh -c 'cd /etc/dokploy/compose/carpient-app-fj43zo/code \
+sudo sh -c 'cd /etc/dokploy/compose/carpetavenue-jp-app-fj43zo/code \
   && sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=v<N>/; s/^NGINX_TAG=.*/NGINX_TAG=v<M>/" .env \
-  && docker compose -p carpient-app-fj43zo pull app nginx cron \
-  && docker compose -p carpient-app-fj43zo up -d'
+  && docker compose -p carpetavenue-jp-app-fj43zo pull app nginx cron \
+  && docker compose -p carpetavenue-jp-app-fj43zo up -d'
 ```
 
-`carpient-upgrade` runs once, holds the others until it exits, and puts the site
+`carpetavenue-jp-upgrade` runs once, holds the others until it exits, and puts the site
 in maintenance mode while it runs.
 
 ## 3. Verify
 
 ```bash
-docker logs carpient-upgrade 2>&1 | tail -5      # "Upgrade completed successfully." + "Disabled maintenance mode"
-docker ps --format "{{.Names}}\t{{.Image}}\t{{.Status}}" | grep carpient
+docker logs carpetavenue-jp-upgrade 2>&1 | tail -5      # "Upgrade completed successfully." + "Disabled maintenance mode"
+docker ps --format "{{.Names}}\t{{.Image}}\t{{.Status}}" | grep carpetavenue-jp
 ```
 
 Then measure the origin, **from inside the container network** so the number is
 render time and not your round-trip:
 
 ```bash
-NET=carpient-app-fj43zo_default
+NET=carpetavenue-jp-app-fj43zo_default
 for i in 1 2 3; do docker run --rm --network $NET curlimages/curl \
   -s -o /dev/null -w "%{http_code} %{time_total}s\n" \
-  -H "Host: carpient.carpetavenue.net" -H "X-Forwarded-Proto: https" \
-  http://carpient-nginx/; done
+  -H "Host: playground.carpetavenue.jp" -H "X-Forwarded-Proto: https" \
+  http://carpetavenue-jp-nginx/; done
 ```
 
 Expect first ~100 ms, then ~18 ms. `X-Forwarded-Proto: https` is required or
@@ -116,7 +124,7 @@ Magento 302s to the secure base URL. Reference numbers per page type:
 Public check goes through Cloudflare, so it is slower by your RTT:
 
 ```bash
-curl -sk -o /dev/null -w "%{http_code} %{time_total}s\n" https://carpient.carpetavenue.net/
+curl -sk -o /dev/null -w "%{http_code} %{time_total}s\n" https://playground.carpetavenue.jp/
 ```
 
 ## 4. Roll back
@@ -134,8 +142,12 @@ was running.
   (`vendor/`, `pub/static/`, `dev/`, most of `var/`) before blaming the cache.
 - **A `499`/`504` mid-push** is a Traefik timeout on the laptop→registry hop, not
   a bad image. Retry.
-- **New locale?** It must be in `STATIC_LOCALES` in `docker/Dockerfile` *before*
-  the build — see [add-store-view.md](add-store-view.md).
+- **New locale?** `STATIC_LOCALES` is `""` = SCD auto-discovers every locale in
+  the **SCD database** (`docker/env.php.scd`), so what matters is that the new
+  store view exists *there* before the build — not in `docker/Dockerfile`. Only
+  edit `STATIC_LOCALES` if someone pinned an explicit list. Production never
+  builds static on demand: a missing locale is a broken storefront for that store
+  view, not a fallback to `en_US`. See [add-store-view.md](add-store-view.md).
 - **No secrets in the image.** `entrypoint.sh` renders `app/etc/env.php` at
   container start, so a config change is an env var plus a restart, never a
   rebuild.

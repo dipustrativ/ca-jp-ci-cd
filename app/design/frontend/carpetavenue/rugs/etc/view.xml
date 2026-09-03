@@ -21,6 +21,14 @@
                 <width>560</width>
                 <height>750</height>
             </image>
+            <!-- Recently-viewed widget. Blank ships 240x300, which gave that grid
+                 a squarer image box than every other product card on the site
+                 (and a fixed-px padding hack instead of an aspect ratio). Same
+                 portrait box as the category grid. -->
+            <image id="recently_viewed_products_grid_content_widget" type="small_image">
+                <width>560</width>
+                <height>750</height>
+            </image>
             <!-- PDP gallery sizes (matches reference theme; MagicGallery reads product_page_image_medium) -->
             <image id="product_base_image" type="image">
                 <width>265</width>

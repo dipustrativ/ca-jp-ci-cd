@@ -1,5 +1,7 @@
 # Add a website on its own domain
 
+> ⚠️ JP is single-website (`ca_jp`). The `ca_se` example below is `carpient`'s.
+
 **Use when** a country needs its own domain, cart, or base currency. If it only
 needs its own language on a `/xx/` path, you want
 [add-store-view.md](add-store-view.md) instead — that is a store view, needs no
@@ -8,7 +10,7 @@ webserver work, and keeps the shared cart.
 A website is the only scope Magento cannot resolve from the URL path. The
 webserver must tell it, via `MAGE_RUN_TYPE` / `MAGE_RUN_CODE`.
 
-Worked example throughout: `carpient-se.carpetavenue.net` → website `ca_se`.
+Worked example throughout: `se.playground.carpetavenue.jp` → website `ca_se`.
 
 **Do not reorder.** Step 6 makes the store unreachable until 4 and 5 are done.
 
@@ -33,7 +35,7 @@ bin/magento config:set --scope=stores --scope-code=se general/locale/code sv_SE
 ```nginx
 map $http_host $MAGE_RUN_CODE {
     default                       "";
-    carpient-se.carpetavenue.net  "ca_se";
+    se.playground.carpetavenue.jp  "ca_se";
 }
 ```
 
@@ -44,8 +46,8 @@ hostnames get `""` and resolve as the base website.
 
 ```bash
 docker buildx build -f docker/Dockerfile.nginx \
-  -t registry.carpetavenue.net/carpient-nginx:latest \
-  -t registry.carpetavenue.net/carpient-nginx:v<M> --push .
+  -t registry.carpetavenue.net/carpetavenue-jp-nginx:latest \
+  -t registry.carpetavenue.net/carpetavenue-jp-nginx:v<M> --push .
 ```
 
 Then set `NGINX_TAG=v<M>` in the Dokploy UI and redeploy —
@@ -54,7 +56,7 @@ Then set `NGINX_TAG=v<M>` in the Dokploy UI and redeploy —
 Verify the map before going further:
 
 ```bash
-docker exec carpient-nginx sh -c 'cat /etc/nginx/fastcgi_extra/*.conf; nginx -t'
+docker exec carpetavenue-jp-nginx sh -c 'cat /etc/nginx/fastcgi_extra/*.conf; nginx -t'
 ```
 
 ## 4. Route the domain — Dokploy → Domains
@@ -77,15 +79,15 @@ DNS-01.
 
 ```bash
 bin/magento config:set --scope=websites --scope-code=ca_se \
-  web/unsecure/base_url https://carpient-se.carpetavenue.net/
+  web/unsecure/base_url https://se.playground.carpetavenue.jp/
 bin/magento config:set --scope=websites --scope-code=ca_se \
-  web/secure/base_url   https://carpient-se.carpetavenue.net/
+  web/secure/base_url   https://se.playground.carpetavenue.jp/
 bin/magento cache:flush config full_page
 ```
 
 This also **moves that website's store views off the main domain**:
-`https://carpient.carpetavenue.net/se/…` starts redirecting to
-`https://carpient-se.carpetavenue.net/se/…`. Expected, but it is a live URL
+`https://playground.carpetavenue.jp/se/…` starts redirecting to
+`https://se.playground.carpetavenue.jp/se/…`. Expected, but it is a live URL
 change. Other websites are untouched.
 
 ## 7. Verify
@@ -95,29 +97,29 @@ proves Traefik, TLS and `MAGE_RUN_CODE` all work. Bypass Cloudflare while
 testing:
 
 ```bash
-curl -sI --resolve carpient-se.carpetavenue.net:443:<origin-ip> \
-  https://carpient-se.carpetavenue.net/ | head -1
+curl -sI --resolve se.playground.carpetavenue.jp:443:<origin-ip> \
+  https://se.playground.carpetavenue.jp/ | head -1
 ```
 
 After step 6, all four must pass:
 
 ```bash
-NET=carpient-app-fj43zo_default
+NET=carpetavenue-jp-app-fj43zo_default
 run() { docker run --rm --network $NET curlimages/curl -s "$@" --max-time 40; }
-H='-H Host:carpient-se.carpetavenue.net -H X-Forwarded-Proto:https'
+H='-H Host:se.playground.carpetavenue.jp -H X-Forwarded-Proto:https'
 
 # a. right language
-run $H http://carpient-nginx/ | grep -o '<html lang="[a-z-]*"'          # sv
+run $H http://carpetavenue-jp-nginx/ | grep -o '<html lang="[a-z-]*"'          # sv
 
 # b. the store cookie must NOT change it
-run $H -H 'Cookie: store=de' http://carpient-nginx/ | grep -o '<html lang="[a-z-]*"'   # sv
+run $H -H 'Cookie: store=de' http://carpetavenue-jp-nginx/ | grep -o '<html lang="[a-z-]*"'   # sv
 
 # c. cacheable: ~100 ms then ~18 ms. Flat ~100 ms = store is in the vary string
-for i in 1 2 3; do run $H -o /dev/null -w "%{time_total}s\n" http://carpient-nginx/; done
+for i in 1 2 3; do run $H -o /dev/null -w "%{time_total}s\n" http://carpetavenue-jp-nginx/; done
 
 # d. the main domain now redirects that prefix
-run -H Host:carpient.carpetavenue.net -H X-Forwarded-Proto:https \
-    -o /dev/null -w "%{http_code} %{redirect_url}\n" http://carpient-nginx/se/
+run -H Host:playground.carpetavenue.jp -H X-Forwarded-Proto:https \
+    -o /dev/null -w "%{http_code} %{redirect_url}\n" http://carpetavenue-jp-nginx/se/
 ```
 
 (c) failing is the trap documented in

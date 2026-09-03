@@ -7,9 +7,15 @@ name: build-deploy
 #   v<run>      frozen version, never moves -> rollback target
 # Setup: docker/README.md, section 6 (CI/CD).
 
+# ⚠️ NO self-hosted runner is registered for indexon/carpetavenue-jp yet, so the
+# push trigger is OFF — with it on, every push to main would queue a job forever
+# waiting for a `carpetavenue-jp-build` runner that does not exist. Builds are
+# manual for now (docker/README.md §1). To turn CI on: deploy
+# docker/github-runner.compose.yml on Server A, add the repo secrets
+# (docker/CI-CD.md), then restore the `push:` block below.
 on:
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -18,9 +24,9 @@ concurrency:
 
 jobs:
   build:
-    runs-on: [self-hosted, carpient-build]
+    runs-on: [self-hosted, carpetavenue-jp-build]
     env:
-      IMAGE: registry.carpetavenue.net/carpient
+      IMAGE: registry.carpetavenue.net/carpetavenue-jp
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3

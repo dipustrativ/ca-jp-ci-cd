@@ -1,15 +1,17 @@
 #!/bin/sh
-# CarpetAvenue — run Magento CLI on the production host without exec'ing in.
+# CarpetAvenue JP — run Magento CLI on the production host without exec'ing in.
 #
-# Install once, as root, on the Dokploy host:
-#   install -m755 docker/host/magento /usr/local/bin/magento
-#   ln -sf /usr/local/bin/magento /usr/local/bin/magerun
+# Install once, as root, on the Dokploy host. ⚠️ `-jp` suffix, NOT plain
+# `magento`: carpient installs its own /usr/local/bin/magento on the same host
+# and the second install would silently overwrite the first.
+#   install -m755 docker/host/magento /usr/local/bin/magento-jp
+#   ln -sf /usr/local/bin/magento-jp /usr/local/bin/magerun-jp
 #
 # Then, from a plain ssh session:
-#   magento cache:flush
-#   magento indexer:reindex
-#   magerun sys:info
-#   magerun db:query "select 1"
+#   magento-jp cache:flush
+#   magento-jp indexer:reindex
+#   magerun-jp sys:info
+#   magerun-jp db:query "select 1"
 #
 # Dispatches on its own basename, so the symlink is the whole magerun install.
 # -u www-data: the image has no USER, so a bare exec runs as root and leaves
@@ -19,10 +21,10 @@
 # Container name comes from `container_name:` in docker-compose.dokploy.yml.
 set -e
 
-container=${CARPIENT_CONTAINER:-carpient-app}
+container=${CARPETAVENUE_JP_CONTAINER:-carpetavenue-jp-app}
 [ -t 0 ] && tty=-t || tty=
 
 case "${0##*/}" in
-  magerun|n98*) exec docker exec -i $tty -u www-data "$container" php n98-magerun2.phar "$@" ;;
+  magerun*|n98*) exec docker exec -i $tty -u www-data "$container" php n98-magerun2.phar "$@" ;;
   *)            exec docker exec -i $tty -u www-data "$container" php bin/magento "$@" ;;
 esac

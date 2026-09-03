@@ -1110,6 +1110,15 @@
             color: #333;
         }
 
+        //  The recently-viewed widget prints a bare <strong>, so it fell
+        //  through to the blank theme's 1.8rem/300 block title while the
+        //  section right above it (similar products) renders at 37px/bold.
+        //  Match the neighbour — same selector weight as the similar block's.
+        strong {
+            font-size: 37px;
+            font-weight: @font-weight__bold;
+        }
+
         .widget_category-btn-holder {
             display: inline-block;
             width: auto;
@@ -1329,6 +1338,16 @@
                         background: rgba(255, 255, 255, 0.95);
                         border-radius: 50px;
                         box-shadow: 0 0 10px rgba(0, 0, 0, 0.13);
+
+                        //  The 35px circle comes from blank's
+                        //  `.actions-secondary > .action` (0,3,0), but the
+                        //  recently-viewed widget renders a <button>, and
+                        //  blank's `> button.action` reset (0,3,1, lib-button-
+                        //  reset => `line-height: inherit`) outranks it on the
+                        //  tag. Inheriting a unitless line-height against the
+                        //  `font-size: 0` above resolves to 0, so the pill
+                        //  collapsed to 35x24 — an oval. Restate it in px.
+                        line-height: 35px;
                     }
                 }
             }

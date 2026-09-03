@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="checkoutmodsjp" translate="label" type="text" sortOrder="510"
+                 showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Checkout Mods JP</label>
+            <tab>sales</tab>
+            <resource>Magento_Config::config</resource>
+            <group id="payment_buttons" translate="label" type="text" sortOrder="10"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Cart Payment Buttons</label>
+                <field id="banktransfer_enabled" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Show Bank Transfer Button</label>
+                    <comment><![CDATA[Select <strong>Yes</strong> to show the "Proceed with Bank Transfer" button on the cart page. When enabled, a second "Proceed with Other Payment Methods" button is always shown alongside it.]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

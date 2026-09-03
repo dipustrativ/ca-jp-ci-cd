@@ -3,7 +3,7 @@
 # Rebuild only when nginx config changes. Build context = repo `src/`.
 #
 #   docker buildx build -f docker/Dockerfile.nginx \
-#     -t registry.carpetavenue.net/carpient-nginx:latest --push .
+#     -t registry.carpetavenue.net/carpetavenue-jp-nginx:latest --push .
 #
 # Bump to 1.30-alpine when the tag ships (2.4.9 certified).
 FROM nginx:1.29-alpine

@@ -1,4 +1,4 @@
-# CarpetAvenue — "normal" server production (plain Docker host, NO Dokploy).
+# CarpetAvenue JP — "normal" server production (plain Docker host, NO Dokploy).
 #
 # Same pulled images as the Dokploy file, but nginx PUBLISHES port 80 on the
 # host instead of hiding behind Traefik. Put TLS at the edge (Caddy, a host
@@ -69,7 +69,7 @@ services:
 
   # Runs setup:upgrade once per deploy, then exits.
   upgrade:
-    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient:${IMAGE_TAG:-latest}
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
     command: >
       sh -c "chown -R www-data:www-data /var/www/html/var &&
       php bin/magento maintenance:enable &&
@@ -97,14 +97,14 @@ services:
       OPENSEARCH_PORT: ${OPENSEARCH_PORT:-9200}
       MAGE_CRYPT_KEY: ${MAGE_CRYPT_KEY}
       MAGE_GRAPHQL_ID_SALT: ${MAGE_GRAPHQL_ID_SALT}
-      DOMAIN: ${DOMAIN:-carpetavenue.net}
+      DOMAIN: ${DOMAIN:-playground.carpetavenue.jp}
       DEBUG_ENV: ${DEBUG_ENV:-false}
     volumes:
       - magento_var:/var/www/html/var
     networks: [magento_net]
 
   app:
-    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient:${IMAGE_TAG:-latest}
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
     restart: unless-stopped
     depends_on:
       upgrade: { condition: service_completed_successfully }
@@ -116,10 +116,10 @@ services:
       - magento_var:/var/www/html/var
     networks:
       magento_net:
-        aliases: [carpient-fpm]
+        aliases: [carpetavenue-jp-fpm]
 
   static:
-    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient:${IMAGE_TAG:-latest}
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
     command: sh -c "rm -rf /mnt/static/* && cp -a /var/www/html/pub/static/. /mnt/static/"
     restart: "no"
     depends_on:
@@ -129,7 +129,7 @@ services:
     networks: [magento_net]
 
   cron:
-    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient:${IMAGE_TAG:-latest}
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
     command: cron -f
     restart: unless-stopped
     depends_on:
@@ -142,13 +142,16 @@ services:
 
   # Baked-config nginx. Publishes :80 on the host — put your TLS proxy in front.
   nginx:
-    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpient-nginx:${NGINX_TAG:-latest}
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp-nginx:${NGINX_TAG:-latest}
     restart: unless-stopped
     depends_on:
       - app
       - static
+    # Co-hosted with carpient? Only one stack can hold host :80 on Path A —
+    # set HTTP_PORT to something else for this one (or use Path B, where Traefik
+    # routes by domain and nothing is published).
     ports:
-      - "80:80"
+      - "${HTTP_PORT:-80}:80"
     volumes:
       - magento_media:/var/www/html/pub/media:ro
       - magento_static:/var/www/html/pub/static:ro

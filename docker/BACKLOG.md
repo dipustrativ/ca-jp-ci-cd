@@ -1,10 +1,10 @@
 # CarpetAvenue Deployment — Backlog
 
-Status: **LIVE** at https://carpient.carpetavenue.net (manual build + Dokploy pull).
-Stack proven end-to-end: image build → registry → Dokploy → nginx → php-fpm →
-Magento → external MySQL + Valkey + RabbitMQ + OpenSearch. TLS via Traefik.
+Status: **NOT DEPLOYED YET.** Target: https://playground.carpetavenue.jp.
 
-Deferred work, prioritized. Nothing here blocks the site running today.
+> ⚠️ This file, `CACHE-RUNBOOK.md`, `IMAGE-SIZE.md` and `UTILITIES.md` came from
+> the `carpient` deployment. The stack is proven there; every number, IP,
+> Dokploy app-id and volume name is that deployment's, not JP's.
 
 ---
 
@@ -14,7 +14,7 @@ Deferred work, prioritized. Nothing here blocks the site running today.
 ```bash
 docker buildx build --secret id=composer_auth,src=auth.json \
   --secret id=env_php_scd,src=docker/env.php.scd \
-  -f docker/Dockerfile -t registry.carpetavenue.net/carpient:latest --push .
+  -f docker/Dockerfile -t registry.carpetavenue.net/carpetavenue-jp:latest --push .
 ```
 
 **Goal:** push to `main` → auto build → push → Dokploy repull. Pieces already exist:
@@ -25,7 +25,7 @@ docker buildx build --secret id=composer_auth,src=auth.json \
 **Next actions:**
 1. Fix the token: Settings → Tokens → **Configure SSO → Authorize** for `indexon`
    (classic PAT), OR use a fine-grained token with resource owner `indexon`,
-   repo `carpient`, permission **Administration: R/W**.
+   repo `carpetavenue-jp`, permission **Administration: R/W**.
 2. Deploy `github-runner.compose.yml` in Dokploy with `GH_PAT`.
 3. Add GitHub secrets: `REGISTRY_USER/PASS`, `COMPOSER_AUTH`, `ENV_PHP_SCD`,
    `DOKPLOY_WEBHOOK` (app → Deployments → Webhook URL).
@@ -36,7 +36,7 @@ Full steps: [CI-CD.md](CI-CD.md).
 ## 2. Media storage & backup — **media has no running backup**
 
 **Now (verified 2026-08-22):** `magento_media` is a **named volume**
-(`/var/lib/docker/volumes/carpient-app-fj43zo_magento_media/_data`), populated
+(`/var/lib/docker/volumes/carpetavenue-jp-app-fj43zo_magento_media/_data`), populated
 with **27 GB**. Host disk is 99 GB, 51 % used.
 
 ⚠️ The compose declares an `offen/docker-volume-backup:v2` service, but **no
@@ -44,7 +44,7 @@ backup container is running** — `docker ps -a` shows none. Media is the only
 non-reproducible data in the stack. Fix this before anything else in this file.
 
 **Then pick a tier:**
-- **Tier 1 (single server, recommended):** bind-mount `/opt/carpient/media` →
+- **Tier 1 (single server, recommended):** bind-mount `/opt/carpetavenue-jp/media` →
   `/var/www/html/pub/media` (rw for app/cron, ro for nginx). Visible on disk,
   easy to back up. Plus a daily `restic`/`rsync` off-box.
 - **Tier 2 (multi-server / host-loss-proof):** Magento `remote_storage` → an
@@ -76,7 +76,7 @@ FPC and block cache confirmed hitting Valkey — 92 % hit rate, zero evictions.
 - OpenSearch heap (`-Xms1g -Xmx1g`) vs catalog size.
 - Cloudflare: cache rules for static + media at the edge; SSL mode **Full
   (strict)**; the cert-renewal trap before **2026-10-21**; WAF skip for
-  `carpient-se.carpetavenue.net` (still 403 at the edge).
+  `se.playground.carpetavenue.jp` (still 403 at the edge).
 - The 5 s `catalog_product_index_price_history` INSERT; enable `slow_query_log`
   with `long_query_time=1`.
 
@@ -103,5 +103,5 @@ FPC and block cache confirmed hitting Valkey — 92 % hit rate, zero evictions.
 - nginx: dynamic fpm resolution (no boot crash), code-less routing, healthcheck.
 - Dokploy: app/upgrade/cron on `dokploy-network` to reach the internal MySQL.
 - All indexers on Update by Schedule; FPC verified serving from Valkey.
-- Per-domain websites: `carpient-se.carpetavenue.net` → `ca_se` via
+- Per-domain websites: `se.playground.carpetavenue.jp` → `ca_se` via
   `MAGE_RUN_CODE` ([../docs/runbooks/add-website.md](../docs/runbooks/add-website.md)).
