@@ -205,6 +205,15 @@
       }
     }
 
+    //  Recently-viewed is moved into the same full-width container (see
+    //  CarpetAvenue_Productify catalog_product_view.xml) but never got the
+    //  gutter, so its title and grid started at x=0 while the similar block
+    //  above it — and every other section — started at the page indent.
+    .content--full-width .block-viewed-products-grid {
+      padding-left: @layout-indent__width;
+      padding-right: @layout-indent__width;
+    }
+
   //
   //  Product Page
   //  _____________________________________________
@@ -1395,6 +1404,7 @@
 
         //  Wishlist: icon-only heart, no text
         .product-social-links .action.towishlist {
+            line-height: 35px !important;
             &:before {
                 .ca-icon("\e642");
                 color: @color-black;
@@ -1447,7 +1457,8 @@
         //  The label span is visually hidden (absolute), so the glyph was the
         //  pill's only in-flow content — without a height it collapses to 0.
         //  Matches the blank-theme `width: 35px; line-height: 35px` pill.
-        height: 35px;
+        height: 35px !important;
+        line-height: 35px !important;
 
         &:before {
             display: none;
@@ -1494,7 +1505,15 @@
         border: 1px solid #ccc;
         padding: 3px;
         width: fit-content;
-        margin: 0 0 20px;
+        margin: 0 0 25px;
+
+        //  The blank theme's `ul li` margin (0 0 10px) left the text flush
+        //  against the left border and hanging off the top of the box.
+        //  carpetavenue.jp resets it to an even 5px, which is what makes the
+        //  frame sit evenly around the text.
+        li {
+            margin: 5px;
+        }
     }
 }
 

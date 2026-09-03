@@ -854,6 +854,23 @@
                     padding: 19px;
                     z-index: 9;
                     overflow: hidden;
+
+                    //  The 19px padding pushes this element's padding box out
+                    //  by 19px on every side, and that padding box is the
+                    //  containing block for the absolutely positioned flag and
+                    //  wishlist heart — so both slid diagonally on hover.
+                    //  carpetavenue.jp compensates the offsets rather than the
+                    //  box (it ships `top: 39px` on the hovered flag); same
+                    //  numbers here, plus the two the flag/heart also need.
+                    .product-item__flag--discount {
+                        top: 20px + 19px;
+                        left: 19px;
+                    }
+
+                    .product-item-actions .towishlist {
+                        top: 10px + 19px;
+                        right: 10px + 19px;
+                    }
                 }
             }
 
