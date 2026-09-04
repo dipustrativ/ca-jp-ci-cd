@@ -874,20 +874,27 @@
 
                     //  The 19px padding pushes this element's padding box out
                     //  by 19px on every side, and that padding box is the
-                    //  containing block for the absolutely positioned flag and
-                    //  wishlist heart — so both slid diagonally on hover.
-                    //  carpetavenue.jp compensates the offsets rather than the
-                    //  box (it ships `top: 39px` on the hovered flag); same
-                    //  numbers here, plus the two the flag/heart also need.
+                    //  containing block for the absolutely positioned flag, so
+                    //  the badge would slide up-left on hover. Give it the
+                    //  19px back so it stays put, exactly as carpetavenue.jp
+                    //  does (live ships `top: 39px; left: 19px`, the same
+                    //  geometry expressed absolutely).
+                    //
+                    //  Compensate with `margin`, NOT `top`/`left`: the widget
+                    //  and recently-viewed cards get the identical rule from
+                    //  CarpetAvenue_Widget's `_module.less`, and a similar-
+                    //  products card matches BOTH selectors. Same property =
+                    //  the cascade picks one; mixed properties stacked and
+                    //  pushed the badge 19px too far down-right.
                     .product-item__flag--discount {
-                        top: 20px + 19px;
-                        left: 19px;
+                        margin: 19px 0 0 19px;
                     }
 
-                    .product-item-actions .towishlist {
-                        top: 10px + 19px;
-                        right: 10px + 19px;
-                    }
+                    //  The heart is deliberately NOT compensated. Live leaves
+                    //  it at `top: 10px; right: 10px` against the grown
+                    //  padding box, which parks it in the 20px white gutter
+                    //  straddling the image's top-right corner. Nudging it by
+                    //  19px dropped it onto the image instead.
                 }
             }
 
@@ -979,7 +986,7 @@
             }
 
             .product-item-actions {
-                margin: 10px 0 0;
+                margin: 0;
 
                 .tocart {
                     .lib-css(border-radius, @button__border-radius);
@@ -1405,6 +1412,7 @@
         .products-grid {
             .product-item {
                 width: calc(~'(100% - 8%) / 5');
+                padding: 5px;
 
                 &:nth-child(4n + 1) {
                     margin-left: 2%;
