@@ -1669,8 +1669,13 @@
         order: 4;
     }
 
+    //  Magento core's widget_recently_viewed.xml always registers a
+    //  "learn-more" column to description-area regardless of show_attributes,
+    //  so this wrapper renders even though we never enabled that attribute -
+    //  it's always empty here. Blank's `.product-item-description` gives it
+    //  `margin: @indent__m 0`, so an empty div ate 50px of card height.
     .product-item-description {
-        order: 5;
+        display: none;
     }
 
     //  Wishlist heart: hidden until the card is hovered.
