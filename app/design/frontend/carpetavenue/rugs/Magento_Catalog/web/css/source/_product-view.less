@@ -43,6 +43,8 @@
 
         .special-price {
           margin-left: 10px;
+            margin-top: 0px;
+            margin-bottom: 0px;
         }
 
         .price-box {
@@ -287,7 +289,7 @@
     }
 
     .breadcrumbs {
-      margin-left: 20px;
+      margin-left: 32px;
       padding-left: 0;
 
       .item {
@@ -504,6 +506,9 @@
       }
 
       .page-title-wrapper {
+      .page-title{
+          margin-top: 0px;
+      }
         h1 {
           font-weight: bold;
           margin-bottom: 5px;
@@ -808,7 +813,7 @@
       margin-bottom: 10px;
     }
     .breadcrumbs {
-      margin: 0;
+      margin-left: 15px;
 
       .items {
         font-size: 1rem;
@@ -855,7 +860,8 @@
   .catalog-product-view {
 
     .block.widget .block-title strong {
-      .lib-font-size(18px);
+      .lib-font-size(18px) !important;
+        margin-bottom: 10px;
     }
 
     .fotorama__active .fotorama__dot {
@@ -1134,6 +1140,11 @@
       flex-basis: 100%;
     }
   }
+    .catalog-product-similar-ajax {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
 }
 
 //
@@ -1314,7 +1325,7 @@
 
       // Widgets
       .block-viewed-products-grid {
-          margin-bottom: 0;
+          margin-bottom: 40px;
 
           .products.products-crosssell {
               margin-bottom: 20px;

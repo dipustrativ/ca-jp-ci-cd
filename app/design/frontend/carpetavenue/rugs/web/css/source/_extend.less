@@ -121,7 +121,7 @@ a:hover, .alink:hover {
 //  Custom top panel (relocated panel wrapper: USP + switchers)
 //  _____________________________________________
 .page-header.custom-panel {
-    margin: 0;
+    margin: 0 !important;
     z-index: 100;
     background: @ca-black;
     color: #ffffff;
@@ -225,7 +225,7 @@ a:hover, .alink:hover {
 .page-header {
     background: #ffffff;
     border-bottom: 0;
-    margin-bottom: 0px;
+    margin-bottom: 20px !important;
 
     //  3 flex zones: search (left, 1fr) · logo (absolute, true center) · actions (right, 1fr)
     .header.content {
@@ -460,9 +460,10 @@ a:hover, .alink:hover {
                 pointer-events: none;
 
                 &:before {
-                    .ca-icon("\e618");
+                    color: #757575;
+                    content: '\e615';
+                    font-family: 'luma-icons';
                     font-size: 2.2rem;
-                    color: #7a7a7a;
                 }
 
                 span {
@@ -485,8 +486,8 @@ a:hover, .alink:hover {
                 padding-left: 45px;
                 padding-right: 0;
                 border-radius: 5px;
-                border: 1px solid #d1d1d1;
-                background: #efefef;
+                border: 1px solid #d1d1d1 !important;
+                background: #efefef !important;
                 font-size: 16px !important;
                 height: 50px;
             }
@@ -1826,3 +1827,16 @@ a:hover, .alink:hover {
     margin-top: 17px;
 }
 
+.message.success > *:first-child:before {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 24px;
+    line-height: 24px;
+    color: #006400;
+    content: '\e60e';
+    font-family: 'luma-icons';
+    top: 19px;
+}
+.callout-widget{
+    margin-top: -20px;
+}
