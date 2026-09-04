@@ -1180,9 +1180,13 @@
                     text-align: center;
                 }
 
-                //  Discount flag stays above the hover image (z-index 2).
+                //  Discount flag stays above the hover image. At rest
+                //  .product-item-info has `z-index: auto` and so opens no
+                //  stacking context, which let the old `999` escape the card
+                //  and paint over the sticky header while scrolling. 9 keeps
+                //  it above the hover image and below the nav.
                 .product-item__flag--discount {
-                    z-index: 999;
+                    z-index: 9;
 
                     //  Maroon ribbon on the widget cards. carpetavenue.jp
                     //  serves `discount_1.svg` (#7c232e) here and keeps the
@@ -1614,6 +1618,12 @@
         //  Add it back (live does the same) and the badge stays put on hover.
         //  As a margin, not top/left: the badge's base offset is 20px on
         //  desktop but 0 on mobile, and a relative shift is right for both.
+        //  The theme's category/similar block (Magento_Catalog/_extend.less)
+        //  carries the identical rule — a similar-products card is both an
+        //  .ev-product-item and inside .catalog-product-similar-ajax, so it
+        //  matches both. Keep the property the same in both places: same
+        //  property means the cascade picks one, mixing margin here with
+        //  top/left there stacked and threw the badge 19px off.
         .product-item__flag--discount {
             margin: 19px 0 0 19px;
         }
