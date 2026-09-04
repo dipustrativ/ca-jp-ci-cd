@@ -75,6 +75,12 @@
           line-height: 2;
           &:before {
             content: '\e609';
+            //  \e609 is a trash can in Pe-icon-7-stroke, but a hamburger in
+            //  blank's `icons-blank-theme`, which is what this inherited.
+            //  carpetavenue.jp swaps the whole `.abs-actions-addto` icon group
+            //  over to Pe-icon-7-stroke; name the font here instead so only
+            //  this button changes.
+            font-family: 'Pe-icon-7-stroke';
             margin-left: 15px;
             font-size: 2rem;
             height: 20px;
@@ -114,40 +120,6 @@
       }
     }
 
-    .product-item-actions {
-      .actions-secondary {
-        & > .action.removefromwish {
-          &:before {
-            content: '\e609';
-            margin-left: 15px;
-            font-size: 2rem;
-            height: 20px;
-          }
-        }
-      }
-    }
-
-    .product-item-photo {
-      .photo.image {
-        object-fit: contain;
-      }
-    }
-
-    .products-grid.grid {
-      .product-items {
-        .product-item {
-          .product-item-info {
-            .product-item-details {
-              .product-item-name {
-                .product-item-link {
-                  font-weight: @font-weight__bold;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
   }
 
   // Wishlist modal
@@ -160,6 +132,38 @@
       border-radius: 5px;
 
       .product-item {
+        margin-bottom: 20px;
+
+        //  The catalogue card styles are scoped to the page types that own a
+        //  grid (.catalog-category-view, .catalogsearch-result-index,
+        //  .catalog-product-view .catalog-product-similar-ajax — see theme
+        //  Magento_Catalog/_extend.less). This modal opens over ANY page, so on
+        //  the homepage or a CMS page none of them matched and the card fell
+        //  back to blank's left-aligned defaults. carpetavenue.jp centres it
+        //  everywhere; restate the card rules here, scoped to the modal, so
+        //  they no longer depend on the host page.
+        //
+        //  One declaration is enough for the whole card: name, size, price and
+        //  actions all inherit text-align from here — nothing below sets it.
+        //
+        //  `width: auto` matters as much as the centring: blank ships a bare
+        //  `.product-item-info { width: 152px }`, so the card content stayed
+        //  152px wide inside a 233px column. That clamped `.tocart`
+        //  (max-width: 100%) below its label width, and the remove icon —
+        //  which sits inline after it — wrapped onto its own line instead of
+        //  sitting beside the button as it does on carpetavenue.jp.
+        //  `position: relative` anchors the absolutely positioned discount
+        //  flag and makes the hover panel's z-index below take effect.
+        .product-item-info {
+          position: relative;
+          width: auto;
+          text-align: center;
+        }
+
+        .product-item-name {
+          .lib-font-size(16px);
+        }
+
         // Price styling
         .price-box {
           .price-label {
@@ -172,6 +176,17 @@
 
           .price {
             color: #a8a8a8;
+          }
+        }
+
+        //  Add-to-cart sits inline with the remove icon (live). The wider
+        //  padding is what live ships; blank's 7px/15px made the button
+        //  narrower but is not what the reference uses.
+        .product-item-actions {
+          margin: 0;
+
+          .tocart {
+            padding: 10px 20px;
           }
         }
       }
@@ -357,9 +372,30 @@
             padding-bottom: 35px;
           }
 
+          //  Hover panel. carpetavenue.jp gets this in the modal from blank's
+          //  own `.products-grid .product-item-info:hover` plus a theme
+          //  override; this theme replaced blank's rule with page-scoped ones
+          //  (.catalog-category-view & co.), so no rule matched a modal card
+          //  and the hovered card stayed flat. Same values as the catalogue
+          //  card — see theme Magento_Catalog/_extend.less.
           &:hover {
+            background: @color-white;
+            border: 1px solid #e6e6e6;
+            border-radius: 5px;
+            box-shadow: @product-item__hover__box-shadow;
+            margin: -20px;
+            padding: 19px;
+            z-index: 9;
+            overflow: hidden;
+
             .product-item-details {
               padding-bottom: 0;
+            }
+
+            //  Give the badge back the 19px the padding takes, so it holds
+            //  position on hover (same margin trick as the catalogue card).
+            .product-item__flag--discount {
+              margin: 19px 0 0 19px;
             }
           }
         }
