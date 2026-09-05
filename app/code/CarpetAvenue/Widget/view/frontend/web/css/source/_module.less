@@ -1173,6 +1173,18 @@
                 letter-spacing: normal;
                 vertical-align: top;
 
+                //  These cards are bootstrap flex columns (.col-xs-6 etc. on a
+                //  .product-items.row), so their width comes from flex-basis,
+                //  not from blank's float grid. Blank still matches them on
+                //  `.product-item` and adds `margin-left: 2%` (zeroed only on
+                //  nth-child(2n+1)), which carpetavenue.jp never gets because
+                //  its markup omits the `product-item` class entirely.
+                //
+                //  At 390px that pushed a pair to 183 + 183 + 7.3 = 373.3px in
+                //  a 366px row, so the second card dropped to its own line and
+                //  the section rendered one-up instead of live's two-up.
+                margin-left: 0;
+
                 //  Card
                 .product-item-info {
                     position: relative;
@@ -1651,6 +1663,18 @@
         opacity: 1;
         visibility: visible;
     }
+}
+
+//  Same blank float-grid margin as the related/similar cards above, but this
+//  grid needs its own rule to win. The shared block reaches these cards as
+//  `.block-viewed-products-grid .products-grid .product-items .product-item`
+//  (four classes), which only *ties* blank's `.block.widget .products-grid
+//  .product-item` — and blank loads later, so the tie went to `margin-left: 2%`
+//  and the cards stayed one-up on mobile. `.block-products-list.grid` carries
+//  an extra class and so never had this problem. Name `.block.widget` here for
+//  the two classes that break the tie.
+.block.widget.block-viewed-products-grid .products-grid .product-items .product-item {
+    margin-left: 0;
 }
 
 //  Recently-viewed widget renders plain .product-item (no .ev-product-item, no
