@@ -1082,6 +1082,10 @@ a:hover, .alink:hover {
     box-sizing: border-box;
 }
 
+.ias-trigger.ias-trigger-next .progressbar__fill {
+    background: #333333;
+}
+
 //
 //  Scroll-to-top button
 //  _____________________________________________
@@ -1142,6 +1146,10 @@ a:hover, .alink:hover {
     .page-header .nav-sections .switcher {
         display: none;
     }
+
+    .minicart-wrapper .minicart-items .product-item {
+        padding: 0 25px;
+    }
 }
 
 //
@@ -1166,6 +1174,10 @@ a:hover, .alink:hover {
 }
 
 @media (max-width: 768px) {
+
+    .block.widget.block-products-list.grid .block-title strong {
+        font-size: 18px;
+    }
 
     .navigation {
         background: #fff;
@@ -1364,7 +1376,12 @@ a:hover, .alink:hover {
                 line-height: 28px;
 
                 &:before {
-                    color: #000;
+                    color: #000 !important;
+                }
+                &:hover {
+                    &:before {
+                        color: #000 !important;
+                    }
                 }
             }
 
@@ -1728,6 +1745,11 @@ a:hover, .alink:hover {
     .ca-pricing-card {
         flex: 0 0 85%;
         scroll-snap-align: start;
+    }
+
+    .carpetfinder-widget{
+        margin-left: -15px !important;
+        margin-right: -15px !important;
     }
 }
 
