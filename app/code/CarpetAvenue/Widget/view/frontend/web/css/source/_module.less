@@ -1374,8 +1374,17 @@
 //  Desktop — 5 products per row (matches theme category grid). On mobile
 //  the items stay in the horizontal elastyslider from _slider.less.
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    //  `.block.widget` is named on the recently-viewed branch purely for
+    //  specificity. As plain `.block-viewed-products-grid` this reaches the
+    //  cards with four classes, which only ties blank's
+    //  `@media (min-width: 1024px) .block.widget .products-grid .product-item
+    //  { padding: 0 }` — and blank loads later, so from 1024px up the tie went
+    //  to blank and the 15px gutter below silently vanished, leaving the two
+    //  cards touching. `.block-products-list.grid` carries an extra class and
+    //  so was never affected. Same tie, same cause as the `margin-left: 0`
+    //  rule further down.
     .block-products-list.grid,
-    .block-viewed-products-grid {
+    .block.widget.block-viewed-products-grid {
         .products-grid .product-items {
             display: flex;
             flex-wrap: wrap;
