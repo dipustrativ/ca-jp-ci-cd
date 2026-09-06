@@ -28,7 +28,8 @@
         <!-- Filters above the product grid -->
         <move element="catalogsearch.leftnav" destination="content" before="-"/>
 
-        <!-- Drop the "Related search terms" recommendations block from the toolbar area -->
+        <!-- Drop the "Did you mean" suggestions and "Related search terms" recommendations blocks from the toolbar area -->
+        <referenceBlock name="search_suggestions" remove="true"/>
         <referenceBlock name="search_recommendations" remove="true"/>
     </body>
 </page>

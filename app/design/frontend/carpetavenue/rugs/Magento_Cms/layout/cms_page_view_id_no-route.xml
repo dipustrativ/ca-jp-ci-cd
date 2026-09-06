@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * 404 (no-route) CMS page: drop the additional sidebar (wishlist block).
+ * The 404 template is a full-width page and has no use for it.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="wishlist_sidebar" remove="true"/>
+        <referenceContainer name="sidebar.additional" remove="true"/>
+    </body>
+</page>
