@@ -39,7 +39,7 @@ Not logged in → `docker login registry.carpetavenue.net`.
 ## 3. Build + push (run in background — takes ~10-20 min)
 
 ```bash
-docker buildx build \
+docker buildx build --platform linux/amd64 \
   --secret id=composer_auth,src=auth.json \
   --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile \
@@ -52,9 +52,18 @@ Always push **both** `latest` (what servers pull) and the immutable `v<N>`
 (rollback anchor). Use `run_in_background: true`; poll the log tail, do not
 stream it into context.
 
-⚠️ **On Apple Silicon add `--platform linux/amd64`** — the servers are amd64 and
-a native arm64 push produces an image they cannot run (`exec format error`).
-Cross-building is slow; prefer building on Server A.
+⚠️ **`--platform linux/amd64` is mandatory on every `--push` build** — this
+laptop is arm64, the servers are amd64, and the pushed manifest is
+single-platform. Miss it and the server exits 255 with
+`exec /entrypoint.sh: exec format error`; because `latest` is mutable, the bad
+arch poisons the next deploy too. Cross-building is slow; prefer Server A.
+
+After the push, verify what actually landed — per tag:
+
+```bash
+docker buildx imagetools inspect registry.carpetavenue.net/carpetavenue-jp:v<N> \
+  --format '{{.Image.OS}}/{{.Image.Architecture}}'   # must print linux/amd64
+```
 
 Force a rebuild (only when asked — an all-`CACHED` build is normally correct,
 see Gotchas):
@@ -72,9 +81,13 @@ Image ~1.2 GB; the vendor+static layer is ~800 MB.
 Separate image, no secrets, fast. Skip it for normal app builds.
 
 ```bash
-docker buildx build -f docker/Dockerfile.nginx \
-  -t registry.carpetavenue.net/carpetavenue-jp-nginx:latest --push .
+docker buildx build --platform linux/amd64 -f docker/Dockerfile.nginx \
+  -t registry.carpetavenue.net/carpetavenue-jp-nginx:latest \
+  -t registry.carpetavenue.net/carpetavenue-jp-nginx:v<M> --push .
 ```
+
+Same `--platform` rule and same post-push arch check as §3 — nginx tags carry
+their own `v<M>` sequence.
 
 ## 5. Local dry-run (only if asked to test before deploying)
 

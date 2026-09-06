@@ -222,10 +222,14 @@ a:hover, .alink:hover {
 //  _____________________________________________
 @ca-header-icon-size: 3rem;
 
+.breadcrumbs{
+    max-width: 2440px !important;
+}
+
 .page-header {
     background: #ffffff;
     border-bottom: 0;
-    margin-bottom: 20px !important;
+    margin-bottom: 0px;
 
     //  3 flex zones: search (left, 1fr) · logo (absolute, true center) · actions (right, 1fr)
     .header.content {
@@ -429,22 +433,8 @@ a:hover, .alink:hover {
             position: relative;
             margin: 0;
 
-            //  MageWorx autocomplete dropdown. The module ships
-            //  `left: -85px; width: 350px`, sized for a narrow stock search box,
-            //  which hangs the panel off the left of our full-width header field.
-            //  Live pins it to the field instead, so it lines up under the input
-            //  and matches its width.
-            #searchsuite-autocomplete {
-                left: 0;
-                width: 100%;
-
-                //  Section heading ("Suggested", "類似検索", …) — live uses #f4f4f4
-                //  at weight 600; the body's base 500 reads too light here.
-                .title {
-                    background: #f4f4f4;
-                    font-weight: 600;
-                }
-            }
+            //  The suggestion dropdown (#search_autocomplete) anchors to this
+            //  field — see _search_suggest.less for the panel itself.
 
             //  Magnifier inside the field
             .label {
@@ -1035,7 +1025,7 @@ a:hover, .alink:hover {
             width: 223px;
             padding: 0 20px;
             border: 1px solid #c2c2c2;
-            background: #ffffff;
+            background: #ffffff !important;
             color: #000000;   //  was #ffffff — typed text was invisible on the white field
             margin: 0px;
             border-radius: 0px;
@@ -1120,6 +1110,10 @@ a:hover, .alink:hover {
 //  Desktop — center wide sections at page max-width (matches reference)
 //  _____________________________________________
 @media (min-width: 769px) {
+
+    .page-header{
+        margin-bottom: 20px !important;
+    }
     main#maincontent,
     .page-wrapper > .page-bottom,
     .content--full-width,
@@ -1859,6 +1853,8 @@ a:hover, .alink:hover {
     font-family: 'luma-icons';
     top: 19px;
 }
-.callout-widget{
-    margin-top: -20px;
-}
+
+//  Search suggestion dropdown — last, so its panel rules land after the
+//  header's .block-search block above.
+@import '_search_suggest';
+
