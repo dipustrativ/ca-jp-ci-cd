@@ -41,7 +41,7 @@ Credentials are in the macOS keychain (`credsStore: osxkeychain`), not
 Application image — 10–20 min, ~4 GB RAM, run it in the background:
 
 ```bash
-docker buildx build \
+docker buildx build --platform linux/amd64 \
   --secret id=composer_auth,src=auth.json \
   --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile \
@@ -53,17 +53,27 @@ docker buildx build \
 nginx image — seconds, no secrets, **only if nginx config changed**:
 
 ```bash
-docker buildx build -f docker/Dockerfile.nginx \
+docker buildx build --platform linux/amd64 -f docker/Dockerfile.nginx \
   -t registry.carpetavenue.net/carpetavenue-jp-nginx:latest \
   -t registry.carpetavenue.net/carpetavenue-jp-nginx:v<M> \
   --push .
 ```
 
-⚠️ **Apple Silicon:** add `--platform linux/amd64` to both builds. A native
-arm64 push gives the server `exec format error`. Local-only test build? Use
-`--load` instead of `--push` and skip the registry entirely.
+⚠️ **`--platform linux/amd64` is mandatory on every `--push` build.** Both
+images are pushed as single-platform manifests, so a build from an Apple
+Silicon laptop without it publishes arm64 and the server dies with
+`exec /entrypoint.sh: exec format error` — including over the mutable `latest`
+tag, which breaks the next deploy of *anything* that pulls it. Local-only test
+build? Use `--load` instead of `--push`, and drop `--platform` so it runs
+natively.
 
-Done = `pushing manifest` for both tags, exit 0.
+Done = `pushing manifest` for both tags, exit 0. Then verify the arch that
+actually landed in the registry — one command per tag pushed:
+
+```bash
+docker buildx imagetools inspect registry.carpetavenue.net/carpetavenue-jp:latest \
+  --format '{{.Image.OS}}/{{.Image.Architecture}}'   # must print linux/amd64
+```
 
 `MAGENTO CLI ERROR (Production Mode) … No such file` during `di:compile` is
 **expected** — there is no database at build time. `di:compile` continues.
