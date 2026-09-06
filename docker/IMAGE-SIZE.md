@@ -42,10 +42,19 @@ locale count went **3 → 12** (`de_DE en_US sv_SE` → all store views), and ea
 locale is a full ~49 MB copy of the theme's compiled assets. 9 × 49 MB ≈ 440 MB,
 which is the jump.
 
-`STATIC_LOCALES=""` (auto-discover from the DB) is the right default —
-production mode never builds static on demand, so a missing locale is a broken
-storefront for that store view, not a fallback to `en_US`. Do not pin the list
-to shrink the image unless you are certain a store view is dead.
+Production mode never builds static on demand, so a missing locale is a broken
+storefront for that store view, not a fallback to `en_US`. Never pin the list to
+shrink the image unless you are certain a store view is dead.
+
+**Superseded:** `STATIC_LOCALES=""` (auto-discover) was the default until it was
+pinned to `"en_US ja_JP"`. Auto-discovery resolves per *area*
+(`Deploy\Package\LocaleResolver::getUsedPackageLocales`) — frontend from store
+views' `general/locale/code`, adminhtml from `en_US` + `admin_user.interface_locale`.
+On this DB that yields a ja_JP-only storefront and an en_US-only admin; the
+pinned list gives both locales to both areas. Cost is small because the
+`hardlink` pass collapses the byte-identical duplicates: the second locale is
+~1 MB in the image, not ~49 MB. Trade-off: a store view on a new locale now
+requires editing the `ARG STATIC_LOCALES` line in `docker/Dockerfile`.
 
 ## The dominant cause: SCD duplicates every locale
 

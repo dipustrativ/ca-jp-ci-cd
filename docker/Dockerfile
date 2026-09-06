@@ -71,16 +71,27 @@ RUN composer dump-autoload --optimize
 RUN php -d memory_limit=4G bin/magento setup:di:compile 2>&1 | tee /tmp/di-compile.log \
     && grep -q "Generated code and dependency injection configuration successfully" /tmp/di-compile.log
 
-# Locales baked into pub/static. EMPTY = let SCD auto-discover every locale in
-# the DB (general/locale/code per store view + admin interface_locale) — the SCD
-# env.php mounted below has real creds, so this needs no maintenance when a store
-# view is added. Production mode does not build static on demand, so a missing
-# locale is a broken storefront for that store view — not a fallback to en_US.
+# Locales baked into pub/static. Production mode does not build static on
+# demand, so a missing locale is a broken storefront for that store view — not a
+# fallback to en_US.
 #
-# Each locale adds its own copy of the theme's compiled assets, so this is the
-# main lever on image size. Pin an explicit subset to shrink the image:
+# EMPTY would let SCD auto-discover, but discovery is PER AREA
+# (Deploy\Package\LocaleResolver::getUsedPackageLocales):
+#   frontend  -> store views' general/locale/code   = ja_JP only
+#   adminhtml -> en_US + every admin_user.interface_locale = en_US only
+# That gives no en_US storefront and no ja_JP admin. Pinning the list applies it
+# to EVERY package regardless of area (PackagePool::ensureRequiredLocales uses
+# the forced list for all packages), so both areas get both locales.
+#
+# Each locale adds its own copy of the theme's compiled assets, but the
+# `hardlink` pass below collapses the byte-identical duplicates, so a second
+# locale costs ~1 MB in the final image, not ~49 MB. See docker/IMAGE-SIZE.md.
+#
+# Override at build time to change the set:
 #   docker buildx build --build-arg STATIC_LOCALES="en_US de_DE sv_SE" ...
-ARG STATIC_LOCALES=""
+# Because this is pinned, ADDING A STORE VIEW ON A NEW LOCALE MEANS EDITING THIS
+# LINE — auto-discovery no longer covers it.
+ARG STATIC_LOCALES="en_US ja_JP"
 
 # Themes baked into pub/static. carpetavenue/rugs is the live frontend theme;
 # Magento/luma is dead weight × every locale.
@@ -94,10 +105,13 @@ ARG STATIC_LOCALES=""
 # Single RUN: BuildKit snapshots final state only — real creds never persist in a layer.
 # ${STATIC_LOCALES} is intentionally unquoted so it word-splits into separate args.
 #
-# The trailing `test`: if minify is off here but on at runtime, SCD writes
+# The trailing `test`s: if minify is off here but on at runtime, SCD writes
 # require.js while the site asks for require.min.js — every generated asset 404s
 # and the build log looks clean. Both flags are locked in app/etc/config.php so
 # that can't drift; this fails the build if it ever does. docker/README.md §8.
+# The four paths also assert the locale × area matrix STATIC_LOCALES asks for:
+# admin and storefront, each in en_US and ja_JP. Drop the matching pair if a
+# locale is ever removed from STATIC_LOCALES.
 RUN --mount=type=secret,id=env_php_scd \
     cp /run/secrets/env_php_scd app/etc/env.php && \
     php -d memory_limit=4G bin/magento setup:static-content:deploy -f \
@@ -105,7 +119,10 @@ RUN --mount=type=secret,id=env_php_scd \
         ${STATIC_LOCALES} --jobs="$(nproc)" && \
     cp docker/env.php.build app/etc/env.php && \
     test -f pub/static/adminhtml/Magento/backend/en_US/requirejs/require.min.js && \
-    test -f pub/static/adminhtml/Magento/backend/en_US/css/styles.min.css
+    test -f pub/static/adminhtml/Magento/backend/en_US/css/styles.min.css && \
+    test -f pub/static/adminhtml/Magento/backend/ja_JP/requirejs/require.min.js && \
+    test -f pub/static/frontend/carpetavenue/rugs/en_US/requirejs/require.min.js && \
+    test -f pub/static/frontend/carpetavenue/rugs/ja_JP/requirejs/require.min.js
 
 # Strip everything the running site never reads. Belt-and-suspenders vs
 # .dockerignore (BuildKit can reuse a cached COPY layer and leak these in):
