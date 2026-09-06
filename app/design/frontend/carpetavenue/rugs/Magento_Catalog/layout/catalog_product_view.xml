@@ -2,8 +2,8 @@
 <!--
 /**
  * Product detail page — ported from the reference carpetavenue theme
- * (Evalent/carpet) without Trustpilot, RuleBanner, PriceHistory,
- * ProductionType and ProductContactForm blocks.
+ * (Evalent/carpet) without RuleBanner, PriceHistory and ProductContactForm
+ * blocks. Trustpilot micro widget above the title is included.
  */
 -->
 <page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
@@ -21,6 +21,13 @@
         </referenceBlock>
 
         <referenceContainer name="product.info.main">
+            <!-- Trustpilot "Micro Combo" TrustBox above the product title.
+                 Content = CMS block trustpilot-micro-count (CreateProductTrustpilotBlock patch). -->
+            <block class="Magento\Cms\Block\Block" name="trustpilot.product.mini">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">trustpilot-micro-count</argument>
+                </arguments>
+            </block>
             <container name="container.size.attribute" htmlTag="div" htmlClass="size-product__attribute">
                 <block name="size.attribute"
                        class="Magento\Catalog\Block\Product\View"
@@ -93,6 +100,17 @@
         <referenceBlock name="product.info.overview" remove="true" />
 
         <referenceContainer name="product.info.stock.sku">
+            <block class="Magento\Catalog\Block\Product\View\Description"
+                   name="product.info.productiontype"
+                   template="Magento_Catalog::product/view/attribute.phtml">
+                <arguments>
+                    <argument name="at_call" xsi:type="string">getProductionType</argument>
+                    <argument name="at_code" xsi:type="string">production_type</argument>
+                    <argument name="css_class" xsi:type="string">production_type</argument>
+                    <argument name="at_label" xsi:type="string">default</argument>
+                    <argument name="add_attribute" xsi:type="string">itemprop="productiontype"</argument>
+                </arguments>
+            </block>
             <block name="product.info.carpient"
                    class="Magento\Catalog\Block\Product\View"
                    template="Magento_Catalog::product/view/carpient-tag.phtml"/>
@@ -126,6 +144,8 @@
         <move element="product.info.social" destination="product.info.form.content" after="-"/>
         <!-- Product name (page title) first inside product-info-main -->
         <move element="page.main.title" destination="product.info.main" before="-"/>
+        <!-- Trustpilot micro widget sits above the title -->
+        <move element="trustpilot.product.mini" destination="product.info.main" before="page.main.title"/>
         <move element="container.size.attribute" destination="product.info.main" after="page.main.title"/>
         <move element="product.info.stock.sku" destination="product.info.main" before="product.info.price"/>
         <move element="product.info.details" destination="product.bottom.holder" before="-"/>
