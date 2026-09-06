@@ -84,6 +84,15 @@
         <move element="header-wrapper" destination="sticky-wrapper" after="-"/>
         <move element="navigation.sections" destination="sticky-wrapper" after="-"/>
 
+        <!-- ============ MESSAGES ============ -->
+
+        <!-- Status messages (add-to-cart success, errors) default to columns.top,
+             inside page-main and BELOW the breadcrumb. The breadcrumb is pinned to
+             page.top on catalog/search/cms handles, so move the whole page.messages
+             container into page.top just before breadcrumbs — the flash then renders
+             ABOVE the breadcrumb, at the very top of the content. -->
+        <move element="page.messages" destination="page.top" before="breadcrumbs"/>
+
         <!-- ============ FOOTER ============ -->
 
         <referenceContainer name="footer">
