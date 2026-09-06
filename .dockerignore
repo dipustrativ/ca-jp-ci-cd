@@ -30,5 +30,11 @@ generated/metadata
 auth.json
 docker/env.php.scd
 docker/certs
-docker/.env
-docker/.env.local
+# Runtime env files. These are NOT --secret mounts — nothing in the build reads
+# them — so this is the only thing keeping them out of the image, and the
+# Dockerfile keeps docker/ in the final stage on purpose (entrypoint.sh reads
+# docker/env.php.template). A glob, not a list: docker/.env.production held real
+# DB/Valkey/RabbitMQ passwords plus MAGE_CRYPT_KEY and shipped because only
+# .env and .env.local were named here. *.example files are safe but excluded
+# too — the image never reads them either.
+docker/.env*
