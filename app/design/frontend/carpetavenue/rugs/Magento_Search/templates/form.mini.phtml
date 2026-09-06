@@ -1,0 +1,78 @@
+<?php
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Header mini search. Core's markup verbatim — the theme's header LESS styles
+ * `.label` into the in-field magnifier and expands `.block-search` on click, so
+ * the structure has to stay as core ships it — with two changes:
+ *
+ *  1. the input boots CarpetAvenue_Productify's suggestion widget instead of
+ *     core `quickSearch`. Core's only ever suggests previously-typed search
+ *     terms; the storefront wants products, collections and pages.
+ *  2. the dropdown host carries `productify-suggest` rather than
+ *     `search-autocomplete`, keeping Magento/blank's dropdown rules off it.
+ *
+ * Replaces MageWorx_SearchSuiteAutocomplete, which powered this dropdown until
+ * the module was removed.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+/** @var \Magento\Search\ViewModel\ConfigProvider $configProvider */
+$configProvider = $block->getData('configProvider');
+/** @var \Magento\Search\ViewModel\AdditionalSearchFormData $additionalSearchFormData */
+$additionalSearchFormData = $block->getData('additionalSearchFormData');
+/** @var \CarpetAvenue\Productify\ViewModel\SuggestOptions|null $suggestOptions */
+$suggestOptions = $block->getData('suggest_options');
+
+$helper = $configProvider->getSearchHelperData();
+$useSuggest = $suggestOptions && $suggestOptions->isEnabled();
+?>
+<div class="block block-search">
+    <div class="block block-title"><strong><?= $escaper->escapeHtml(__('Search')) ?></strong></div>
+    <div class="block block-content">
+        <form class="form minisearch" id="search_mini_form"
+              action="<?= $escaper->escapeUrl($helper->getResultUrl()) ?>" method="get">
+            <?php if (!empty($queryParams = $additionalSearchFormData->getFormData())) : ?>
+                <?php foreach ($queryParams as $param) : ?>
+                    <input type="hidden" name="<?= $escaper->escapeHtmlAttr($param['name']) ?>"
+                           value="<?= $escaper->escapeHtmlAttr($param['value']) ?>"/>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            <div class="field search">
+                <label class="label" for="search" data-role="minisearch-label">
+                    <span><?= $escaper->escapeHtml(__('Search')) ?></span>
+                </label>
+                <div class="control">
+                    <input id="search"
+                           <?php if ($useSuggest) : ?>
+                               data-mage-init="<?= $escaper->escapeHtmlAttr(
+                                   $suggestOptions->getJsonConfig('#search_autocomplete', '#search_mini_form')
+                               ) ?>"
+                           <?php endif; ?>
+                           type="text"
+                           name="<?= $escaper->escapeHtmlAttr($helper->getQueryParamName()) ?>"
+                           value="<?= /* @noEscape */ $helper->getEscapedQueryText() ?>"
+                           placeholder="<?= $escaper->escapeHtmlAttr(__('Search entire store here...')) ?>"
+                           class="input-text"
+                           maxlength="<?= $escaper->escapeHtmlAttr($helper->getMaxQueryLength()) ?>"
+                           role="combobox"
+                           aria-haspopup="false"
+                           aria-autocomplete="both"
+                           autocomplete="off"
+                           aria-expanded="false"/>
+                    <div id="search_autocomplete" class="productify-suggest"></div>
+                    <?= $block->getChildHtml() ?>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit"
+                        title="<?= $escaper->escapeHtmlAttr(__('Search')) ?>"
+                        class="action search"
+                        aria-label="<?= $escaper->escapeHtmlAttr(__('Search')) ?>">
+                    <span><?= $escaper->escapeHtml(__('Search')) ?></span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

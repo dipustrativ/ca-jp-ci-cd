@@ -6,11 +6,8 @@ declare(strict_types=1);
 
 namespace CarpetAvenue\Productify\Block\Search;
 
-use CarpetAvenue\Productify\Helper\Data as ProductifyHelper;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Model\Product;
-use Magento\Catalog\Pricing\Price\FinalPrice;
-use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Search\Helper\Data as SearchHelper;
@@ -22,6 +19,8 @@ use Magento\Search\Helper\Data as SearchHelper;
  * @method string getQuery()
  * @method int getTotal()
  * @method array getCategories()
+ * @method int getCategoriesTotal()
+ * @method array getSuggestions()
  * @method array getPages()
  */
 class Suggest extends Template
@@ -40,7 +39,6 @@ class Suggest extends Template
         Template\Context $context,
         private readonly ImageHelper $imageHelper,
         private readonly PriceCurrencyInterface $priceCurrency,
-        private readonly ProductifyHelper $productifyHelper,
         private readonly SearchHelper $searchHelper,
         array $data = []
     ) {
@@ -66,7 +64,10 @@ class Suggest extends Template
 
     public function hasResults(): bool
     {
-        return $this->getProductCount() > 0 || $this->getCategories() || $this->getPages();
+        return $this->getProductCount() > 0
+            || $this->getCategories()
+            || $this->getSuggestions()
+            || $this->getPages();
     }
 
     /**
@@ -86,24 +87,19 @@ class Suggest extends Template
     }
 
     /**
-     * "160 x 240 cm" / "∅ 160 cm" — same helper the product listing uses.
-     */
-    public function getSize(Product $product): string
-    {
-        return $this->productifyHelper->formatSize(
-            $product->getData('width'),
-            $product->getData('length'),
-            $product->getData('shape')
-        );
-    }
-
-    /**
      * Final price, formatted through the store currency so the JPY ceiling and
      * hidden .00 plugins apply exactly as they do on the listing.
+     *
+     * Read off the price index (SuggestProvider calls addPriceData()) rather
+     * than the price model: the suggestion collection only selects the handful
+     * of attributes the dropdown prints, so `special_price` isn't loaded and
+     * the model would price every discounted rug at full price. The index is
+     * also what the listing and the results page display, catalog rules and
+     * tier prices included.
      */
     public function getFinalPrice(Product $product): string
     {
-        return $this->format($this->priceValue($product, FinalPrice::PRICE_CODE));
+        return $this->format((float) $product->getData('final_price'));
     }
 
     /**
@@ -111,9 +107,9 @@ class Suggest extends Template
      */
     public function getOldPrice(Product $product): string
     {
-        $regular = $this->priceValue($product, RegularPrice::PRICE_CODE);
+        $regular = (float) $product->getData('price');
 
-        return $regular > $this->priceValue($product, FinalPrice::PRICE_CODE) ? $this->format($regular) : '';
+        return $regular > (float) $product->getData('final_price') ? $this->format($regular) : '';
     }
 
     /**
@@ -152,13 +148,13 @@ class Suggest extends Template
         return $this->getUrl('catalogsearch/result', ['_query' => ['q' => $this->getQuery()]]);
     }
 
-    private function priceValue(Product $product, string $priceCode): float
-    {
-        return (float) $product->getPriceInfo()->getPrice($priceCode)->getAmount()->getValue();
-    }
-
+    /**
+     * Index prices are in the base currency, so they have to be converted, not
+     * just formatted — and the conversion is where the JPY ceiling lands
+     * (Plugin\Currency\JPCurrencyConvert wraps Currency::convert()).
+     */
     private function format(float $value): string
     {
-        return (string) $this->priceCurrency->format($value, false);
+        return (string) $this->priceCurrency->convertAndFormat($value, false);
     }
 }

@@ -20,8 +20,8 @@ class SuggestConfig
     private const XML_PATH_PRODUCT_LIMIT = 'productify/search_suggest/product_limit';
     private const XML_PATH_CACHE_TTL = 'productify/search_suggest/cache_ttl';
 
-    /** Categories and CMS pages shown in the left column. */
-    public const SIDE_LIMIT = 5;
+    /** Rows per secondary section: categories, suggested searches, CMS pages. */
+    public const SIDE_LIMIT = 8;
 
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig

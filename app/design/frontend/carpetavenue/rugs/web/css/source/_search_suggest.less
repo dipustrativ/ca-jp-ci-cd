@@ -1,0 +1,313 @@
+//
+//  Search suggestion dropdown (CarpetAvenue_Productify)
+//  _____________________________________________
+//
+//  Replaces MageWorx_SearchSuiteAutocomplete, whose stylesheet left with the
+//  module. Values below are measured off carpetavenue.jp's live panel: sections
+//  stacked full width, a darker heading over the category rows, grey rows with
+//  hairline separators, and centred product cells with a blue article number
+//  and a green special price.
+//
+
+@suggest__border: #c2c2c2;
+@suggest__heading-bg: #f4f4f4;
+@suggest__heading-primary-bg: #cccccc;
+@suggest__row-bg: #e8e8e8;
+@suggest__chip-bg: #e8e8e8;
+@suggest__sku: #004875;
+@suggest__special: #2d8e3c;
+@suggest__old: #a8a8a8;
+@suggest__thumb-size: 135px;
+
+.productify-suggest {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 9999999;
+    display: none;
+    width: 100%;
+    margin-top: 4px;
+    background: #fff;
+    border: 1px solid @suggest__border;
+    box-shadow: 0 3px 3px rgba(0, 0, 0, .15);
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+
+    //  Toggled by CarpetAvenue_Productify/js/search-suggest
+    &.is-open {
+        display: block;
+    }
+
+    //  Live stacks every section full width — there is no two-column split.
+    &__inner {
+        width: 100%;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    &__section + &__section {
+        margin-top: 5px;
+    }
+
+    //  Section heading — "Products", "Suggested", "Pages"
+    &__heading {
+        margin: 0;
+        padding: 10px;
+        background: @suggest__heading-bg;
+        color: #333;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 20px;
+        overflow: hidden;
+    }
+
+    //  Categories carry the heavier bar on live
+    &__heading--primary {
+        background: @suggest__heading-primary-bg;
+        color: #000;
+        font-size: 16px;
+    }
+
+    //  "See All 11" chip, right-aligned inside the heading bar
+    &__all {
+        float: right;
+        margin: auto 0;
+        padding: 3px 5px 0;
+        background: @suggest__chip-bg;
+        color: #333 !important;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover {
+            color: #000;
+            text-decoration: none;
+        }
+    }
+
+    &__list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+            margin: 0;
+        }
+    }
+
+    &__link {
+        display: block;
+        padding: 10px 20px;
+        color: #333 !important;
+        text-decoration: none;
+
+        b {
+            font-weight: 700;
+        }
+
+        &:hover,
+        &.is-selected {
+            background: #f9f9f9;
+            color: #000;
+            text-decoration: none;
+        }
+    }
+
+    //  Category rows: grey bands split by hairline white separators
+    &__list--categories {
+        li + li .productify-suggest__link {
+            border-top: 1px solid #fff;
+        }
+
+        .productify-suggest__link {
+            background: @suggest__row-bg;
+            padding: 13px 20px;
+            color: #000;
+
+            &:hover,
+            &.is-selected {
+                background: darken(@suggest__row-bg, 5%);
+            }
+        }
+    }
+
+    &__count {
+        color: inherit;
+    }
+
+    &__grid {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0;
+        padding: 0 10px 0 20px;
+        list-style: none;
+    }
+
+    //  Three across: the panel is as wide as the header field (~460px), which
+    //  is three @suggest__thumb-size cells. An exact article number normally
+    //  returns one rug, but a SKU shared by variants can return several.
+    &__cell {
+        //  Magento/blank leaves `li` on content-box, which adds the cell padding
+        //  on top of the 33.3% basis and drops the third cell to the next row.
+        box-sizing: border-box;
+        flex: 0 0 (100% / 3);
+        max-width: (100% / 3);
+        min-width: 0;
+        margin: 0;
+        padding: 15px 5px;
+        list-style: none;
+    }
+
+    //  A lone hit gets the full panel, as live centres it
+    &__grid > &__cell:only-child {
+        flex-basis: 100%;
+        max-width: 100%;
+    }
+
+    &__product {
+        display: block;
+        color: inherit;
+        text-align: center;
+        text-decoration: none;
+
+        &:hover,
+        &.is-selected {
+            text-decoration: none;
+
+            .productify-suggest__name {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    //  Rugs are portrait renders from the listing image id, so the box has to
+    //  cap height as well as width — `max-width` alone lets a tall rug run past
+    //  the cell and cover the name below it.
+    &__thumb {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: @suggest__thumb-size;
+        height: @suggest__thumb-size;
+        margin: 0 auto 8px;
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+    }
+
+    &__info {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+
+    &__name {
+        display: inline-block;
+        width: 100%;
+        color: #000;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 20px;
+    }
+
+    &__sku {
+        display: block;
+        width: 100%;
+        color: @suggest__sku;
+        font-size: 12px;
+        line-height: 1.43;
+    }
+
+    &__price {
+        display: inline-block;
+        margin-top: 15px;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 20px;
+    }
+
+    &__price-old {
+        color: @suggest__old;
+        text-decoration: line-through;
+    }
+
+    &__price-value {
+        color: #000;
+
+        &.is-special {
+            color: @suggest__special;
+        }
+    }
+
+    &__empty {
+        padding: 15px 20px;
+        color: #333;
+    }
+
+    //  Grey placeholder rows while the fragment is in flight
+    &__skeleton {
+        margin: 0;
+        padding: 10px 20px;
+        list-style: none;
+    }
+
+    &__skeleton-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+        list-style: none;
+    }
+
+    &__skeleton-thumb {
+        flex: 0 0 auto;
+        width: 48px;
+        height: 48px;
+        background: #f0f0f0;
+    }
+
+    &__skeleton-lines {
+        flex: 1 1 auto;
+
+        span {
+            display: block;
+            height: 8px;
+            margin-bottom: 6px;
+            background: #f0f0f0;
+
+            &:nth-child(2) {
+                width: 70%;
+            }
+
+            &:nth-child(3) {
+                width: 40%;
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+//  Phones: the header field goes full width, so give product cells more room.
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .productify-suggest {
+        top: 31px;
+        left: -38px;
+        width: calc(100vw - 40px);
+        &__inner {
+            max-height: 60vh;
+        }
+
+        &__cell {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+    }
+}
