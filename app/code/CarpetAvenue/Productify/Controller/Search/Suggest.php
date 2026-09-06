@@ -98,6 +98,7 @@ class Suggest implements HttpGetActionInterface
     private function render(string $query, int $storeId): string
     {
         $products = $this->provider->getProducts($query, $this->config->getProductLimit($storeId));
+        $categories = $this->provider->getCategories($query, SuggestConfig::SIDE_LIMIT);
 
         /** @var SuggestBlock $block */
         $block = $this->layoutFactory->create()->createBlock(SuggestBlock::class);
@@ -105,7 +106,9 @@ class Suggest implements HttpGetActionInterface
             ->setData('query', $query)
             ->setData('products', $products['products'])
             ->setData('total', $products['total'])
-            ->setData('categories', $this->provider->getCategories($query, SuggestConfig::SIDE_LIMIT))
+            ->setData('categories', $categories['items'])
+            ->setData('categories_total', $categories['total'])
+            ->setData('suggestions', $this->provider->getSuggestions($query, SuggestConfig::SIDE_LIMIT))
             ->setData('pages', $this->provider->getPages($query, SuggestConfig::SIDE_LIMIT));
 
         return $block->toHtml();

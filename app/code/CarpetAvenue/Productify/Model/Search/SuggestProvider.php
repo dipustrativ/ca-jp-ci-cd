@@ -6,39 +6,29 @@ declare(strict_types=1);
 
 namespace CarpetAvenue\Productify\Model\Search;
 
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFactory;
-use Magento\Framework\Api\FilterBuilderFactory;
-use Magento\Framework\Api\Search\SearchCriteriaBuilderFactory;
-use Magento\Framework\DB\Select;
-use Magento\Framework\DB\Sql\Expression;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\UrlInterface;
-use Magento\Search\Api\SearchInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Data behind the search suggestion dropdown: products from OpenSearch plus
- * matching categories ("collections") and CMS pages.
+ * Data behind the search suggestion dropdown: matching categories
+ * ("collections"), previously-searched terms, CMS pages, and an exact
+ * article-number lookup.
  */
 class SuggestProvider
 {
-    /**
-     * Same ordering the search results page uses, so the dropdown and the full
-     * result list agree on what comes first.
-     */
-    private const ORDERS = ['is_out_of_stock' => 'DESC', '_score' => 'DESC'];
-
     public function __construct(
-        private readonly SearchInterface $search,
-        private readonly SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
-        private readonly FilterBuilderFactory $filterBuilderFactory,
         private readonly ProductCollectionFactory $productCollectionFactory,
         private readonly CategoryCollectionFactory $categoryCollectionFactory,
         private readonly PageCollectionFactory $pageCollectionFactory,
+        private readonly ResourceConnection $resource,
         private readonly StoreManagerInterface $storeManager,
         private readonly UrlInterface $url,
         private readonly LoggerInterface $logger
@@ -46,79 +36,58 @@ class SuggestProvider
     }
 
     /**
+     * The "Products" column is an article-number lookup, not a catalogue search:
+     * carpetavenue.jp lists a rug here only when the term *is* its SKU, and
+     * routes every browsing term through the category and suggested-search rows
+     * instead. Verified against live — `OSG16359` returns the rug, while
+     * `OSG163`, `ギャッベ` and `タブリーズ` return no products at all.
+     *
      * @return array{products: ProductCollection|null, total: int}
      */
     public function getProducts(string $query, int $limit): array
     {
-        $ids = [];
-        $total = 0;
-
         try {
-            // Fresh builder instances: the framework's SearchCriteriaBuilder is a
-            // shared singleton that the fulltext collection also grabs, so reusing
-            // it leaks filters between searches in the same request (see
-            // LayeredNavigation\Model\Search\FacetProvider::isolateCriteriaBuilders).
-            $criteriaBuilder = $this->searchCriteriaBuilderFactory->create();
-            $filterBuilder = $this->filterBuilderFactory->create();
+            $collection = $this->loadProducts($query, $limit);
+            $total = $collection->getSize();
 
-            $criteriaBuilder->addFilter(
-                $filterBuilder->setField('search_term')->setValue($query)->create()
-            );
-            $criteriaBuilder->addFilter(
-                $filterBuilder->setField('visibility')
-                    ->setValue([Visibility::VISIBILITY_IN_SEARCH, Visibility::VISIBILITY_BOTH])
-                    ->create()
-            );
-
-            $criteria = $criteriaBuilder->create();
-            $criteria->setRequestName('quick_search_container');
-            $criteria->setCurrentPage(0);
-            $criteria->setPageSize($limit);
-            $criteria->setSortOrders(self::ORDERS);
-
-            $result = $this->search->search($criteria);
-            $total = (int) $result->getTotalCount();
-
-            foreach ($result->getItems() as $item) {
-                $ids[] = (int) $item->getId();
-            }
+            return ['products' => $total ? $collection : null, 'total' => $total];
         } catch (\Exception $e) {
-            $this->logger->warning('Productify suggest search failed: ' . $e->getMessage());
+            $this->logger->warning('Productify suggest product lookup failed: ' . $e->getMessage());
 
             return ['products' => null, 'total' => 0];
         }
-
-        if (!$ids) {
-            return ['products' => null, 'total' => $total];
-        }
-
-        return ['products' => $this->loadProducts($ids), 'total' => $total];
     }
 
-    /**
-     * Hydrate the search hits in one collection, keeping relevance order.
-     */
-    private function loadProducts(array $ids): ProductCollection
+    private function loadProducts(string $query, int $limit): ProductCollection
     {
         /** @var ProductCollection $collection */
         $collection = $this->productCollectionFactory->create();
-        $collection->addAttributeToSelect(['name', 'small_image', 'width', 'length', 'shape'])
+
+        // Prices come from addPriceData()'s index join (`price` / `final_price`),
+        // not from EAV — see Block\Search\Suggest::getFinalPrice().
+        $collection->addAttributeToSelect(['name', 'small_image'])
             ->addPriceData()
             ->addUrlRewrite()
-            ->addStoreFilter();
-
-        $collection->getSelect()
-            ->where('e.entity_id IN (?)', $ids)
-            ->reset(Select::ORDER)
-            ->order(new Expression('FIELD(e.entity_id, ' . implode(',', $ids) . ')'));
+            ->addStoreFilter()
+            ->addAttributeToFilter('sku', $query)
+            ->addAttributeToFilter('status', Status::STATUS_ENABLED)
+            ->addAttributeToFilter(
+                'visibility',
+                ['in' => [Visibility::VISIBILITY_IN_SEARCH, Visibility::VISIBILITY_BOTH]]
+            )
+            ->setPageSize($limit);
 
         return $collection;
     }
 
     /**
-     * Categories matching the term — the "collections" column.
+     * Categories matching the term, with the number of products in each — the
+     * "Collections" rows.
      *
-     * @return array<int, array{label: string, url: string}>
+     * `total` is every match, not just the rows returned — it drives the
+     * "See All N" chip, which reads 11 while eight rows are listed.
+     *
+     * @return array{items: array<int, array{label: string, url: string, count: int}>, total: int}
      */
     public function getCategories(string $query, int $limit): array
     {
@@ -129,17 +98,62 @@ class SuggestProvider
                 ->addAttributeToFilter('is_active', 1)
                 ->addAttributeToFilter('name', ['like' => '%' . $query . '%'])
                 ->addAttributeToFilter('level', ['gt' => 1])
+                ->setLoadProductCount(true)
                 ->setOrder('level', 'ASC')
                 ->setPageSize($limit);
 
             $items = [];
             foreach ($collection as $category) {
-                $items[] = ['label' => (string) $category->getName(), 'url' => (string) $category->getUrl()];
+                $items[] = [
+                    'label' => (string) $category->getName(),
+                    'url' => (string) $category->getUrl(),
+                    'count' => (int) $category->getProductCount(),
+                ];
+            }
+
+            return ['items' => $items, 'total' => (int) $collection->getSize()];
+        } catch (\Exception $e) {
+            $this->logger->warning('Productify suggest category lookup failed: ' . $e->getMessage());
+
+            return ['items' => [], 'total' => 0];
+        }
+    }
+
+    /**
+     * Terms other shoppers have searched for — the "Suggested searches" rows.
+     *
+     * Queried directly rather than through Search\ResourceModel\Query\Collection
+     * because Plugin\Search\FilterSpamQueries gates that collection at
+     * `popularity > 5` for the popular-terms page, which would leave this list
+     * empty on any store that isn't already busy. Only `num_results` matters
+     * here: never suggest a search that lands on an empty results page.
+     *
+     * @return array<int, array{label: string, url: string}>
+     */
+    public function getSuggestions(string $query, int $limit): array
+    {
+        try {
+            $connection = $this->resource->getConnection();
+            $select = $connection->select()
+                ->from($this->resource->getTableName('search_query'), ['query_text'])
+                ->where('store_id = ?', (int) $this->storeManager->getStore()->getId())
+                ->where('num_results > 0')
+                ->where('query_text LIKE ?', '%' . $query . '%')
+                ->where('query_text != ?', $query)
+                ->order('popularity DESC')
+                ->limit($limit);
+
+            $items = [];
+            foreach ($connection->fetchCol($select) as $text) {
+                $items[] = [
+                    'label' => (string) $text,
+                    'url' => $this->url->getUrl('catalogsearch/result', ['_query' => ['q' => $text]]),
+                ];
             }
 
             return $items;
         } catch (\Exception $e) {
-            $this->logger->warning('Productify suggest category lookup failed: ' . $e->getMessage());
+            $this->logger->warning('Productify suggest term lookup failed: ' . $e->getMessage());
 
             return [];
         }
