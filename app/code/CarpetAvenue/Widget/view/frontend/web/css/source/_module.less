@@ -1200,11 +1200,20 @@
                 .product-item__flag--discount {
                     z-index: 9;
 
-                    //  Maroon ribbon on the widget cards. carpetavenue.jp
-                    //  serves `discount_1.svg` (#7c232e) here and keeps the
-                    //  green `discount.svg` on category pages — both verified
-                    //  live — so override the theme's green only in this scope.
-                    background-image: url('../images/catalog_flags/discount_1.svg');
+                    //  Maroon ribbon on the widget cards, but not on the
+                    //  product page. carpetavenue.jp serves `discount_1.svg`
+                    //  (#7c232e) for the home page's widget carousels and the
+                    //  green `discount.svg` everywhere else — category grids
+                    //  and, crucially, the related and recently-viewed rows on
+                    //  a product page, where all 21 badges come back green.
+                    //  Without the guard this scope caught those too, since the
+                    //  PDP rows are the same `.block-products-list.grid` and
+                    //  `.block-viewed-products-grid` widgets. Excluding the
+                    //  handle lets the theme's green base rule through
+                    //  (Magento_Catalog/web/css/source/_extend.less).
+                    body:not(.catalog-product-view) & {
+                        background-image: url('../images/catalog_flags/discount_1.svg');
+                    }
                 }
 
                 //  Same 280px box as the image container below — the hover
