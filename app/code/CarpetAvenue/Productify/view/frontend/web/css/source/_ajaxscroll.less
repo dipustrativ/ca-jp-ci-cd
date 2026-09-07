@@ -34,15 +34,6 @@
         &.ias-trigger-next {
             margin-bottom: 40px;
 
-            .ias-count {
-                display: block;
-                text-align: center;
-                color: #333;
-                font-size: 14px;
-                line-height: 1.4;
-                margin: 0 auto 12px;
-            }
-
             .toolbar-amount {
                 display: block;
                 text-align: center;
@@ -65,20 +56,35 @@
                 text-align: center;
                 margin-left: 15px;
             }
+        }
+    }
 
-            .progressbar {
-                background: #d6d6d6;
-                height: 8px;
-                width: 100%;
-                max-width: 700px;
-                margin: 0 auto 20px;
+    //  Sits above the trigger but is not part of it: IAS destroys and
+    //  recreates its trigger node on every load and never restores it once
+    //  the last page is in, so anything scoped to `.ias-trigger-next`
+    //  styled a node that is not always on the page.
+    .ias-count-box {
+        .ias-count {
+            display: block;
+            text-align: center;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.4;
+            margin: 0 auto 12px;
+        }
 
-                &__fill {
-                    background: #9b9b9b;
-                    display: block;
-                    height: 100%;
-                    transition: width .3s ease;
-                }
+        .progressbar {
+            background: #d6d6d6;
+            height: 8px;
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto 20px;
+
+            &__fill {
+                background: #9b9b9b;
+                display: block;
+                height: 100%;
+                transition: width .3s ease;
             }
         }
     }
