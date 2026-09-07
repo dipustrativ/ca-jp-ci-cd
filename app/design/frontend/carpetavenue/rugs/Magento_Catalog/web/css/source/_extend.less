@@ -37,9 +37,47 @@
         display: none;
     }
 
-    //  Floating "scroll to filter" helper — redundant (filters already on top)
+    //  Floating filter pill, opens the slide-out filter modal. Position and
+    //  styling match live exactly. Nothing else occupies this corner: the
+    //  scroll-to-top button would have sat at bottom 55px and overlapped, so
+    //  it is hidden site-wide (`.button-go_top.primary` in the theme's
+    //  web/css/source/_extend.less) — same as live, where it never shows.
     .wrap-filter-top-button {
-        display: none;
+        position: fixed;
+        right: 25px;
+        bottom: 40px;
+        z-index: 100;
+    }
+
+    .button-go_filter_top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border: 0;
+        border-radius: 50px;
+        background: @ca-black;
+        color: #ffffff;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        user-select: none;
+        transition: .2s;
+
+        //  Restate colours: the theme's global button/a styles win on hover
+        //  otherwise and the pill goes light-on-light.
+        &:hover,
+        &:focus,
+        &:active {
+            background: @ca-black;
+            color: #ffffff;
+            border: 0;
+        }
+
+        &:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
     }
 
     //  Layered navigation as a horizontal button bar — every button opens the
@@ -1088,6 +1126,20 @@
 //  `min-width: 0`, so it holds down to 320px without the halves overflowing.
 //  _____________________________________________
 .media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+
+    //  Floating filter pill: live tightens the padding and pulls it into the
+    //  corner at this width. Selector prefix repeated because a media query
+    //  adds no specificity — without it the 3-class media-common rule above
+    //  keeps winning. The vertical offset is inherited from that rule.
+    .page-layout-2columns-left.page-layout-fullwidth-filter {
+        .wrap-filter-top-button {
+            right: 20px;
+        }
+
+        .button-go_filter_top {
+            padding: 8px 12px;
+        }
+    }
 
     //  Four classes (both body-level) so this beats the media-common
     //  `display: block !important` in _carpient.less regardless of the order

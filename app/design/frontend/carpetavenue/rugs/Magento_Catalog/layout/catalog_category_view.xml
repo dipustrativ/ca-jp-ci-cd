@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <!-- Breadcrumbs last in page.top: after the callout widget, still
-             above #maincontent. The category h1 comes from category content
-             instead of the default page title. -->
-        <move element="breadcrumbs" destination="page.top" after="-"/>
+        <!-- Breadcrumbs + messages are placed globally in Magento_Theme's
+             default.xml (page.top, above #maincontent). The category h1 comes
+             from category content instead of the default page title. -->
 
         <!-- Bottom category info holder (parity with base project):
              image.cover (picture) + description with title + read-more,

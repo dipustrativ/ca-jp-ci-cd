@@ -224,8 +224,11 @@ a:hover, .alink:hover {
 
 .breadcrumbs{
     max-width: 2440px !important;
-    padding-left: 0px !important;
-    padding-right: 0px !important;
+}
+
+.page.messages {
+    padding-left: 32px;
+    padding-right: 32px;
 }
 
 .page-header {
@@ -1081,6 +1084,9 @@ a:hover, .alink:hover {
 //
 //  Scroll-to-top button
 //  _____________________________________________
+.button-go_top.primary {
+    display: none !important;
+}
 .button-go_top {
     display: none;
     position: fixed;
@@ -1170,6 +1176,11 @@ a:hover, .alink:hover {
 }
 
 @media (max-width: 768px) {
+
+    .page.messages {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
 
     .block.widget.block-products-list.grid .block-title strong {
         font-size: 18px;

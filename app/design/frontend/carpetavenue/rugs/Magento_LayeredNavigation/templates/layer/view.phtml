@@ -119,6 +119,30 @@
         </div>
     </div>
 
+    <?php // Floating filter pill, parity with live. Rendered here rather than at
+          // body level so it only exists where layered navigation does (category
+          // + search) and so the AJAX filter swap re-renders it with the rest of
+          // .column.main. No ancestor creates a containing block, so
+          // position: fixed still resolves against the viewport.
+          //
+          // A real <button> instead of live's <span>: same classes, so the CSS
+          // and the delegated handler below are unchanged, but it is focusable
+          // and fires on Enter/Space. ?>
+    <div class="wrap-filter-top-button">
+        <button type="button"
+                class="button-go_filter_top"
+                data-scroll-button="filter"
+                aria-haspopup="dialog">
+            <svg width="20" height="20" viewBox="0 0 20 20" stroke-width="1.25" stroke="currentColor"
+                 aria-hidden="true" focusable="false" role="presentation" class="icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M1 6h18M1 14h18"></path>
+                <circle cx="7" cy="6" r="3"></circle>
+                <circle cx="13" cy="14" r="3"></circle>
+            </svg>
+            <span><?= $escaper->escapeHtml(__('Filter')) ?></span>
+        </button>
+    </div>
+
     <?php // Slide-out filter modal opener. Replaces the removed carpetavenueFilterModal
           // module — uses core Magento_Ui modal (type: 'filter'). The filter buttons
           // render disabled and are enabled here once the modal is wired. ?>
@@ -216,7 +240,7 @@
                     $('#filter-popup').modal('openModal');
                     activateTab($(this).attr('data-filter-tab'));
                 })
-                .on('click.carpFilter', '.open-filter-popup, .filter-title', function () {
+                .on('click.carpFilter', '.open-filter-popup, .filter-title, .button-go_filter_top', function () {
                     $('#filter-popup').modal('openModal');
                 })
                 .on('click.carpFilter', '.filter-options-back', function () {
