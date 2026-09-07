@@ -1,0 +1,74 @@
+<!--@subject {{var subject|default="Customer Email"}} {{var customer.name|default="Valued Customer"}} @-->
+<!--@vars
+{
+  "store url=\"\"":"Store Url",
+  "skin url=\"images/logo_email.gif\" _area='frontend'":"Email Logo Image",
+  "store url=\"customer/account/\"":"Customer Account Url",
+  "htmlescape var=$customer.name":"Customer Name",
+  "var customer.email":"Customer Email",
+  "store url=\"customer/account/confirm/\" _query_id=$customer.id _query_key=$customer.confirmation _query_back_url=$back_url":"Confirmation Url",
+  "htmlescape var=$customer.password":"Customer Password",
+  "var logo_url":"Email Logo Image URL",
+  "var logo_alt":"Email Logo Alt Text",
+  "var logo_height":"Email Logo Image Height",
+  "var logo_width":"Email Logo Image Width",
+  "var surname": "Customer Surname",
+  "var name": "Customer First Name",
+  "var email": "Customer Email",
+  "var zip": "Postal Code",
+  "var address": "Address",
+  "var phone": "Phone Number"
+}
+@-->
+
+<!--@styles
+body,td { color:#2f2f2f; font:11px/1.35em Verdana, Arial, Helvetica, sans-serif; }
+@-->
+
+<body style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">
+<div style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">
+    <table cellspacing="0" cellpadding="0" border="0" height="100%" width="100%">
+        <tr>
+            <td align="center" valign="top" style="padding:20px 0 20px 0">
+                <!-- [ header starts here] -->
+                <table bgcolor="FFFFFF" cellspacing="0" cellpadding="10" border="0" width="650" style="border:1px solid #E0E0E0;">
+                    <tr>
+                        <td valign="top">
+                            <a class="logo" href="{{store url=""}}">
+                            <img
+                                    {{if logo_width}} width="{{var logo_width}}" {{else}} width="180" {{/if}}
+                            {{if logo_height}} height="{{var logo_height}}" {{/if}}
+                            src="{{var logo_url}}"
+                            alt="{{var logo_alt}}"
+                            border="0"
+                            />
+                            </a>
+                        </td>
+                    </tr>
+                    <!-- [ middle starts here] -->
+                    <tr>
+                        <td valign="top">
+                            <h1 style="font-size:22px; font-weight:normal; line-height:22px; margin:0 0 11px 0;">ニューカタログ 2025</h1>
+                            {{if surname}}<strong>{{trans "Surname"}}:</strong>&nbsp;<span>{{var surname}}</span><br/>{{/if}}
+                            {{if name}}<strong>{{trans "First Name"}}:</strong>&nbsp;<span>{{var name}}</span><br/>{{/if}}
+                            {{if email}}<strong>{{trans "Email"}}:</strong>&nbsp;<span>{{var email}}</span><br/>{{/if}}
+                            {{if zip}}<strong>{{trans "Postal Code"}}:</strong>&nbsp;<span>{{var zip}}</span><br/>{{/if}}
+                            {{if address}}<strong>{{trans "Address"}}:</strong>&nbsp;<span>{{var address}}</span><br/>{{/if}}
+                            {{if phone}}<strong>{{trans "Phone"}}:</strong>&nbsp;<span>{{var phone}}</span><br/>{{/if}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#EAEAEA" align="center" style="background:#EAEAEA; text-align:center;">
+                            <center>
+                                <p style="font-size:12px; margin:0;">
+                                    {{trans "Thank you"}}
+                                </p>
+                            </center>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>

@@ -1,0 +1,81 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * Webkul Software.
+ *
+ * @category  Webkul
+ * @package   Webkul_AjaxContactForm
+ * @author    Webkul
+ * @copyright Copyright (c) Webkul Software Private Limited (https://webkul.com)
+ * @license   https://store.webkul.com/license.html
+ */
+ -->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:VerticalProductSlider:Magento_Widget:etc/widget.xsd">
+	<widget class="Webkul\AjaxContactForm\Block\Widget\Contactus" id="webkul_ajaxcontactform_contactus">
+		<label translate="true">Ajax Contact Form</label>
+		<description translate="true">Popup contact form</description>
+		<parameters>
+			<parameter name="alignment" xsi:type="select" visible="true"
+                       source_model="Webkul\AjaxContactForm\Model\Config\Source\Allignment" sort_order="1">
+                <label translate="true">Alignment</label>
+            </parameter>
+			<parameter name="name" xsi:type="text" visible="true" required="true" sort_order="10" >
+					<label translate="true">Title</label>
+					<description translate="true">Title to be shown on form.</description>
+			</parameter>
+			<parameter name="address" xsi:type="text" visible="true" required="true" sort_order="20" >
+                <label translate="true">Address</label>
+                <description translate="true">Address to be shown on form.</description>
+            </parameter>
+			<parameter name="email_to" xsi:type="text" visible="true" required="true" sort_order="40" >
+                <label translate="true">Email</label>
+                <description translate="true">Enter email address to receive emails.</description>
+            </parameter>
+
+			<parameter name="show_full_address" xsi:type="select" visible="true"
+                       source_model="Webkul\AjaxContactForm\Model\Config\Source\Options" sort_order="70">
+                <label translate="true">Show Full Address</label>
+            </parameter>
+			<parameter name="thanku_msg" xsi:type="text" visible="true" required="true" sort_order="90" >
+                <label translate="true">Thank You Message</label>
+                <description translate="true">Enter message to display after form is sent.</description>
+            </parameter>
+		</parameters>
+	</widget>
+
+    <widget class="Webkul\AjaxContactForm\Block\Widget\ContactCatalogue" id="webkul_ajaxcontactform_contactcatalogue">
+		<label translate="true">Order Catalogue Form</label>
+		<description translate="true">Order catalogue</description>
+		<parameters>
+			<parameter name="alignment" xsi:type="select" visible="true"
+                       source_model="Webkul\AjaxContactForm\Model\Config\Source\Allignment" sort_order="1">
+                <label translate="true">Alignment</label>
+            </parameter>
+			<parameter name="name" xsi:type="text" visible="true" required="true" sort_order="10" >
+					<label translate="true">Title</label>
+					<description translate="true">Title to be shown on form.</description>
+			</parameter>
+			<parameter name="identifier" xsi:type="text" visible="true" required="true" sort_order="11" >
+				<label translate="true">Identifier</label>
+				<description translate="true">A identifier without space must be in lower case (Like : catalog_2025)</description>
+			</parameter>
+			<parameter name="address" xsi:type="text" visible="true" required="true" sort_order="20" >
+                <label translate="true">Address</label>
+                <description translate="true">Address to be shown on form.</description>
+            </parameter>
+			<parameter name="email_to" xsi:type="text" visible="true" required="true" sort_order="40" >
+                <label translate="true">Email</label>
+                <description translate="true">Enter email address to receive emails.</description>
+            </parameter>
+
+			<parameter name="show_full_address" xsi:type="select" visible="true"
+                       source_model="Webkul\AjaxContactForm\Model\Config\Source\Options" sort_order="70">
+                <label translate="true">Show Full Address</label>
+            </parameter>
+			<parameter name="thanku_msg" xsi:type="text" visible="true" required="true" sort_order="90" >
+                <label translate="true">Thank You Message</label>
+                <description translate="true">Enter message to display after form is sent.</description>
+            </parameter>
+		</parameters>
+	</widget>
+</widgets>

@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Webkul ajaxcontactform module xml
+ * @category  Webkul
+ * @package   Webkul_AjaxContactForm
+ * @author    Webkul
+ * @copyright Copyright (c) Webkul Software Private Limited (https://webkul.com)
+ * @license   https://store.webkul.com/license.html
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="ajaxcontactform" translate="label" type="text" sortOrder="99" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Ajax Contact Form</label>
+            <tab>general</tab>
+            <resource>Webkul_AjaxContactForm::config_ajaxcontactform</resource>
+            <group id="general" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Settings</label>
+                <field id="map_status" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>Map Status</label>
+                    <source_model>Webkul\AjaxContactForm\Model\Config\Source\Options</source_model>
+                </field>
+                <field id="appendChild" translate="label comment"  type="obscure" sortOrder="4" showInDefault="1" showInWebsite="1">
+                    <label>Maps API Key</label>
+                    <validate>required-entry</validate>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="map_status" separator=",">1</field>
+                    </depends>
+                </field>
+                <field id="address" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set Default Address</label>
+                    <frontend_model>Webkul\AjaxContactForm\Block\Adminhtml\SetAddress</frontend_model>
+                    <depends>
+                        <field id="map_status" separator=",">1</field>
+                    </depends>
+                </field>
+                <field id="showemail" translate="label comment" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>Show Email Id on Frontend</label>
+                    <source_model>Webkul\AjaxContactForm\Model\Config\Source\Options</source_model>
+                </field>
+                <field id="map_coordinates" translate="label comment" sortOrder="8" type="text" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>Map Coordinates</label>
+                    <comment>e.g 28.612027,77.377661</comment>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="map_status" separator=",">1</field>
+                    </depends>
+                </field>
+                <field id="contactus_email" translate="label" type="select" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select Ajax Contact us Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="catalogue_email" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select Ajax Order Catalogue Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+            </group>
+        </section>
+
+        <section id="recaptcha_frontend">
+            <group id="type_for">
+                <field id="callmepopup" translate="label" type="select" sortOrder="140" showInDefault="1"
+                       showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Enable for Call Me popup</label>
+                    <source_model>Magento\ReCaptchaAdminUi\Model\OptionSource\Type</source_model>
+                </field>
+                <field id="ordercatalogue" translate="label" type="select" sortOrder="141" showInDefault="1"
+                       showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Enable for Order Catalogue Form</label>
+                    <source_model>Magento\ReCaptchaAdminUi\Model\OptionSource\Type</source_model>
+                </field>
+                <field id="backend_verification_enabled" translate="label" type="select" sortOrder="142" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Enable Recaptch Backend Verification for Order Catalogue Form</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="backend_verification_catalog_form_enabled" translate="label" type="select" sortOrder="143" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Enable Recaptch Backend Verification for Catalogue Form</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="backend_verification_contact_enabled" translate="label" type="select" sortOrder="144" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Enable Recaptch Backend Verification for Contact Form</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

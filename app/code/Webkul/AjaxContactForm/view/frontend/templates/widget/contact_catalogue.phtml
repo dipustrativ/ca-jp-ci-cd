@@ -1,0 +1,275 @@
+<?php
+/**
+ * Optimized reCAPTCHA v3 Contact/Catalogue Form with Inline Badge
+ * Dynamic, identifier-namespaced version using $block->uniqueId and rand()
+ * @var $block \Webkul\AjaxContactForm\Block\Widget\ContactCatalogue
+ */
+
+$recaptchaSiteKey = $block->getRecaptchaSiteKey();
+$recaptchaLang    = $block->getRecaptchaLang() ?: 'en';
+$recaptchaText    = $block->getRecaptchaAttribution();
+$panelid          = match ((int)$block->getData('alignment')) {
+    1 => 'panel-left',
+    2 => 'panel-right',
+    3 => 'panel-megamenu',
+    default => 'panel-page',
+};
+$emailTo   = $block->getData('email_to');
+
+// The identifier is now a random 5-digit number string
+$identifier = $block->getData('identifier') ?? "identifier_" . rand(90000, 99999);
+$mailUrl   = $block->getUrl('ajaxcontactform/email/sent', ['_secure' => $block->getRequest()->isSecure()]);
+$thankuMsg = $block->getData('thanku_msg') ?: __('Thank you for your submission!');
+$showFullAddress = $block->getData('show_full_address');
+$address   = $block->getData('address');
+$isShowEmail = $block->isShowEmail();
+$customerEmail = $block->getCustomerEmail();
+$sentFromStore = $block->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]);
+
+// Add a unique callback name to prevent conflicts
+$callbackName = 'recaptchaCallback_' . str_replace('-', '_', $identifier);
+
+?>
+
+<script>
+    window.<?= $callbackName ?> = function() {
+        // This ensures the script is fully loaded before execution
+        console.log('reCAPTCHA loaded for <?= $identifier ?>');
+    };
+</script>
+
+<script src="https://www.google.com/recaptcha/api.js?render=<?= $recaptchaSiteKey ?>&hl=<?= $recaptchaLang ?>&onload=<?= $callbackName ?>"></script>
+
+<div class="wk-loading-mask-ajax wk-display-none-ajax <?= $identifier ?>" id="<?= $block->uniqueId($identifier, 'wk-loading-mask-ajax') ?>">
+    <div class="wk-loader-ajax"></div>
+</div>
+<div class="contact_catalogue-form-panel contactus-form-panel <?= $panelid ?> <?= $identifier ?>-panel" id="<?= $identifier ?>">
+    <div class="cform">
+        <?php if ($showFullAddress): ?>
+            <div class="address">
+                <p>
+                    <br/><?= $address ?><br/>
+                    <?php if ($isShowEmail) echo $emailTo; ?>
+                </p>
+            </div>
+        <?php endif; ?>
+        <div class="successdata" style="display:none;" id="<?= $block->uniqueId($identifier, 'success') ?>">
+            <p><?= /* @noEscape */ html_entity_decode($thankuMsg) ?></p>
+        </div>
+        <div class="err_data wk-display-none-ajax" id="<?= $block->uniqueId($identifier, 'err') ?>"></div>
+        <div class="contact-form" id="<?= $block->uniqueId($identifier, 'form_wrap') ?>">
+            <form autocomplete="off" id="<?= $block->uniqueId($identifier, 'form') ?>">
+                <fieldset class="fieldset">
+                    <?php
+                    $fields = [
+                        ['Surname',     'surname',   'text',    $block->uniqueId($identifier, 'Surname'),    false],
+                        ['First Name',  'name',      'text',    $block->uniqueId($identifier, 'Username'),   false],
+                        ['Email',       'email',     'email',   $block->uniqueId($identifier, 'UserEmail'),  $customerEmail],
+                        ['Postal Code', 'zip',       'text',    $block->uniqueId($identifier, 'PostalCode'), false],
+                        ['Address',     'address',   'text',    $block->uniqueId($identifier, 'Address'),    false],
+                        ['Phone Number','telephone', 'tel',     $block->uniqueId($identifier, 'UserPhone'),  false],
+                    ];
+                    foreach ($fields as [$label, $name, $type, $id, $value]) { ?>
+                        <div class="field">
+                            <label class="label formtxt" for="<?= $id ?>"><?= __($label) ?></label>
+                            <div class="control">
+                                <input
+                                        type="<?= $type ?>"
+                                        name="<?= $name ?>"
+                                        id="<?= $id ?>"
+                                        value="<?= $value ? htmlspecialchars($value) : '' ?>"
+                                        class="<?= $name ?> <?= $identifier ?>-field"
+                                />
+                            </div>
+                        </div>
+                    <?php } ?>
+                    <input type="hidden" name="g-recaptcha-response" id="<?= $block->uniqueId($identifier, 'recaptcha_token') ?>" value="" />
+                    <!-- Inline reCAPTCHA badge will render here -->
+                    <div id="<?= $block->uniqueId($identifier, 'recaptcha_inline_container') ?>" class="recaptcha-inline-container"></div>
+                </fieldset>
+            </form>
+            <div class="actions-toolbar">
+                <div class="primary">
+                    <a href="#" class="action button primary order-catalogue-btn ui-menu-item <?= $identifier ?>-submit">
+                        <span><?= $block->escapeHtml(__('Submit')) ?></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inline reCAPTCHA render and usage -->
+<script>
+    require(['jquery', 'mage/translate'], function ($, $t) {
+        "use strict";
+        const identifier = '<?= $identifier ?>';
+        const recaptchaSiteKey = '<?= $recaptchaSiteKey ?>';
+        const mailUrl = '<?= $mailUrl ?>';
+        const emailTo = '<?= $emailTo ?>';
+        const fromStore = '<?= $sentFromStore ?>';
+
+        const formId          = '#<?= $block->uniqueId($identifier, 'form') ?>';
+        const loadingMaskId   = '#<?= $block->uniqueId($identifier, 'wk-loading-mask-ajax') ?>';
+        const successId       = '#<?= $block->uniqueId($identifier, 'success') ?>';
+        const errorId         = '#<?= $block->uniqueId($identifier, 'err') ?>';
+        const formWrapId      = '#<?= $block->uniqueId($identifier, 'form_wrap') ?>';
+        const submitClass     = '.<?= $identifier ?>-submit';
+
+        const fieldIds = {
+            surname:    '#<?= $block->uniqueId($identifier, 'Surname') ?>',
+            name:       '#<?= $block->uniqueId($identifier, 'Username') ?>',
+            email:      '#<?= $block->uniqueId($identifier, 'UserEmail') ?>',
+            phone:      '#<?= $block->uniqueId($identifier, 'UserPhone') ?>',
+            zip:        '#<?= $block->uniqueId($identifier, 'PostalCode') ?>',
+            address:    '#<?= $block->uniqueId($identifier, 'Address') ?>',
+            recaptcha:  '#<?= $block->uniqueId($identifier, 'recaptcha_token') ?>'
+        };
+
+        // Simple validation with error reporting
+        function validateForm() {
+            $(formId).find('.error').remove();
+            let hasError = false;
+            const validators = [
+                {id: fieldIds.surname,   msg: $t('This is a required field.')},
+                {id: fieldIds.name,      msg: $t('This is a required field.')},
+                {id: fieldIds.email,     msg: $t('This is a required field.')},
+                {id: fieldIds.phone,     msg: $t('This is a required field.')},
+                {id: fieldIds.address,   msg: $t('This is a required field.')},
+                {id: fieldIds.zip,       msg: $t('This is a required field.')},
+                {id: fieldIds.email,     msg: $t('This is a required field.'), validate: function(val) {
+                        if (!val) return false;
+                        const emailReg = /^([\w-.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+                        if (!emailReg.test(val)) {
+                            $(this.id).after('<span class="error">' + $t('Invalid email address.') + '</span>');
+                            return false;
+                        }
+                        return true;
+                    }}
+            ];
+            validators.forEach(function(field) {
+                const val = $(field.id).val();
+                if (typeof field.validate === "function") {
+                    if (!field.validate(val)) hasError = true;
+                } else if (!val) {
+                    $(field.id).after('<span class="error">' + field.msg + '</span>');
+                    hasError = true;
+                }
+            });
+            return !hasError;
+        }
+
+        function sendForm(token) {
+            $(loadingMaskId).removeClass('wk-display-none-ajax');
+            $(errorId).html('').addClass('wk-display-none-ajax');
+            $.post(mailUrl, {
+                emailto: emailTo,
+                surname:   $(fieldIds.surname).val(),
+                name:      $(fieldIds.name).val(),
+                email:     $(fieldIds.email).val(),
+                phone:     $(fieldIds.phone).val(),
+                zip:       $(fieldIds.zip).val(),
+                address:   $(fieldIds.address).val(),
+                fromstore: fromStore,
+                area:      "order_catalogue",
+                'g-recaptcha-response': token
+            }, function (status) {
+                $(loadingMaskId).addClass('wk-display-none-ajax');
+                if (status && status.success) {
+                    $(formWrapId).hide();
+                    $(successId).show();
+                    $(".order_catalog_form_content").hide();
+                } else {
+                    $(errorId).html('<strong>' + (status && status.error ? status.error : $t('Submission failed')) + '</strong>').removeClass('wk-display-none-ajax');
+                }
+            }).fail(function(xhr, status, error) {
+                $(loadingMaskId).addClass('wk-display-none-ajax');
+                $(errorId).html('<strong>' + error + '</strong>').removeClass('wk-display-none-ajax');
+            });
+        }
+
+        // Inline reCAPTCHA render logic
+        let recaptchaReady = false;
+        let recaptchaContainerId = '<?= $block->uniqueId($identifier, 'recaptcha_inline_container') ?>';
+
+        function waitForRecaptcha(callback, maxAttempts = 50) {
+            let attempts = 0;
+            const checkRecaptcha = () => {
+                attempts++;
+                if (window.grecaptcha && window.grecaptcha.ready) {
+                    recaptchaReady = true;
+                    callback();
+                } else if (attempts < maxAttempts) {
+                    setTimeout(checkRecaptcha, 100);
+                } else {
+                    console.error('reCAPTCHA failed to load after maximum attempts');
+                    $(errorId).html('<strong>' + $t('Security verification failed. Please refresh the page.') + '</strong>').removeClass('wk-display-none-ajax');
+                }
+            };
+            checkRecaptcha();
+        }
+
+        function renderRecaptchaInline() {
+            if (window.renderedRecaptcha && window.renderedRecaptcha[recaptchaContainerId]) {
+                return;
+            }
+
+            try {
+                grecaptcha.render(recaptchaContainerId, {
+                    'sitekey': recaptchaSiteKey,
+                    'badge': 'inline',
+                    'size': 'invisible'
+                });
+                window.renderedRecaptcha = window.renderedRecaptcha || {};
+                window.renderedRecaptcha[recaptchaContainerId] = true;
+            } catch (error) {
+                console.error('reCAPTCHA render error:', error);
+            }
+        }
+
+
+        // Initialize reCAPTCHA with proper loading detection
+        waitForRecaptcha(function() {
+            grecaptcha.ready(function() {
+                renderRecaptchaInline();
+            });
+        });
+
+
+        // Enhanced form submission with better error handling
+        $(submitClass).on('click', function(e) {
+            e.preventDefault();
+
+            if (!validateForm()) return;
+
+            if (!recaptchaReady || !window.grecaptcha) {
+                $(errorId).html('<strong>' + $t('Security verification not ready. Please try again.') + '</strong>').removeClass('wk-display-none-ajax');
+                return;
+            }
+
+            grecaptcha.ready(function() {
+                grecaptcha.execute(recaptchaSiteKey, {action: identifier})
+                    .then(function(token) {
+                        if (!token) {
+                            throw new Error('reCAPTCHA token generation failed');
+                        }
+                        $(fieldIds.recaptcha).val(token);
+                        sendForm(token);
+                    })
+                    .catch(function(error) {
+                        console.error('reCAPTCHA execution error:', error);
+                        $(errorId).html('<strong>' + $t('Security verification failed. Please try again.') + '</strong>').removeClass('wk-display-none-ajax');
+                    });
+            });
+        });
+    });
+</script>
+
+<style>
+    .grecaptcha-badge[data-style="bottomright"] {
+        display: none !important;
+    }
+    .grecaptcha-badge[data-style="bottomleft"] {
+        display: none !important;
+    }
+</style>
