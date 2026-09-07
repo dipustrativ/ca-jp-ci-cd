@@ -1834,6 +1834,36 @@ a:hover, .alink:hover {
     top: 19px;
 }
 
+//  Form field labels: stack full-width above their control from tablet up.
+//  `.fieldset.fieldset` is a deliberate specificity bump (0,0,5): lib
+//  _forms.less emits `.fieldset > .field:not(.choice) > .label` (0,0,4) into
+//  styles-l.css *after* this rule, reverting the label to right-aligned 25.8%.
+//  Equal specificity + later source = lib wins, so we outrank it by one class.
+@media (min-width: 768px) {
+    .fieldset.fieldset > .field:not(.choice) > .label {
+        padding: 0 15px 0 0;
+        text-align: left;
+        width: 100%;
+        box-sizing: border-box;
+        float: left;
+        margin-bottom: 10px;
+    }
+
+    //  Spacer before choice / no-label fields: lib forms sizes it 25.8% to sit
+    //  under the (right-aligned) label column. With labels now full-width above
+    //  their control, the spacer must span the full row too, else these fields
+    //  indent. Same `.fieldset.fieldset` bump to outrank lib in styles-l.
+    .fieldset.fieldset > .field.choice:before,
+    .fieldset.fieldset > .field.no-label:before {
+        padding: 6px 15px 0 0;
+        width: 100%;
+        box-sizing: border-box;
+        content: ' ';
+        float: left;
+        height: 1px;
+    }
+}
+
 //  Search suggestion dropdown — last, so its panel rules land after the
 //  header's .block-search block above.
 @import '_search_suggest';
