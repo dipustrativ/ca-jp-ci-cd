@@ -484,18 +484,32 @@
             border-radius: 5px;
             color: #3b3b3b;
             font-weight: 700;
+            //  Live centres the badge copy at every width; without this the
+            //  multi-line middle badge (phone + e-mail) rags left.
+            text-align: center;
 
             img, svg, p {
                 margin: auto;
             }
 
-            img, svg {
+            //  Live sizes the badge icon by max-width alone. The artwork is far
+            //  larger than the slot, so it lands at 20% of the badge — a 48px
+            //  cap rendered it noticeably smaller than live.
+            img {
+                max-width: 20%;
+                height: auto;
+            }
+
+            //  Inline SVG (admin-authored content) carries no intrinsic size,
+            //  so it still needs an explicit width or it collapses.
+            svg {
                 width: 20%;
                 max-width: 48px;
                 height: auto;
             }
             p {
                 max-width: 60%;
+                font-size: 1rem;
             }
         }
     }
@@ -992,8 +1006,11 @@
 
         .icon-usps {
             &__container {
-                padding: 10px 15px;
+                //  Live's desktop padding. 10px 15px left the badges as thin
+                //  strips instead of the tall cards the design calls for.
+                padding: 26px 15px;
                 height: 100%;
+                min-height: 49px;
             }
 
             // Badge row: 3 badges side by side, full content width below the cart.
