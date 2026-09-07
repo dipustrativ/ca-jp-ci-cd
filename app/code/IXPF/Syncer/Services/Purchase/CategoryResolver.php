@@ -10,6 +10,7 @@ use IXPF\Syncer\Helper\Logger\PurchaseLogger;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Api\Data\CategoryInterfaceFactory;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use Magento\Store\Model\Store;
 
 /**
  * Resolves "A/B/C" category path strings to category ids.
@@ -117,6 +118,13 @@ class CategoryResolver
     private function findChildByName(int $parentId, string $name): ?int
     {
         $collection = $this->categoryCollectionFactory->create();
+        // Match against the admin/default name. The ERP payload sends default
+        // (English) category names; store views (e.g. JP, store 1) override
+        // names with translations. Without pinning scope the collection joins
+        // the current store's name — in the frontend area that is the JP view,
+        // so English paths never match, and the resolver wrongly tries to
+        // create a duplicate (url_key collision → category skipped).
+        $collection->setStoreId(Store::DEFAULT_STORE_ID);
         $collection->addAttributeToSelect('name')
             ->addFieldToFilter('parent_id', $parentId)
             ->addAttributeToFilter('name', $name)
