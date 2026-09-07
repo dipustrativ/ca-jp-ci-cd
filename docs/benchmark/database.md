@@ -48,6 +48,23 @@ and `utf8mb4_unicode_ci` (65 tables) — both exist in MySQL 8.4. The dump carri
 `utf8mb3`, no MariaDB `uca1400` collations, and no generated columns, which is what
 normally breaks a MariaDB → MySQL move.
 
+> **Correction, 2026-09-03 — that held for the DB dumped here, not for every DB.**
+> A `jp_db_backup.sql` taken from an 11.4 server carried 10 tables on
+> `utf8mb4_uca1400_ai_ci`, which does not exist in MySQL 8.4, so the import aborts.
+> All 10 were `sequence_{order,invoice,shipment,creditmemo,proforma}_{0,1}` — sales
+> sequences are the one thing declarative schema does not own, so they are created with
+> no `COLLATE` (`vendor/magento/framework/DB/Ddl/Sequence.php:28`) and inherit the
+> database default, which MariaDB 11.4+ sets to `uca1400`. One set per store view.
+>
+> Check a dump before trusting it against MySQL, and repair it in place:
+>
+> ```bash
+> grep -c uca1400 dump.sql   # expect 0
+> sed -i '' 's/utf8mb4_uca1400_ai_ci/utf8mb4_general_ci/g' dump.sql
+> ```
+>
+> Safe: those tables hold one `int unsigned AUTO_INCREMENT` column and no character data.
+
 ## Functional parity
 
 60-URL crawl: every category, 15 products, CMS pages, sorted / paged / filtered PLPs, SEO

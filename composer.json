@@ -33,7 +33,8 @@
         "mageplaza/module-smtp": "^4.7",
         "mpdf/mpdf": "^8.3",
         "trustpilot/module-reviews": "^2.6",
-        "webshopapps/module-matrixrate": "^20.5"
+        "webshopapps/module-matrixrate": "^20.5",
+        "ext-curl": "*"
     },
     "autoload": {
         "exclude-from-classmap": [
