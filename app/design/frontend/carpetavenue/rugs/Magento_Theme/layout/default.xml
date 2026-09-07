@@ -84,13 +84,23 @@
         <move element="header-wrapper" destination="sticky-wrapper" after="-"/>
         <move element="navigation.sections" destination="sticky-wrapper" after="-"/>
 
-        <!-- ============ MESSAGES ============ -->
+        <!-- ============ BREADCRUMBS + MESSAGES ============ -->
 
-        <!-- Status messages (add-to-cart success, errors) default to columns.top,
-             inside page-main and BELOW the breadcrumb. The breadcrumb is pinned to
-             page.top on catalog/search/cms handles, so move the whole page.messages
-             container into page.top just before breadcrumbs — the flash then renders
-             ABOVE the breadcrumb, at the very top of the content. -->
+        <!-- Both render ABOVE <main id="maincontent">, on every handle.
+             page.top is declared after="header.container", so it sits outside
+             and before #maincontent; columns.top is *inside* it.
+
+             Stock puts the breadcrumb in header.container (above the "Flash
+             Sale" all_pages callout, which lives in page.top) and page.messages
+             in columns.top (inside #maincontent, below the breadcrumb). So both
+             are moved here: breadcrumb last in page.top so it follows the
+             callout, then messages immediately above it.
+
+             Global on purpose — this used to be repeated per handle (cms,
+             search, category, product), which let the handles drift apart. Move
+             the breadcrumb first so `before="breadcrumbs"` has a sibling to
+             anchor to when the messages move is applied. -->
+        <move element="breadcrumbs" destination="page.top" after="-"/>
         <move element="page.messages" destination="page.top" before="breadcrumbs"/>
 
         <!-- ============ FOOTER ============ -->
