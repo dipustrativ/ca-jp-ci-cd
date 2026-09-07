@@ -95,6 +95,12 @@ $callbackName = 'recaptchaCallback_' . str_replace('-', '_', $identifier);
                     </a>
                 </div>
             </div>
+            <?php if ($recaptchaSiteKey): ?>
+                <!-- reCAPTCHA v3 is invisible; show the Google-required attribution notice -->
+                <div class="recaptcha-attribution" id="<?= $block->uniqueId($identifier, 'recaptcha_attribution') ?>">
+                    <?= /* @noEscape */ $recaptchaText ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -271,5 +277,15 @@ $callbackName = 'recaptchaCallback_' . str_replace('-', '_', $identifier);
     }
     .grecaptcha-badge[data-style="bottomleft"] {
         display: none !important;
+    }
+    .recaptcha-attribution {
+        margin-top: 12px;
+        font-size: 11px;
+        line-height: 1.5;
+        color: #888;
+    }
+    .recaptcha-attribution a {
+        color: #666;
+        text-decoration: underline;
     }
 </style>
