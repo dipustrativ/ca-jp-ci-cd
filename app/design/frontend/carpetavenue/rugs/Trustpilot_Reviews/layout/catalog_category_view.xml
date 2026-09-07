@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Renders the Trustpilot "Micro Combo" TrustBox at the top of every category
+ * page (columns.top, above the product toolbar). Mirrors the reference
+ * Evalent/carpet theme. The widget markup lives in the CMS static block
+ * "trustpilot-micro-combo" (seeded by
+ * CarpetAvenue\ThemeContent\Setup\Patch\Data\CreateCategoryTrustpilotBlock) and
+ * is rendered by the Trustpilot_Reviews bootstrap script.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="columns.top">
+            <block class="Magento\Cms\Block\Block"
+                   name="trustpilot.category.horizontal.mini"
+                   before="-">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">trustpilot-micro-combo</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>
