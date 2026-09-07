@@ -31,26 +31,30 @@ foreach ($filterItems as $item) {
     $sliderConfig = $sliderFilter->getSliderConfig();
     $units = (string)($sliderConfig['units'] ?? '');
     ?>
+    <?php // Slider above, from/to inputs below it — the order carpetavenue.jp
+          // uses (its Amasty markup is .amshopby-slider-container followed by
+          // .amshopby-fromto-wrap). The unit sits *after* the value, inside the
+          // field, matching live's `input` + `span.amshopby-currency`. ?>
     <div class="am-price-slider"
          data-mage-init='{"carpetavenuePriceSlider": <?= $escaper->escapeHtmlAttr(json_encode($sliderConfig)) ?>}'>
+        <div data-role="slider" class="am-price-slider-track"></div>
         <div class="am-price-slider-inputs">
             <div class="am-price-field">
-                <?php if ($units !== ''): ?><span class="am-price-units"><?= $escaper->escapeHtml($units) ?></span><?php endif; ?>
                 <input type="number" data-role="from" class="input-text am-price-from"
                        min="<?= $escaper->escapeHtmlAttr((string)$sliderConfig['min']) ?>"
                        max="<?= $escaper->escapeHtmlAttr((string)$sliderConfig['max']) ?>"
                        aria-label="<?= $escaper->escapeHtmlAttr(__('From')) ?>"/>
+                <?php if ($units !== ''): ?><span class="am-price-units"><?= $escaper->escapeHtml($units) ?></span><?php endif; ?>
             </div>
             <span class="am-price-sep">&ndash;</span>
             <div class="am-price-field">
-                <?php if ($units !== ''): ?><span class="am-price-units"><?= $escaper->escapeHtml($units) ?></span><?php endif; ?>
                 <input type="number" data-role="to" class="input-text am-price-to"
                        min="<?= $escaper->escapeHtmlAttr((string)$sliderConfig['min']) ?>"
                        max="<?= $escaper->escapeHtmlAttr((string)$sliderConfig['max']) ?>"
                        aria-label="<?= $escaper->escapeHtmlAttr(__('To')) ?>"/>
+                <?php if ($units !== ''): ?><span class="am-price-units"><?= $escaper->escapeHtml($units) ?></span><?php endif; ?>
             </div>
         </div>
-        <div data-role="slider" class="am-price-slider-track"></div>
     </div>
     <?php return; ?>
 <?php endif; ?>
