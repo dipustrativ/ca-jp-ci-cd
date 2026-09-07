@@ -6,6 +6,10 @@
 //  Common
 //  _____________________________________________
 
+body.contact-index-index #maincontent {
+    margin-top: 15px;
+}
+
 & when (@media-common = true) {
     //  Kill the desktop forms left-indent (.abs-margin-for-forms-desktop group).
     //  Zeroes the 25.8% margin-left on legends + actions-toolbar store-wide.
@@ -270,6 +274,10 @@
         .fieldset > .field.choice:before,
         .fieldset > .field.no-label:before {
             display: none;
+        }
+
+        .actions-toolbar .primary .action{
+            padding: 15px 20px;
         }
     }
 }

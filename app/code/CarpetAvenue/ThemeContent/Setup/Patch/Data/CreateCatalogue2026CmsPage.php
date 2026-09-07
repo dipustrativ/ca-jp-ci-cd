@@ -90,7 +90,17 @@ class CreateCatalogue2026CmsPage implements DataPatchInterface
     /* -----------------------------------
        Catalogue 2026 PDF styles
     ----------------------------------- */
+    .cform {
+        margin-left: 0px;
+    }
 
+    .action.primary{
+        padding: 15px 20px;
+    }
+
+    ._keyfocus *:focus, input:not([disabled]):focus, textarea:not([disabled]):focus, select:not([disabled]):focus {
+       border: 1px solid #c2c2c2 !important;
+    }
     /* Intro inline link */
     .ca-pdf-inline {
         color: #555;
@@ -248,11 +258,12 @@ class CreateCatalogue2026CmsPage implements DataPatchInterface
     /* Desktop: stack field labels above inputs (override Magento's 25% right-aligned labels) */
     @media (min-width: 768px), print {
         .contact_catalogue-form-panel .fieldset > .field:not(.choice) > .label {
-            padding: 6px 15px 0 0;
+            padding: 0px;
             text-align: left;
             width: 100%;
             box-sizing: border-box;
             float: left;
+            margin-bottom: 8px;
         }
     }
 
