@@ -158,10 +158,7 @@
         <referenceBlock name="reviews.tab" remove="true"/>
         <referenceBlock name="product.review.form" remove="true"/>
 
-        <!-- Messages + breadcrumbs render INSIDE the main content section
-             (<main id="maincontent"> via columns.top), message first then breadcrumb.
-             Overrides the global page.messages->page.top move for the PDP only. -->
-        <move element="breadcrumbs" destination="columns.top" after="-"/>
-        <move element="page.messages" destination="columns.top" before="breadcrumbs"/>
+        <!-- Breadcrumbs + messages are placed globally in Magento_Theme's
+             default.xml (page.top, above #maincontent). -->
     </body>
 </page>

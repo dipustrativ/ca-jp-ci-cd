@@ -1351,6 +1351,23 @@ if(typeof(IASCallbacks) == "undefined"){
             var $trigger = this.$triggerNext || (this.$triggerNext = this.createTrigger(this.next, this.html));
             var $lastItem = this.ias.getLastItem();
 
+            //  CarpetAvenue: scrollHandler calls next() on every throttled
+            //  scroll event for as long as the reader sits past the threshold,
+            //  and stock IAS re-ran .after() + fadeIn() each time — tearing the
+            //  trigger out of the DOM and re-inserting it several times a
+            //  second. Every one of those invalidates layout at the bottom of
+            //  the page, which is what made scrolling there stutter.
+            //
+            //  If the trigger is already attached and already follows the last
+            //  item, there is nothing to do. render() appends new grids with
+            //  .after() on the last item, i.e. *before* the trigger, so this
+            //  still holds after a load and the trigger correctly stays put.
+            if ($trigger.parent().length && $lastItem.length &&
+                ($lastItem[0].compareDocumentPosition($trigger[0]) & Node.DOCUMENT_POSITION_FOLLOWING)
+            ) {
+                return false;
+            }
+
             $lastItem.after($trigger);
             $trigger.fadeIn();
 

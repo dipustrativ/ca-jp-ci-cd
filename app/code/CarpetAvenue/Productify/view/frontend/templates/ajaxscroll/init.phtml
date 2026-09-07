@@ -258,7 +258,15 @@ if($helper->isEnabled() && $enable) { ?>
                             //  node on every load and never brings it back once
                             //  the last page is in — so the count vanished at the
                             //  exact moment it read 100%.
+                            //  Exactly one box, always. A second one would make
+                            //  the position test below measure the wrong node and
+                            //  move both on every observer callback — an endless
+                            //  DOM-churn loop that locks up scrolling.
                             var $box = $host.children('.ias-count-box');
+                            if ($box.length > 1) {
+                                $box.slice(1).remove();
+                            }
+                            $box = $box.first();
                             if (!$box.length) {
                                 $box = $('<div class="ias-count-box"><div class="ias-count"></div>'
                                     + (showProgressbar === "1"
@@ -267,19 +275,34 @@ if($helper->isEnabled() && $enable) { ?>
                                     + '</div>');
                             }
 
-                            //  IAS parks the trigger, the spinner and the "none
-                            //  left" message after the last grid with .after(),
-                            //  which would land them above the box. Keep the box
-                            //  directly in front of whichever one is present, and
-                            //  only move it when it is actually out of place, so
-                            //  repositioning cannot loop against the observer.
-                            var $anchor = $host.children('.ias-trigger-next, .ias-spinner, .ias-noneleft').first();
-                            if ($anchor.length) {
-                                if ($anchor.prev()[0] !== $box[0]) {
+                            //  The box has to sit after the last grid and above
+                            //  the "load more" button. IAS inserts the trigger,
+                            //  the spinner and the "none left" message with
+                            //  .after() on the last grid, i.e. all three land
+                            //  between the grid and the box.
+                            //
+                            //  Only those two constraints are tested, and the box
+                            //  is moved only when one is actually violated. An
+                            //  earlier version pinned the box directly in front of
+                            //  the first of the three, which made it leapfrog the
+                            //  spinner on the way out and back on every load —
+                            //  two relocations of a ~60px block at the bottom of
+                            //  the page, which is exactly where the reader is
+                            //  scrolling. The spinner is deliberately not an
+                            //  anchor: it is transient, so during a load the box
+                            //  simply stays put and the spinner shows above it.
+                            var kids = $host.children().toArray();
+                            var $anchor = $host.children('.ias-trigger-next, .ias-noneleft').first();
+                            var boxAt = kids.indexOf($box[0]);
+                            var lastGridAt = kids.indexOf($wrappers.last()[0]);
+                            var anchorAt = $anchor.length ? kids.indexOf($anchor[0]) : -1;
+
+                            if (boxAt < 0 || boxAt < lastGridAt || (anchorAt >= 0 && boxAt > anchorAt)) {
+                                if ($anchor.length) {
                                     $box.insertBefore($anchor);
+                                } else {
+                                    $box.insertAfter($wrappers.last());
                                 }
-                            } else if ($wrappers.last().next()[0] !== $box[0]) {
-                                $box.insertAfter($wrappers.last());
                             }
 
                             //  Signature guard: data() does not touch the DOM the
