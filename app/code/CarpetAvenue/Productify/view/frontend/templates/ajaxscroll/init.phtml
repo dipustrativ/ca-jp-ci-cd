@@ -233,10 +233,21 @@ if($helper->isEnabled() && $enable) { ?>
                                 if (n > total) { total = n; }
                             });
 
-                            //  Loaded = tiles in the category list only (first
-                            //  product-items <ol>), never upsell/related widgets.
-                            var $list = $('.column.main ol.products.product-items').first();
-                            var loaded = ($list.length ? $list.children('li.product-item') : $('.products.wrapper .product-item')).length;
+                            //  Loaded = tiles in the category list only, never
+                            //  upsell/related widgets. The IAS item selector is
+                            //  .products-grid — the whole wrapper div — so each
+                            //  load appends a *new* wrapper with its own <ol>
+                            //  next to the previous one. Counting only the first
+                            //  <ol> froze this at the first page size, which is
+                            //  why the text and the bar never moved. Count tiles
+                            //  across every sibling wrapper instead; widgets sit
+                            //  nested in their own blocks, so they stay out.
+                            var $wrapper = $('.column.main ol.products.product-items').first()
+                                .closest('.products.wrapper');
+                            var loaded = $wrapper.length
+                                ? $wrapper.parent().children('.products.wrapper')
+                                    .find('ol.products.product-items > li.product-item').length
+                                : $('.products.wrapper .product-item').length;
 
                             if (!total || !loaded) {
                                 return;
