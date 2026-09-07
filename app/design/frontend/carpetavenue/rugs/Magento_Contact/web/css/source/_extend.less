@@ -1,0 +1,312 @@
+// CMS stuff
+@contact-panel__background: @color-gray-light1;
+@contact-panel__border: 1px solid #D9D9D9;
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+    //  Kill the desktop forms left-indent (.abs-margin-for-forms-desktop group).
+    //  Zeroes the 25.8% margin-left on legends + actions-toolbar store-wide.
+    //  (.abs-margin-for-forms-desktop is a LESS mixin token — including it as a
+    //  selector drops the whole rule at compile, so it's left out here.)
+    .fieldset .legend,
+    .column:not(.sidebar-main) form .actions-toolbar,
+    .column:not(.sidebar-additional) form .actions-toolbar,
+    .login-container .fieldset:after {
+        margin-left: 0 !important;
+    }
+
+    form#contact-form {
+        #telephone {
+
+            & + span {
+                display: inline-block;
+                vertical-align: middle;
+                padding-left: 5px;
+                box-sizing: border-box;
+
+                label {
+                    display: inline-block;
+                    width: 86%;
+                    vertical-align: middle;
+                }
+            }
+        }
+        .field.telephone {
+            label {
+                vertical-align: middle;
+            }
+        }
+    }
+
+    input#cbcallme {
+        vertical-align: middle;
+        margin: 0 5px 0 0;
+        top: 0
+    }
+
+    body.contact-index-index {
+        .cms-content-important {
+            background: @contact-panel__background;
+            display: block;
+            font-weight: 300;
+            padding: 20px;
+        }
+
+        .cms-content-border {
+            border: @contact-panel__border;
+            display: block;
+            padding: 20px;
+        }
+
+        .block {
+            &.block {
+                &-col2, &-col3, &-col4 {
+                    margin-bottom: auto;
+                    float: none;
+                }
+                &-col2 {
+                    width: 50%;
+                }
+                &-col3 {
+                    width: 33%;
+                }
+                &-col-4 {
+                    width: 25%;
+                }
+            }
+
+            &--table {
+                box-sizing: border-box;
+                display: table;
+                width: 100%;
+            }
+
+            &--tablecell {
+                display: table-cell;
+                float: none;
+            }
+
+            &--tablerow {
+                display: table-row;
+
+                & > span {
+                    padding: 0 0 20px;
+                    display: block;
+                }
+            }
+        }
+    }
+}
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__s) {
+    form#contact-form {
+        #telephone {
+            width: 50%;
+
+            & + span {
+                width: 47%;
+
+            }
+        }
+        .field.telephone {
+            label {
+                display: inline-block;
+                width: 90%;
+                vertical-align: middle;
+            }
+
+            & > .control {
+                & > span {
+                    display: block;
+                    width: 100%;
+                    margin: 10px 0 0;
+                }
+            }
+        }
+        .iti.iti--allow-dropdown {
+            #telephone {
+                width: 100%;
+            }
+        }
+    }
+}
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .contact-index-index .column.right .form.contact {
+        width: 100%;
+    }
+    .contact-index-index {
+        .column.right {
+            .form.contact {
+                min-width: unset;
+                margin-bottom: 6rem;
+            }
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__s) {
+    form#contact-form {
+        #telephone {
+            width: 63%;
+
+            & + span {
+                width: 35%;
+
+            }
+        }
+        .iti.iti--allow-dropdown {
+            #telephone {
+                width: 100%;
+            }
+        }
+    }
+}
+
+//
+//  2-column contact layout — equal columns (ported from reference Evalent/carpet)
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    body.page-layout-2columns {
+        .columns {
+            .column.right {
+                max-width: 100%;
+                padding-bottom: 4rem;
+                -webkit-flex-basis: 100%;
+                flex-basis: 100%;
+                -webkit-flex-grow: 1;
+                flex-grow: 1;
+                -ms-flex-order: 2;
+                -webkit-order: 2;
+                order: 2;
+                width: 100%;
+            }
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    body.page-layout-2columns {
+        .columns {
+            .column.main {
+                display: inline-block;
+                width: 50%;
+            }
+            .column.right {
+                float: right;
+                width: 48%;
+            }
+        }
+    }
+}
+
+//
+//  Left-align the whole contact form: stacked labels + full-width inputs
+//  _____________________________________________
+
+& when (@media-common = true) {
+    .contact-index-index form#contact-form {
+        text-align: left;
+
+        .legend {
+            float: none;
+            width: 100%;
+            text-align: left;
+            margin: 0 0 10px;
+            border-bottom: 1px solid #c5c5c5;
+            padding: 0 0 10px;
+        }
+
+        .fieldset > .field.note {
+            float: none;
+            width: 100%;
+            margin-left: 0;
+            padding-left: 0;
+            text-align: left;
+        }
+
+        .fieldset > .field:not(.choice) {
+            > .label {
+                float: none;
+                display: block;
+                width: 100%;
+                text-align: left;
+                padding: 0 0 6px;
+                box-sizing: border-box;
+            }
+
+            > .control {
+                float: none;
+                width: 100%;
+            }
+        }
+
+        .input-text,
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #c2c2c2;
+
+            &:focus {
+                border: 1px solid #c2c2c2 !important;
+                box-shadow: none;
+            }
+        }
+
+        //  Remove the inline-label spacer pseudo that pushed no-label / choice
+        //  fields to the right (made the intro note look centered).
+        .fieldset > .field.choice:before,
+        .fieldset > .field.no-label:before {
+            display: none;
+        }
+    }
+}
+
+//  Desktop reinforcement (lands in styles-l.css so it beats min-width rules)
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .contact-index-index form#contact-form {
+        text-align: left;
+
+        .legend {
+            float: none;
+            width: 100%;
+            text-align: left;
+            border-bottom: 1px solid #c5c5c5;
+            padding: 0 0 10px;
+        }
+
+        .fieldset > .field.note {
+            float: none;
+            width: 100%;
+            margin-left: 0;
+            padding-left: 0;
+            text-align: left;
+        }
+
+        .fieldset > .field:not(.choice) {
+            > .label {
+                float: none;
+                width: 100%;
+                text-align: left;
+            }
+
+            > .control {
+                float: none;
+                width: 100%;
+                margin-left: 0;
+            }
+        }
+    }
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Custom "2columns" page layout (equal columns) ported from reference Evalent/carpet.
+ * Extends 1column (so no left sidebar / wishlist block) and adds a right column
+ * container. Used by the contact page.
+ */
+-->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_layout.xsd">
+    <update handle="1column"/>
+    <referenceContainer name="columns">
+        <container name="div.sidebar.additional" htmlTag="div" htmlClass="column right" after="main">
+            <container name="column.right" label="Column Right"/>
+        </container>
+    </referenceContainer>
+</layout>

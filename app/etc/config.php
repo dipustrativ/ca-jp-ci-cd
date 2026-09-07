@@ -403,7 +403,8 @@ return [
         'PayPal_BraintreeGraphQl' => 1,
         'PayPal_BraintreeReward' => 1,
         'Trustpilot_Reviews' => 1,
-        'WebShopApps_MatrixRate' => 1
+        'WebShopApps_MatrixRate' => 1,
+        'Webkul_AjaxContactForm' => 1
     ],
     'system' => [
         'default' => [

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>Contact Us</title>
+    </head>
+    <body>
+        <referenceContainer name="column.right">
+            <block class="Magento\Framework\View\Element\Template" template="Magento_Contact::cms-block-wrapper.phtml" name="contact.page.right.top.wrapper">
+                <block class="Magento\Cms\Block\Block" name="contact.page.right.top">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">contact_page_right_top</argument>
+                    </arguments>
+                </block>
+            </block>
+
+            <block class="Magento\Framework\View\Element\Template" template="Magento_Contact::cms-block-wrapper.phtml" name="contact.page.right.bottom.wrapper">
+                <block class="Magento\Cms\Block\Block" name="contact.page.right.bottom">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">contact_page_right_bottom</argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceContainer>
+
+        <referenceContainer name="main">
+            <block class="Magento\Framework\View\Element\Template" template="Magento_Contact::cms-block-wrapper.phtml" name="contact.page.left.wrapper">
+                <block class="Magento\Cms\Block\Block" name="contact.page.left">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">contact_page_left</argument>
+                    </arguments>
+                </block>
+
+            </block>
+        </referenceContainer>
+
+        <move element="contactForm" destination="column.right" after="contact.page.right.top.wrapper" />
+
+        <!-- Move stuff -->
+        <move element="contact.page.right.bottom" destination="main" before="-" />
+        <move element="contact.page.right.top" destination="main" after="contact.page.right.bottom" />
+        <move element="contact.page.left" destination="column.right" before="contactForm" />
+
+        <!-- Contact page does not use the page title -->
+        <referenceBlock name="page.main.title" remove="true"/>
+
+    </body>
+</page>

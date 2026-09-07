@@ -1,0 +1,51 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject {{if data.cbcallme}}}I want to be called{{else}}{{trans "Contact Form"}}{{/if}} @-->
+<!--@vars {
+"var data.comment":"Comment",
+"var data.email":"Sender Email",
+"var data.name":"Sender Name",
+"var data.telephone":"Sender Telephone",
+"var data.cbcallme":"Call Me Back"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table class="message-details">
+    <tr>
+        <td><strong>{{trans "Name"}}</strong></td>
+        <td>{{var data.name}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Email Address"}}</strong></td>
+        <td>{{var data.email}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Phone Number"}}</strong></td>
+        <td>{{var data.telephone}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Store"}}</strong></td>
+        <td>{{var data.contactfromstore|raw}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Request a callback"}}</strong></td>
+        <td>
+            &nbsp;
+            {{if data.cbcallme}}}
+                <span>{{trans "Yes"}}</span>
+            {{else}}
+                <span>{{trans "No"}}</span>
+            {{/if}}
+
+        </td>
+    </tr>
+</table>
+<p><strong>{{trans "Message"}}</strong></p>
+<p>{{var data.comment}}</p>
+
+{{template config_path="design/email/footer_template"}}

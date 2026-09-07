@@ -1,0 +1,11 @@
+<?php
+
+/** @var $block \Magento\Framework\View\Element\Template */
+
+if (!($content = $block->getChildHtml())) {
+    return "";
+}
+?>
+<div class="cms-block rich-text">
+    <?= $content; ?>
+</div>
