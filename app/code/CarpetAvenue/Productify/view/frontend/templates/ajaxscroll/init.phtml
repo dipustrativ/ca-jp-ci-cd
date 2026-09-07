@@ -201,7 +201,6 @@ if($helper->isEnabled() && $enable) { ?>
                             amountSeen = parseInt($(elementAmount).find(".toolbar-number.amount-current").text());
 
                             if(elementAmount != null) {
-                                showProgressBar();
                                 setTopToolbarAmount();
                             }
 
@@ -213,15 +212,20 @@ if($helper->isEnabled() && $enable) { ?>
                         //  either: the trigger extension returns false from its
                         //  own "next" listener to stop the auto-load, which halts
                         //  the callback chain before anything bound after it runs.
-                        //  Painting when the trigger node appears sidesteps all of
-                        //  that and also survives the AJAX filter swap.
+                        //  Painting on DOM change sidesteps all of that and also
+                        //  survives the AJAX filter swap.
                         var countTpl = '<?php echo $helper->jsQuoteEscape(__('Showing %1 - %2 of %3 products')) ?>';
 
                         function renderIasCount() {
-                            var $trigger = $('.ias-trigger-next');
-                            if (!$trigger.length) {
+                            //  Anchor everything on the first product list, so the
+                            //  host element is whatever container IAS appends into
+                            //  rather than an assumed `.column.main`.
+                            var $first = $('.column.main').find('ol.products.product-items').first()
+                                .closest('.products.wrapper');
+                            if (!$first.length) {
                                 return;
                             }
+                            var $host = $first.parent();
 
                             //  Grand total is the largest toolbar-number — robust
                             //  against locale word-order (JP puts total first,
@@ -242,39 +246,55 @@ if($helper->isEnabled() && $enable) { ?>
                             //  why the text and the bar never moved. Count tiles
                             //  across every sibling wrapper instead; widgets sit
                             //  nested in their own blocks, so they stay out.
-                            var $wrapper = $('.column.main ol.products.product-items').first()
-                                .closest('.products.wrapper');
-                            var loaded = $wrapper.length
-                                ? $wrapper.parent().children('.products.wrapper')
-                                    .find('ol.products.product-items > li.product-item').length
-                                : $('.products.wrapper .product-item').length;
+                            var $wrappers = $host.children('.products.wrapper');
+                            var loaded = $wrappers.find('ol.products.product-items > li.product-item').length;
 
                             if (!total || !loaded) {
                                 return;
                             }
 
+                            //  The box is ours and it persists. It used to be
+                            //  painted *into* the trigger, but IAS removes that
+                            //  node on every load and never brings it back once
+                            //  the last page is in — so the count vanished at the
+                            //  exact moment it read 100%.
+                            var $box = $host.children('.ias-count-box');
+                            if (!$box.length) {
+                                $box = $('<div class="ias-count-box"><div class="ias-count"></div>'
+                                    + (showProgressbar === "1"
+                                        ? '<div class="progressbar"><span class="progressbar__fill"></span></div>'
+                                        : '')
+                                    + '</div>');
+                            }
+
+                            //  IAS parks the trigger, the spinner and the "none
+                            //  left" message after the last grid with .after(),
+                            //  which would land them above the box. Keep the box
+                            //  directly in front of whichever one is present, and
+                            //  only move it when it is actually out of place, so
+                            //  repositioning cannot loop against the observer.
+                            var $anchor = $host.children('.ias-trigger-next, .ias-spinner, .ias-noneleft').first();
+                            if ($anchor.length) {
+                                if ($anchor.prev()[0] !== $box[0]) {
+                                    $box.insertBefore($anchor);
+                                }
+                            } else if ($wrappers.last().next()[0] !== $box[0]) {
+                                $box.insertAfter($wrappers.last());
+                            }
+
                             //  Signature guard: data() does not touch the DOM the
                             //  observer watches, so updating it cannot re-trigger us.
                             var sig = loaded + '/' + total;
-                            if ($trigger.data('iasSig') === sig) {
+                            if ($box.data('iasSig') === sig) {
                                 return;
                             }
-                            $trigger.data('iasSig', sig);
+                            $box.data('iasSig', sig);
 
                             var text = countTpl.replace('%1', 1).replace('%2', loaded).replace('%3', total);
                             var pct = Math.min(100, Math.round((loaded / total) * 100));
 
-                            var $count = $trigger.find('.ias-count');
-                            if (!$count.length) {
-                                $count = $('<div class="ias-count"></div>').prependTo($trigger);
-                            }
-                            $count.text(text);
-
-                            var $bar = $trigger.find('.progressbar');
-                            if (!$bar.length) {
-                                $bar = $('<div class="progressbar"><span class="progressbar__fill"></span></div>').insertAfter($count);
-                            }
-                            $bar.find('.progressbar__fill').css('width', pct + '%');
+                            $box.find('.ias-count').text(text);
+                            $box.find('.progressbar__fill').css('width', pct + '%');
                         }
 
                         if (window.MutationObserver && !window.iasCountObserver) {
@@ -329,18 +349,6 @@ if($helper->isEnabled() && $enable) { ?>
                 elementAmountTopEl = $(".toolbar.toolbar-products").first().find(".modes").after(elAmountClone);
             }
 
-        }
-
-        function showProgressBar() {
-
-            if(!$('.ias-trigger-next .progressbar').length && showProgressbar === "1") {
-                let partialAmount = $(elementAmount).find('span.amount-current').text();
-                let totalAmount = $(elementAmount).find('span.amount-total').text();
-                let _percent = (100 * partialAmount) / totalAmount;
-
-                $('.ias-trigger-next .toolbar-amount')
-                    .after('<div class="progressbar"><span class="progressbar__fill" style="width: '+_percent+'%;"></span></div>');
-            }
         }
 
         $(document).ready(function () {
