@@ -60,7 +60,7 @@ body {
 
 ._keyfocus *:focus, input:not([disabled]):focus, textarea:not([disabled]):focus, select:not([disabled]):focus {
     background-color: unset !important;
-    border: unset !important;
+    border: unset;
     box-shadow: none !important;
 }
 
@@ -280,7 +280,7 @@ a:hover, .alink:hover {
         color: @ca-black;   //  stop Magento's link blue reaching currentColor icons
 
         img {
-            max-width: 100%;
+            max-width: 320px;
             width: auto;
             height: auto;
             margin: auto;
@@ -642,13 +642,15 @@ a:hover, .alink:hover {
         .counter.qty {
             top: -6px;
             min-width: 18px;
-            height: 24px;
-            line-height: 24px;
-            padding: 0 4px;
+            height: 22px;
+            line-height: 22px;
+            padding: 0 2px;
             font-size: 1rem;
-            background: @ca-price;
-            color: #000;
-            border-radius: 9px;
+            background: #2c8e3b;
+            color: #000000;
+            border-radius: 50px;
+            position: relative;
+            margin-left: 2px;
         }
 
         //  Subtotal appended to the icon by minicart-mixin — hidden, like base.
