@@ -1,0 +1,8 @@
+"Contact","¿Preguntas?"
+"Write Us","¿Tiene alguna pregunta sobre esta alfombra?"
+"Write Us --CONTACT","¿Tiene alguna pregunta sobre esta alfombra?"
+"Send us a message --CONTACT","Envíenos sus preguntas y nos pondremos en contacto con usted lo antes posible."
+"Name","Nombre"
+Email,Correo electrónico
+"What’s on your mind?","Su pregunta",module,Magento_Contact
+"A question about %name %sku","Una pregunta sobre la alfombra %name %sku"

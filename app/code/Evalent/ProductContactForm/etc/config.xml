@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+	<default>
+		<catalog>
+			<contact_form>
+				<receiving_email/>
+				<cc_email/>
+				<enabled>0</enabled>
+				<recaptcha_enabled>0</recaptcha_enabled>
+				<sender_email_identity>custom2</sender_email_identity>
+				<email_template>catalog_contact_form_email_template</email_template>
+			</contact_form>
+		</catalog>
+        <customer>
+            <captcha>
+                <forms>user_forgotpassword,user_login,user_productcontactform</forms>
+                <shown_to_logged_in_user>
+                    <user_productcontactform>1</user_productcontactform>
+                </shown_to_logged_in_user>
+                <always_for>
+                    <user_productcontactform>1</user_productcontactform>
+                </always_for>
+            </captcha>
+        </customer>
+        <captcha>
+            <frontend>
+                <areas>
+                    <user_productcontactform>
+                        <label>Product Contact Form</label>
+                    </user_productcontactform>
+                </areas>
+            </frontend>
+        </captcha>
+	</default>
+</config>

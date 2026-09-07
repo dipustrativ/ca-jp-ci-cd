@@ -1,0 +1,62 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject {{trans "A question about %name %sku" name=$data.product_name sku=$data.product_sku}} @-->
+<!--@vars {
+"var data.comment":"Comment",
+"var data.email":"Sender Email",
+"var data.name":"Sender Name",
+"var data.product_id":"Product ID"
+"var data.product_sku":"Product SKu"
+"var data.request_url":"Request Url"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table class="message-details">
+    <tr>
+        <td><strong>{{trans "Name"}}</strong></td>
+        <td>{{var data.name}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Email"}}</strong></td>
+        <td>{{var data.email}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Phone"}}</strong></td>
+        <td>{{var data.dial_code}} {{var data.telephone}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Request a callback"}}</strong></td>
+        <td>
+            {{if data.cbcallme}}}
+            <span>{{trans "Yes"}}</span>
+            {{else}}
+            <span>{{trans "No"}}</span>
+            {{/if}}
+        </td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Product ID"}}</strong></td>
+        <td>{{var data.product_id}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Product Sku"}}</strong></td>
+        <td>{{var data.product_sku}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Product Name"}}</strong></td>
+        <td>{{var data.product_name}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Request Url"}}</strong></td>
+        <td>{{var data.request_url}}</td>
+    </tr>
+</table>
+<p><strong>{{trans "Message"}}</strong></p>
+<p>{{var data.comment}}</p>
+
+{{template config_path="design/email/footer_template"}}

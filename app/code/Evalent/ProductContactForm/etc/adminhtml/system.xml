@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+		<section id="catalog">
+			<tab>catalog</tab>
+			<group id="contact_form" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label">
+				<field id="enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+					<label>Enabled</label>
+					<comment/>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+				<label>Contact Form</label>
+				<field id="receiving_email" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+					<label>Receiving Email</label>
+					<comment>To which email shall the form be send to. Emails separated with commas</comment>
+				</field>
+				<field id="cc_email" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+					<label>Email CC</label>
+					<comment>Emails separated with commas</comment>
+				</field>
+				<field id="sender_email_identity" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+					<label>Email Sender</label>
+					<source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+				</field>
+				<field id="email_template" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+					<label>Email Template</label>
+					<comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
+					<source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+				</field>
+				<field id="recaptcha_enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="select">
+					<label>Enable ReCaptcha</label>
+					<comment/>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+			</group>
+		</section>
+        <section id="customer">
+            <group id="captcha">
+                <field id="failed_attempts_productcontactform" translate="label comment" type="text" sortOrder="100" showInDefault="1" canRestore="1">
+                    <label>Number of Unsuccessful Attempts to contact on Product</label>
+                    <comment>If 0 is specified, CAPTCHA on the Product Contact form will be always available.</comment>
+                    <depends>
+                        <field id="mode">after_fail</field>
+                        <field id="enable">1</field>
+                    </depends>
+                    <frontend_class>required-entry validate-digits</frontend_class>
+                </field>
+            </group>
+        </section>
+
+        <section id="recaptcha_frontend">
+            <group id="type_for">
+                <field id="productcontactform" translate="label" type="select" sortOrder="140" showInDefault="1"
+                       showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Enable for Product Contact Form</label>
+                    <source_model>Magento\ReCaptchaAdminUi\Model\OptionSource\Type</source_model>
+                </field>
+            </group>
+        </section>
+	</system>
+</config>

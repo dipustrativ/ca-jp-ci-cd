@@ -1,0 +1,24 @@
+{
+    "name": "evalent/module-productcontactform",
+    "description": "Adds a contact form to the product page",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "email": "tobias.nilsson@evalent.com",
+            "name": "Tobias Nilsson"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "msp/recaptcha": "^2.0.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Evalent\\ProductContactForm\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}
