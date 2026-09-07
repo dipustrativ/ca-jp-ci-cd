@@ -85,16 +85,16 @@ HTML,
                 'title' => 'Cart: Trust badges (USPs)',
                 'content' => <<<'HTML'
 <div class="icon-usps__container">
-<svg viewBox="0 0 24 24" fill="none" stroke="#2c8f3b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-<p>Secure payment</p>
+<img src="{{view url="images/icons/Check.webp"}}" alt="" width="583" height="492">
+<p>安全な決済</p>
 </div>
 <div class="icon-usps__container">
-<svg viewBox="0 0 24 24" fill="none" stroke="#2c8f3b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-<p>For expert consultation, please call<br><strong>0467-33-5348</strong><br>or email <strong>info@carpetavenue.jp</strong></p>
+<img src="{{view url="images/icons/Phone.webp"}}" alt="" width="473" height="429">
+<p>専門家へのご相談<br><strong>0467-33-5348</strong><br><strong>info@carpetavenue.jp</strong></p>
 </div>
 <div class="icon-usps__container">
-<svg viewBox="0 0 24 24" fill="none" stroke="#2c8f3b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L3 8"/></svg>
-<p>30-day money-back guarantee</p>
+<img src="{{view url="images/icons/30Days.webp"}}" alt="" width="622" height="523">
+<p>30日間の返金保証</p>
 </div>
 HTML,
             ],

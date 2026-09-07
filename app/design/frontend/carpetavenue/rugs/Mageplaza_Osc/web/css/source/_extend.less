@@ -70,6 +70,15 @@
         text-align: center;
       }
 
+      //  Live renders the checkout logo 280x41 — measured off the live
+      //  storefront. Capping the image height at 55px instead scaled it to
+      //  186x55: smaller than live and a different aspect.
+      //
+      //  The width goes on the anchor, not the image. `.logo` is inline-block,
+      //  so `width: 280px` + the global `img { max-width: 100% }` on the image
+      //  is circular (shrink-to-fit resolving against itself) and Chrome
+      //  settles on 140px — exactly half. Giving the anchor a definite width
+      //  and letting the image fill it removes the circularity.
       .logo {
         float: none;
         margin: 0 auto;
@@ -77,10 +86,12 @@
         display: inline-block;
         top: 45%;
         transform: translateY(-50%);
+        width: 280px;
+        max-width: 100%;
 
         img {
-          height: 55px;
-          width: auto;
+          width: 100%;
+          height: auto;
         }
       }
     }
@@ -245,6 +256,21 @@
 
         .product-item-detail {
             flex-wrap: wrap;
+        }
+
+        //  Size on its own line, under the name block.
+        //
+        //  `.product-item-inner` ships as `display: table`, which lays the
+        //  name block and the size span out as sibling table boxes — side by
+        //  side, whatever their widths. As a plain block the name block (a
+        //  div) takes its own line and the size span follows in an anonymous
+        //  block below it, which is the live arrangement.
+        //
+        //  Not a flex problem: flex-basis on the size does nothing while the
+        //  parent is a table, and widening the name block to 100% only makes
+        //  long names wrap over several lines in the narrow cell.
+        .product-item-inner {
+            display: block;
         }
     }
 
@@ -444,6 +470,8 @@
       }
 
       .checkout-shipping-address {
+
+
         .step-title {
           margin-bottom: 0;
         }
@@ -520,6 +548,18 @@
       .create-account-block {
         margin-top: -20px;
       }
+
+      //  Address form column width. Magento_Checkout's own rule caps these at
+      //  600px; live caps them at 500px inside the same ~619px column, which
+      //  is why our fields came out 299px wide against live's 250px.
+      //
+      //  Has to live in this min-@screen__m block, not media-common: core's
+      //  600px ships in styles-l.css, which loads after styles-m.css, so a
+      //  media-common override of equal specificity would lose.
+      .form-login,
+      .form-shipping-address {
+        max-width: 500px;
+      }
     }
 
     #co-place-order-area {
@@ -588,4 +628,11 @@
       }
     }
   }
+}
+
+form.form.form-login .fieldset{
+    padding: 0px 10px;
+}
+.back-to-cart__wrapper {
+    margin-top: 20px;
 }
