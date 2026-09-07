@@ -137,21 +137,78 @@
     .am-price-slider {
         padding: 8px 6px 4px;
 
+        //  From/to row, measured off carpetavenue.jp: a ~95x32 field at each
+        //  end, the unit tucked inside the field on the right, and a 1px
+        //  #888 rule spanning the gap between them. The delimiter is the
+        //  flexible element — it grows to fill, which is what pushes the two
+        //  fields to opposite ends.
+        //  Gap above this row comes from the track's margin-bottom; a
+        //  margin-top here would just collapse against it.
         .am-price-slider-inputs {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
+
+            .am-price-field {
+                position: relative;
+                flex: 0 0 auto;
+                text-align: center;
+            }
 
             input[type='number'] {
-                width: 80px;
+                width: 95px;
+                height: 32px;
                 text-align: center;
+                //  Right padding reserves room for the unit sitting on top.
+                padding: 0 22px 0 3px;
+                border: 1px solid #dfdedd;
+                //  Square corners — the theme's global
+                //  @form-element-input__border-radius would round these.
+                border-radius: 0;
+                background: @color-white;
+                //  Spinners would collide with the unit.
+                appearance: textfield;
+                -moz-appearance: textfield;
+
+                &::-webkit-outer-spin-button,
+                &::-webkit-inner-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                }
+            }
+
+            .am-price-units {
+                position: absolute;
+                right: 5px;
+                top: 50%;
+                transform: translateY(-50%);
+                .lib-font-size(12);
+                line-height: 1;
+                color: #666;
+                pointer-events: none;
+            }
+
+            //  Text hidden rather than removed: it still reads as "from – to"
+            //  to a screen reader while the visible connector is the rule.
+            .am-price-sep {
+                position: relative;
+                flex: 1 1 auto;
+                font-size: 0;
+
+                &:after {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    left: 5%;
+                    width: 90%;
+                    height: 1px;
+                    background: #888888;
+                }
             }
         }
 
         .am-price-slider-track {
             height: 4px;
-            margin: 0 8px 14px;
+            margin: 15px 8px 30px;
             border-radius: 2px;
             background: @color-gray82;
             position: relative;
