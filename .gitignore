@@ -39,6 +39,7 @@ node_modules
 # Docker secrets — never commit
 docker/.env
 docker/.env.local
+docker/.env.production
 docker/env.php.scd
 auth.json
 docker/certs/*
