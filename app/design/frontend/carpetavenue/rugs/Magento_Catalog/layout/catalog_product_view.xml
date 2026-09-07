@@ -93,7 +93,9 @@
         <move element="product.info.carpientdescription" destination="product.info.main.after" after="product.info.description"/>
         <move element="product.attributes.title" destination="product.info.main.after" after="product.info.carpientdescription"/>
         <move element="product.attributes" destination="product.info.main.after" after="product.attributes.title"/>
-        <move element="product.description" destination="product.info.main.after" after="product.attributes"/>
+        <!-- "Write Us" contact form sits directly after the Specifications collapsible -->
+        <move element="productcontactform" destination="product.info.main.after" after="product.attributes"/>
+        <move element="product.description" destination="product.info.main.after" after="productcontactform"/>
         <move element="cms.block.bargain" destination="product.info.main" after="product.info.stock.sku"/>
         <move element="product.discount.precent" destination="product.info.main" before="product.info.price"/>
 

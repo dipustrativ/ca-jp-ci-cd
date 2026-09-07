@@ -386,6 +386,7 @@ return [
         'Evalent_MatrixRateMods' => 1,
         'CarpetAvenue_Japan' => 1,
         'Evalent_ProductCertificate' => 1,
+        'Evalent_ProductContactForm' => 1,
         'Fooman_EmailAttachments' => 1,
         'IXPF_Syncer' => 1,
         'IXPF_SyncerMsi' => 1,
