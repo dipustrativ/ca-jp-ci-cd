@@ -11,6 +11,10 @@
 & when (@media-common = true) {
   .onestepcheckout-index-index {
 
+      .minicart-wrapper .action.showcart .counter.qty{
+          color: #ffffff !important;
+      }
+
       main#maincontent {
           background-color: transparent !important;
       }
@@ -41,18 +45,29 @@
     input {
       padding: 5px 10px;
       height: unset;
+
+        &:focus{
+            border: 1px solid #c2c2c2 !important;
+        }
     }
 
     .fieldset > .field:not(.choice) > .label {
       text-align: left;
     }
 
+    //  `width: 100%` on a content-box element *excludes* its 15px horizontal
+    //  padding, so these came out 30px wider than the viewport and pushed the
+    //  checkout header to 348px against a 303px screen — a sideways scroll on
+    //  every phone. border-box folds the padding back in and reproduces live's
+    //  measurements exactly (page-main 303, header content 273).
     .page-header.custom-panel .page-main {
+      box-sizing: border-box;
       max-width: 100%;
       width: 100%;
     }
 
     .header.content {
+      box-sizing: border-box;
       max-width: 100%;
       width: 100%;
       text-align: center;
@@ -70,24 +85,24 @@
         text-align: center;
       }
 
-      //  Live renders the checkout logo 280x41 — measured off the live
-      //  storefront. Capping the image height at 55px instead scaled it to
-      //  186x55: smaller than live and a different aspect.
+      //  Checkout logo, sized exactly as live: a *cap* of 280px on a block
+      //  anchor, with the image filling it. Live measures 280x41 on desktop
+      //  and 200x29 on a 303px screen, both from this one rule.
       //
-      //  The width goes on the anchor, not the image. `.logo` is inline-block,
-      //  so `width: 280px` + the global `img { max-width: 100% }` on the image
-      //  is circular (shrink-to-fit resolving against itself) and Chrome
-      //  settles on 140px — exactly half. Giving the anchor a definite width
-      //  and letting the image fill it removes the circularity.
+      //  A fixed `width: 280px` looks equivalent but is not — it never shrinks,
+      //  so on mobile the logo came out 273px against live's 200px. And on an
+      //  inline-block anchor a fixed width plus the global
+      //  `img { max-width: 100% }` is circular (shrink-to-fit resolving
+      //  against itself); Chrome settled on exactly half, 140px. Block display
+      //  plus max-width avoids both traps.
       .logo {
         float: none;
         margin: 0 auto;
         position: relative;
-        display: inline-block;
+        display: block;
         top: 45%;
         transform: translateY(-50%);
-        width: 280px;
-        max-width: 100%;
+        max-width: 280px;
 
         img {
           width: 100%;
@@ -438,6 +453,65 @@
       }
     }
 
+    //  Estimated-total bar cart button. Only exists below @screen__m — the bar
+    //  is display:none on desktop — so both fixes belong here.
+    //
+    //  Mageplaza paints every non-primary checkout button with the
+    //  `osc/design_configuration/heading_background` colour, inline and
+    //  `!important`. That config still holds the module default #01007F, so the
+    //  button rendered navy where live is #DDDDDD; hence the !important here to
+    //  win against the inline rule. The icon at 2.8rem also pushed the button
+    //  to 50px tall against live's 42px.
+    //  The doubled classes are load-bearing. Mageplaza's rule is
+    //  `.checkout-container button:not(.primary):not(.action-show)
+    //  :not(.action-close):not(.edit-address-link):not(.ui-datepicker-trigger)`
+    //  — every :not() contributes its argument, so it scores (0,6,1) and is
+    //  emitted inline, which also wins any tie on source order. Repeating
+    //  `.minicart-wrapper` and `.showcart` takes this to (0,7,1) so it lands.
+    .opc-estimated-wrapper .minicart-wrapper.minicart-wrapper button.action.showcart.showcart {
+      background-color: #dddddd !important;
+      border-color: #dddddd !important;
+      color: @color-black !important;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      &:before {
+        .lib-font-size(22);
+        line-height: 1;
+        color: @color-black;
+      }
+    }
+
+    //  Review-table thumbnail. Magento stamps the width inline from view.xml's
+    //  mini_cart_product_thumbnail (156px), which left a 134px-wide image
+    //  crushing the product name into a narrow column. Live renders it 42px
+    //  wide, so the inline width has to be overridden.
+    #checkout-review-table {
+      .product-image-container {
+        width: 42px !important;
+        height: auto !important;
+      }
+
+      //  Magento's wrapper reserves the thumbnail's aspect ratio with
+      //  `padding-bottom` and absolutely positions the image inside a
+      //  zero-height box, so capping the container's width alone left a 156px
+      //  tall gap. Unwrap it and let the image set its own height.
+      .product-image-wrapper {
+        padding: 0 !important;
+        height: auto !important;
+        display: block;
+      }
+
+      .product-image-photo,
+      .product-image-container img {
+        position: static !important;
+        width: 100%;
+        height: auto;
+      }
+    }
+
     .back-to-cart {
       &__wrapper {
         position: absolute;
@@ -635,4 +709,13 @@ form.form.form-login .fieldset{
 }
 .back-to-cart__wrapper {
     margin-top: 20px;
+
+    .back-to-cart__label{
+        color: #333333 !important;
+
+    }
+}
+
+.back-to-cart__link:before{
+    color: #333333;
 }

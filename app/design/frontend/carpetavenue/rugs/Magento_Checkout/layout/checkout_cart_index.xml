@@ -74,5 +74,14 @@
         <!-- Remove "Check Out with Multiple Addresses" link -->
         <referenceBlock name="checkout.cart.methods.multishipping" remove="true"/>
 
+        <!-- Remove gift options. This block carries the whole Knockout
+             giftOptionsCart component, which renders the per-item
+             "Gift Options" (.action-gift) button inside .item-actions as well
+             as the order-level form — so dropping it takes the button with it.
+             The sales/gift_options/* config does not gate this component, which
+             is why the button showed with gift messages left at their default
+             off. Live shows no gift options on the cart either. -->
+        <referenceBlock name="checkout.cart.order.actions.gift_options" remove="true"/>
+
     </body>
 </page>
