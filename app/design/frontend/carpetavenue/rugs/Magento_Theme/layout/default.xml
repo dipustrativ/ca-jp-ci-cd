@@ -6,6 +6,20 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
+        <!-- Preload the icon font. Every header icon (wishlist heart, account
+             person, cart glyph) is a Pe-icon-7-stroke glyph on a :before, and the
+             @font-face carries `font-display: block` — correct for an icon font,
+             since these are private-use codepoints and `swap` would flash tofu
+             boxes instead. But the font is CSS-discovered, so it was not requested
+             until styles-m.css had downloaded and parsed: measured start 436ms,
+             done 569ms, well after first paint. Every header icon was therefore
+             invisible and then popped in together — the "flashing" icons.
+             Preloading starts it alongside the stylesheet instead.
+             crossorigin is required even same-origin, or the preload does not
+             match the font's CORS-mode request and the file downloads twice. -->
+        <link src="fonts/Pe-icon-7-stroke.woff"
+              rel="preload" as="font" type="font/woff" crossorigin="anonymous"/>
+
         <!-- Trustpilot widget bootstrap: scans .trustpilot-widget nodes and injects the review iframes.
              Without it the widget divs (e.g. CMS block trustpilot-home-list) render only the fallback link. -->
         <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
