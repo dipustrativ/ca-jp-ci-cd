@@ -206,13 +206,23 @@
     //  It sits in the full-width container, so without this the grid ran edge
     //  to edge while the rest of the page was inset — and only the title
     //  carried an ad-hoc 15px, so title and grid did not even line up.
-    .catalog-product-similar-ajax {
+    .catalog-product-similar-ajax,
+    .trustpilot-horizontal-carousel-wrapper,
+    .trustpilot-mini-carousel-wrapper {
       padding-left: @layout-indent__width;
       padding-right: @layout-indent__width;
 
       .block-title.title {
         padding: 0;
       }
+    }
+
+    //  Only one of the two carousels is ever displayed (see the breakpoint
+    //  switch in Trustpilot_Reviews/_extend.less), so they share the slot and
+    //  the gap below it.
+    .trustpilot-horizontal-carousel-wrapper,
+    .trustpilot-mini-carousel-wrapper {
+      margin-bottom: 30px;
     }
 
     //  Recently-viewed is moved into the same full-width container (see
@@ -1138,7 +1148,9 @@
       flex-basis: 100%;
     }
   }
-    .catalog-product-similar-ajax {
+    .catalog-product-similar-ajax,
+    .trustpilot-horizontal-carousel-wrapper,
+    .trustpilot-mini-carousel-wrapper {
         padding-left: 15px;
         padding-right: 15px;
     }
