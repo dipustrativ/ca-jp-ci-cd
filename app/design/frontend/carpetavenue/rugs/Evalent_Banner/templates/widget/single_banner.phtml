@@ -88,13 +88,40 @@ if(!isset($_bannerHeadingTag) || empty($_bannerHeadingTag)): $_bannerHeadingTag 
                 <a href="<?= $_bannerLinkUrl ?>" class="ev-banners__link" target="<?= $_bannerLinkNewWindow === '1' ? '_blank' : '_self' ?>"></a>
             <?php endif; ?>
 
+            <?php /*
+                This banner is above the fold on the home page — the only place
+                single_banner.phtml is used — so it is deliberately NOT
+                lazy-loaded. The real URLs sit in <picture>, where the browser's
+                preload scanner finds them while parsing the HTML.
+
+                It used to render `class="lazy-load"` with a grey 1920x670
+                placeholder in `src` and the real URL hidden in `data-original`.
+                The scanner cannot see `data-original`, so the hero could not
+                begin downloading until RequireJS, jQuery and
+                Magento_Theme/js/lazyload had all loaded — measured at ~950ms,
+                against ~220ms for the placeholder. lazyload.js then applied the
+                `effect: "fadeIn"` configured in Magento_Theme/templates/lazyload.phtml,
+                which runs `$element.hide()` -> swap `src` -> `fadeIn()`; that
+                display:none dropped the image out of layout mid-load. Grey box
+                for ~700ms, then a collapse and fade — the "flash".
+
+                width/height carry the placeholder's own 1920x670 aspect so the
+                box stays reserved while the image loads and nothing below the
+                banner shifts. They are the design's assumed banner ratio, not a
+                specific file's dimensions, which is why they are safe to keep
+                when an admin swaps the image.
+            */ ?>
             <?php if ($_bannerImageMobile !== null && $_bannerImageDesktop !== null) : ?>
 
-                <img class="lazy-load" data-original="<?= $_bannerImageDesktop ?>" src="<?= $this->getViewFileUrl('Evalent_Banner::images/lazyload_banner.png') ?>" data-original-srcset="<?= $_bannerImageMobile . ' 768w, ' . $_bannerImageDesktop ?>"  alt="Banner image">
+                <picture>
+                    <source media="(max-width: 768px)" srcset="<?= $_bannerImageMobile ?>">
+                    <source media="(min-width: 769px)" srcset="<?= $_bannerImageDesktop ?>">
+                    <img src="<?= $_bannerImageDesktop ?>" width="1920" height="670" fetchpriority="high" alt="Banner image">
+                </picture>
 
             <?php elseif ($_bannerImageMobile == null && $_bannerImageDesktop !== null): ?>
 
-                <img class="lazy-load" src="<?= $this->getViewFileUrl('Evalent_Banner::images/lazyload_banner.png') ?>" data-original="<?= $_bannerImageDesktop ?>" alt="Banner image">
+                <img src="<?= $_bannerImageDesktop ?>" width="1920" height="670" fetchpriority="high" alt="Banner image">
 
             <?php endif; ?>
 
