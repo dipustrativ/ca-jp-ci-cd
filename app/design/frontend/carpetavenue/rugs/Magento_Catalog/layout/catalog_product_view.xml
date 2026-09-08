@@ -85,6 +85,23 @@
             <container name="product.bottom.holder" htmlTag="div" after="-" htmlClass="product-bottom_holder"/>
         </referenceContainer>
 
+        <!-- Trustpilot review carousel (slider). CMS block trustpilot-horizontal-list
+             (CreateCartTrustBlocks patch). Placed in main.full, above the ajax similar
+             products section — ported from the reference Evalent/carpet theme. -->
+        <referenceContainer name="main.full">
+            <container name="trustpilot.product.view.horizontal-carousel.wrapper"
+                       htmlTag="div" htmlClass="trustpilot-horizontal-carousel-wrapper">
+                <block class="Magento\Cms\Block\Block"
+                       name="trustpilot.product.view.horizontal-carousel">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">trustpilot-horizontal-list</argument>
+                    </arguments>
+                </block>
+            </container>
+        </referenceContainer>
+        <move element="trustpilot.product.view.horizontal-carousel.wrapper"
+              destination="main.full" before="catalog.product.similar.ajax"/>
+
         <!-- Details wrapper (description + Specifications) renders under the
              gallery as its own column in .column.main; flex order in
              _product-view.less places it below the media, after the buy box. -->
