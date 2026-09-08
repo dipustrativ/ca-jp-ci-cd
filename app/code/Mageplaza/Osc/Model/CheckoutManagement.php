@@ -29,6 +29,7 @@ use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\GiftMessage\Model\GiftMessageManager;
 use Magento\GiftMessage\Model\Message;
@@ -143,6 +144,11 @@ class CheckoutManagement implements CheckoutManagementInterface
     private $logger;
 
     /**
+     * @var ManagerInterface
+     */
+    private $messageManager;
+
+    /**
      * CheckoutManagement constructor.
      *
      * @param CartRepositoryInterface $cartRepository
@@ -180,7 +186,8 @@ class CheckoutManagement implements CheckoutManagementInterface
         AddressInterface $addressInterface,
         ShippingMethodConverter $shippingMethodConverter,
         QuoteAddressValidator $quoteAddressValidator,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ManagerInterface $messageManager
     ) {
         $this->cartRepository                = $cartRepository;
         $this->oscDetailsFactory             = $oscDetailsFactory;
@@ -199,6 +206,7 @@ class CheckoutManagement implements CheckoutManagementInterface
         $this->_shippingMethodConverter      = $shippingMethodConverter;
         $this->addressValidator              = $quoteAddressValidator;
         $this->logger                        = $logger;
+        $this->messageManager                = $messageManager;
     }
 
     /**
@@ -217,12 +225,43 @@ class CheckoutManagement implements CheckoutManagementInterface
             throw new NoSuchEntityException(__('Cart %1 doesn\'t contain item  %2', $cartId, $itemId));
         }
 
+        $originalQty = $quoteItem->getQty();
+
         try {
-            $quoteItem->setQty($itemQty)->save();
+            // No direct $quoteItem->save() here: it would persist the requested qty raw,
+            // bypassing stock validation. Let the quote save run stock validation instead.
+            $quoteItem->setQty($itemQty);
             $this->cartRepository->save($quote);
         } catch (Exception $e) {
             $this->logger->critical($e->getMessage());
             throw new CouldNotSaveException(__('Could not update item from quote'));
+        }
+
+        // Requested qty is not salable (e.g. exceeds available stock): don't keep the invalid
+        // qty (would oversell and show a wrong number on the cart). Revert to the previous qty,
+        // then redirect to the cart so the stock message is shown there.
+        if ($quoteItem->getHasError()) {
+            // Capture the stock message before reverting — the revert clears the item error,
+            // so the cart page would otherwise show no reason for the redirect.
+            $errorMessage = trim((string) $quoteItem->getMessage());
+
+            $quoteItem->setQty($originalQty);
+            try {
+                $this->cartRepository->save($quote);
+            } catch (Exception $e) {
+                $this->logger->critical($e->getMessage());
+            }
+
+            $this->messageManager->addErrorMessage(
+                $errorMessage !== ''
+                    ? $errorMessage
+                    : __('The requested quantity is not available.')
+            );
+
+            /** @var OscDetailsInterface $oscDetails */
+            $oscDetails = $this->oscDetailsFactory->create();
+
+            return $oscDetails->setRedirectUrl($this->_urlBuilder->getUrl('checkout/cart'));
         }
 
         return $this->getResponseData($quote);

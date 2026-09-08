@@ -47,7 +47,6 @@
                 <is_enabled_gift_wrap>0</is_enabled_gift_wrap>
                 <show_multi_address_checkout_link>1</show_multi_address_checkout_link>
                 <seal_block>
-                    <seal_image>default/seal.png</seal_image>
                     <seal_description>This is a demonstration of trust badge. Please contact your SSL or Security provider to have trust badges embed properly</seal_description>
                 </seal_block>
             </display_configuration>

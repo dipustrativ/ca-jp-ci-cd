@@ -33,6 +33,11 @@
         <plugin name="productify_guest_wishlist_product_url" type="CarpetAvenue\Productify\Plugin\Wishlist\GuestItemProductUrl"/>
     </type>
 
+    <!-- Expose is_unique on quoteItemData so OSC summary hides qty +/- on unique products -->
+    <type name="Magento\Checkout\Model\DefaultConfigProvider">
+        <plugin name="productify_checkout_config_is_unique" type="CarpetAvenue\Productify\Plugin\Checkout\DefaultConfigProvider"/>
+    </type>
+
     <preference for="Magento\Framework\Pricing\Render\Amount" type="CarpetAvenue\Productify\Block\Pricing\Render\Amount" />
 
     <!-- ═══════════════════════════════════════════════════════════════════
