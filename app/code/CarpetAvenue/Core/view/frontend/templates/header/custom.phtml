@@ -2,26 +2,16 @@
 /**
  * Copyright © Carpet Avenue GmbH. All rights reserved.
  *
- * Global custom CSS — loaded on every page via head.additional
+ * Global custom CSS — loaded on every page via head.additional.
+ *
+ * The Trustpilot wrapper rules that used to live here have moved into the
+ * theme: the breakpoint switch to Trustpilot_Reviews/web/css/source/_extend.less
+ * and the spacing to Magento_Catalog/web/css/source/_product-view.less, next to
+ * the PDP sections it lines up with.
  */
 ?>
 <style>
     /* ══════════════════════════════════════════
        Global Custom CSS
     ══════════════════════════════════════════ */
-
-    /* Trustpilot wrappers */
-    .trustpilot-horizontal-carousel-wrapper {
-        display: none;
-    }
-    .trustpilot-mini-carousel-wrapper {
-        display: none;
-    }
-
-    @media (min-width: 560px) {
-        .trustpilot-horizontal-carousel-wrapper { display: block; width: 100%; }
-    }
-    @media (max-width: 559px) {
-        .trustpilot-mini-carousel-wrapper { display: block; width: 100%; margin: 20px 0; }
-    }
 </style>
