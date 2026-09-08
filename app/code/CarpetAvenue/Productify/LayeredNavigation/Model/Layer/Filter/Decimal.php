@@ -15,6 +15,7 @@ use Magento\Catalog\Model\Layer\Filter\ItemFactory as FilterItemFactory;
 use Magento\Catalog\Model\ResourceModel\Layer\Filter\DecimalFactory;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -55,6 +56,7 @@ class Decimal extends \Magento\CatalogSearch\Model\Layer\Filter\Decimal implemen
         private readonly FacetProvider $facetProvider,
         private readonly CacheInterface $cache,
         private readonly SerializerInterface $serializer,
+        private readonly ResourceConnection $resource,
         private readonly string $unitsLabel = 'cm',
         array $data = []
     ) {
@@ -153,8 +155,14 @@ class Decimal extends \Magento\CatalogSearch\Model\Layer\Filter\Decimal implemen
 
     /**
      * Min/max of the attribute across the current result set, excluding this
-     * filter's own applied range so the slider does not collapse. Bounds come
-     * from the search facet buckets (keyed "from_to").
+     * filter's own applied range so the slider does not collapse.
+     *
+     * Exact values come from the decimal EAV table scoped to the products in
+     * the current result set — NOT the search facet buckets. Those buckets are
+     * coarse (interval-wide), so their lowest "from"/highest "to" round to the
+     * bucket edge: a set whose real range is 40-680 sits in the 0_100..600_700
+     * buckets and the slider read 0-700. Mirrors how Price uses the exact
+     * getMinPrice()/getMaxPrice() rather than bucket edges.
      *
      * @return array{0: float, 1: float}
      */
@@ -177,29 +185,39 @@ class Decimal extends \Magento\CatalogSearch\Model\Layer\Filter\Decimal implemen
             }
         }
 
-        $collection = $this->currentRange !== null
-            ? $this->facetProvider->createStatelessCollection($this->getLayer(), $code)
-            : $this->getLayer()->getProductCollection();
+        // Always the stateless collection — never the live layer collection.
+        // The latter shares the singleton SearchCriteriaBuilder, so calling
+        // getAllIds() on it mid-render empties the shared criteria and the page
+        // 500s with EmptyRequestDataException. The stateless one has isolated
+        // builders. Excluding this filter's own code is a no-op when it isn't
+        // applied and keeps the slider from collapsing when it is.
+        $collection = $this->facetProvider->createStatelessCollection($this->getLayer(), $code);
 
-        $mins = [];
-        $maxs = [];
+        $min = 0.0;
+        $max = 0.0;
         try {
-            $facets = $collection !== null ? $collection->getFacetedData($code) : [];
-            foreach ($facets as $key => $aggregation) {
-                [$from, $to] = array_pad(explode('_', (string)$key), 2, '');
-                if (is_numeric($from)) {
-                    $mins[] = (float)$from;
-                }
-                if (is_numeric($to)) {
-                    $maxs[] = (float)$to;
-                }
+            $productIds = $collection !== null ? $collection->getAllIds() : [];
+
+            if ($productIds !== []) {
+                $connection = $this->resource->getConnection();
+                $select = $connection->select()
+                    ->from(
+                        $this->resource->getTableName('catalog_product_entity_decimal'),
+                        ['min_value' => 'MIN(value)', 'max_value' => 'MAX(value)']
+                    )
+                    ->where('attribute_id = ?', (int)$this->getAttributeModel()->getId())
+                    ->where('store_id IN (?)', [0, (int)$this->_storeManager->getStore()->getId()])
+                    ->where('entity_id IN (?)', $productIds)
+                    ->where('value IS NOT NULL');
+
+                $row = $connection->fetchRow($select);
+                $min = (float)($row['min_value'] ?? 0.0);
+                $max = (float)($row['max_value'] ?? 0.0);
             }
         } catch (\Exception $e) {
-            $mins = $maxs = [];
+            $min = 0.0;
+            $max = 0.0;
         }
-
-        $min = $mins !== [] ? min($mins) : 0.0;
-        $max = $maxs !== [] ? max($maxs) : 0.0;
 
         $bounds = [floor($min), ceil($max)];
 

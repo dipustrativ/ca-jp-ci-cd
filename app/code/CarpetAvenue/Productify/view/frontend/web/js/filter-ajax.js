@@ -239,10 +239,18 @@ define([
                 self._countHtml = html;
                 self._countUrl = url;
 
-                if (nums.length) {
-                    count = parseInt(nums[nums.length - 1].textContent.replace(/[^0-9]/g, ''), 10);
-                }
-                self._updateCount(isNaN(count) ? 0 : count);
+                // Grand total is the largest toolbar-number — robust against
+                // locale word-order (JP renders "1104件中 1 - 50", total first;
+                // EN "1-50 of 1104", total last). Taking .last() read the "to"
+                // value (50/100 = page size) instead of the total.
+                nums.forEach(function (node) {
+                    var n = parseInt(node.textContent.replace(/[^0-9]/g, ''), 10);
+
+                    if (!isNaN(n) && n > count) {
+                        count = n;
+                    }
+                });
+                self._updateCount(count);
             });
         },
 
