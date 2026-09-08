@@ -87,8 +87,21 @@
 
         <!-- Trustpilot review carousel (slider). CMS block trustpilot-horizontal-list
              (CreateCartTrustBlocks patch). Placed in main.full, above the ajax similar
-             products section — ported from the reference Evalent/carpet theme. -->
+             products section — ported from the reference Evalent/carpet theme.
+             Two widgets, one per breakpoint, as live does: the horizontal (140px)
+             carousel renders no review cards at phone widths, so below 560px it is
+             swapped for the taller mini carousel. The display switch lives in the
+             theme's Trustpilot_Reviews/web/css/source/_extend.less. -->
         <referenceContainer name="main.full">
+            <container name="trustpilot.product.view.mini-carousel.wrapper"
+                       htmlTag="div" htmlClass="trustpilot-mini-carousel-wrapper">
+                <block class="Magento\Cms\Block\Block"
+                       name="trustpilot.product.view.mini-carousel">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">trustpilot-mini-list</argument>
+                    </arguments>
+                </block>
+            </container>
             <container name="trustpilot.product.view.horizontal-carousel.wrapper"
                        htmlTag="div" htmlClass="trustpilot-horizontal-carousel-wrapper">
                 <block class="Magento\Cms\Block\Block"
@@ -99,6 +112,8 @@
                 </block>
             </container>
         </referenceContainer>
+        <move element="trustpilot.product.view.mini-carousel.wrapper"
+              destination="main.full" before="catalog.product.similar.ajax"/>
         <move element="trustpilot.product.view.horizontal-carousel.wrapper"
               destination="main.full" before="catalog.product.similar.ajax"/>
 

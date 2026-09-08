@@ -2,11 +2,17 @@
 /**
  * Copyright © CarpetAvenue. All rights reserved.
  *
- * Creates the CMS static block the catalog_product_view layout renders inside
- * product-info-main, above the product title:
+ * Creates the CMS static blocks the catalog_product_view layout renders:
  *   - trustpilot-micro-count : Trustpilot "Micro Combo" TrustBox (green star +
- *     "See our N reviews on Trustpilot"). Same businessunit as the cart/home
- *     widgets, rendered by the Trustpilot_Reviews bootstrap script.
+ *     "See our N reviews on Trustpilot"), inside product-info-main above the
+ *     product title. Same businessunit as the cart/home widgets, rendered by
+ *     the Trustpilot_Reviews bootstrap script.
+ *   - trustpilot-mini-list : the phone-sized review carousel, shown below 560px
+ *     in .trustpilot-mini-carousel-wrapper where the 140px-tall horizontal
+ *     carousel (trustpilot-horizontal-list) is hidden. Trustpilot's horizontal
+ *     carousel template collapses to a bare score strip at phone widths — it
+ *     renders no review cards — so live pairs it with this taller template, the
+ *     same one the home page uses on mobile. Markup copied from live.
  *
  * Create-only: if a block with the identifier already exists (e.g. authored in
  * admin on production) it is left untouched, so this never clobbers live
@@ -77,6 +83,14 @@ class CreateProductTrustpilotBlock implements DataPatchInterface
                 'content' => <<<'HTML'
 <div class="trustpilot-widget micro-combo" data-locale="ja-JP" data-template-id="5419b6a8b0d04a076446a9ad" data-businessunit-id="60796b57fc3da40001e564fb" data-style-height="24px" data-style-width="100%" data-theme="light" data-style-alignment="left"><a href="https://jp.trustpilot.com/review/carpetavenue.jp" target="_blank" rel="noopener">Trustpilot</a></div>
 <!-- End TrustBox widget -->
+HTML,
+            ],
+            'trustpilot-mini-list' => [
+                'title' => 'Trustpilot: Product - mini carousel (mobile)',
+                // The negative bottom margin is live's: this template reserves
+                // ~40px of empty space under the cards inside its iframe.
+                'content' => <<<'HTML'
+<div class="trustpilot-widget hide-on-desktop" style="margin-bottom: -40px; margin-top: 0px; position: relative;" data-locale="ja-JP" data-template-id="539ad0ffdec7e10e686debd7" data-businessunit-id="60796b57fc3da40001e564fb" data-style-height="350px" data-style-width="100%" data-theme="light" data-stars="4,5"><a href="https://jp.trustpilot.com/review/carpetavenue.jp" target="_blank" rel="noopener">Trustpilot</a></div>
 HTML,
             ],
         ];
