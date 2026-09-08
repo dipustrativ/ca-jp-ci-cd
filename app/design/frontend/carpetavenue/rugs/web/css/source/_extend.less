@@ -574,6 +574,15 @@ a:hover, .alink:hover {
             font-size: @ca-header-icon-size;
         }
 
+        //  Deliberately NOT transitioned. Knockout drops and re-inserts
+        //  `.counter.qty` while customer-data refreshes on load, so `:has()`
+        //  briefly stops matching. With `transition: opacity .5s` that blip
+        //  stretched into a visible flicker — and because the `:before` colour
+        //  below is not transitioned, the two fell out of sync and both hearts
+        //  were painted at once. Measured on a page load with one wishlist
+        //  item: outline+fill together at 119ms, fill fading out to 0.85, then
+        //  fading back in, settling only at 251ms. Swapping both in the same
+        //  style recalculation keeps it to one imperceptible frame.
         &:after {
             content: '';
             position: absolute;
@@ -585,7 +594,6 @@ a:hover, .alink:hover {
             background: url('@{baseDir}images/icons/like.svg') no-repeat 0 0;
             background-size: 100%;
             opacity: 0;
-            transition: opacity .5s;
         }
 
         &:has(.counter.qty) {
