@@ -643,8 +643,18 @@ a:hover, .alink:hover {
             top: -5px !important;
         }
 
+        //  Positioned overlay on the cart glyph in EVERY state, not just
+        //  .has-items. minicart.phtml binds `empty: … && !isLoading()`, so the
+        //  badge is deliberately made visible during an add-to-cart to host the
+        //  blockLoader spinner — but .has-items is added later, by
+        //  minicart-mixin's update() once cart data arrives. Gating the position
+        //  on it left the counter (and the spinner anchored to it by
+        //  ._block-content-loading) in normal flow ~32px too low on the first
+        //  add-to-cart. `top: -6px` here was dead: position was relative.
         .counter.qty {
-            top: -6px;
+            position: absolute;
+            top: 3px;
+            left: 38px;
             min-width: 18px;
             height: 22px;
             line-height: 22px;
@@ -653,7 +663,6 @@ a:hover, .alink:hover {
             background: #2c8e3b;
             color: #000000;
             border-radius: 50px;
-            position: relative;
             margin-left: 2px;
         }
 
@@ -695,10 +704,9 @@ a:hover, .alink:hover {
                 color: #fff;
             }
 
+            //  Colour only — the geometry now lives on the unqualified
+            //  `.counter.qty` above so it also applies while loading.
             .counter.qty {
-                position: absolute;
-                top: 3px;
-                left: 38px;
                 background: #fff;
                 border-radius: 10em;
                 color: #000;
@@ -1365,10 +1373,13 @@ a:hover, .alink:hover {
                 }
             }
 
-            //  Must repeat `.has-items .action.showcart` — the desktop badge rule
-            //  (line ~604) is .minicart-wrapper.has-items .action.showcart .counter.qty
-            //  (0,6,0) and outguns a plainer selector, so top/left never applied.
-            &.has-items .action.showcart .counter.qty {
+            //  Not gated on .has-items, for the same reason as the desktop badge
+            //  above: the spinner shown during an add-to-cart needs the mobile
+            //  offsets before minicart-mixin adds that class. The desktop rule is
+            //  now the unqualified `.minicart-wrapper … .counter.qty` (0,5,0), so
+            //  this (0,6,0) still outguns it — the old note about needing to
+            //  repeat `.has-items` to win on specificity no longer applies.
+            .action.showcart .counter.qty {
                 position: absolute;
                 top: 5px;
                 left: 20px;
