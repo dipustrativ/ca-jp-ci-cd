@@ -39,8 +39,9 @@
 
     //  Floating filter pill, opens the slide-out filter modal. Position and
     //  styling match live exactly. It has this corner to itself: the theme's
-    //  floating scroll-to-top button would have sat at bottom 55px and
-    //  overlapped, so it was dropped — live does not show one either.
+    //  floating scroll-to-top button (web/js/scroll-to-top.js) bails out on
+    //  pages with the `page-products` body class, which is exactly the
+    //  category/search pages this pill renders on. Don't drop that guard.
     .wrap-filter-top-button {
         position: fixed;
         right: 25px;

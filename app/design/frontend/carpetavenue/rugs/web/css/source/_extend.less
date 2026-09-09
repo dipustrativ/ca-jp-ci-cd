@@ -1034,6 +1034,58 @@ a:visited, .alink:visited {
 }
 
 //
+//  Scroll-to-top button — appended by web/js/scroll-to-top.js. Not on product
+//  listing pages; the floating filter pill has that corner there. Box and CSS
+//  chevron match live (.button-go_top in its styles-l.min.css), except `bottom`
+//  which live sets to 55px — nothing sits under it here.
+//  _____________________________________________
+.button-go_top {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    z-index: 100;
+    padding: 20px;
+    border: 0;
+    border-radius: 10em;
+    background: @ca-black;
+    line-height: 0;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, .7);
+
+    //  Hidden until the script adds .is-visible. Opacity rather than display
+    //  so the fade is CSS and the script's class write stays idempotent.
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s ease, visibility .3s ease;
+
+    &.is-visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    //  Restate black: the theme's global .primary button styles otherwise win
+    //  on hover/focus and the pill goes light-on-light.
+    &:hover,
+    &:focus,
+    &:active {
+        background: @ca-black;
+        border: 0;
+    }
+
+    i {
+        display: inline-block;
+        padding: 3px;
+        border-style: solid;
+        border-color: #ffffff;
+        border-width: 0 3px 3px 0;
+        color: #ffffff;
+
+        &.up {
+            transform: rotate(-135deg);
+        }
+    }
+}
+
+//
 //  Desktop — center wide sections at page max-width (matches reference)
 //  _____________________________________________
 @media (min-width: 769px) {
@@ -1372,6 +1424,12 @@ a:visited, .alink:visited {
 
 //  Mobile
 .media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+
+    //  Scroll-to-top button is desktop-only, same as live.
+    .button-go_top {
+        display: none !important;
+    }
+
     .nav-sections {
         z-index: 99999;
 
