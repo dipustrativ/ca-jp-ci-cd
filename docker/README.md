@@ -8,11 +8,10 @@ troubleshooting. Read top to bottom the first time.
 Certified stack: PHP 8.5 · MySQL 8.4 (external) · OpenSearch 3 · Valkey 9 ·
 RabbitMQ 4.2 · nginx 1.29.
 
-> **Path B (Dokploy-pull) uses shared infrastructure.** MySQL, OpenSearch and
-> RabbitMQ are not in this stack — they live in `Workspace/DOCKER-GLOBAL/` and are
-> shared with the carpient store. Deploy those three first. This app's database,
-> vhost and index prefix: **[docker/SHARED-INFRA.md](SHARED-INFRA.md)**. Paths A
-> and C still run their own `queue`/`search` containers, as does local dev.
+> **Path B uses shared infrastructure** — MySQL, OpenSearch and RabbitMQ live in
+> `Workspace/DOCKER-GLOBAL/`, shared with carpient. Deploy them first; this app's
+> values and the one-time steps: **[SHARED-INFRA.md](SHARED-INFRA.md)**. Paths A/C
+> and local dev still run their own `queue`/`search` containers.
 
 ---
 
@@ -211,26 +210,19 @@ networks and volumes are Dokploy-project-prefixed; `docker-compose.dokploy.yml`
 publishes no host port (Traefik routes to `nginx`); the registry is shared with a
 separate repo; `vm.max_map_count` is host-wide and already set.
 
-On Path B the two stacks also **share** one MySQL, one OpenSearch and one
-RabbitMQ, each namespaced per app (database / vhost / index prefix — see
-[SHARED-INFRA.md](SHARED-INFRA.md)). That is what keeps two Magento installs on
-one host affordable: the ~4.3G of search + broker is paid once, not twice.
+On Path B both stacks **share** one MySQL, one OpenSearch and one RabbitMQ,
+namespaced per app ([SHARED-INFRA.md](SHARED-INFRA.md)). That's what makes two
+installs on one host affordable — the ~4.3G of search + broker is paid once.
 
-**RAM is the only real constraint.** Shared infra ~8.3G (mysql 4 + opensearch 3.3
-+ rabbitmq 1) + carpient's app stack ~6.7G + this app stack ~5G ⇒ **~20G, so a
-24GB host**. The full budget lives in `DOCKER-GLOBAL/README.md` §2 — it is the one
-place that counts every stack.
+**RAM is the only real constraint:** ~20G for both apps + infra ⇒ **24GB host**.
+Full budget: `DOCKER-GLOBAL/README.md` §2, the one place that counts every stack.
 
-| Knob | Where | Playground value |
-|---|---|---|
-| `VALKEY_MAXMEMORY` | Dokploy env | `512mb` |
-| `VALKEY_SESSION_MAXMEMORY` | Dokploy env | `128mb` |
-| `pm.max_children` | `docker/php/www.conf`, baked in | `8` (~1.6G) — already set |
-| `OPENSEARCH_HEAP` | **the opensearch stack**, not here | `2g`, shared by both apps |
+Playground knobs: `VALKEY_MAXMEMORY=512mb`, `VALKEY_SESSION_MAXMEMORY=128mb`,
+`pm.max_children=8` (baked into `docker/php/www.conf`). `OPENSEARCH_HEAP` belongs
+to the opensearch stack, not here.
 
-Check before deploying: `free -g` ≥ 24, `df -h` has ~10G free (two images +
-volumes), and `valkey-cli info stats | grep evicted_keys` stays 0 on **both**
-stacks afterwards.
+Before deploying: `free -g` ≥ 24, `df -h` ~10G free. After: `valkey-cli info
+stats | grep evicted_keys` stays 0 on **both** stacks.
 
 Two more same-host details:
 
@@ -263,10 +255,10 @@ Magento HTML.
 
 ### Path B — Dokploy, pull a pre-built image ⭐
 
-**First:** deploy the three shared stacks from `Workspace/DOCKER-GLOBAL/` and
-create this app's database + RabbitMQ vhost/user — `DOCKER-GLOBAL/README.md` §3
-and §5. Nothing here waits on them (they are separate stacks, so Compose cannot
-gate on their health), so a missing one deploys fine and fails at runtime.
+**First:** deploy the three shared stacks and create this app's database +
+RabbitMQ vhost/user — `DOCKER-GLOBAL/START-HERE-CA_JP-FIRST.md`. Nothing here can
+gate on them (separate Compose projects), so a missing one deploys green and fails
+at runtime.
 
 Then, in the Dokploy UI:
 
@@ -626,10 +618,9 @@ deploy genuinely production-grade.
 - `MAGE_MODE=production`, OpCache tuned + `validate_timestamps=0`, JIT off, Redis
   sessions/cache on Valkey (db0/1/2, igbinary), FPM worker recycling + slowlog.
 - No secrets in the image; env rendered at start from env vars.
-- Healthchecks on cache/sessions/nginx (plus queue/search on Paths A and C);
-  `upgrade` gates `app`/`cron`/`static` (they start only after schema is current).
-  ⚠️ Path B cannot gate on the shared mysql/opensearch/rabbitmq stacks — they are
-  separate Compose projects. Verify they are up before deploying.
+- Healthchecks on cache/sessions/nginx (plus queue/search on Paths A/C); `upgrade`
+  gates `app`/`cron`/`static`. ⚠️ Path B **cannot** gate on the shared stacks —
+  separate Compose projects. Verify they're up first.
 - TLS terminated at Traefik; nginx runs HTTP behind it.
 - Rollback anchor: every CI build pushes an immutable `v<N>` tag.
 
@@ -652,18 +643,17 @@ php bin/magento deploy:mode:show          # -> production
 ```
 
 ### Operator responsibilities (not baked into the image)
-- **Backups — database yes, media no.** On Path B the shared `mysql` stack dumps
+- **Backups — database yes, media no.** The shared `mysql` stack dumps
   `--all-databases` nightly to GCS, so `carpetavenue_jp` is covered with nothing
-  set here; configuration and restore are in `DOCKER-GLOBAL/README.md` §8.
-  `magento_media` (uploaded product images) is **not** backed up: this stack's
-  `backup` service sits on the `media-backup` profile and is off, because
-  `offen/docker-volume-backup` writes a full tar every run and re-uploads every
-  unchanged byte. The right fix is an incremental `rclone sync` /
+  set here (`DOCKER-GLOBAL/README.md` §8).
+
+  `magento_media` is **not** backed up: this stack's `backup` service is on the
+  `media-backup` profile and off, because `offen/docker-volume-backup` writes a
+  full tar every run and re-uploads every unchanged byte. Right fix is
   `gsutil -m rsync -r`. Until then, losing the volume means re-uploading every
-  product image. `magento_var`, `magento_static` and valkey data are regenerable
-  and deliberately not backed up.
-  ⚠️ A dump you have never restored is not a backup — restore one into a
-  throwaway database and confirm it opens before trusting it.
+  product image. `magento_var`, `magento_static` and valkey data are regenerable.
+
+  ⚠️ A dump you have never restored is not a backup.
 - **`MAGE_CRYPT_KEY`** is tied to the database it decrypts — store it with the DB
   credentials, rotate them together, never lose it (encrypted config becomes
   unreadable without it).

@@ -1,22 +1,13 @@
 # CarpetAvenue JP — Dokploy production, PULL a pre-built image (recommended path).
+# All pulled images, no bind-mounts, so Dokploy needs no git repo.
 #
-# Every service is a pulled image — zero host bind-mounts, so Dokploy needs no
-# git repo. CI (or you) builds carpetavenue-jp + carpetavenue-jp-nginx and pushes to the
-# registry; Dokploy pulls and restarts. Only the carpetavenue-jp image changes between
-# code deploys; nginx + infra images are effectively fixed.
+# Shared infra is NOT here — mysql:3306, opensearch:9200, rabbitmq:5672 live in
+# Workspace/DOCKER-GLOBAL/, shared with carpient. Deploy those THREE FIRST: nothing here
+# gates on them, so a missing one starts fine and fails at runtime.
+# This app: db `carpetavenue_jp`, vhost/user `/ca_jp`, prefix `ca_jp`. See docker/SHARED-INFRA.md
 #
-# Shared infra is NOT here: mysql:3306 (+phpMyAdmin), opensearch:9200, rabbitmq:5672
-# live in Workspace/DOCKER-GLOBAL/ and are shared with carpient. Deploy those THREE FIRST —
-# nothing here gates on their health, so if one is missing this stack still starts and
-# fails at runtime. Found by container name on dokploy-network. See docker/SHARED-INFRA.md.
-#
-# This app's resources: db `carpetavenue_jp`, vhost `/ca_jp`, user `ca_jp`, prefix `ca_jp`
-# (must differ from every other app on the cluster).
-#
-# Dokploy setup (see docker/README.md §Dokploy-pull):
-#   Registries : add registry.carpetavenue.net (user/pass)
-#   Environment: paste docker/.env.production.example
-#   Domains    : playground.carpetavenue.jp -> service `nginx`, port 80, HTTPS on
+# Dokploy (README §3): Registries = registry.carpetavenue.net | Environment =
+# docker/.env.production.example | Domains = playground.carpetavenue.jp -> `nginx` :80, HTTPS on.
 
 services:
 
@@ -29,13 +20,9 @@ services:
     # cache:clean-by-tag silently miss. Defence is sizing, not another policy:
     #   valkey-cli info stats | grep evicted_keys    # must stay 0
     #
-    #
-    # HOST BUDGET, all stacks on this host together: this stack ~6.5G (php-fpm 3.9 | cache 2 |
-    # sessions 0.25 | cron 0.3 | nginx 0.05) + opensearch ~3.3G + mysql ~4G + rabbitmq ~1G
-    # + OS/docker ~0.6G  =>  ~15.4G, and carpient's app stack adds another ~6.7G on top.
-    # `free -g` before deploying; on 8/12GB the kernel OOM-kills php-fpm or mysqld under
-    # load, which reads as random 502s.
-    # evicted_keys non-zero => add host RAM, don't take it from pm.max_children.
+    # This stack ~5G at playground sizing; host budget for everything, including
+    # carpient's stack: DOCKER-GLOBAL/README.md §2. evicted_keys non-zero => add host
+    # RAM, don't take it from pm.max_children.
     command: >
       valkey-server
       --maxmemory ${VALKEY_MAXMEMORY:-2gb}
@@ -194,10 +181,9 @@ services:
 
   # magento_media -> GCS. OFF, on its own `media-backup` profile so the mysql stack's
   # COMPOSE_PROFILES=backup can't switch it on by accident. Databases are backed up by
-  # the shared mysql stack (DOCKER-GLOBAL/README.md §8) — nothing to set here.
-  # Why off: this tool writes a FULL tar every run, so it re-uploads every unchanged
-  # byte nightly; the right fix is an incremental `rclone sync` / `gsutil -m rsync -r`.
-  # Until then media is UNPROTECTED. One-off snapshot: COMPOSE_PROFILES=media-backup.
+  # the shared mysql stack; nothing to set here.
+  # Why off: full tar every run, re-uploading every unchanged byte. Right fix is
+  # `gsutil -m rsync -r`. Until then media is UNPROTECTED.
   backup:
     image: offen/docker-volume-backup:v2
     container_name: carpetavenue-jp-media-backup
