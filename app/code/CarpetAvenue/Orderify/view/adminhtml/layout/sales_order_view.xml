@@ -1,5 +1,6 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+        <referenceBlock name="order_info" template="CarpetAvenue_Orderify::order/view/info.phtml"/>
         <referenceContainer name="order_additional_info">
             <block ifconfig="orderify/fake_customer_statistic/enable" class="CarpetAvenue\Orderify\Block\Adminhtml\Order\RefundStatisticsSection" name="orderify_refund_statistic_section" template="CarpetAvenue_Orderify::order/view/fake_customer_statistics.phtml"/>
         </referenceContainer>
