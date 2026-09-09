@@ -44,3 +44,6 @@ docker/env.php.scd
 auth.json
 docker/certs/*
 
+
+# Local working data (SKU batches, import CSVs) — not source
+RESOURCE/
