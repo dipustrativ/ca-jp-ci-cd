@@ -1,15 +1,13 @@
 # CarpetAvenue JP — Dokploy production, PULL a pre-built image (recommended path).
+# All pulled images, no bind-mounts, so Dokploy needs no git repo.
 #
-# Every service is a pulled image — zero host bind-mounts, so Dokploy needs no
-# git repo. CI (or you) builds carpetavenue-jp + carpetavenue-jp-nginx and pushes to the
-# registry; Dokploy pulls and restarts. Only the carpetavenue-jp image changes between
-# code deploys; nginx + infra images are effectively fixed.
+# Shared infra is NOT here — mysql:3306, opensearch:9200, rabbitmq:5672 live in
+# Workspace/DOCKER-GLOBAL/, shared with carpient. Deploy those THREE FIRST: nothing here
+# gates on them, so a missing one starts fine and fails at runtime.
+# This app: db `carpetavenue_jp`, vhost/user `/ca_jp`, prefix `ca_jp`. See docker/SHARED-INFRA.md
 #
-# Dokploy setup (see docker/README.md §Dokploy-pull):
-#   Registries : add registry.carpetavenue.net (user/pass)
-#   Environment: paste docker/.env.production.example  (DB_HOST = external MySQL)
-#   Domains    : domain -> service `nginx`, port 80, HTTPS on (Traefik terminates TLS)
-# Host once   : sysctl -w vm.max_map_count=262144   (OpenSearch; persist in sysctl.conf)
+# Dokploy (README §3): Registries = registry.carpetavenue.net | Environment =
+# docker/.env.production.example | Domains = playground.carpetavenue.jp -> `nginx` :80, HTTPS on.
 
 services:
 
@@ -22,14 +20,9 @@ services:
     # cache:clean-by-tag silently miss. Defence is sizing, not another policy:
     #   valkey-cli info stats | grep evicted_keys    # must stay 0
     #
-    # Host budget (MySQL is external): OpenSearch ~3.3G (2G heap + off-heap) |
-    # php-fpm ~3.9G | cache 2G | sessions 0.25G | rabbitmq ~0.2G | cron ~0.3G |
-    # nginx ~0.05G | OS+docker ~0.6G  =>  ~10.6G. NEEDS A 12GB+ HOST. The earlier
-    # 1G/1G sizing fit 8GB; if this stack is still on 8GB it will OOM-kill php-fpm
-    # or OpenSearch under load, which reads as random 502s. Check before deploying:
-    #   free -g            # total must be >= 12
-    # If evicted_keys goes non-zero, add host RAM — do not take it from
-    # pm.max_children (docker/php/www.conf), sized off the same budget.
+    # This stack ~5G at playground sizing; host budget for everything, including
+    # carpient's stack: DOCKER-GLOBAL/README.md §2. evicted_keys non-zero => add host
+    # RAM, don't take it from pm.max_children.
     command: >
       valkey-server
       --maxmemory ${VALKEY_MAXMEMORY:-2gb}
@@ -72,46 +65,6 @@ services:
       retries: 10
     networks: [magento_net]
 
-  queue:
-    image: rabbitmq:4.2-management-alpine
-    container_name: carpetavenue-jp-queue
-    restart: unless-stopped
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
-      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-/}
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    networks: [magento_net]
-
-  search:
-    image: opensearchproject/opensearch:3
-    container_name: carpetavenue-jp-search
-    restart: unless-stopped
-    environment:
-      discovery.type: single-node
-      # 2g is the carpient sizing. Co-hosted on the same VPS as carpient, set
-      # OPENSEARCH_HEAP=1g — JP is one locale and playground traffic.
-      OPENSEARCH_JAVA_OPTS: "-Xms${OPENSEARCH_HEAP:-2g} -Xmx${OPENSEARCH_HEAP:-2g}"
-      DISABLE_SECURITY_PLUGIN: "true"
-      DISABLE_INSTALL_DEMO_CONFIG: "true"
-    volumes:
-      - opensearch_data:/usr/share/opensearch/data
-    ulimits:
-      memlock: { soft: -1, hard: -1 }
-      nofile:  { soft: 65536, hard: 65536 }
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-    networks: [magento_net]
-
   # Runs setup:upgrade once per deploy, then exits.
   #
   # Nothing here has to clear var/view_preprocessed: env.php.template pins
@@ -131,8 +84,6 @@ services:
     depends_on:
       cache:    { condition: service_healthy }
       sessions: { condition: service_healthy }
-      queue:    { condition: service_healthy }
-      search:   { condition: service_healthy }
     environment: &magento_env
       DB_HOST: ${DB_HOST}
       DB_NAME: ${DB_NAME}
@@ -145,20 +96,25 @@ services:
       # instance if these are unset, so an older stack still boots unchanged.
       VALKEY_SESSION_HOST: ${VALKEY_SESSION_HOST:-sessions}
       VALKEY_SESSION_PORT: ${VALKEY_SESSION_PORT:-6379}
-      RABBITMQ_HOST: ${RABBITMQ_HOST:-queue}
+      # Shared broker in DOCKER-GLOBAL/, on dokploy-network. Named vhost, never `/`.
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-rabbitmq}
       RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
       RABBITMQ_USER: ${RABBITMQ_USER}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-      RABBITMQ_VHOST: ${RABBITMQ_VHOST:-/}
-      OPENSEARCH_HOST: ${OPENSEARCH_HOST:-search}
+      RABBITMQ_VHOST: ${RABBITMQ_VHOST:-/ca_jp}
+      # Shared cluster in DOCKER-GLOBAL/, on dokploy-network.
+      OPENSEARCH_HOST: ${OPENSEARCH_HOST:-opensearch}
       OPENSEARCH_PORT: ${OPENSEARCH_PORT:-9200}
+      # Unique per Magento install — one cluster, one prefix each, or they overwrite
+      # each other's indices. Changing it on a live install needs a full reindex.
+      OPENSEARCH_INDEX_PREFIX: ${OPENSEARCH_INDEX_PREFIX:-ca_jp}
       MAGE_CRYPT_KEY: ${MAGE_CRYPT_KEY}
       MAGE_GRAPHQL_ID_SALT: ${MAGE_GRAPHQL_ID_SALT}
       DOMAIN: ${DOMAIN:-playground.carpetavenue.jp}
       DEBUG_ENV: ${DEBUG_ENV:-false}
     volumes:
       - magento_var:/var/www/html/var
-    networks: [magento_net, dokploy-network]   # dokploy-network: reach the internal Dokploy MySQL
+    networks: [magento_net, dokploy-network]   # dokploy-network: reach mysql/opensearch/rabbitmq
 
   app:
     image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
@@ -166,8 +122,6 @@ services:
     restart: unless-stopped
     depends_on:
       upgrade: { condition: service_completed_successfully }
-      queue:   { condition: service_healthy }
-      search:  { condition: service_healthy }
     environment: *magento_env
     volumes:
       - magento_media:/var/www/html/pub/media
@@ -175,7 +129,7 @@ services:
     networks:
       magento_net:
         aliases: [carpetavenue-jp-fpm]
-      dokploy-network:                         # reach the internal Dokploy MySQL
+      dokploy-network:                         # reach mysql/opensearch/rabbitmq
 
   static:
     image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
@@ -199,7 +153,7 @@ services:
     volumes:
       - magento_media:/var/www/html/pub/media
       - magento_var:/var/www/html/var
-    networks: [magento_net, dokploy-network]   # dokploy-network: reach the internal Dokploy MySQL
+    networks: [magento_net, dokploy-network]   # dokploy-network: reach mysql/opensearch/rabbitmq
 
   # Baked-config nginx (no bind-mounts). Traefik (Dokploy Domain tab) fronts it.
   nginx:
@@ -225,26 +179,27 @@ services:
       start_period: 60s
     networks: [magento_net, dokploy-network]
 
-  # Nightly tar of magento_media -> GCS (via S3-interop HMAC keys). Only
-  # magento_media is backed up: it's the one volume not reproducible from a
-  # build (uploaded product images). var/static/valkey/rabbitmq/opensearch
-  # are all regenerable — see docker/README.md §11.
+  # magento_media -> GCS. OFF, on its own `media-backup` profile so the mysql stack's
+  # COMPOSE_PROFILES=backup can't switch it on by accident. Databases are backed up by
+  # the shared mysql stack; nothing to set here.
+  # Why off: full tar every run, re-uploading every unchanged byte. Right fix is
+  # `gsutil -m rsync -r`. Until then media is UNPROTECTED.
   backup:
     image: offen/docker-volume-backup:v2
-    container_name: carpetavenue-jp-backup
+    container_name: carpetavenue-jp-media-backup
+    profiles: ["media-backup"]
     restart: unless-stopped
     environment:
-      BACKUP_CRON_EXPRESSION: "0 3 * * *"
-      BACKUP_FILENAME: "media-%Y-%m-%d.tar.gz"
-      BACKUP_RETENTION_DAYS: "14"
-      BACKUP_PRUNING_LEEWAY: "5m"
+      BACKUP_CRON_EXPRESSION: ${BACKUP_MEDIA_CRON:-30 3 * * *}
+      BACKUP_FILENAME: media-jp-%Y-%m-%d.tar.gz
+      BACKUP_PRUNING_PREFIX: media-jp-    # prune only our own files, never the bucket's
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
       AWS_ENDPOINT: storage.googleapis.com
-      AWS_ENDPOINT_PROTO: https
       AWS_S3_BUCKET_NAME: ${BACKUP_GCS_BUCKET}
       AWS_ACCESS_KEY_ID: ${BACKUP_GCS_HMAC_KEY}
       AWS_SECRET_ACCESS_KEY: ${BACKUP_GCS_HMAC_SECRET}
     volumes:
-      - magento_media:/backup/magento_media:ro
+      - magento_media:/backup/media:ro
     networks: [magento_net]
 
 volumes:
@@ -253,8 +208,6 @@ volumes:
   magento_static:
   valkey_data:
   valkey_sessions:
-  rabbitmq_data:
-  opensearch_data:
 
 networks:
   magento_net:

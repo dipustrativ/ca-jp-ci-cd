@@ -64,6 +64,12 @@ body {
     box-shadow: none !important;
 }
 
+input[type="text"], input[type="password"], input[type="url"], input[type="tel"],
+input[type="search"], input[type="number"], input[type*="date"], input[type="email"],
+textarea, select{
+    border: 1px solid #c2c2c2 !important;
+}
+
 a, .alink {
     color: #333;
     text-decoration: none;
@@ -74,8 +80,13 @@ a:hover, .alink:hover {
     text-decoration: underline;
 }
 
-.action.primary, .action-primary{
-    padding: 15px 20px;
+a:visited, .alink:visited {
+    color: #333333;
+    text-decoration: none;
+}
+
+.fieldset>.field, .fieldset>.fields>.field {
+    margin: 0 0 20px !important;
 }
 
 //
@@ -310,7 +321,8 @@ a:hover, .alink:hover {
     .block-search,
     .header-actions,
     .customer-account-header,
-    .customer-account-header .header.links,
+    .customer-account-header > .header.links,
+    .wish.wrapper,
     .minicart-wrapper {
         display: flex;
         align-items: center;
@@ -321,11 +333,18 @@ a:hover, .alink:hover {
     .nav-toggle:before,
     .block-search .block-title,
     .block-search .block-title:before,
-    .header.links > li,
-    .header.links > li > a,
-    .header.links > li > a:before,
+    .customer-account-header > .header.links > li,
+    .customer-account-header > .header.links > li > a,
+    .wish.wrapper .action.wish,
     .action.showcart,
     .action.showcart:before {
+        //  NOT the account button's own `:before`. That glyph is centred in its 50px
+        //  box by the pairing of `padding: 20px` with `line-height: .3` (see
+        //  Magento_Customer/_extend.less, same as carpetavenue.jp): a 28px glyph in a
+        //  tiny line box lands on the row's centre line. Forcing `line-height: 1`
+        //  here made the line box 28px tall, so it started below the padding and the
+        //  icon sat ~9px lower than the heart and cart. The logged-in state escaped it
+        //  only because .customer-name is a span, not an `a`.
         line-height: 1;
         margin-top: 0;
         margin-bottom: 0;
@@ -333,7 +352,7 @@ a:hover, .alink:hover {
     }
 
     .minicart-wrapper .action.showcart:before,
-    .header.links > li > a:before,
+    .customer-account-header > .header.links > li > a:before,
     .block-search .block-title:before,
     .nav-toggle:before {
         display: block;
@@ -500,6 +519,7 @@ a:hover, .alink:hover {
 
 //  Right — account / wishlist / cart icons (inside .header-actions flex)
 .customer-account-header,
+.wish.wrapper,
 .minicart-wrapper {
     flex: 0 0 auto;
 }
@@ -509,115 +529,25 @@ a:hover, .alink:hover {
     display: none;
 }
 
-//  Account links -> single person icon (hide text + extra links)
-.customer-account-header .header.links {
+//  Account links: the button and its dropdown are in
+//  Magento_Customer/web/css/source/_extend.less; the heart is in
+//  Magento_Wishlist/web/css/source/_extend.less. Only the row layout stays here.
+.customer-account-header > .header.links {
     display: flex;
     align-items: center;
     margin: 0;
     padding: 0;
     list-style: none;
 
+    //  The greeting and the compare link are not part of this header.
     .greet.welcome,
-    .authorization-link,
-    .compare,
-    .link.wishlist ~ .link.wishlist {
+    .compare {
         display: none;
     }
 
     > li {
         margin: 0;
     }
-
-    > li:first-child{
-        padding: 0 20px;
-    }
-
-    li.link.wishlist{
-        padding: 0 20px;
-    }
-
-
-    a {
-        display: inline-block;
-        font-size: 0;
-        line-height: 1;
-        color: @ca-black;
-        text-decoration: none;
-    }
-    a:hover{
-        text-decoration: none;
-    }
-
-    //  My Account (first) -> person (SVG icon)
-    > li:first-child > a:before {
-        font-family: 'Pe-icon-7-stroke';
-        font-size: 2.8rem;
-        display: block;
-        line-height: .3;
-        content: "\e605";
-    }
-
-    //  Wish list -> heart. Outline while the list is empty, filled once it has
-    //  items — same swap carpetavenue.jp does, where the empty state is keyed
-    //  off BelVG's `.no-display` class.
-    //
-    //  Here the marker is Magento's own counter: the header link only renders
-    //  `.counter.qty` when `wishlist().counter` is set, and Knockout inserts
-    //  and removes it as items come and go, so `:has()` follows the state
-    //  live with no JS. The counter itself is 0x0 (the link is `font-size: 0`),
-    //  so it only ever acts as a flag.
-    .link.wishlist > a {
-        position: relative;
-
-        &:before {
-            .ca-icon("\e642");
-            font-size: @ca-header-icon-size;
-        }
-
-        //  Deliberately NOT transitioned. Knockout drops and re-inserts
-        //  `.counter.qty` while customer-data refreshes on load, so `:has()`
-        //  briefly stops matching. With `transition: opacity .5s` that blip
-        //  stretched into a visible flicker — and because the `:before` colour
-        //  below is not transitioned, the two fell out of sync and both hearts
-        //  were painted at once. Measured on a page load with one wishlist
-        //  item: outline+fill together at 119ms, fill fading out to 0.85, then
-        //  fading back in, settling only at 251ms. Swapping both in the same
-        //  style recalculation keeps it to one imperceptible frame.
-        &:after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: @ca-header-icon-size;
-            height: @ca-header-icon-size;
-            transform: translate(-50%, -50%);
-            background: url('@{baseDir}images/icons/like.svg') no-repeat 0 0;
-            background-size: 100%;
-            opacity: 0;
-        }
-
-        &:has(.counter.qty) {
-            //  Hide the outline by colour, not by dropping `content` — the link
-            //  is `font-size: 0` with an absolutely positioned `:after`, so the
-            //  glyph box is the only thing giving it height. Emptying it
-            //  collapses the link to 0x0 and the icon row shifts.
-            &:before {
-                color: transparent;
-            }
-
-            &:after {
-                opacity: 1;
-            }
-        }
-    }
-}
-
-//  Wishlist merged into the header heart icon: hide BelVG's standalone
-//  "My Wish List" link. The heart click opens the mini-wishlist modal
-//  (see js/header-wishlist-merge.js). #mini-wishlist-modal is relocated to a
-//  body-level modal on init, so hiding this wrapper does not break it.
-.wish.wrapper {
-    display: none;
 }
 
 //  Cart icon
@@ -1203,10 +1133,6 @@ a:hover, .alink:hover {
         justify-content: flex-start;
     }
 
-    .customer-account-header .header.links {
-        gap: 0;
-    }
-
     //  Mobile header: toggle + search (left) · logo (center) · heart + cart (right)
     .page-header .header.content {
         display: flex;
@@ -1328,23 +1254,8 @@ a:hover, .alink:hover {
         gap: 8px;
         padding-right: 0px;
 
-        //  Glyph sizes match carpetavenue.jp mobile: 25px heart, 30px cart.
-        //  The heart needs the full desktop selector — the @ca-header-icon-size
-        //  rule at line ~545 is (0,5,2) and beats a plainer one.
-        .customer-account-header .header.links .link.wishlist > a {
-            &:before {
-                width: 2.5rem;
-                height: 2.5rem;
-                font-size: 2.5rem;
-                color: #333;
-            }
-
-            //  Keep the filled heart the same size as the outline it replaces.
-            &:after {
-                width: 2.5rem;
-                height: 2.5rem;
-            }
-        }
+        //  Heart sizing lives with the heart, in
+        //  Magento_Wishlist/web/css/source/_extend.less.
 
         .action.showcart:before {
             width: 3rem;
@@ -1410,15 +1321,6 @@ a:hover, .alink:hover {
                 }
             }
         }
-    }
-
-    //  No account/person icon on mobile — keep wishlist heart
-    .customer-account-header .header.links > li:first-child {
-        display: none;
-    }
-
-    .customer-account-header .header.links li.link.wishlist {
-        padding: 0 0px;
     }
 
     .foo-col3 {

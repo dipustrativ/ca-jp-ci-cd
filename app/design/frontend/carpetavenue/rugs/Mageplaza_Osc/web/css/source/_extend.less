@@ -9,10 +9,55 @@
 //  _____________________________________________
 
 & when (@media-common = true) {
+
+    .checkout-payment-method .payment-option-title .action-toggle{
+        color: #333333;
+    }
+
+    .opc-wrapper .form-discount {
+        display: flex;
+        width: 100%;
+
+        .payment-option-inner {
+            margin-bottom: 0px !important;
+            width: 100%;
+        }
+
+        .actions-toolbar {
+            min-width: 131px;
+        }
+
+    }
+
+    //  Delivery-address "New Address" button.
+    //
+    //  Colour: design.phtml paints every checkout button that isn't `.primary`
+    //  with `osc/design_configuration/heading_background`, still the module
+    //  default navy #01007F, inline and !important — same mechanism documented
+    //  on the estimated-total showcart button below. Mageplaza's selector scores
+    //  (0,6,1) (each :not() contributes its argument), so the ID here at (1,2,1)
+    //  is what lets these !importants land.
+    //
+    //  Alignment: Mageplaza insets the address list 20px
+    //  (`.opc-wrapper .shipping-address-items { padding: 0 20px }` in
+    //  Mageplaza/Osc/view/frontend/web/css/style.css) but the button is a sibling
+    //  of that wrapper, so it sat 20px left of the address box. The max-width
+    //  keeps the button inside the same box below @screen__s, where blank widens
+    //  it to 100%.
+    #checkout-step-shipping button.action.action-show-popup {
+        background-color: @button-primary__background !important;
+        border-color: @button-primary__background !important;
+        color: @button-primary__color !important;
+        margin-left: 20px;
+        max-width: calc(100% - 40px);
+    }
+
   .onestepcheckout-index-index {
 
       .minicart-wrapper .action.showcart .counter.qty{
           color: #ffffff !important;
+          position: initial;
+          margin-top: -4px;
       }
 
       main#maincontent {
@@ -40,6 +85,9 @@
     .osc-authentication-wrapper {
       text-align: right;
       padding: 0 10px;
+        .osc-authentication-toggle{
+            color: #333;
+        }
     }
 
     input {
@@ -300,6 +348,23 @@
 
         &.grand {
           background: #f4f4f4;
+            .mark{
+                padding: 11px 0;
+                strong{
+                    font-size: 1.8rem;
+                    font-weight: 600;
+                    padding: 3px 0 0;
+                }
+            }
+            .amount{
+                padding: 11px 0;
+                padding-right: 20px;
+                strong{
+                    font-size: 1.8rem;
+                    font-weight: 600;
+                    padding: 3px 0 0;
+                }
+            }
         }
       }
     }
@@ -570,7 +635,7 @@
       padding: 0;
 
       .payment-option-content {
-        padding: 0 8px;
+        padding: 0 25px;
       }
     }
 

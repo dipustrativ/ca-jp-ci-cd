@@ -21,6 +21,10 @@
 @font-family__base:                 @font-family-name__base, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
 //  Buttons
+//  @button__padding drives both the default/secondary button (lib _resets) and
+//  @button-primary__padding, so primary and secondary come out the same size —
+//  carpetavenue.jp sets the same value in Evalent/carpet's Magento_Theme/_extend.less.
+@button__padding:                   15px 20px;
 @button__border-radius:             5px;
 @button-primary__background:        @ca-green;
 @button-primary__color:             #ffffff;
@@ -32,6 +36,22 @@
 //  Form inputs
 @form-element-input__border-radius: 5px;
 @form-element-input__height:        48px;
+
+//  Account sidebar nav — the current item's left bar. The sidebar is rendered by
+//  Magento_Theme's collapsible navigation (.block-collapsible-nav), not by
+//  Magento_Customer's .account-nav, so this is the variable that reaches it. Blank
+//  derives it from @active__color (orange); carpetavenue.jp renders it green.
+//  Overriding just this one keeps every other @active__color component where it is.
+@collapsible-nav-current-border-color: @ca-green;
+
+//  Modals — blank sizes the ✕ close icon at 32px; Luma (and so carpetavenue.jp)
+//  renders it at base font size.
+@modal-action-close__font-size:     @font-size__base;
+
+//  Checkout — the selected delivery-address card. Blank derives its border from
+//  @active__color (orange); @checkout-shipping-item-icon__background-color is
+//  declared as an alias of this variable, so the ✓ badge follows it.
+@checkout-shipping-item__active__border-color: @ca-green;
 
 //  Price
 @price-color:                       @ca-price;

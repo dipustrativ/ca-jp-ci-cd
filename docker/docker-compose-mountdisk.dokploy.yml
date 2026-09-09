@@ -1,0 +1,200 @@
+# CarpetAvenue JP — Dokploy production, PULL a pre-built image, media/var on a HOST DISK.
+#
+# Same as docker-compose.dokploy.yml except magento_media + magento_var are bind mounts
+# under /mnt/disks/dokploy/carpetavenuejp (a mounted persistent disk) instead of named
+# volumes, so media survives a stack delete and is sized independently of the boot disk.
+# Create both dirs before the first deploy, or Docker creates them root-owned and
+# `upgrade`'s chown is the only thing that saves you:
+#   sudo mkdir -p /mnt/disks/dokploy/carpetavenuejp/{media,var}
+# No GCS media backup here — the host disk is expected to carry a snapshot policy.
+# All pulled images, no bind-mounts, so Dokploy needs no git repo.
+#
+# Shared infra is NOT here — mysql:3306, opensearch:9200, rabbitmq:5672 live in
+# Workspace/DOCKER-GLOBAL/, shared with carpient. Deploy those THREE FIRST: nothing here
+# gates on them, so a missing one starts fine and fails at runtime.
+# This app: db `carpetavenue_jp`, vhost/user `/ca_jp`, prefix `ca_jp`. See docker/SHARED-INFRA.md
+#
+# Dokploy (README §3): Registries = registry.carpetavenue.net | Environment =
+# docker/.env.production.example | Domains = playground.carpetavenue.jp -> `nginx` :80, HTTPS on.
+
+services:
+
+  cache:
+    image: valkey/valkey:9-alpine
+    container_name: carpetavenue-jp-cache
+    restart: unless-stopped
+    # cache db0 + page_cache db1 only; sessions are in the `sessions` service.
+    # allkeys-lru evicts tag->id SETS as readily as data, and a lost tag set makes
+    # cache:clean-by-tag silently miss. Defence is sizing, not another policy:
+    #   valkey-cli info stats | grep evicted_keys    # must stay 0
+    #
+    # This stack ~5G at playground sizing; host budget for everything, including
+    # carpient's stack: DOCKER-GLOBAL/README.md §2. evicted_keys non-zero => add host
+    # RAM, don't take it from pm.max_children.
+    command: >
+      valkey-server
+      --maxmemory ${VALKEY_MAXMEMORY:-2gb}
+      --maxmemory-policy allkeys-lru
+      --save ""
+      ${VALKEY_PASSWORD:+--requirepass ${VALKEY_PASSWORD}}
+    volumes:
+      - valkey_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [magento_net]
+
+  sessions:
+    image: valkey/valkey:9-alpine
+    container_name: carpetavenue-jp-sessions
+    restart: unless-stopped
+    # Sessions only (db2). Magento's session handler sets a TTL on every key, so
+    # volatile-lru drops the oldest idle session under pressure — never a cache
+    # tag set. Separate instance so catalog cache churn cannot evict a live cart.
+    #
+    # ONE-TIME ON FIRST DEPLOY: existing sessions are in db2 of `cache` and are NOT
+    # migrated — every logged-in customer is signed out once and guest carts are
+    # lost. Deploy in a low-traffic window, or set VALKEY_SESSION_HOST=cache to
+    # keep sessions where they are.
+    command: >
+      valkey-server
+      --maxmemory ${VALKEY_SESSION_MAXMEMORY:-256mb}
+      --maxmemory-policy volatile-lru
+      --save ""
+      ${VALKEY_PASSWORD:+--requirepass ${VALKEY_PASSWORD}}
+    volumes:
+      - valkey_sessions:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [magento_net]
+
+  # Runs setup:upgrade once per deploy, then exits.
+  #
+  # Nothing here has to clear var/view_preprocessed: env.php.template pins
+  # minify_html=0, so templates are read from the image, not from that tree. If
+  # you ever turn minification back on, the tree becomes build output living in
+  # a persistent volume and this deploy step has to restore it — read the note
+  # in docker/env.php.template first.
+  upgrade:
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
+    container_name: carpetavenue-jp-upgrade
+    command: >
+      sh -c "chown -R www-data:www-data /var/www/html/var &&
+      php bin/magento maintenance:enable &&
+      php -d memory_limit=2G bin/magento setup:upgrade --keep-generated &&
+      php bin/magento maintenance:disable"
+    restart: "no"
+    depends_on:
+      cache:    { condition: service_healthy }
+      sessions: { condition: service_healthy }
+    environment: &magento_env
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      VALKEY_HOST: ${VALKEY_HOST:-cache}
+      VALKEY_PORT: ${VALKEY_PORT:-6379}
+      VALKEY_PASSWORD: ${VALKEY_PASSWORD:-}
+      # Sessions on their own instance; env.php.template falls back to the cache
+      # instance if these are unset, so an older stack still boots unchanged.
+      VALKEY_SESSION_HOST: ${VALKEY_SESSION_HOST:-sessions}
+      VALKEY_SESSION_PORT: ${VALKEY_SESSION_PORT:-6379}
+      # Shared broker in DOCKER-GLOBAL/, on dokploy-network. Named vhost, never `/`.
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-rabbitmq}
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_VHOST: ${RABBITMQ_VHOST:-/ca_jp}
+      # Shared cluster in DOCKER-GLOBAL/, on dokploy-network.
+      OPENSEARCH_HOST: ${OPENSEARCH_HOST:-opensearch}
+      OPENSEARCH_PORT: ${OPENSEARCH_PORT:-9200}
+      # Unique per Magento install — one cluster, one prefix each, or they overwrite
+      # each other's indices. Changing it on a live install needs a full reindex.
+      OPENSEARCH_INDEX_PREFIX: ${OPENSEARCH_INDEX_PREFIX:-ca_jp}
+      MAGE_CRYPT_KEY: ${MAGE_CRYPT_KEY}
+      MAGE_GRAPHQL_ID_SALT: ${MAGE_GRAPHQL_ID_SALT}
+      DOMAIN: ${DOMAIN:-playground.carpetavenue.jp}
+      DEBUG_ENV: ${DEBUG_ENV:-false}
+    volumes:
+      - /mnt/disks/dokploy/carpetavenuejp/var:/var/www/html/var
+    networks: [magento_net, dokploy-network]   # dokploy-network: reach mysql/opensearch/rabbitmq
+
+  app:
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
+    container_name: carpetavenue-jp-app
+    restart: unless-stopped
+    depends_on:
+      upgrade: { condition: service_completed_successfully }
+    environment: *magento_env
+    volumes:
+      - /mnt/disks/dokploy/carpetavenuejp/media:/var/www/html/pub/media
+      - /mnt/disks/dokploy/carpetavenuejp/var:/var/www/html/var
+    networks:
+      magento_net:
+        aliases: [carpetavenue-jp-fpm]
+      dokploy-network:                         # reach mysql/opensearch/rabbitmq
+
+  static:
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
+    container_name: carpetavenue-jp-static
+    command: sh -c "rm -rf /mnt/static/* && cp -a /var/www/html/pub/static/. /mnt/static/"
+    restart: "no"
+    depends_on:
+      upgrade: { condition: service_completed_successfully }
+    volumes:
+      - magento_static:/mnt/static
+    networks: [magento_net]
+
+  cron:
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp:${IMAGE_TAG:-latest}
+    container_name: carpetavenue-jp-cron
+    command: cron -f
+    restart: unless-stopped
+    depends_on:
+      upgrade: { condition: service_completed_successfully }
+    environment: *magento_env
+    volumes:
+      - /mnt/disks/dokploy/carpetavenuejp/media:/var/www/html/pub/media
+      - /mnt/disks/dokploy/carpetavenuejp/var:/var/www/html/var
+    networks: [magento_net, dokploy-network]   # dokploy-network: reach mysql/opensearch/rabbitmq
+
+  # Baked-config nginx (no bind-mounts). Traefik (Dokploy Domain tab) fronts it.
+  nginx:
+    image: ${REGISTRY_HOST:-registry.carpetavenue.net}/carpetavenue-jp-nginx:${NGINX_TAG:-latest}
+    container_name: carpetavenue-jp-nginx
+    restart: unless-stopped
+    depends_on:
+      - app
+      - static
+    expose:
+      - "80"
+    volumes:
+      - /mnt/disks/dokploy/carpetavenuejp/media:/var/www/html/pub/media:ro
+      - magento_static:/var/www/html/pub/static:ro
+    healthcheck:
+      # 127.0.0.1 (NOT localhost — that hits IPv6 ::1, which nginx doesn't listen
+      # on → false "unhealthy" → Traefik drops the container → 404). health_check.php
+      # returns 200 via php-fpm.
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1/health_check.php || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks: [magento_net, dokploy-network]
+
+
+volumes:
+  magento_static:
+  valkey_data:
+  valkey_sessions:
+
+networks:
+  magento_net:
+    driver: bridge
+  dokploy-network:
+    external: true
