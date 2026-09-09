@@ -1,0 +1,25 @@
+<?php
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Wishlist item image. Core renders the 113px `wishlist_small_image` through
+ * product/image.phtml (a bare <img>, deprecated upstream); carpetavenue.jp renders the
+ * larger `wishlist_thumbnail` inside the container/wrapper spans, which is what
+ * image_with_borders.phtml does — it also emits the per-product width + aspect-ratio
+ * CSS, so the box comes straight from the theme's etc/view.xml with no extra rules.
+ *
+ * @var \Magento\Wishlist\Block\Customer\Wishlist\Item\Column\Image $block
+ */
+
+/** @var \Magento\Wishlist\Model\Item $item */
+$item = $block->getItem();
+$product = $item->getProduct();
+?>
+<a class="product-item-photo"
+   tabindex="-1"
+   href="<?= $block->escapeUrl($block->getProductUrl($item)) ?>"
+   title="<?= $block->escapeHtmlAttr($product->getName()) ?>">
+    <?= $block->getImage($block->getProductForThumbnail($item), 'wishlist_thumbnail')
+              ->setTemplate('Magento_Catalog::product/image_with_borders.phtml')
+              ->toHtml() ?>
+</a>

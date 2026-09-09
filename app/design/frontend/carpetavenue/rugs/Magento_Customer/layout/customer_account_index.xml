@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * The dashboard runs full width with no account sidebar, as on carpetavenue.jp
+ * (there it comes from CarpetAvenue_ChangePayment, a module this install does not have).
+ * Every other account page keeps the 2columns-left sidebar from core's customer_account.
+ */
+-->
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"/>

@@ -33,5 +33,12 @@
 @form-element-input__border-radius: 5px;
 @form-element-input__height:        48px;
 
+//  Account sidebar nav — the current item's left bar. The sidebar is rendered by
+//  Magento_Theme's collapsible navigation (.block-collapsible-nav), not by
+//  Magento_Customer's .account-nav, so this is the variable that reaches it. Blank
+//  derives it from @active__color (orange); carpetavenue.jp renders it green.
+//  Overriding just this one keeps every other @active__color component where it is.
+@collapsible-nav-current-border-color: @ca-green;
+
 //  Price
 @price-color:                       @ca-price;

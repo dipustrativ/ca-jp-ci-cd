@@ -72,6 +72,16 @@
       .main {
           .product-info-details {
 
+              .fieldset > .field:not(.choice) > .control{
+                  width: 100%;
+              }
+
+              ._keyfocus *:focus, input:not([disabled]):focus, textarea:not([disabled]):focus, select:not([disabled]):focus {
+                  background-color: #f1f1f1 !important;
+                  border: 1px solid #a2a2a2 !important;
+                  box-shadow: none !important;
+              }
+
               .product-short_description + .product.attribute.description > .value {
                   max-height: 0;
                   overflow: hidden;

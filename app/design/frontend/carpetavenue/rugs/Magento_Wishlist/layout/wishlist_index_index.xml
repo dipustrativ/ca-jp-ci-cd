@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Extra item columns on the customer wishlist, matching carpetavenue.jp: discount
+ * flag, size (W x L cm / ∅ cm) and the Carpient badge.
+ *
+ * The templates are the ones already ported for BelVG's guest wishlist — same
+ * `$block->getItem()` contract, so there is no reason to keep a second copy.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="customer.wishlist.items">
+            <block class="Magento\Wishlist\Block\Customer\Wishlist\Item\Column"
+                   name="customer.wishlist.item.sale"
+                   template="BelVG_GuestWishlist::sale-flag.phtml"
+                   after="customer.wishlist.item.image"
+                   before="customer.wishlist.item.name"
+                   cacheable="false"/>
+
+            <block class="Magento\Wishlist\Block\Customer\Wishlist\Item\Column"
+                   name="customer.wishlist.item.size"
+                   template="BelVG_GuestWishlist::size.phtml"
+                   after="customer.wishlist.item.name"
+                   before="customer.wishlist.item.price"
+                   cacheable="false"/>
+
+            <block class="Magento\Wishlist\Block\Customer\Wishlist\Item\Column"
+                   name="customer.wishlist.item.carpient"
+                   template="BelVG_GuestWishlist::carpient-tag.phtml"
+                   after="customer.wishlist.item.name"
+                   before="customer.wishlist.item.price"
+                   cacheable="false"/>
+        </referenceBlock>
+    </body>
+</page>

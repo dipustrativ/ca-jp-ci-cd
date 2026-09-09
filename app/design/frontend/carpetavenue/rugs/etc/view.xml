@@ -29,6 +29,13 @@
                 <width>560</width>
                 <height>750</height>
             </image>
+            <!-- Wishlist grid. Core renders the 113px `wishlist_small_image`;
+                 carpetavenue.jp uses the same portrait box as the category grid
+                 (see Magento_Wishlist/templates/item/column/image.phtml). -->
+            <image id="wishlist_thumbnail" type="small_image">
+                <width>280</width>
+                <height>375</height>
+            </image>
             <!-- PDP gallery sizes (matches reference theme; MagicGallery reads product_page_image_medium) -->
             <image id="product_base_image" type="image">
                 <width>265</width>
