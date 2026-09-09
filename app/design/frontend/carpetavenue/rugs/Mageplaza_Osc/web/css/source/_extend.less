@@ -9,10 +9,32 @@
 //  _____________________________________________
 
 & when (@media-common = true) {
+
+    .checkout-payment-method .payment-option-title .action-toggle{
+        color: #333333;
+    }
+
+    .opc-wrapper .form-discount {
+        display: flex;
+        width: 100%;
+
+        .payment-option-inner {
+            margin-bottom: 0px !important;
+            width: 100%;
+        }
+
+        .actions-toolbar {
+            min-width: 131px;
+        }
+
+    }
+
   .onestepcheckout-index-index {
 
       .minicart-wrapper .action.showcart .counter.qty{
           color: #ffffff !important;
+          position: initial;
+          margin-top: -4px;
       }
 
       main#maincontent {
@@ -40,6 +62,9 @@
     .osc-authentication-wrapper {
       text-align: right;
       padding: 0 10px;
+        .osc-authentication-toggle{
+            color: #333;
+        }
     }
 
     input {
@@ -300,6 +325,23 @@
 
         &.grand {
           background: #f4f4f4;
+            .mark{
+                padding: 11px 0;
+                strong{
+                    font-size: 1.8rem;
+                    font-weight: 600;
+                    padding: 3px 0 0;
+                }
+            }
+            .amount{
+                padding: 11px 0;
+                padding-right: 20px;
+                strong{
+                    font-size: 1.8rem;
+                    font-weight: 600;
+                    padding: 3px 0 0;
+                }
+            }
         }
       }
     }
@@ -570,7 +612,7 @@
       padding: 0;
 
       .payment-option-content {
-        padding: 0 8px;
+        padding: 0 25px;
       }
     }
 

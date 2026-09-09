@@ -85,11 +85,26 @@
         <!-- Right-side actions group (account + wishlist + cart) -->
         <referenceContainer name="header-wrapper">
             <container name="header.actions" htmlTag="div" htmlClass="header-actions" after="header-wrapper-center">
-                <container name="header-customer-account" htmlTag="div" htmlClass="customer-account-header"/>
+                <container name="header-customer-account" htmlTag="div" htmlClass="customer-account-header">
+                    <!-- `header.links` is declared by Luma (inside its header.panel), not by
+                         blank, so a blank-based theme has no such block. Declare it here: it
+                         is the <ul> that carries the header account button, and
+                         Magento_Customer/layout/default.xml hangs the customer-welcome
+                         dropdown off it. `top.links` is NOT moved here any more — it becomes
+                         the dropdown's contents. -->
+                    <block class="Magento\Framework\View\Element\Html\Links" name="header.links">
+                        <arguments>
+                            <argument name="css_class" xsi:type="string">header links</argument>
+                        </arguments>
+                    </block>
+                </container>
             </container>
         </referenceContainer>
-        <move element="top.links" destination="header-customer-account"/>
-        <move element="minicart" destination="header.actions" after="header-customer-account"/>
+        <!-- BelVG declares the heart in its own `wishlist-link-wrapper` (ul.wish.wrapper)
+             directly under header-wrapper, which lands it after the cart. carpetavenue.jp
+             order is account · heart · cart. -->
+        <move element="wishlist-link-wrapper" destination="header.actions" after="header-customer-account"/>
+        <move element="minicart" destination="header.actions" after="wishlist-link-wrapper"/>
 
         <!-- Sticky wrapper around header + navigation -->
         <referenceContainer name="header.container">
@@ -211,6 +226,10 @@
         <!-- Core's ifconfig="design/footer/report_bugs" defaults to 1, so removing the
              block here is what actually keeps the "Report Bugs" link off the storefront. -->
         <referenceBlock name="report.bugs" remove="true"/>
+
+        <!-- The account pages' "My Wish List" sidebar box. carpetavenue.jp removes it
+             globally; the header heart + /wishlist/ cover it. -->
+        <referenceBlock name="wishlist_sidebar" remove="true"/>
 
         <!-- Remove compare (reference theme has no compare) -->
         <referenceBlock name="catalog.compare.link" remove="true"/>

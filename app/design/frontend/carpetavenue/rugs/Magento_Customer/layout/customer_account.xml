@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © CarpetAvenue. All rights reserved.
+ *
+ * Account sidebar nav — match carpetavenue.jp's link set.
+ * Downloadable products is removed by the reference theme; product reviews is absent
+ * on the live site because reviews are switched off there, so it is dropped here too.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="customer-account-navigation-downloadable-products-link" remove="true"/>
+        <referenceBlock name="customer-account-navigation-product-reviews-link" remove="true"/>
+    </body>
+</page>

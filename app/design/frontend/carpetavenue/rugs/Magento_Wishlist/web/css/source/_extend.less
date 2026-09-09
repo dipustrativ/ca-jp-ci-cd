@@ -1,0 +1,235 @@
+//
+//  Header wishlist heart + the customer wishlist page.
+//  Ported from carpetavenue.jp (Evalent/carpet Magento_Wishlist/_extend.less).
+//  _____________________________________________
+
+& when (@media-common = true) {
+
+    //
+    //  Header heart
+    //  ---------------------------------------------
+    //
+    //  The heart is BelVG's own header link (ul.wish.wrapper > li > #wishlist-link),
+    //  which is also the element its widget binds the mini-wishlist modal to — so it
+    //  opens the popup natively, no glue JS. Its `no-display` class is Knockout's
+    //  "wishlist is empty" flag (`css: {'no-display': !wishlist().counter}`), and here
+    //  it doubles as the state selector: with the class we draw the outline heart,
+    //  without it the filled SVG. The class also carries `.no-display{display:none}`
+    //  from the lib, which the two-class selector below outranks.
+    .wish.wrapper {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+
+        > .item.link.wishlist {
+            margin: 0;
+            padding: 0 20px;
+        }
+
+        .action.wish {
+            display: block;
+            position: relative;
+            box-sizing: border-box;
+            color: @ca-black;
+            //  Hides the "My Wish List" label and the counter inside it.
+            font-size: 0;
+            cursor: pointer;
+
+            //  Filled — the list has items.
+            &:after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: @ca-header-icon-size;
+                height: @ca-header-icon-size;
+                transform: translate(-50%, -50%);
+                background: url('@{baseDir}images/icons/like.svg') no-repeat 0 0;
+                background-size: 100%;
+            }
+
+            //  The glyph box is what gives the element its height, so the outline is
+            //  hidden by colour rather than by dropping `content` — emptying it
+            //  collapses the heart to 0x0 and the icon row shifts.
+            &:before {
+                .ca-icon('\e642');
+                font-size: @ca-header-icon-size;
+                display: block;
+                line-height: 1;
+                color: transparent;
+            }
+
+            //  Empty — outline only.
+            &.no-display {
+                &:before {
+                    color: @ca-black;
+                }
+
+                &:after {
+                    display: none;
+                }
+            }
+
+            &:hover {
+                text-decoration: none !important;
+            }
+        }
+    }
+
+    //  「お気に入り (1 商品)」 in the account dropdown. Magento prints the count bare;
+    //  the brackets are CSS, as in Luma's Magento_Wishlist/_module.less.
+    .link.wishlist .counter.qty {
+        .lib-css(color, @text__color__muted);
+        white-space: nowrap;
+
+        &:before {
+            content: '(';
+        }
+
+        &:after {
+            content: ')';
+        }
+    }
+
+
+    //
+    //  Wishlist page
+    //  ---------------------------------------------
+    .wishlist-index-index {
+
+        .products-grid.wishlist {
+
+            .product-item {
+
+                .product-item-name {
+                    margin-left: auto;
+                    margin-right: auto;
+                    text-align: center;
+                    font-weight: @font-weight__bold;
+                    .lib-font-size(16);
+                }
+
+                .fieldset {
+                    display: block;
+                    text-align: right;
+
+                    //  Rugs are single-piece items — no quantity to choose.
+                    .field.qty {
+                        display: none;
+                    }
+
+                    .product-item-actions {
+                        display: block;
+                        width: auto;
+                        padding-right: 15px;
+                    }
+                }
+            }
+
+            .product-item-actions {
+                display: inline-block;
+                width: 40px;
+
+                .action.edit {
+                    display: none;
+                }
+
+                //  \e609 is a trash can in Pe-icon-7-stroke but a hamburger in blank's
+                //  icons-blank-theme, so the family has to be named here.
+                .action.delete:before {
+                    font-family: 'Pe-icon-7-stroke';
+                    content: '\e609';
+                    font-size: 2rem;
+                }
+            }
+
+            .box-tocart {
+                display: inline-block;
+                width: ~"calc(100% - 60px)";
+                min-width: 0;
+
+                .tocart {
+                    border-radius: @button__border-radius;
+                }
+            }
+
+            //  Blank raises a shadow panel on hover; live keeps the card flat.
+            .product-item-info:hover .product-item-inner {
+                box-shadow: none;
+            }
+
+            //  「特別価格:」 — in the DOM on live but not shown.
+            .price-box .price-label {
+                display: none;
+            }
+        }
+
+        //  Core prints the pager twice, above and below the grid; carpetavenue.jp
+        //  shows only the top one. Both toolbars are siblings in .column.main, so
+        //  this hides the second without owning a copy of core's view.phtml.
+        .wishlist-toolbar ~ .wishlist-toolbar {
+            display: none;
+        }
+
+        //  The per-item comment textarea is not used.
+        .product-item-inner .comment-box {
+            display: none;
+        }
+
+        .price-box {
+            text-align: center;
+
+            .price {
+                color: @ca-price;
+                .lib-font-size(18);
+            }
+        }
+    }
+
+    .form.wishlist.share .legend {
+        display: none;
+    }
+}
+
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+
+    //  25px heart on mobile, matching carpetavenue.jp. The account button is gone at
+    //  this width (Magento_Customer/_extend.less), so the heart leads the icon row.
+    .wish.wrapper {
+        //  BelVG's own module CSS hides this wrapper below @screen__m — harmless while
+        //  it was only a text link, but it is the heart now, so put it back. Same
+        //  specificity as BelVG's rule; theme _extend.less is collected after module
+        //  _module.less, so this wins.
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+
+        > .item.link.wishlist {
+            padding: 0;
+        }
+
+        .action.wish {
+            color: #333;
+
+            &:before {
+                font-size: 2.5rem;
+            }
+
+            &:after {
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+
+            &.no-display:before {
+                color: #333;
+            }
+        }
+    }
+}

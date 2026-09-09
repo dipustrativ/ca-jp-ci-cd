@@ -1,0 +1,290 @@
+//
+//  Header account button + customer-welcome dropdown, and the account pages.
+//  Ported from carpetavenue.jp (Evalent/carpet Magento_Customer/_extend.less) plus
+//  the dropdown mechanics that theme inherits from Luma and this one does not.
+//  _____________________________________________
+
+//  Header icon-button chrome. Shared by the account button and the wishlist heart
+//  (Magento_Wishlist/_extend.less) — the same 50px pill carpetavenue.jp uses.
+@ca-header-btn-bg:      #EFEFEF;
+@ca-header-btn-border:  1px solid #D1D1D1;
+@ca-header-btn-hover:   #2a2d34;
+@ca-header-btn-height:  50px;
+//  The reference writes `background: green`; live computes to rgb(0, 128, 0).
+//  Not @ca-green-check (#30af31) — that is the USP bar's lighter tick.
+@ca-account-tick-bg:    #008000;
+
+//  Geometry and glyph, shared by both states of the account button:
+//  .authorization-link a when signed out, .customer-name when signed in.
+//  The grey pill is NOT here — live draws it only for the signed-in state
+//  (_header_centered.less strips background and border off the signed-out link),
+//  so it sits on .customer-name below.
+.ca-header-account-button() {
+    display: block;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 20px;
+    border-radius: @button__border-radius;
+    color: @ca-black;
+    text-decoration: none;
+    //  Hides the link text; the glyph below is the whole button.
+    font-size: 0;
+
+    &:before {
+        font-family: 'Pe-icon-7-stroke';
+        content: '\e605';
+        font-size: 2.8rem;
+        display: block;
+        line-height: .3;
+    }
+
+    &:hover,
+    &:focus {
+        text-decoration: none;
+    }
+}
+
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+
+    //  Account pages. `.account` is on the body of every account page including
+    //  /wishlist/, so it covers the wishlist title too.
+    .account {
+
+        //  40px/500 on live. Blank's h1 is @font-weight__light (300); the reference
+        //  gets 500 by remapping @font-weight__light theme-wide, which would move
+        //  every heading on the site — keep it scoped here.
+        .page-title {
+            font-weight: @font-weight__heavier;
+        }
+
+        .column.main {
+
+            //  50px between the dashboard blocks (live). Blank's last-child rule
+            //  still zeroes the final one.
+            .block:not(.widget) {
+                margin-bottom: 50px;
+
+                //  Restated because the rule above outranks blank's own last-child
+                //  reset; live leaves no trailing gap above the footer.
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+
+            //  「アカウント情報」/「アドレス帳」: 22px/500 over a full-width rule.
+            //  Scoped inside .column.main on purpose — the authentication popup's
+            //  .block-new-customer / .block-customer-login titles sit outside it and
+            //  stay at their own size, as on live.
+            //  「編集 | パスワードの変更」 — the pipe between the box actions. Luma
+            //  draws it (.abs-account-actions); blank has nothing, so the links ran
+            //  together.
+            .box-actions .action:after {
+                border-left: 1px solid @primary__color__light;
+                content: '';
+                display: inline-block;
+                height: 12px;
+                margin: 0 @indent__s;
+                vertical-align: -1px;
+            }
+
+            .box-actions .action:last-child:after {
+                display: none;
+            }
+
+            //  `:not(.widget)` is not decoration — blank's own rule carries it, so
+            //  without it this loses on specificity and the title stays 18px/300.
+            .block:not(.widget) .block-title {
+                border-bottom: 1px solid #c6c6c6;
+                padding-bottom: @indent__s;
+                margin-bottom: @indent__base;
+
+                > strong {
+                    .lib-font-size(22);
+                    font-weight: @font-weight__heavier;
+                }
+            }
+        }
+    }
+}
+
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+
+    //  No account button on mobile — the reference drops the whole container and
+    //  leaves the heart and cart. The account links stay reachable from the
+    //  off-canvas nav, where Magento clones .header.links into #store.links.
+    //
+    //  Matched through .page-header .header.content because that is where the
+    //  theme's own `display: flex` for this container lives; a bare
+    //  `.customer-account-header` loses to it and the raw link text
+    //  (サインイン / アカウントを作成) lands on top of the logo.
+    .page-header .header.content .customer-account-header {
+        display: none;
+    }
+}
+
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+
+    .customer-account-header {
+        margin-left: auto;
+
+        //  「アカウントを作成」 — rendered as a bare <li> after the account button.
+        > .header.links > li:last-child {
+            display: none;
+        }
+    }
+
+    .page-header .header.links {
+        list-style: none;
+        margin: 0 10px 0 0;
+        padding: 0;
+
+        > li {
+            margin: 0;
+        }
+
+        //  Signed out: the person icon links straight to the login page.
+        .authorization-link {
+            margin: 0;
+            height: @ca-header-btn-height;
+
+            a {
+                .ca-header-account-button();
+            }
+        }
+
+        //  Signed in: same button, plus the green tick badge.
+        .customer-welcome {
+            margin: 0;
+            height: @ca-header-btn-height;
+
+            .customer-name {
+                .ca-header-account-button();
+                cursor: pointer;
+                border: @ca-header-btn-border;
+                background: @ca-header-btn-bg;
+
+                &:hover,
+                &:focus {
+                    background: @ca-header-btn-hover;
+                    border: 1px solid @ca-header-btn-hover;
+                    color: @color-white;
+                }
+
+                //  Positioned against li.customer-welcome, which .lib-dropdown()
+                //  gives `position: relative`.
+                &:after {
+                    font-family: 'Pe-icon-7-stroke';
+                    content: '\e66c';
+                    font-size: 1.5rem;
+                    display: block;
+                    line-height: 1;
+                    position: absolute;
+                    top: .9rem;
+                    right: 1.6rem;
+                    background: @ca-account-tick-bg;
+                    color: @color-white;
+                    border-radius: 50%;
+                }
+
+                //  Kill the dropdown caret the toggle would otherwise draw — the
+                //  tick badge occupies that corner.
+                .action.switch:after {
+                    display: none;
+                }
+            }
+
+            //  Dropdown mechanics. carpetavenue.jp inherits this from Luma
+            //  (theme-frontend-luma/Magento_Theme/web/css/source/_module.less:543);
+            //  blank ships nothing for .customer-welcome, so call the lib mixin here.
+            //  Values are the live computed ones: 175px wide, right-anchored pointer.
+            .lib-dropdown(
+                @_toggle-selector: ~'.action.switch',
+                @_options-selector: ~'ul',
+                @_dropdown-actions-padding: 0,
+                @_dropdown-list-item-padding: 0,
+                @_dropdown-list-min-width: 175px,
+                @_dropdown-list-background: @color-white,
+                @_dropdown-list-border: 1px solid rgba(0, 0, 0, .08),
+                @_dropdown-list-shadow: 0 0 30px rgba(47, 47, 47, .22),
+                @_dropdown-list-item-hover: #e8e8e8,
+                @_dropdown-list-pointer-position: right,
+                @_dropdown-list-position-right: 0,
+                @_dropdown-list-z-index: 1000,
+                @_dropdown-toggle-icon-content: @icon-down,
+                @_dropdown-toggle-active-icon-content: @icon-up,
+                @_icon-font-text-hide: true,
+                @_icon-font-size: 10px,
+                @_icon-font-line-height: 22px
+            );
+
+            .action.switch {
+                .lib-button-reset();
+            }
+
+            .customer-menu {
+                display: none;
+            }
+
+            .greet {
+                display: none;
+            }
+
+            //  Menu rows. The icon-reset rules in the theme's own _extend.less are
+            //  scoped to `.customer-account-header > .header.links`, so they do not
+            //  reach in here.
+            .header.links {
+                margin: 0;
+
+                a {
+                    display: block;
+                    padding: 8px;
+                    .lib-font-size(14);
+                    line-height: 1.4;
+                    color: @ca-black;
+                    text-decoration: none;
+                }
+            }
+
+            &.active {
+                .customer-menu {
+                    display: block;
+                }
+
+                //  「サインアウト」 is the same block as the signed-out button, so it
+                //  arrives wearing the 50px pill. Undo it for the menu row.
+                .header.links .authorization-link {
+                    display: list-item;
+                    height: auto;
+
+                    a {
+                        padding: 8px;
+                        .lib-font-size(14);
+                        height: auto;
+                        border: none;
+                        border-radius: 0;
+                        background: none;
+
+                        &:before {
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
