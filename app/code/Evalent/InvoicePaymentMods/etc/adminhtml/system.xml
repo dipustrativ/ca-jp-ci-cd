@@ -102,7 +102,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
                 </field>
                 <field id="pdf_footer_type" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="200" translate="label" type="select">
-                    <label>PDF Footer Left</label>
+                    <label>PDF Footer Style</label>
                     <source_model>Evalent\InvoicePaymentMods\Model\Config\Source\PdfFooterTypes</source_model>
                     <comment>Keep in mind that the first row will be bold. If this is not desired add a new line at the top of the text</comment>
                 </field>
@@ -125,7 +125,7 @@
                     </depends>
                 </field>
                 <field id="pdf_footer_right" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="209" translate="label" type="textarea">
-                    <label>PDF Footer Left</label>
+                    <label>PDF Footer Right</label>
                     <depends>
                         <field id="*/*/pdf_footer_type">2</field>
                     </depends>

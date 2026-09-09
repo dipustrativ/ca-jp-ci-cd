@@ -197,4 +197,14 @@
             <column name="store_id"/>
         </index>
     </table>
+
+    <!-- JP storefront blocklist: SKUs listed here are treated as disabled on
+         the frontend (hidden from catalog/search, 404 on the PDP). Managed via
+         Catalog > Productify > JP Blacklist. -->
+    <table name="ca_jp_blacklist" resource="default" engine="innodb" comment="JP storefront product blocklist (hidden SKUs)">
+        <column xsi:type="varchar" name="sku" nullable="false" length="64" comment="Blocklisted product SKU"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="sku"/>
+        </constraint>
+    </table>
 </schema>

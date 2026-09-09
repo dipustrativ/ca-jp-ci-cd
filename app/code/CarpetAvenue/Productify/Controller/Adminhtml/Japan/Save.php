@@ -2,6 +2,7 @@
 
 namespace CarpetAvenue\Productify\Controller\Adminhtml\Japan;
 
+use CarpetAvenue\Productify\Model\Blacklist\CachePurger;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -12,7 +13,8 @@ class Save extends Action implements HttpPostActionInterface
 {
     public function __construct(
         Context $context,
-        protected ResourceConnection $resourceConnection
+        protected ResourceConnection $resourceConnection,
+        private readonly CachePurger $cachePurger
     ) {
         parent::__construct($context);
     }
@@ -26,6 +28,7 @@ class Save extends Action implements HttpPostActionInterface
                 $connection = $this->resourceConnection->getConnection();
                 $tableName = $this->resourceConnection->getTableName('ca_jp_blacklist');
                 $connection->insert($tableName, ['sku' => $sku]);
+                $this->cachePurger->purgeBySku((string) $sku);
                 $this->messageManager->addSuccessMessage(__('SKU "%1" has been added to JP blocklist.', $sku));
             } catch (\Exception $e) {
                 $this->messageManager->addErrorMessage(__('Error adding SKU: %1', $e->getMessage()));

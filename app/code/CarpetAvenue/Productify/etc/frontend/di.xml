@@ -54,6 +54,25 @@
     </type>
 
     <!-- ═══════════════════════════════════════════════════════════════════
+         JP product blocklist — hide blocklisted SKUs on the storefront.
+         - status -> DISABLED and the collection filter drop them from every
+           listing / search / widget collection.
+         - initProduct returns false so the direct PDP 404s for ANY product
+           type, including group variants that render despite not being
+           individually visible.
+         See Model\Blacklist\SkuProvider and Plugin\Blacklist\*.
+         ═══════════════════════════════════════════════════════════════════ -->
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="carpetavenue_productify_blacklist_status" type="CarpetAvenue\Productify\Plugin\Blacklist\ProductStatus"/>
+    </type>
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
+        <plugin name="carpetavenue_productify_blacklist_collection" type="CarpetAvenue\Productify\Plugin\Blacklist\CollectionVisibility"/>
+    </type>
+    <type name="Magento\Catalog\Helper\Product">
+        <plugin name="carpetavenue_productify_blacklist_pdp" type="CarpetAvenue\Productify\Plugin\Blacklist\InitProduct"/>
+    </type>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
          Merged CarpetAvenue_LayeredNavigation
 
          NOTE: these area-level virtualType arguments REPLACE the global array

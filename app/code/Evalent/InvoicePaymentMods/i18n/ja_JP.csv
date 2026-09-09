@@ -24,3 +24,8 @@ Subtotal,小計
 "Japanese Additional Invoice Message","価格には、消費税、税関手続き(該当する場合のみ)を含むすべての料金が含まれています。"
 "CA - Qty","個数"
 "CA - Ship to:","配送先:"
+"Rechnungsdatum entspricht dem Leistungs-/Lieferdatum.","請求日は役務提供日・納品日と同一です。"
+"Storno-Rechnung zu Rechnungsnummer: %1","取消請求書 対象請求番号: %1"
+"Steuerfreie innergemeinschaftliche Lieferung","非課税のEU域内供給"
+"Steuerfreie Ausfuhrlieferung","非課税の輸出供給"
+"Cancellation invoice","取消請求書"

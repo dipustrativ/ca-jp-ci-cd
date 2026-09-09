@@ -946,6 +946,9 @@ class Invoice extends \Evalent\InvoicePaymentMods\Plugin\Invoice
     protected function insertLogo(&$page, $store = null)
     {
         $this->y = $this->y ? $this->y : 815;
+
+        $absoluteImagePath = null;
+
         $image = $this->_scopeConfig->getValue(
             'sales/identity/logo',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
@@ -959,7 +962,24 @@ class Invoice extends \Evalent\InvoicePaymentMods\Plugin\Invoice
                 $this->fileStorageDatabase->saveFileToFilesystem($imagePath);
             }
             if ($this->_mediaDirectory->isFile($imagePath)) {
-                $image = \Zend_Pdf_Image::imageWithPath($this->_mediaDirectory->getAbsolutePath($imagePath));
+                $absoluteImagePath = $this->_mediaDirectory->getAbsolutePath($imagePath);
+            }
+        }
+
+        // No configured logo (or the configured file is missing) -> fall back to the
+        // alpha-free logo bundled with the module so the invoice PDF always carries a logo.
+        if ($absoluteImagePath === null) {
+            $moduleLogo = $this->moduleReader->getModuleDir(
+                \Magento\Framework\Module\Dir::MODULE_VIEW_DIR,
+                'Evalent_InvoicePaymentMods'
+            ) . '/base/web/images/ca_logo_pdf.png';
+            if (is_file($moduleLogo)) {
+                $absoluteImagePath = $moduleLogo;
+            }
+        }
+
+        if ($absoluteImagePath !== null) {
+                $image = \Zend_Pdf_Image::imageWithPath($absoluteImagePath);
                 $top = 830;
                 //top border of the page
                 $widthLimit = 200;
@@ -992,7 +1012,6 @@ class Invoice extends \Evalent\InvoicePaymentMods\Plugin\Invoice
 
                 $this->y = $y1 - 10;
             }
-        }
     }
 
     public function drawLineBlocks(\Zend_Pdf_Page $page, array $draw, array $pageSettings = [])
