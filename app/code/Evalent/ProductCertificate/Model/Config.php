@@ -65,6 +65,6 @@ class Config implements ConfigInterface
                 return new Phrase($footerText);
             }
         }
-        return "Carpient GmbH, Bargkoppelweg 64, 22145 ". __('Hamburg, Germany');
+        return "Carpet Avenue GmbH, Bargkoppelweg 64, 22145 ". __('Hamburg, Germany');
     }
 }

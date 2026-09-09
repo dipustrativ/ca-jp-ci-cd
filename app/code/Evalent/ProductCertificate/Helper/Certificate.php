@@ -24,7 +24,7 @@ class Certificate extends AbstractHelper
 
     /** @var \Magento\Store\Model\App\Emulation */
     protected $emulation;
-    
+
     /** @var \Magento\Eav\Model\Config */
     protected $eavConfig;
 
@@ -36,6 +36,9 @@ class Certificate extends AbstractHelper
     /** @var ProductRepository $_productRepository */
     private $_productRepository;
 
+    /** @var \Magento\Framework\Module\Dir\Reader */
+    protected $moduleReader;
+
     public function __construct(
         Context $context,
         LayoutInterface $layout,
@@ -43,7 +46,8 @@ class Certificate extends AbstractHelper
         \Magento\Framework\Filesystem\DirectoryList $directoryList,
         \Evalent\ProductCertificate\Api\ConfigInterface $config,
         \Magento\Store\Model\App\Emulation $emulation,
-        \Magento\Eav\Model\Config $eavConfig
+        \Magento\Eav\Model\Config $eavConfig,
+        \Magento\Framework\Module\Dir\Reader $moduleReader
     ) {
         $this->_layout = $layout;
         $this->_productRepository = $productRepository;
@@ -52,6 +56,7 @@ class Certificate extends AbstractHelper
         $this->config = $config;
         $this->emulation = $emulation;
         $this->eavConfig = $eavConfig;
+        $this->moduleReader = $moduleReader;
     }
 
     /**
@@ -72,10 +77,26 @@ class Certificate extends AbstractHelper
         $block->setProducts($products);
         $block->setStoreId($order->getStoreId());
         $this->emulation->startEnvironmentEmulation($order->getStoreId(), \Magento\Framework\App\Area::AREA_FRONTEND, true);
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
         $mpdf = new \Mpdf\Mpdf([
             'format' => 'A5-P',
-            'tempDir' => $this->directoryList->getPath('tmp'),
-            'default_font' => 'dejavusans'
+            'fontDir' => array_merge($fontDirs, [
+                $this->moduleReader->getModuleDir(
+                    \Magento\Framework\Module\Dir::MODULE_VIEW_DIR,
+                    'Evalent_ProductCertificate'
+                ),
+            ]),
+            'fontdata' => $fontData + [
+                    'cid0jp' => [
+                        'R' => 'cid0jp.ttf',
+                    ],
+                ],
+            'default_font' => 'cid0jp',
+            'tempDir' => $this->directoryList->getPath('tmp')
         ]);
         /** @var \Evalent\ProductCertificate\Block\Details $details */
         $details = $this->_layout->createBlock('Evalent\ProductCertificate\Block\Details');
