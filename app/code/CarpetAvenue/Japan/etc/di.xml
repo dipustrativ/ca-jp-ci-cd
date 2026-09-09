@@ -2,4 +2,6 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="CarpetAvenue\Japan\Api\PriceStepItemInterface"
                 type="CarpetAvenue\Japan\Model\PriceStepItem"/>
+    <preference for="CarpetAvenue\Japan\Api\ReportsConfigInterface"
+                type="CarpetAvenue\Japan\Model\ReportsConfig"/>
 </config>

@@ -20,6 +20,8 @@
             <module name="Magento_Swatches"/>
             <module name="Evalent_MegaMenu"/>
             <module name="Evalent_InvoicePaymentMods"/>
+            <module name="Magento_Ui"/>
+            <module name="Magento_Reports"/>
         </sequence>
     </module>
 </config>

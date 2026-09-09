@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="reports_report_custom_jp_grid"/>
+    <body>
+        <referenceBlock name="adminhtml.report.grid.store_switcher" remove="true" />
+        <referenceBlock name="adminhtml.report.grid">
+            <arguments>
+                <argument name="id" xsi:type="string">gridOrdersJpRoyalty</argument>
+                <argument name="dataSource" xsi:type="object" shared="false">CarpetAvenue\Japan\Model\ResourceModel\Order\Jp\Royalty\Collection\Initial</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="adminhtml.report.grid.export">
+            <arguments>
+                <argument name="exportTypes" xsi:type="array">
+                    <item name="csv" xsi:type="array">
+                        <item name="urlPath" xsi:type="string">*/*/exportJpRoyaltyCsv</item>
+                        <item name="label" xsi:type="string" translate="true">CSV</item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="adminhtml.report.grid.columnSet">
+            <arguments>
+                <argument name="id" xsi:type="string">report_order_jp_royalty</argument>
+                <argument name="count_totals" xsi:type="string">0</argument>
+            </arguments>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.order_no" as="order_no">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Order No</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">order_no</argument>
+                    <argument name="id" xsi:type="string">order_no</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-order_no</argument>
+                    <argument name="header_css_class" xsi:type="string">col-order_no</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.order_status" as="order_status">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Order status</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">order_status</argument>
+                    <argument name="id" xsi:type="string">order_status</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-order_status</argument>
+                    <argument name="header_css_class" xsi:type="string">col-order_status</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.invoice_no" as="invoice_no">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Invoice No</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">invoice_no</argument>
+                    <argument name="id" xsi:type="string">invoice_no</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-invoice_no</argument>
+                    <argument name="header_css_class" xsi:type="string">col-invoice_no</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.invoice_date" as="invoice_date">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Invoice date</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">invoice_date</argument>
+                    <argument name="id" xsi:type="string">invoice_date</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-invoice_date</argument>
+                    <argument name="header_css_class" xsi:type="string">col-invoice_date</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.creditmemo_no" as="creditmemo_no">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Creditmemo No</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">creditmemo_no</argument>
+                    <argument name="id" xsi:type="string">creditmemo_no</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-creditmemo_no</argument>
+                    <argument name="header_css_class" xsi:type="string">col-creditmemo_no</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.creditmemo_date" as="creditmemo_date">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Creditmemo date</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">creditmemo_date</argument>
+                    <argument name="id" xsi:type="string">creditmemo_date</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-creditmemo_date</argument>
+                    <argument name="header_css_class" xsi:type="string">col-creditmemo_date</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.invoiced_excl_tax" as="invoiced_excl_tax">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Invoiced excl tax</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">invoiced_excl_tax</argument>
+                    <argument name="id" xsi:type="string">invoiced_excl_tax</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-invoiced_excl_tax</argument>
+                    <argument name="header_css_class" xsi:type="string">col-invoiced_excl_tax</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.invoiced_royalty" as="invoiced_royalty">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Invoiced Royalty</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">invoiced_royalty</argument>
+                    <argument name="id" xsi:type="string">invoiced_royalty</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-invoiced_royalty</argument>
+                    <argument name="header_css_class" xsi:type="string">col-invoiced_royalty</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.refunded_excl_tax" as="refunded_excl_tax">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Refunded excl tax</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">refunded_excl_tax</argument>
+                    <argument name="id" xsi:type="string">refunded_excl_tax</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-refunded_excl_tax</argument>
+                    <argument name="header_css_class" xsi:type="string">col-refunded_excl_tax</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.refunded_royalty" as="refunded_royalty">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Refunded Royalty</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">refunded_royalty</argument>
+                    <argument name="id" xsi:type="string">refunded_royalty</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-refunded_royalty</argument>
+                    <argument name="header_css_class" xsi:type="string">col-refunded_royalty</argument>
+                </arguments>
+            </block>
+
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.invoiced_excl_tax_eur" as="invoiced_excl_tax_eur">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Invoiced excl tax EUR</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">invoiced_excl_tax_eur</argument>
+                    <argument name="id" xsi:type="string">invoiced_excl_tax_eur</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-invoiced_excl_tax_eur</argument>
+                    <argument name="header_css_class" xsi:type="string">col-invoiced_excl_tax_eur</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.invoiced_royalty_eur" as="invoiced_royalty_eur">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Invoiced Royalty EUR</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">invoiced_royalty_eur</argument>
+                    <argument name="id" xsi:type="string">invoiced_royalty_eur</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-invoiced_royalty_eur</argument>
+                    <argument name="header_css_class" xsi:type="string">col-invoiced_royalty_eur</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.refunded_excl_tax_eur" as="refunded_excl_tax_eur">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Refunded excl tax EUR</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">refunded_excl_tax_eur</argument>
+                    <argument name="id" xsi:type="string">refunded_excl_tax_eur</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-refunded_excl_tax_eur</argument>
+                    <argument name="header_css_class" xsi:type="string">col-refunded_erefunded_excl_tax_eurcl_tax</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.refunded_royalty_eur" as="refunded_royalty_eur">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Refunded Royalty EUR</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">refunded_royalty_eur</argument>
+                    <argument name="id" xsi:type="string">refunded_royalty_eur</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-refunded_royalty_eur</argument>
+                    <argument name="header_css_class" xsi:type="string">col-refunded_royalty_eur</argument>
+                </arguments>
+            </block>
+
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.invoice_currency_rate" as="invoice_currency_rate">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Invoice currency rate</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">invoice_currency_rate</argument>
+                    <argument name="id" xsi:type="string">invoice_currency_rate</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-invoice_currency_rate</argument>
+                    <argument name="header_css_class" xsi:type="string">col-invoice_currency_rate</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.report.grid.columnSet.creditmemo_currency_rate" as="creditmemo_currency_rate">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Creditmemo currency rate</argument>
+                    <argument name="type" xsi:type="string">text</argument>
+                    <argument name="index" xsi:type="string">creditmemo_currency_rate</argument>
+                    <argument name="id" xsi:type="string">creditmemo_currency_rate</argument>
+                    <argument name="sortable" xsi:type="boolean">false</argument>
+                    <argument name="column_css_class" xsi:type="string">col-creditmemo_currency_rate</argument>
+                    <argument name="header_css_class" xsi:type="string">col-creditmemo_currency_rate</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

@@ -9,5 +9,13 @@
                 <mobile_hide>0</mobile_hide>
             </carpet_finder>
         </japan>
+        <carpet_reports>
+            <jp>
+                <royalty_percent>5</royalty_percent>
+                <cost_multiplier>1.5</cost_multiplier>
+                <cost_base>60</cost_base>
+                <store_id>1</store_id>
+            </jp>
+        </carpet_reports>
     </default>
 </config>

@@ -18,6 +18,11 @@
                 <resource id="CarpetAvenue_Core::carpetavenue">
                     <resource id="CarpetAvenue_Japan::config" title="Japan" translate="title" sortOrder="35"/>
                 </resource>
+                <resource id="Magento_Reports::report">
+                    <resource id="Magento_Reports::report_products">
+                        <resource id="Magento_Reports::jp_royalty" title="JP Royalty" translate="title" sortOrder="61"/>
+                    </resource>
+                </resource>
             </resource>
         </resources>
     </acl>

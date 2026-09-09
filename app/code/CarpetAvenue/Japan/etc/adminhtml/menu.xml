@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Japan
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="CarpetAvenue_Japan::report_products_jp_royalty" title="Jp Royalty" translate="title" module="Magento_Reports" sortOrder="61" parent="Magento_Reports::report" resource="Magento_Reports::report_products"/>
+        <add id="CarpetAvenue_Japan::report_custom_product_jp_royalty" title="JP Product Royalty invoiced" translate="title" module="Magento_Reports" sortOrder="70" parent="CarpetAvenue_Japan::report_products_jp_royalty" action="reports/report_product/jp_royalty" resource="Magento_Reports::jp_royalty"/>
+        <add id="CarpetAvenue_Japan::report_custom_order_jp_royalty" title="JP Order Royalty invoiced" translate="title" module="Magento_Reports" sortOrder="71" parent="CarpetAvenue_Japan::report_products_jp_royalty" action="reports/report_order/jp_royalty" resource="Magento_Reports::jp_royalty"/>
+    </menu>
+</config>

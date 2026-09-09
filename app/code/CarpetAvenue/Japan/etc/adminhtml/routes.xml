@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Japan
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+    <router id="admin">
+        <route id="reports">
+            <module name="CarpetAvenue_Japan" after="Magento_Reports"/>
+        </route>
+    </router>
+</config>
