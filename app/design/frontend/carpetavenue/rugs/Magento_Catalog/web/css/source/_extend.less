@@ -481,6 +481,25 @@
                 }
             }
 
+            //  ...but only on the lists that carry an image. The tick was
+            //  designed to sit over a swatch or a category thumbnail; on a
+            //  plain label list (制作工程, パターン, デザイン, manufacturer)
+            //  there is nothing for it to sit against and it reads as a stray
+            //  mark in the card's corner. Live shows no marker on those
+            //  either — its `.amshopby-choice` is `visibility: hidden`
+            //  throughout and the blue label is the entire selected cue, which
+            //  `.am-filter-label { color: #1979c3 }` above already matches.
+            //  Keyed off the three image lists rather than naming the label
+            //  ones, so a newly filterable text attribute is covered too.
+            &:not(.am-filter--color):not(.am-filter--shape):not(.am-filter--cat) {
+                .am-filter-item.-selected {
+                    &:before,
+                    &:after {
+                        content: none;
+                    }
+                }
+            }
+
             //  Live's row link: `padding: 0 7px 0 0` on a 44px row, so the
             //  swatch sits against the card's left padding and the count pill
             //  7px in from the right.
@@ -570,7 +589,7 @@
                 //  placeholder occupy the same 30px, keeping every label in one
                 //  column whether the option has an image or not.
                 .am-filter-swatch {
-                    border: 1px solid #dadada;
+                    border: none;
                     box-sizing: border-box;
                     background-size: contain;
                     background-position: center;
