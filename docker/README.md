@@ -8,6 +8,12 @@ troubleshooting. Read top to bottom the first time.
 Certified stack: PHP 8.5 · MySQL 8.4 (external) · OpenSearch 3 · Valkey 9 ·
 RabbitMQ 4.2 · nginx 1.29.
 
+> **Path B (Dokploy-pull) uses shared infrastructure.** MySQL, OpenSearch and
+> RabbitMQ are not in this stack — they live in `Workspace/DOCKER-GLOBAL/` and are
+> shared with the carpient store. Deploy those three first. This app's database,
+> vhost and index prefix: **[docker/SHARED-INFRA.md](SHARED-INFRA.md)**. Paths A
+> and C still run their own `queue`/`search` containers, as does local dev.
+
 ---
 
 ## 0. How it works (read once)
@@ -18,8 +24,8 @@ control plane share one server; the application runs on another:
 | Machine | Job | Runs |
 |---|---|---|
 | **Server A** — build/registry | Build the image, push to the **local** registry, hold the CI runner + Dokploy control panel. | Docker, registry, GitHub runner, Dokploy |
-| **Server B** — application | Run the Magento stack (app/nginx/cron/valkey/queue/search). Pull the image from A's registry. **Never builds.** | Docker / Dokploy agent |
-| **Database** | MySQL 8.4, its own endpoint (IP:port). | MySQL only |
+| **Server B** — application | Run the Magento stack (app/nginx/cron/valkey; on Path B, MySQL/OpenSearch/RabbitMQ are separate shared stacks on the same host). Pull the image from A's registry. **Never builds.** | Docker / Dokploy agent |
+| **Database** | MySQL 8.4, its own endpoint. Path B: the shared `mysql` stack, reached as `mysql:3306`. | MySQL only |
 
 Because the build and the registry sit on the same host (A), the CI push is a
 **localhost push** — fast, and it never touches Traefik (so the large-layer 504
@@ -205,19 +211,24 @@ networks and volumes are Dokploy-project-prefixed; `docker-compose.dokploy.yml`
 publishes no host port (Traefik routes to `nginx`); the registry is shared with a
 separate repo; `vm.max_map_count` is host-wide and already set.
 
-**RAM is the only real constraint.** `carpient` alone budgets ~10.6G (see the
-`cache` service comment in `docker-compose.dokploy.yml`). JP at those defaults
-would need another ~10G → a 24GB host. JP's playground profile instead needs
-**~5G**, so a **16GB** host carries both:
+On Path B the two stacks also **share** one MySQL, one OpenSearch and one
+RabbitMQ, each namespaced per app (database / vhost / index prefix — see
+[SHARED-INFRA.md](SHARED-INFRA.md)). That is what keeps two Magento installs on
+one host affordable: the ~4.3G of search + broker is paid once, not twice.
+
+**RAM is the only real constraint.** Shared infra ~8.3G (mysql 4 + opensearch 3.3
++ rabbitmq 1) + carpient's app stack ~6.7G + this app stack ~5G ⇒ **~20G, so a
+24GB host**. The full budget lives in `DOCKER-GLOBAL/README.md` §2 — it is the one
+place that counts every stack.
 
 | Knob | Where | Playground value |
 |---|---|---|
-| `OPENSEARCH_HEAP` | Dokploy env | `1g` (container ~1.6G) |
 | `VALKEY_MAXMEMORY` | Dokploy env | `512mb` |
 | `VALKEY_SESSION_MAXMEMORY` | Dokploy env | `128mb` |
 | `pm.max_children` | `docker/php/www.conf`, baked in | `8` (~1.6G) — already set |
+| `OPENSEARCH_HEAP` | **the opensearch stack**, not here | `2g`, shared by both apps |
 
-Check before deploying: `free -g` ≥ 16, `df -h` has ~10G free (two images +
+Check before deploying: `free -g` ≥ 24, `df -h` has ~10G free (two images +
 volumes), and `valkey-cli info stats | grep evicted_keys` stays 0 on **both**
 stacks afterwards.
 
@@ -230,9 +241,9 @@ Two more same-host details:
 
 Benign but worth knowing: both stacks join the external `dokploy-network`, so
 the service aliases `app`, `cron`, `upgrade`, `nginx` exist twice on it. Nothing
-resolves those names — Magento uses `cache`/`queue`/`search` (on the private
-`magento_net` only) and `carpetavenue-jp-fpm`, and Traefik routes by container,
-not DNS. Don't add a service that resolves a bare `app` on that network.
+resolves those names — on that network Magento only resolves `mysql`,
+`opensearch` and `rabbitmq`; `cache`/`sessions` stay on the private `magento_net`.
+Don't add a service that resolves a bare `app` on that network.
 
 ### Path A — plain Docker server (pull image)
 
@@ -252,14 +263,19 @@ Magento HTML.
 
 ### Path B — Dokploy, pull a pre-built image ⭐
 
-In the Dokploy UI:
+**First:** deploy the three shared stacks from `Workspace/DOCKER-GLOBAL/` and
+create this app's database + RabbitMQ vhost/user — `DOCKER-GLOBAL/README.md` §3
+and §5. Nothing here waits on them (they are separate stacks, so Compose cannot
+gate on their health), so a missing one deploys fine and fails at runtime.
+
+Then, in the Dokploy UI:
 
 1. **Settings → Registries** → add `registry.carpetavenue.net` (user/pass).
 2. **Create → Compose** → paste `docker/docker-compose.dokploy.yml`.
 3. **Environment** → paste `docker/.env.production.example`, fill real values
-   (`DB_HOST` = the external MySQL IP:port).
-4. **Domains** → your domain → service **`nginx`**, port **80**, HTTPS **on**
-   (Dokploy/Traefik injects the cert + labels; the container stays HTTP).
+   (`DB_HOST=mysql:3306`, `DB_PASSWORD` = the mysql stack's root password).
+4. **Domains** → `playground.carpetavenue.jp` → service **`nginx`**, port **80**,
+   HTTPS **on** (Dokploy/Traefik injects the cert + labels; container stays HTTP).
 5. **Deploy.** Then open the app → **Deployments** tab → copy the **Webhook
    URL** — that is the `DOKPLOY_WEBHOOK` used by CI in §6.
 
@@ -442,11 +458,13 @@ Template: `docker/.env.production.example`.
 | `REGISTRY_HOST` | default `registry.carpetavenue.net` |
 | `IMAGE_TAG` | `latest`, or `v<N>` to pin/rollback |
 | `DOMAIN` | storefront domain |
-| `DB_HOST` `DB_NAME` `DB_USER` `DB_PASSWORD` | external MySQL 8.4 (IP:port in `DB_HOST`) |
+| `DB_HOST` `DB_NAME` `DB_USER` `DB_PASSWORD` | MySQL 8.4. Path B: `mysql:3306`, db `carpetavenue_jp`, user `root` |
 | `VALKEY_HOST` `VALKEY_PORT` `VALKEY_PASSWORD` | cache db0 / page_cache db1 / sessions db2 |
-| `RABBITMQ_HOST` `_PORT` `_USER` `_PASSWORD` `_VHOST` | message queue |
-| `OPENSEARCH_HOST` `OPENSEARCH_PORT` | search engine |
-| `OPENSEARCH_HEAP` | JVM heap, default `2g`. `1g` when co-hosted with carpient |
+| `RABBITMQ_HOST` `_PORT` `_USER` `_PASSWORD` `_VHOST` | message queue. Path B: `rabbitmq`, user `ca_jp`, vhost `/ca_jp` |
+| `OPENSEARCH_HOST` `OPENSEARCH_PORT` | search engine. Path B: `opensearch:9200` |
+| `OPENSEARCH_INDEX_PREFIX` | **must be unique per install** — `ca_jp` here, `carpient` there. Same prefix on one cluster = each reindex wipes the other store |
+| `OPENSEARCH_HEAP` | Paths A/C only (in-stack `search`). Path B sets it in the shared opensearch stack |
+| `COMPOSE_PROFILES` | leave **empty**. `media-backup` starts a full-tar media upload |
 | `VALKEY_MAXMEMORY` `VALKEY_SESSION_MAXMEMORY` | defaults `2gb` / `256mb`; playground `512mb` / `128mb` |
 | `HTTP_PORT` | Path A only — host port for nginx, default `80` |
 | `MAGE_CRYPT_KEY` | **must equal** the `crypt/key` of the DB it decrypts |
@@ -466,7 +484,9 @@ the database, not the environment — copy it from the DB you are pointing at.
 | `upgrade` hangs at "Schema creation/updates" | DB setup-lock held by another instance on the same DB. Use an isolated DB, or `--profile localdb`. |
 | Storefront loads but no CSS/JS | `static` service didn't finish, or nginx can't see the static volume. Check `docker compose logs static` and that both mount `magento_static`. |
 | Admin/storefront unstyled, every `*.min.js` / `*.min.css` 404s while a few assets 200 | Minification mismatch — see below. |
-| `search` container won't start | Host `vm.max_map_count` too low → set `262144` (§3). |
+| `search` container won't start (Paths A/C) | Host `vm.max_map_count` too low → set `262144` (§3). Path B: same fix, in the shared opensearch stack. |
+| `getaddrinfo for mysql / opensearch / rabbitmq failed` | Path B: that shared stack isn't deployed, or this app isn't on `dokploy-network`. `docker exec carpetavenue-jp-app getent hosts mysql` |
+| Storefront search returns carpient's products | Both installs on the same `OPENSEARCH_INDEX_PREFIX` — see [SHARED-INFRA.md](SHARED-INFRA.md). |
 | Garbled config / decrypt errors | `MAGE_CRYPT_KEY` ≠ the DB's crypt key (§7). |
 | Can't pull image on host | Registry not added / not logged in on that host. |
 | Changed an env var, no effect | Restart the containers — env.php is rendered at start, not live. |
@@ -531,8 +551,11 @@ docker/
   env.php.scd                SECRET: env.php for static-content deploy (gitignored)
   docker-compose.local.yml   local dry-run (HTTP :80, optional localdb)
   docker-compose.yml         Path A — plain server (pull, publish :80)
-  docker-compose.dokploy.yml Path B — Dokploy pull (recommended)
+  docker-compose.dokploy.yml Path B — Dokploy pull (recommended), shared infra
+  docker-compose-mountdisk.dokploy.yml
+                             Path B variant — media/var on a mounted host disk
   docker-compose.build.yml   Path C — Dokploy builds from git
+  SHARED-INFRA.md            this app's db / vhost / index prefix on the shared stacks
   github-runner.compose.yml  CI runner as a Dokploy container (§6)
   .env.production.example    runtime env template (copy to .env)
   .env.local                 SECRET: local dry-run env (gitignored)
@@ -543,10 +566,10 @@ docker/
 .github/workflows/build-deploy.yml   CI (§6)
 ```
 
-Named volumes: `magento_media`, `magento_var`, `magento_static`,
-`valkey_data`, `valkey_sessions` (Path B only), `rabbitmq_data`,
-`opensearch_data`. Compose prefixes them per project, so carpient's volumes of
-the same names are separate objects. `magento_static` is written
+Named volumes: `magento_media`, `magento_var`, `magento_static`, `valkey_data`,
+`valkey_sessions`, plus `rabbitmq_data` / `opensearch_data` on Paths A and C only
+(Path B uses the shared stacks' own volumes). Compose prefixes them per project,
+so carpient's volumes of the same names are separate objects. `magento_static` is written
 by the `static` service and read-only in nginx; `magento_media` is shared
 read-write by app/cron and read-only in nginx.
 
@@ -603,8 +626,10 @@ deploy genuinely production-grade.
 - `MAGE_MODE=production`, OpCache tuned + `validate_timestamps=0`, JIT off, Redis
   sessions/cache on Valkey (db0/1/2, igbinary), FPM worker recycling + slowlog.
 - No secrets in the image; env rendered at start from env vars.
-- Healthchecks on cache/queue/search/nginx; `upgrade` gates `app`/`cron`/`static`
-  (they start only after schema is current).
+- Healthchecks on cache/sessions/nginx (plus queue/search on Paths A and C);
+  `upgrade` gates `app`/`cron`/`static` (they start only after schema is current).
+  ⚠️ Path B cannot gate on the shared mysql/opensearch/rabbitmq stacks — they are
+  separate Compose projects. Verify they are up before deploying.
 - TLS terminated at Traefik; nginx runs HTTP behind it.
 - Rollback anchor: every CI build pushes an immutable `v<N>` tag.
 
@@ -627,20 +652,18 @@ php bin/magento deploy:mode:show          # -> production
 ```
 
 ### Operator responsibilities (not baked into the image)
-- **Backups.** External MySQL is your DBA's job (daily dump + PITR).
-  `magento_media` (uploaded product images) is backed up automatically by the
-  `backup` service in `docker-compose.dokploy.yml` — nightly tar (03:00),
-  14-day retention, pushed to a GCS bucket via `offen/docker-volume-backup`
-  using GCS's S3-interoperability mode (HMAC keys, not a service-account
-  JSON). Set `BACKUP_GCS_BUCKET` / `BACKUP_GCS_HMAC_KEY` /
-  `BACKUP_GCS_HMAC_SECRET` (see `.env.production.example`) — generate the HMAC
-  pair at GCS Console → Cloud Storage → Settings → Interoperability. Files
-  land in the bucket root as `media-YYYY-MM-DD.tar.gz`. It is the only
-  stateful container data that isn't reproducible from a build — `magento_var`,
-  `magento_static`, valkey/opensearch/rabbitmq data are all regenerable, not
-  backed up on purpose.
-  ⚠️ Restore is untested until you run one — pull a tarball, extract into a
-  throwaway `magento_media` volume, confirm images render, before trusting it.
+- **Backups — database yes, media no.** On Path B the shared `mysql` stack dumps
+  `--all-databases` nightly to GCS, so `carpetavenue_jp` is covered with nothing
+  set here; configuration and restore are in `DOCKER-GLOBAL/README.md` §8.
+  `magento_media` (uploaded product images) is **not** backed up: this stack's
+  `backup` service sits on the `media-backup` profile and is off, because
+  `offen/docker-volume-backup` writes a full tar every run and re-uploads every
+  unchanged byte. The right fix is an incremental `rclone sync` /
+  `gsutil -m rsync -r`. Until then, losing the volume means re-uploading every
+  product image. `magento_var`, `magento_static` and valkey data are regenerable
+  and deliberately not backed up.
+  ⚠️ A dump you have never restored is not a backup — restore one into a
+  throwaway database and confirm it opens before trusting it.
 - **`MAGE_CRYPT_KEY`** is tied to the database it decrypts — store it with the DB
   credentials, rotate them together, never lose it (encrypted config becomes
   unreadable without it).
