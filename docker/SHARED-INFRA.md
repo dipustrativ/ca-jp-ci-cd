@@ -27,6 +27,16 @@ runtime.
 Database and vhost are created by hand, no redeploy — `DOCKER-GLOBAL/README.md`
 §4 and §5.
 
+⚠️ The stacks' env values (`MYSQL_DATABASE`, `RABBITMQ_DEFAULT_*`) bootstrap an
+**empty volume only** and are inert afterwards. So whether this app's vhost and
+user already exist depends on whether `rabbitmq_data` survived. Don't guess —
+check, and use the idempotent create either way:
+
+```bash
+docker exec rabbitmq rabbitmqctl -q list_vhosts
+docker exec rabbitmq rabbitmqctl -q list_users
+```
+
 ## Environment
 
 `docker/.env.production.example` is authoritative and already filled in:
