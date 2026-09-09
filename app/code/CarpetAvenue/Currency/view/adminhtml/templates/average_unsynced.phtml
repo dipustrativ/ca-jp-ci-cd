@@ -1,0 +1,37 @@
+<?php
+/**
+ * Template for \CarpetAvenue\Currency\Block\Adminhtml\Average\Unsynced
+ * @var $block \CarpetAvenue\Currency\Block\Adminhtml\Average\Unsynced
+ */
+$unsyncedData = $block->getUnsyncedData();
+$index=0;
+?>
+<?php if(count($unsyncedData)) : ?>
+    <h3>Unsynced dates:</h3>
+    <table class="data-grid">
+        <thead>
+            <th class="data-grid-th">
+                <span class="data-grid-cell-content"><?= __('Currency');?></span>
+            </th>
+            <th class="data-grid-th">
+            <span class="data-grid-cell-content"><?= __('Time');?></span>
+            </th>
+        </thead>
+        <tbody>
+            <?php foreach($unsyncedData as $data): ?>
+                <tr class="data-row" data-bind="css: {'_odd-row': <?= $index++ ?> % 2}">
+                    <td>
+                        <div class="data-grid-cell-content" ><?= $data['order_currency_code']?></div>
+                    </td>
+                    <td>
+                        <?php
+                            $dateObj = DateTime::createFromFormat('!m', $data['month']);
+                            $month = $dateObj->format('F');
+                        ?>
+                        <div class="data-grid-cell-content"><?= $month?> <?= $data['year']?></div>
+                    </td>
+                </tr>
+            <?php endforeach ?>
+        <tbody>
+    </table>
+<?php endif ?>

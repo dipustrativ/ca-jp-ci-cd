@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * store_to_eur_rate on invoice/creditmemo (copied from the order via
+ * etc/fieldset.xml and backfilled by the currency crons) so the JP royalty
+ * reports can convert totals to EUR. The sales_order column is owned by
+ * CarpetAvenue_Orderify. carpet_currency_rates holds the monthly average
+ * EUR rates managed from the admin grid.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="sales_invoice" resource="sales" engine="innodb">
+        <column xsi:type="decimal" name="store_to_eur_rate" scale="4" precision="12" unsigned="false" nullable="true" comment="Store To EUR Rate"/>
+    </table>
+    <table name="sales_creditmemo" resource="sales" engine="innodb">
+        <column xsi:type="decimal" name="store_to_eur_rate" scale="4" precision="12" unsigned="false" nullable="true" comment="Store To EUR Rate"/>
+    </table>
+
+    <table name="carpet_currency_rates" resource="default" engine="innodb" comment="Carpet Currency Average Rates">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="varchar" name="currency_from" nullable="false" length="3" comment="Currency Code Convert From"/>
+        <column xsi:type="varchar" name="currency_to" nullable="false" length="3" comment="Currency Code Convert To"/>
+        <column xsi:type="decimal" name="rate" scale="12" precision="24" unsigned="false" nullable="false" default="0" comment="Currency Conversion Rate"/>
+        <column xsi:type="timestamp" name="rate_time" nullable="true" default="CURRENT_TIMESTAMP" comment="Rate Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="CARPET_CURRENCY_RATES_CURRENCY_TO" indexType="btree">
+            <column name="currency_to"/>
+        </index>
+    </table>
+</schema>

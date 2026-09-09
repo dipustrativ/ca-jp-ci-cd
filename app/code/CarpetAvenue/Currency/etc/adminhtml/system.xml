@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="catalog">
+            <group id="price" showInWebsite="1" showInStore="1">
+                <group id="ceil_to_zeroes" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1000" translate="label comment">
+                    <label>JPY: Ceil currency converted price to zeroes</label>
+                    <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Enable</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="price_threshold" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Threshold</label>
+                        <comment>Apply to prices higher than this</comment>
+                        <validate>required-entry validate-zero-or-greater</validate>
+                    </field>
+                    <field id="number_of_zeroes" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Number of zeroes</label>
+                        <comment>Number of zeroes to "ceil"</comment>
+                        <validate>required-entry validate-zero-or-greater</validate>
+                    </field>
+                    <!-- field id="max_percent_deviation" translate="label comment" type="text" sortOrder="1002" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Max price deviation</label>
+                        <comment>Hide decimal zeros when they are not needed</comment>
+                        <validate>required-entry validate-zero-or-greater</validate>
+                    </field -->
+                </group>    
+            </group>
+        </section>
+    </system>
+</config>

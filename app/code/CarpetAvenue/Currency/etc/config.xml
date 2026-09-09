@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+	<default>
+		<catalog>
+			<price>
+				<ceil_to_zeroes>
+					<enable>0</enable>
+					<price_threshold>999999999999</price_threshold>
+					<number_of_zeroes>0</number_of_zeroes>
+					<max_percent>0</max_percent>
+				</ceil_to_zeroes>
+			</price>
+		</catalog>
+	</default>
+</config>

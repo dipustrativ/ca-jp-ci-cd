@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * NB: the reference module also plugs CarpetAvenue\Currency\Plugin\Quote into
+ * Bss\CheckoutWithDisplayCurrency\Plugin\Quote to capture the live quote rate.
+ * Bss_CheckoutWithDisplayCurrency is not installed here, so that plugin (and
+ * Plugin/Quote.php) are omitted; the currency crons backfill the rates instead.
+ * The JPY price-ceiling plugin (Plugin/Currency) is left disabled, as upstream.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="CarpetAvenue\Currency\Api\AverageManagerInterface"
+                type="CarpetAvenue\Currency\Model\AverageManager"/>
+    <preference for="CarpetAvenue\Currency\Api\DailyManagerInterface"
+                type="CarpetAvenue\Currency\Model\DailyManager"/>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="carpetcurrency_average_listing_data_source" xsi:type="string">CarpetAvenue\Currency\Model\ResourceModel\AverageRates\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="CarpetAvenue\Currency\Model\ResourceModel\AverageRates\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">carpet_currency_rates</argument>
+            <argument name="resourceModel" xsi:type="string">CarpetAvenue\Currency\Model\ResourceModel\AverageRates</argument>
+        </arguments>
+    </type>
+</config>

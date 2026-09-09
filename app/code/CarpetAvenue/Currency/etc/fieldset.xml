@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * Copy the order's store->EUR rate onto the invoice and creditmemo when they
+ * are created, so the JP royalty reports can read si./sc.store_to_eur_rate.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:DataObject/etc/fieldset.xsd">
+    <scope id="global">
+        <fieldset id="sales_convert_order">
+            <field name="store_to_eur_rate">
+                <aspect name="to_invoice"/>
+                <aspect name="to_cm"/>
+            </field>
+        </fieldset>
+    </scope>
+</config>

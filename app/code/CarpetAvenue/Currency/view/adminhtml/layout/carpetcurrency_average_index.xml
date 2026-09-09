@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="CarpetAvenue\Currency\Block\Adminhtml\Average\Unsynced" name="currency_average_unsynced" befire="-" template="CarpetAvenue_Currency::average_unsynced.phtml"/>
+            <uiComponent name="carpetcurrency_average_listing"/>
+        </referenceContainer>
+    </body>
+</page>

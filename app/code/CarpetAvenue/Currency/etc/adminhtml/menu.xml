@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="CarpetAvenue_Currency::system_average_rates" title="Average Currency Rates" translate="title" module="CarpetAvenue_Currency" sortOrder="40" parent="Magento_CurrencySymbol::system_currency" action="carpetcurrency/average/index" resource="Magento_CurrencySymbol::currency_rates"/>
+    </menu>
+</config>

@@ -1,0 +1,27 @@
+{
+    "sales_invoice": {
+        "column": {
+            "store_to_eur_rate": true
+        }
+    },
+    "sales_creditmemo": {
+        "column": {
+            "store_to_eur_rate": true
+        }
+    },
+    "carpet_currency_rates": {
+        "column": {
+            "id": true,
+            "currency_from": true,
+            "currency_to": true,
+            "rate": true,
+            "rate_time": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "CARPET_CURRENCY_RATES_CURRENCY_TO": true
+        }
+    }
+}
