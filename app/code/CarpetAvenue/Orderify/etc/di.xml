@@ -9,6 +9,17 @@
         <plugin name="show_state_message_plugin" type="CarpetAvenue\Orderify\Plugins\Adminhtml\View\ShippingStateMessagePlugin"/>
     </type>
 
+    <!--
+        Order items can have product_id = NULL (deleted product, imported historic
+        order). Core's Item::getProduct() calls getById(null); the resulting PHP
+        deprecation kills the whole adminhtml order view in developer mode.
+    -->
+    <type name="Magento\Sales\Model\Order\Item">
+        <plugin name="carpetavenue_orderify_guard_item_product"
+                type="CarpetAvenue\Orderify\Plugins\Sales\Order\GuardItemProduct"
+                sortOrder="10"/>
+    </type>
+
     <virtualType name="CarpetAvenue\Orderify\Model\ResourceModel\Blacklist\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
