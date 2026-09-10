@@ -1,0 +1,17 @@
+{
+    "name": "carpetavenue/module-export-import",
+    "description": "Store-wise order CSV export and validated order CSV import for CarpetAvenue.",
+    "type": "magento2-module",
+    "require": {
+        "php": "~8.2.0||~8.3.0||~8.4.0",
+        "magento/framework": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "CarpetAvenue\\ExportImport\\": ""
+        }
+    }
+}

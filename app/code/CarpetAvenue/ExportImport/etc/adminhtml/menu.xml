@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="CarpetAvenue_ExportImport::exportimport"
+             title="Order Export / Import"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="60"
+             parent="CarpetAvenue_Core::carpetavenue"
+             resource="CarpetAvenue_ExportImport::exportimport"/>
+
+        <add id="CarpetAvenue_ExportImport::export"
+             title="Export Orders"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="10"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/export/index"
+             resource="CarpetAvenue_ExportImport::export"/>
+
+        <add id="CarpetAvenue_ExportImport::import"
+             title="Import Orders"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="20"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/import/index"
+             resource="CarpetAvenue_ExportImport::import"/>
+    </menu>
+</config>

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Order
+ * @package   CarpetAvenue_ExportImport
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <!-- Nest under the shared CarpetAvenue umbrella (owned by CarpetAvenue_Core). -->
+                <resource id="CarpetAvenue_Core::carpetavenue">
+                    <resource id="CarpetAvenue_ExportImport::exportimport"
+                              title="Order Export / Import" translate="title" sortOrder="60">
+                        <resource id="CarpetAvenue_ExportImport::export"
+                                  title="Export Orders" translate="title" sortOrder="10"/>
+                        <resource id="CarpetAvenue_ExportImport::import"
+                                  title="Import Orders" translate="title" sortOrder="20"/>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

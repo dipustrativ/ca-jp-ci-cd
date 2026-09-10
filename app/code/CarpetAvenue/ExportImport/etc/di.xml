@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!--
+        Dedicated logger: writes to var/log/carpetavenue/exportimport/exportimport_YYYY-MM-DD.log
+        Reuses CarpetAvenue_Core's file logger, scoped to this module's sub-directory.
+    -->
+    <virtualType name="CarpetAvenue\ExportImport\Logger\ExportImportLogger"
+                 type="CarpetAvenue\Core\Logger\Logger">
+        <arguments>
+            <argument name="logDir" xsi:type="string">exportimport</argument>
+            <argument name="logFile" xsi:type="string">exportimport</argument>
+            <argument name="dayWise" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="CarpetAvenue\ExportImport\Model\Order\Exporter">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="CarpetAvenue\ExportImport\Model\Order\Importer">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="CarpetAvenue\ExportImport\Model\Order\Validator">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
+    <!-- CLI commands -->
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="carpetavenue_exportimport_orders_export" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ExportOrdersCommand</item>
+                <item name="carpetavenue_exportimport_orders_import" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ImportOrdersCommand</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

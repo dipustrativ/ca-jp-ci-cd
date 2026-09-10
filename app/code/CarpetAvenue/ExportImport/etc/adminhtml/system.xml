@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="exportimport" translate="label" sortOrder="500" showInDefault="1"
+                 showInWebsite="0" showInStore="0">
+            <label>Order Export / Import</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_ExportImport::exportimport</resource>
+            <group id="general" translate="label" sortOrder="10" showInDefault="1"
+                   showInWebsite="0" showInStore="0">
+                <label>General</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Export / Import</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Master switch. When off, admin pages and CLI commands refuse to run.</comment>
+                </field>
+                <field id="batch_size" translate="label comment" type="text" sortOrder="20"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Import Batch Size</label>
+                    <comment>Number of orders committed per batch during import.</comment>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
