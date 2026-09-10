@@ -15,6 +15,10 @@
     <module name="CarpetAvenue_Japan">
         <sequence>
             <module name="CarpetAvenue_Core"/>
+            <!-- Owns the tax/display/vat_text + excl_vat_text fields that
+                 ConfigureJapanTaxDisplay seeds. -->
+            <module name="CarpetAvenue_Productify"/>
+            <module name="Magento_Tax"/>
             <module name="Magento_Catalog"/>
             <module name="Magento_LayeredNavigation"/>
             <module name="Magento_Swatches"/>

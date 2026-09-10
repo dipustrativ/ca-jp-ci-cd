@@ -18,6 +18,8 @@ history record them.
 | [ISSUE-002](ISSUE-002-uniqueattributevalidator-null-array-offset-php85.md) | Product import: `null` array offset in `UniqueAttributeValidator` from a NULL row on a unique attribute (`ean_barcode`) | Magento 2.4.9 + PHP 8.5 | 🟡 WORKAROUND — data cleanup | 2026-08-12 |
 | [ISSUE-003](ISSUE-003-catalog-image-url-store-param.md) | Core appends `?___store=<code>` to every product image URL, fragmenting the CDN cache once per store view | Magento 2.4.9 (`web/url/use_store=1`) | 🟢 WORKAROUND — after-plugin | 2026-08-21 |
 | [ISSUE-004](ISSUE-004-fpc-store-vary-collapse-use-store-in-url.md) | All store views share one full-page-cache entry, so `/` serves whichever language rendered first | Magento 2.4.9 (`web/url/use_store=1`) | 🟡 WORKAROUND — frontend plugin | 2026-08-22 |
+| [ISSUE-005](ISSUE-005-order-item-null-product-id-deprecation.md) | Admin order view redirects to the grid when an order item has `product_id = NULL`: `null` array offset in `ProductRepository::getById()` | Magento 2.4.9 + PHP 8.5 | 🟡 WORKAROUND — order-item plugin | 2026-09-10 |
+| [ISSUE-006](ISSUE-006-admin-order-item-price-double-converted.md) | Admin order item **Price** column multiplied by the currency rate (¥21,000 → ¥3,570,000): `getItemDisplayPriceExclTax()` converts an order-currency value as if it were base-currency | Magento 2.4.9, base ≠ display currency | 🟡 WORKAROUND — admin tax display set to *Including Tax* | 2026-09-10 |
 
 ## Resolved
 
