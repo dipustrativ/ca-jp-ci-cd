@@ -25,6 +25,40 @@
                    before="checkout.root"/>
         </referenceBlock>
 
+        <!-- Consent notice below the checkout app: ordering accepts the privacy
+             policy and the terms of use. The `osc-cms-block` class on the wrapper
+             is what the theme styles the sentence through — see
+             Mageplaza_Osc/web/css/source/_extend.less, `.osc-cms-block
+             .agreements-block` under `.onestepcheckout-index-index`. The CMS
+             block itself is created by
+             CarpetAvenue\ThemeContent\Setup\Patch\Data\CreateCheckoutAgreementsBlock
+             and carries the inner `agreements-block` wrapper. -->
+        <referenceContainer name="content">
+            <container name="osc.agreements" htmlTag="div" htmlClass="osc-cms-block" after="checkout.root">
+                <block class="Magento\Cms\Block\Block" name="osc.agreements.text">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">checkout-agreements-text</argument>
+                    </arguments>
+                </block>
+            </container>
+        </referenceContainer>
+
+        <!-- Copyright bar. The `checkout` page layout extends `empty`, which has
+             no footer/footer-container, so core's `copyright` block is never
+             built here and the theme's `move` of it in Magento_Theme/layout/
+             default.xml is a no-op — hence declaring it fresh under page.wrapper.
+
+             The name must NOT be `copyright`: that same `move` applies on every
+             handle and would drag the block into a container this page lacks.
+             `.copyright` (black, white centred text) is already styled in the
+             theme's web/css/source/_extend.less. -->
+        <referenceContainer name="page.wrapper">
+            <block class="Magento\Theme\Block\Html\Footer"
+                   name="checkout.copyright"
+                   template="Magento_Theme::html/copyright.phtml"
+                   after="-"/>
+        </referenceContainer>
+
         <!-- Moving newsletter subscribe -->
         <referenceBlock name="checkout.root">
             <arguments>
