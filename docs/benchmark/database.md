@@ -22,7 +22,7 @@ Dataset: 541 tables, ~1.73 M rows, 431 FKs, 108 mview triggers, 1951 products,
 | | current | candidate A | candidate B |
 |---|---|---|---|
 | engine | MariaDB **11.8.8** | MySQL **8.4.11** | MariaDB **12.3.2** |
-| runs today | local dev (`../compose.versions.yaml`) | **production**, external endpoint (`docker/.env.production.example:24`, `docker/README.md:8`) | nowhere |
+| runs today | local dev (`../compose.versions.yaml`) | **production**, external endpoint (`docker/.env.production.example:24`, `docker/README.md` "Certified stack") | nowhere |
 | Magento 2.4.9 support | yes | yes | yes |
 | release status | LTS, EOL Jun 2028 | LTS, premier support to Apr 2029 (extended 2032) | LTS, maintenance to Jun 2029 |
 

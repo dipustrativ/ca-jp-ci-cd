@@ -13,8 +13,8 @@ once. If something is not in this index, it is not findable — add the row.
 | Add a new website (own domain) | [runbooks/add-website.md](runbooks/add-website.md) |
 | Add a new store view (`/xx/`) | [runbooks/add-store-view.md](runbooks/add-store-view.md) |
 | Work on LESS / theme styles | [runbooks/frontend-less-grunt.md](runbooks/frontend-less-grunt.md) |
-| Fix a cache that will not cache | [../docker/CACHE-RUNBOOK.md](../docker/CACHE-RUNBOOK.md) |
-| Run a Magento CLI command in production | [../docker/UTILITIES.md](../docker/UTILITIES.md) |
+| Fix anything broken in production (cache, arch, 404s, CI) | [../docker/TROUBLESHOOTING.md](../docker/TROUBLESHOOTING.md) |
+| Run a Magento CLI command in production, upload media | [../docker/INFRA-CI.md](../docker/INFRA-CI.md#part-3--server-ops) |
 | Work locally (containers, CLI, static, tests) | [../CLAUDE.md](../CLAUDE.md) |
 | Understand an error that lives in `vendor/` | [Issues/README.md](Issues/README.md) — check before debugging |
 | Know why the site is/isn't fast | [performance/README.md](performance/README.md) |
@@ -42,9 +42,9 @@ Imperative, copy-pasteable, no theory. Each opens with **Use when**.
 | [multistore-setup.php](architecture/multistore-setup.php) | Idempotent script that applies the whole multistore config. Dry-run by default |
 | [theme-manual.html](architecture/theme-manual.html) | Theme manual for content editors |
 | [../CLAUDE.md](../CLAUDE.md) | Module ecosystem, vendors, DI gotchas, local commands |
-| [../docker/README.md](../docker/README.md) | Production image design: one image, five roles; the three deploy paths |
-| [../docker/IMAGE-SIZE.md](../docker/IMAGE-SIZE.md) | Where the bytes go and which strips are verified safe |
-| [../docker/CI-CD.md](../docker/CI-CD.md) | Self-hosted runner → registry → Dokploy webhook |
+| [../docker/README.md](../docker/README.md) | Deploy guide: one image five roles, which build platform applies to your machine (§1.1), the three deploy paths, rollback, and where the image bytes go (§7) |
+| [../docker/INFRA-CI.md](../docker/INFRA-CI.md) | Shared MySQL/OpenSearch/RabbitMQ · self-hosted runner → registry → Dokploy webhook · server ops · open items |
+| [../docker/TROUBLESHOOTING.md](../docker/TROUBLESHOOTING.md) | Every production symptom → cause → fix |
 
 ### 3. Performance — measurements and decisions
 
@@ -86,7 +86,7 @@ git history record it.
 |---|---|
 | [../CHANGELOG.md](../CHANGELOG.md) | Release history |
 | [../SECURITY.md](../SECURITY.md) | Vulnerability reporting |
-| [../docker/BACKLOG.md](../docker/BACKLOG.md) | Infrastructure to-do list, with verified state |
+| [../docker/INFRA-CI.md](../docker/INFRA-CI.md#part-4--open-items) | Infrastructure to-do list, with verified state |
 
 ## Rules
 

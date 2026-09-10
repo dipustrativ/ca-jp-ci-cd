@@ -10,7 +10,9 @@ root; the parent directory holds the local Docker stack.
 |---|---|
 | **[docs/README.md](docs/README.md)** | **The knowledge base — start here.** Task index, chapters, and the rules that keep them organised |
 | [CLAUDE.md](CLAUDE.md) | Working locally: containers, CLI, static content, tests, module ecosystem |
-| [docker/README.md](docker/README.md) | Production image and deploy paths |
+| [docker/README.md](docker/README.md) | Production image, build platforms, deploy paths, rollback |
+| [docker/INFRA-CI.md](docker/INFRA-CI.md) | Shared MySQL/OpenSearch/RabbitMQ, CI/CD, server ops, open items |
+| [docker/TROUBLESHOOTING.md](docker/TROUBLESHOOTING.md) | Production symptom → cause → fix |
 
 Common tasks:
 

@@ -4,7 +4,7 @@
 # Shared infra is NOT here — mysql:3306, opensearch:9200, rabbitmq:5672 live in
 # Workspace/DOCKER-GLOBAL/, shared with carpient. Deploy those THREE FIRST: nothing here
 # gates on them, so a missing one starts fine and fails at runtime.
-# This app: db `carpetavenue_jp`, vhost/user `/ca_jp`, prefix `ca_jp`. See docker/SHARED-INFRA.md
+# This app: db `carpetavenue_jp`, vhost/user `/ca_jp`, prefix `ca_jp`. See docker/INFRA-CI.md
 #
 # Dokploy (README §3): Registries = registry.carpetavenue.net | Environment =
 # docker/.env.production.example | Domains = playground.carpetavenue.jp -> `nginx` :80, HTTPS on.
@@ -12,7 +12,7 @@
 services:
 
   cache:
-    image: valkey/valkey:9-alpine
+    image: valkey/valkey:9.0-alpine
     container_name: carpetavenue-jp-cache
     restart: unless-stopped
     # cache db0 + page_cache db1 only; sessions are in the `sessions` service.
@@ -39,7 +39,7 @@ services:
     networks: [magento_net]
 
   sessions:
-    image: valkey/valkey:9-alpine
+    image: valkey/valkey:9.0-alpine
     container_name: carpetavenue-jp-sessions
     restart: unless-stopped
     # Sessions only (db2). Magento's session handler sets a TTL on every key, so

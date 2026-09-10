@@ -5,14 +5,14 @@ name: build-deploy
 # Tags pushed (same image, both):
 #   latest      what Dokploy pulls by default
 #   v<run>      frozen version, never moves -> rollback target
-# Setup: docker/README.md, section 6 (CI/CD).
+# Setup: docker/INFRA-CI.md, Part 2 (CI/CD).
 
 # ⚠️ NO self-hosted runner is registered for indexon/carpetavenue-jp yet, so the
 # push trigger is OFF — with it on, every push to main would queue a job forever
 # waiting for a `carpetavenue-jp-build` runner that does not exist. Builds are
 # manual for now (docker/README.md §1). To turn CI on: deploy
 # docker/github-runner.compose.yml on Server A, add the repo secrets
-# (docker/CI-CD.md), then restore the `push:` block below.
+# (docker/INFRA-CI.md), then restore the `push:` block below.
 on:
   # push:
   #   branches: [main]

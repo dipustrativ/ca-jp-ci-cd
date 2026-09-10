@@ -122,14 +122,14 @@ Dokploy environment → Redeploy. Only touch the server if the user asks.
 - Site up but every generated `*.min.js`/`*.min.css` 404s (a few vendor-shipped
   `.min` files still 200, `static.php` 404s) = minification mismatch between the
   SCD DB and the production DB. Both flags are locked in `app/etc/config.php`;
-  the SCD step asserts `require.min.js` exists. Detail: `docker/README.md` §8.
+  the SCD step asserts `require.min.js` exists. Detail: `docker/TROUBLESHOOTING.md` §3.
 - Every step `CACHED` = nothing in the context changed; BuildKit keys on content,
   not mtime, so `COPY . .` hits cache and di:compile/SCD are skipped. The new
   `v<N>` is then the same image ID as the last one (`docker images | grep
   carpetavenue-jp`). Check the edit isn't in a `.dockerignore`d path (`vendor/`,
   `pub/static/`, `dev/`, most of `var/`) before blaming the cache.
 - `docker buildx build` on the laptop pushes over Traefik; a `499`/`504` mid-push
-  is a Traefik timeout, not a bad image (fix in `docker/README.md` §10). CI on
+  is a Traefik timeout, not a bad image (fix in `docker/TROUBLESHOOTING.md` §4). CI on
   Server A pushes over localhost and never hits this.
 - Build peaks around ~4 GB RAM.
 - No secrets in the image — `entrypoint.sh` renders `app/etc/env.php` from
