@@ -20,6 +20,7 @@
                 <item name="carpetavenue_productify_product_sync"  xsi:type="object">CarpetAvenue\Productify\Console\ProductSyncCommand</item>
                 <item name="carpetavenue_productify_queue_run"  xsi:type="object">CarpetAvenue\Productify\Console\ProductifyQueueRun</item>
                 <item name="carpetavenue_productify_campaign_import" xsi:type="object">CarpetAvenue\Productify\Console\CampaignImportCommand</item>
+                <item name="carpetavenue_productify_onsale_update" xsi:type="object">CarpetAvenue\Productify\Console\UpdateOnSaleFlagCommand</item>
                 <item name="carpetavenue_productify_assign_color_shape_category" xsi:type="object">CarpetAvenue\Productify\Console\AssignColorShapeCategoriesCommand</item>
             </argument>
         </arguments>

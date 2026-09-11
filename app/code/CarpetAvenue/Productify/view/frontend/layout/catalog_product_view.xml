@@ -15,6 +15,15 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+        <!-- Renders nothing. It exists so its _prepareLayout() runs, which is what
+             calls addCrumb() on the "breadcrumbs" block for home plus every entry of
+             Catalog\Helper\Data::getBreadcrumbPath(). Magento only ever creates this
+             block from the category view block, so without it the server-rendered
+             product breadcrumb comes out empty. -->
+        <referenceContainer name="page.top">
+            <block class="Magento\Catalog\Block\Breadcrumbs" name="productify.breadcrumbs.path"/>
+        </referenceContainer>
+
         <block class="Magento\Catalog\Block\Product\View" name="productify.variants" template="CarpetAvenue_Productify::variants.phtml">
             <arguments>
                 <argument name="view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\VariantCacheView</argument>

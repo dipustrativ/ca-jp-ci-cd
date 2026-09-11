@@ -1,0 +1,89 @@
+//
+//  404 (no-route) CMS page
+//  _____________________________________________
+//
+//  The body of this page is CMS content, so its markup is whatever the editor
+//  saves. Today it leans on Bootstrap-ish utility classes — .text-center,
+//  .margin-bottom20/30, .btn.btn-secondary — that neither this theme nor
+//  Magento/blank defines, which is why the copy rendered flush left and the
+//  only call to action rendered as a bare underlined link.
+//
+//  These rules give those classes a meaning and centre the page, scoped to
+//  .cms-no-route so no other CMS page inherits them. The button reuses the
+//  theme's own button tokens rather than introducing a second button style.
+//
+//  The container is deliberately content-agnostic: a CMS block dropped in here
+//  later inherits the centring, the measure and the vertical rhythm.
+
+.cms-no-route {
+
+    .page-title-wrapper {
+        text-align: center;
+        margin: 0 auto;
+        padding: 48px @layout-indent__width 0;
+    }
+
+    .page-title {
+        margin-bottom: 0;
+    }
+
+    .column.main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 24px @layout-indent__width 96px;
+        text-align: center;
+    }
+
+    //  Utility classes the CMS content relies on.
+    .text-center {
+        text-align: center;
+    }
+
+    .margin-bottom20 {
+        margin-bottom: 20px;
+    }
+
+    .margin-bottom30 {
+        margin-bottom: 30px;
+    }
+
+    //  Neutral counterpart to the green primary button, which stays reserved for
+    //  add-to-cart. Same padding and radius tokens, so it sits at the same size.
+    .btn {
+        display: inline-block;
+        padding: @button__padding;
+        border: 1px solid @ca-black;
+        border-radius: @button__border-radius;
+        background: @ca-black;
+        color: #ffffff;
+        font-weight: 600;
+        line-height: 1.2;
+        text-decoration: none;
+
+        &:hover,
+        &:focus,
+        &:visited {
+            background: lighten(@ca-black, 20%);
+            border-color: lighten(@ca-black, 20%);
+            color: #ffffff;
+            text-decoration: none;
+        }
+    }
+}
+
+//
+//  Mobile — tighten the vertical space so the call to action stays in view.
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .cms-no-route {
+
+        .page-title-wrapper {
+            padding-top: 32px;
+        }
+
+        .column.main {
+            padding-bottom: 56px;
+        }
+    }
+}
