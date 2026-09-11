@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+
+    <event name="model_save_after">
+        <observer instance="IXPF\CarpetAvenueJP\Observer\Model\Product\SaveAfter" name="ixpf_ca_adminactivitylog_observer_model_product_save_after"/>
+    </event>
+
+</config>

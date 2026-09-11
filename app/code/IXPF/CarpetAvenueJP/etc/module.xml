@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="IXPF_CarpetAvenueJP">
+        <sequence>
+            <module name="IXPF_Syncer"/>
+            <module name="Evalent_AdminActivityLog"/>
+            <module name="CarpetAvenue_Proforma"/>
+            <module name="CarpetAvenue_Orderify"/>
+        </sequence>
+    </module>
+</config>
