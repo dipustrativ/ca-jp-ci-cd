@@ -24,5 +24,113 @@
              parent="CarpetAvenue_ExportImport::exportimport"
              action="exportimport/import/index"
              resource="CarpetAvenue_ExportImport::import"/>
+
+        <!--
+            Invoices and credit memos share one pair of controllers; the document
+            type travels in the URL, which is why each entry carries /type/<code>.
+        -->
+        <add id="CarpetAvenue_ExportImport::document_export_invoice"
+             title="Export Invoices"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="30"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/document_export/index/type/invoice"
+             resource="CarpetAvenue_ExportImport::export"/>
+
+        <add id="CarpetAvenue_ExportImport::document_import_invoice"
+             title="Import Invoices"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="40"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/document_import/index/type/invoice"
+             resource="CarpetAvenue_ExportImport::import"/>
+
+        <add id="CarpetAvenue_ExportImport::document_export_creditmemo"
+             title="Export Credit Memos"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="50"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/document_export/index/type/creditmemo"
+             resource="CarpetAvenue_ExportImport::export"/>
+
+        <add id="CarpetAvenue_ExportImport::document_import_creditmemo"
+             title="Import Credit Memos"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="60"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/document_import/index/type/creditmemo"
+             resource="CarpetAvenue_ExportImport::import"/>
+
+        <add id="CarpetAvenue_ExportImport::document_export_shipment"
+             title="Export Shipments"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="70"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/document_export/index/type/shipment"
+             resource="CarpetAvenue_ExportImport::export"/>
+
+        <add id="CarpetAvenue_ExportImport::document_import_shipment"
+             title="Import Shipments"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="80"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/document_import/index/type/shipment"
+             resource="CarpetAvenue_ExportImport::import"/>
+
+        <!--
+            Payment transactions have their own controllers — the table is not
+            shaped like a document, so it is not a document type.
+        -->
+        <add id="CarpetAvenue_ExportImport::transaction_export"
+             title="Export Transactions"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="90"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/transaction_export/index"
+             resource="CarpetAvenue_ExportImport::export"/>
+
+        <add id="CarpetAvenue_ExportImport::transaction_import"
+             title="Import Transactions"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="100"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/transaction_import/index"
+             resource="CarpetAvenue_ExportImport::import"/>
+
+        <!--
+            Customers and their addresses are two files: import customers first,
+            addresses second. The menu order says so.
+        -->
+        <add id="CarpetAvenue_ExportImport::customer_export"
+             title="Export Customers"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="110"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/customer_export/index"
+             resource="CarpetAvenue_ExportImport::export"/>
+
+        <add id="CarpetAvenue_ExportImport::customer_import"
+             title="Import Customers"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="120"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/customer_import/index"
+             resource="CarpetAvenue_ExportImport::import"/>
+
+        <add id="CarpetAvenue_ExportImport::customer_address_export"
+             title="Export Customer Addresses"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="130"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/customer_address_export/index"
+             resource="CarpetAvenue_ExportImport::export"/>
+
+        <add id="CarpetAvenue_ExportImport::customer_address_import"
+             title="Import Customer Addresses"
+             module="CarpetAvenue_ExportImport"
+             sortOrder="140"
+             parent="CarpetAvenue_ExportImport::exportimport"
+             action="exportimport/customer_address_import/index"
+             resource="CarpetAvenue_ExportImport::import"/>
     </menu>
 </config>

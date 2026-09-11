@@ -16,6 +16,11 @@ namespace CarpetAvenue\ExportImport\Model\Order;
 
 /**
  * Mutable outcome of validating an order CSV. Not injected — created per run.
+ *
+ * Entity-agnostic despite the namespace: `Model\Document\Validator` (invoices and
+ * credit memos) uses the same class, keyed by document increment id instead of
+ * order increment id. It stayed here rather than moving to a neutral namespace so
+ * the class the order half has always used keeps its name and history.
  */
 class ValidationResult
 {

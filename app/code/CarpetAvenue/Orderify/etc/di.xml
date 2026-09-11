@@ -20,6 +20,18 @@
                 sortOrder="10"/>
     </type>
 
+    <!--
+        Same NULL product_id, MSI side: core GetSkuFromOrderItem feeds the null id to
+        GetSkusByProductIds and indexes the result by it, so every ship/invoice/credit-memo
+        screen that resolves a stock SKU dies on the PHP deprecation. sortOrder 20 keeps
+        this inside InventoryConfigurableProduct's around-plugin (sortOrder 0).
+    -->
+    <type name="Magento\InventorySalesApi\Model\GetSkuFromOrderItemInterface">
+        <plugin name="carpetavenue_orderify_guard_order_item_sku"
+                type="CarpetAvenue\Orderify\Plugins\InventorySales\GuardOrderItemSku"
+                sortOrder="20"/>
+    </type>
+
     <virtualType name="CarpetAvenue\Orderify\Model\ResourceModel\Blacklist\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>

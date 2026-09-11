@@ -20,9 +20,11 @@
                     <resource id="CarpetAvenue_ExportImport::exportimport"
                               title="Order Export / Import" translate="title" sortOrder="60">
                         <resource id="CarpetAvenue_ExportImport::export"
-                                  title="Export Orders" translate="title" sortOrder="10"/>
+                                  title="Export Sales Data / Customers"
+                                  translate="title" sortOrder="10"/>
                         <resource id="CarpetAvenue_ExportImport::import"
-                                  title="Import Orders" translate="title" sortOrder="20"/>
+                                  title="Import Sales Data / Customers"
+                                  translate="title" sortOrder="20"/>
                     </resource>
                 </resource>
             </resource>
