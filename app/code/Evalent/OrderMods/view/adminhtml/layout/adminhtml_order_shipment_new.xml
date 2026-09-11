@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <referenceBlock name="order_items">
+                <action method="setTemplate">
+                    <argument name="template" xsi:type="string">Evalent_OrderMods::create/items.phtml</argument>
+                </action>
+                <block class="Evalent\OrderMods\Block\Adminhtml\Items\Column\Thumbnail" name="column_thumbnail" template="Evalent_OrderMods::order/item/thumbnail.phtml" group="column"/>
+
+                <referenceBlock name="default">
+                    <action method="setTemplate">
+                        <argument name="template" xsi:type="string">Evalent_OrderMods::create/items/renderer/default.phtml</argument>
+                    </action>
+                </referenceBlock>
+            </referenceBlock>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,10 @@
+<?php
+/** @var \Evalent\OrderMods\Block\Adminhtml\Items\Column\Thumbnail $block */
+$product = $block->getProduct();
+?>
+
+<?php if (isset($product)): ?>
+    <span>
+    <?= $product->getPallet() ?>
+</span>
+<?php endif; ?>

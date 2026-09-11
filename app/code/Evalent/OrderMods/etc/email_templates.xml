@@ -1,0 +1,31 @@
+<config
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="sales_email_order_reminder_template"
+              label="Order Reminder"
+              file="order_reminder.html"
+              type="html"
+              module="Evalent_OrderMods"
+              area="frontend"
+    />
+    <template id="sales_email_order_cancellation_template"
+              label="Order Cancellation"
+              file="order_cancellation_email.html"
+              type="html"
+              module="Evalent_OrderMods"
+              area="frontend"
+    />
+    <template id="sales_email_order_reminder_guest_template"
+              label="Order Reminder Guest"
+              file="order_reminder_guest.html"
+              type="html"
+              module="Evalent_OrderMods"
+              area="frontend"
+    />
+    <template id="sales_email_order_cancellation_guest_template"
+              label="Order Cancellation Guest"
+              file="order_cancellation_email_guest.html"
+              type="html"
+              module="Evalent_OrderMods"
+              area="frontend"
+    />
+</config>
