@@ -60,8 +60,8 @@ class Index extends AbstractController
                 // Normalize date-only strings to include full day boundary
                 $fromDate = (strlen($paramFromDate) === 10) ? $paramFromDate . ' 00:00:00' : $paramFromDate;
                 $toDate   = (strlen($paramToDate)   === 10) ? $paramToDate   . ' 23:59:59' : $paramToDate;
-                $shipmentCollection->addFieldToFilter('updated_at', ['gteq' => $fromDate]);
-                $shipmentCollection->addFieldToFilter('updated_at', ['lteq' => $toDate]);
+                $shipmentCollection->addFieldToFilter('created_at', ['gteq' => $fromDate]);
+                $shipmentCollection->addFieldToFilter('created_at', ['lteq' => $toDate]);
                 $shipmentCollection->setPageSize($pageSize);
                 $shipmentCollection->setCurPage($page);
             } elseif ($paramLatestCreditMemo) {

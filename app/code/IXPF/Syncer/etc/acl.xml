@@ -10,6 +10,8 @@
                     <resource id="IXPF_Syncer::bulk_update_revert" title="Bulk Update Revert" translate="title"/>
                     <resource id="IXPF_Syncer::product_gallery_webhook_list" title="PhotoStudio Webhooks" translate="title"/>
                     <resource id="IXPF_Syncer::order_api_activity" title="Order API Activity" translate="title"/>
+                    <resource id="IXPF_Syncer::product_reviews" title="Product Reviews" translate="title"/>
+                    <resource id="IXPF_Syncer::review_pools" title="Review Pools" translate="title"/>
                     <resource id="IXPF_Syncer::docs" title="API Docs" translate="title"/>
                 </resource>
             </resource>

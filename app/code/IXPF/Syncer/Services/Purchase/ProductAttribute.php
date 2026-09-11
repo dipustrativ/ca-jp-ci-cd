@@ -10,11 +10,19 @@ use Magento\Eav\Api\Data\AttributeOptionLabelInterfaceFactory;
 use Magento\Eav\Api\AttributeOptionManagementInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Eav\Setup\EavSetupFactory;
+use Magento\Eav\Model\Entity\Attribute\Source\Table as TableSource;
 
 class ProductAttribute
 {
     protected array $cacheAttributes = [];
     protected array $cacheAttributesOptionValues = [];
+
+    /**
+     * Valid option ids per attribute code (id => id)
+     *
+     * @var array<string, array>
+     */
+    protected array $cacheAttributesOptionIds = [];
 
     public function __construct(
         protected AttributeCollectionFactory $attributeCollectionFactory,
@@ -89,8 +97,64 @@ class ProductAttribute
             return $options[strtolower($label)];
         }
 
+        //-- payload may send the raw option id instead of the label (e.g. tax_class_id = "6")
+        $optionId = $this->matchOptionId($attributeCode, $originalLabel);
+        if ($optionId !== null) {
+            return $optionId;
+        }
+
+        //-- attributes backed by a custom source model (tax_class_id, status, ...) do not
+        //-- store their options in eav_attribute_option — never create options for them
+        if (!$this->canCreateOption($attributeCode)) {
+            return null;
+        }
+
         $options = $this->createOptionsValue($attributeCode, $originalLabel);
         return ($options && isset($options[strtolower($label)])) ? $options[strtolower($label)] : null;
+    }
+
+    /**
+     * Return the value as-is when it already is a valid option id of the attribute.
+     *
+     * @param string $attributeCode
+     * @param string $value
+     * @return string|null
+     */
+    public function matchOptionId(string $attributeCode, string $value): ?string
+    {
+        $attributeCode = trim($attributeCode);
+
+        if ($value === '' || !is_numeric($value)) {
+            return null;
+        }
+
+        if (!isset($this->cacheAttributesOptionIds[$attributeCode])) {
+            $this->getAttributeOptionListWithLabelIdPair($attributeCode);
+        }
+
+        $optionIds = $this->cacheAttributesOptionIds[$attributeCode] ?? [];
+        $key = (string)(int)$value;
+
+        return isset($optionIds[$key]) ? $key : null;
+    }
+
+    /**
+     * Only plain option-table attributes may get new options created on the fly.
+     *
+     * @param string $attributeCode
+     * @return bool
+     */
+    public function canCreateOption(string $attributeCode): bool
+    {
+        $attribute = $this->getAttribute(trim($attributeCode));
+        if (!$attribute) {
+            return false;
+        }
+
+        $sourceModel = trim((string)$attribute->getData('source_model'));
+
+        return $sourceModel === ''
+            || ltrim($sourceModel, '\\') === TableSource::class;
     }
 
     /**
@@ -123,6 +187,7 @@ class ProductAttribute
         $attribute = $this->getAttribute(trim($attributeCode));
         $options = $attribute->setStoreId(0)->getSource()->getAllOptions(false);
         $attributeOptionValues = [];
+        $attributeOptionIds = [];
         foreach ($options as $option) {
             if (!empty($option['value']) && !empty($option['label'])) {
                 $attributeOptionValues[strtolower(trim($option['label']))] = $option['value'];

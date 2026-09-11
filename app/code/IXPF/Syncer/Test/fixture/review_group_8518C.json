@@ -1,0 +1,135 @@
+{
+  "review_group": "8518C",
+  "group_label": {
+    "en_US": "Pakistan Bokhara",
+    "de_DE": "Pakistan Bokhara",
+    "fr_FR": "Pakistan Bokhara",
+    "sv_SE": "Pakistan Bokhara",
+    "da_DK": "Pakistan Bokhara",
+    "nb_NO": "Pakistan Bokhara",
+    "nl_NL": "Pakistan Bokhara",
+    "it_IT": "Pakistan Bokhara",
+    "es_ES": "Pakistan Bokhara",
+    "pt_PT": "Pakistan Bokhara",
+    "pl_PL": "Pakistan Bokhara",
+    "fi_FI": "Pakistan Bokhara",
+    "hu_HU": "Pakistan Bokhara",
+    "ja_JP": "パキスタン ボハラ"
+  },
+  "generated_at": "2026-09-01T08:12:00Z",
+  "count": 3,
+  "with_text_count": 3,
+  "average": 4.33,
+  "distribution": [0, 0, 1, 0, 2],
+  "sub_averages": {
+    "quality": 4.7,
+    "delivery": 4.0,
+    "customer_service": 4.3
+  },
+  "reviews": [
+    {
+      "id": "zztest18ec8892e02f1d9cc9",
+      "sku": "AW1645",
+      "source": "customer",
+      "rating": 5,
+      "sub_ratings": {
+        "quality": 5,
+        "delivery": 4,
+        "customer_service": 5
+      },
+      "reviewer": "Susanne H.",
+      "created_at": "2026-08-26T13:33:00Z",
+      "source_locale": "da_DK",
+      "source_store_code": "dk",
+      "bought": {
+        "name": "Pakistan Bokhara",
+        "variant_text": "Bought a NMA15 200 x 250 cm",
+        "purchased_at": "2026-01-15T00:00:00Z",
+        "thumbnail_path": "caProdMagento/products/aw1645/images/standard/aw1645-00001.jpg"
+      },
+      "body": {
+        "da_DK": "Flot tæppe, farverne passer perfekt til stuen. Leveringen tog lidt længere end lovet.",
+        "sv_SE": "Fin matta, färgerna passar perfekt i vardagsrummet. Leveransen tog lite längre än utlovat.",
+        "en_US": "Beautiful rug, the colors fit the living room perfectly. Delivery took a bit longer than promised.",
+        "de_DE": "Schöner Teppich, die Farben passen perfekt ins Wohnzimmer. Die Lieferung dauerte etwas länger als versprochen.",
+        "nb_NO": "Flott teppe, fargene passer perfekt til stuen. Leveringen tok litt lengre tid enn lovet."
+      },
+      "photos": [
+        {
+          "bucket_path": "caProdMagento/reviews/zztest18ec8892e02f1d9cc9/xyz-p1.jpg",
+          "width": 2000,
+          "height": 1500
+        },
+        {
+          "bucket_path": "caProdMagento/reviews/zztest18ec8892e02f1d9cc9/xyz-p2.jpg",
+          "width": 1600,
+          "height": 1600
+        }
+      ],
+      "reply": {
+        "body": {
+          "da_DK": "Tak for din anmeldelse, Susanne! Vi beklager forsinkelsen og er glade for, at du er tilfreds med tæppet.",
+          "sv_SE": "Tack för din recension, Susanne! Vi beklagar förseningen och är glada att du är nöjd med mattan.",
+          "en_US": "Thank you for your review, Susanne! We are sorry about the delay and glad you are happy with the rug."
+        },
+        "author": "Carpet Avenue Customer Service",
+        "created_at": "2026-08-27T08:00:00Z"
+      }
+    },
+    {
+      "id": "zztest18ec8892e02f1d9daf",
+      "sku": "AW1646",
+      "source": "staff",
+      "rating": 5,
+      "sub_ratings": {
+        "quality": 5,
+        "delivery": 4,
+        "customer_service": 4
+      },
+      "reviewer": "Henrik L.",
+      "created_at": "2026-08-24T09:10:00Z",
+      "source_locale": "sv_SE",
+      "source_store_code": "se",
+      "bought": {
+        "name": "Pakistan Bokhara",
+        "variant_text": "Bought a NMA15 200 x 300 cm",
+        "purchased_at": "2026-06-02T00:00:00Z",
+        "thumbnail_path": "caProdMagento/products/aw1646/images/standard/aw1646-00001.jpg"
+      },
+      "body": {
+        "sv_SE": "Ligger platt direkt och känns rejäl. Lite tunnare än väntat.",
+        "da_DK": "Ligger fladt med det samme og føles solid. Lidt tyndere end forventet.",
+        "en_US": "Lies flat right away and feels sturdy. A bit thinner than expected."
+      },
+      "photos": [],
+      "reply": null
+    },
+    {
+      "id": "zztest18ec8892e02f1d9e10",
+      "sku": "AW1650",
+      "source": "customer",
+      "rating": 3,
+      "sub_ratings": {
+        "quality": 4,
+        "delivery": 3,
+        "customer_service": 4
+      },
+      "reviewer": "Petra M.",
+      "created_at": "2026-07-30T17:45:00Z",
+      "source_locale": "de_DE",
+      "source_store_code": "ch_de",
+      "bought": {
+        "name": "Pakistan Bokhara",
+        "variant_text": "Bought a NMA15 160 x 230 cm",
+        "purchased_at": "2026-05-11T00:00:00Z",
+        "thumbnail_path": "caProdMagento/products/aw1650/images/standard/aw1650-00001.jpg"
+      },
+      "body": {
+        "de_DE": "Die Qualität stimmt, aber der Teppich wirkt im Raum kleiner als auf den Bildern.",
+        "en_US": "The quality is right, but the rug looks smaller in the room than in the photos."
+      },
+      "photos": [],
+      "reply": null
+    }
+  ]
+}

@@ -11,6 +11,20 @@
     <preference for="IXPF\Syncer\Api\Product\ProductListResponseApi" type="IXPF\Syncer\Model\Api\Product\ProductListResponse"/>
     <preference for="IXPF\Syncer\Api\Product\ProductResponseApi" type="IXPF\Syncer\Model\Api\Product\ProductResponse"/>
 
+    <!-- reviews read service -->
+    <preference for="IXPF\Syncer\Api\ReviewProviderInterface" type="IXPF\Syncer\Model\Reviews\ReviewProvider"/>
+    <preference for="IXPF\Syncer\Api\Data\ReviewFilterInterface" type="IXPF\Syncer\Model\Reviews\ReviewFilter"/>
+    <preference for="IXPF\Syncer\Api\Data\ReviewSummaryInterface" type="IXPF\Syncer\Model\Reviews\ReviewSummary"/>
+    <preference for="IXPF\Syncer\Api\Data\ReviewListInterface" type="IXPF\Syncer\Model\Reviews\ReviewList"/>
+
+    <!--
+        Reviews log through IXPF\Syncer\Helper\Logger\ReviewLogger, the same BaseLogger helper
+        every other ixpf domain uses (photostudio, webhook, product, orders). No virtualType or
+        Monolog handler needed: the helper is injected directly and picks its own folder, so
+        activity lands in var/log/ixpf/review/review-<Y-m-d>.log and Throwables in
+        var/log/ixpf/exception/review-<Y-m-d>.log.
+    -->
+
 
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="carpetavenue_currency_order_extension" type="IXPF\Syncer\Plugin\OrderExtension" />
@@ -19,6 +33,25 @@
     <type name="Magento\Sales\Api\Data\OrderInterface">
         <plugin name="add_default_name_to_order_items"
                 type="IXPF\Syncer\Plugin\OrderItemDefaultName" />
+    </type>
+
+    <!--
+        Comment-save webhooks. Adding a comment does not modify the parent row,
+        so *_save_after never fires; hook the comment resource save instead and
+        fire the parent webhook. One concrete subclass per parent type carries
+        $type (virtualType as plugin type breaks di:compile — get_class_methods).
+    -->
+    <type name="Magento\Sales\Model\ResourceModel\Order\Status\History">
+        <plugin name="ixpf_syncer_order_comment_webhook" type="IXPF\Syncer\Plugin\OrderCommentWebhook" />
+    </type>
+    <type name="Magento\Sales\Model\ResourceModel\Order\Invoice\Comment">
+        <plugin name="ixpf_syncer_invoice_comment_webhook" type="IXPF\Syncer\Plugin\InvoiceCommentWebhook" />
+    </type>
+    <type name="Magento\Sales\Model\ResourceModel\Order\Shipment\Comment">
+        <plugin name="ixpf_syncer_shipment_comment_webhook" type="IXPF\Syncer\Plugin\ShipmentCommentWebhook" />
+    </type>
+    <type name="Magento\Sales\Model\ResourceModel\Order\Creditmemo\Comment">
+        <plugin name="ixpf_syncer_creditmemo_comment_webhook" type="IXPF\Syncer\Plugin\CreditmemoCommentWebhook" />
     </type>
 
 
@@ -74,6 +107,23 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="IXPF\Syncer\Model\ResourceModel\IxpfReview\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ixpf_review</argument>
+            <argument name="resourceModel" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfReview</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- identifierName is review_group, not entity_id: this table's primary key is the varchar
+         join key itself and SearchResult otherwise assumes an "id" column that does not exist. -->
+    <virtualType name="IXPF\Syncer\Model\ResourceModel\IxpfReviewGroup\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ixpf_review_group</argument>
+            <argument name="resourceModel" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfReviewGroup</argument>
+            <argument name="identifierName" xsi:type="string">review_group</argument>
+        </arguments>
+    </virtualType>
+
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
@@ -83,6 +133,8 @@
                 <item name="ixpfsyncer_purchaseorder_product_listing_data_source" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfPurchaseOrderProduct\Grid\Collection</item>
                 <item name="ixpf_product_bulk_update_queue_listing_data_source" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfProductBulkUpdateQueue\Grid\Collection</item>
                 <item name="ixpfsyncer_orderapiactivity_listing_data_source" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfOrderApiActivity\Grid\Collection</item>
+                <item name="ixpfsyncer_review_listing_data_source" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfReview\Grid\Collection</item>
+                <item name="ixpfsyncer_reviewgroup_listing_data_source" xsi:type="string">IXPF\Syncer\Model\ResourceModel\IxpfReviewGroup\Grid\Collection</item>
             </argument>
         </arguments>
     </type>

@@ -37,5 +37,9 @@
             <schedule>*/1 * * * *</schedule>
         </job>
 
+        <job name="ixpf_review_media_cleanup" instance="IXPF\Syncer\Cron\ReviewMediaCleanup" method="execute">
+            <schedule>0 3 * * *</schedule>
+        </job>
+
     </group>
 </config>

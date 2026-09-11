@@ -146,4 +146,121 @@
             <column name="entity_id"/>
         </constraint>
     </table>
+
+    <table name="ixpf_review_group" engine="innodb" comment="IXPF Review Pool Aggregates">
+        <column xsi:type="varchar" name="review_group" length="64" nullable="false" comment="Pool key as sent by IXPF, opaque"/>
+        <column xsi:type="int" name="review_count" unsigned="true" nullable="false" default="0"/>
+        <!-- Reviews carrying a written body. review_count is every rating, including star-only
+             ones, so this is always <= review_count. Drives the "79 ratings and 41 reviews"
+             label and the with-text filter's unfiltered total. -->
+        <column xsi:type="int" name="with_text_count" unsigned="true" nullable="false" default="0"/>
+        <column xsi:type="decimal" name="review_average" scale="2" precision="3" nullable="false" default="0"/>
+        <column xsi:type="int" name="dist_1" unsigned="true" nullable="false" default="0" comment="distribution[0], 1-star"/>
+        <column xsi:type="int" name="dist_2" unsigned="true" nullable="false" default="0"/>
+        <column xsi:type="int" name="dist_3" unsigned="true" nullable="false" default="0"/>
+        <column xsi:type="int" name="dist_4" unsigned="true" nullable="false" default="0"/>
+        <column xsi:type="int" name="dist_5" unsigned="true" nullable="false" default="0" comment="distribution[4], 5-star"/>
+        <column xsi:type="decimal" name="avg_quality" scale="2" precision="3" nullable="true"/>
+        <column xsi:type="decimal" name="avg_delivery" scale="2" precision="3" nullable="true"/>
+        <column xsi:type="decimal" name="avg_customer_service" scale="2" precision="3" nullable="true"/>
+        <column xsi:type="text" name="group_label" nullable="true" comment="JSON, locale keyed"/>
+        <column xsi:type="datetime" name="generated_at" nullable="false" comment="Payload generated_at, staleness guard"/>
+        <column xsi:type="datetime" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Local write time"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="review_group"/>
+        </constraint>
+    </table>
+
+    <table name="ixpf_review" engine="innodb" comment="IXPF Reviews">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Module internal, do not join from outside"/>
+        <column xsi:type="varchar" name="review_id" length="32" nullable="false" comment="IXPF id, the identifier to join on"/>
+        <column xsi:type="varchar" name="review_group" length="64" nullable="false"/>
+        <column xsi:type="char" name="payload_hash" length="32" nullable="false" comment="md5 of this review JSON as received, drives the diff apply"/>
+        <column xsi:type="varchar" name="sku" length="64" nullable="false" comment="SKU actually reviewed, display only"/>
+        <column xsi:type="smallint" name="rating" unsigned="true" nullable="false"/>
+        <column xsi:type="smallint" name="rating_quality" unsigned="true" nullable="true"/>
+        <column xsi:type="smallint" name="rating_delivery" unsigned="true" nullable="true"/>
+        <column xsi:type="smallint" name="rating_customer_service" unsigned="true" nullable="true"/>
+        <column xsi:type="varchar" name="reviewer" length="255" nullable="false"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" comment="Review date from payload, not local time"/>
+        <column xsi:type="datetime" name="purchased_at" nullable="true"/>
+        <!-- customer | staff | auto. Stored because the spec asks for it; nothing renders it. -->
+        <column xsi:type="varchar" name="source" length="16" nullable="true"/>
+        <column xsi:type="varchar" name="source_locale" length="12" nullable="false"/>
+        <column xsi:type="varchar" name="source_store_code" length="32" nullable="false"/>
+        <column xsi:type="varchar" name="bought_name" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="bought_variant_text" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="thumbnail_path" length="500" nullable="true" comment="Bucket path as sent"/>
+        <column xsi:type="varchar" name="thumbnail_local" length="500" nullable="true" comment="Local media path once fetched"/>
+        <column xsi:type="smallint" name="has_photos" nullable="false" default="0" comment="Denormalised, drives the photo filter"/>
+        <column xsi:type="varchar" name="reply_author" length="255" nullable="true"/>
+        <column xsi:type="datetime" name="reply_created_at" nullable="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="IXPF_REVIEW_REVIEW_ID_UNIQUE">
+            <column name="review_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="IXPF_REVIEW_GROUP_FK"
+                    table="ixpf_review" column="review_group"
+                    referenceTable="ixpf_review_group" referenceColumn="review_group" onDelete="CASCADE"/>
+
+        <!-- created_at is the trailing column on purpose: the list is always sorted by it, so the
+             index satisfies filter and sort together instead of filtering then filesorting. -->
+        <index referenceId="IXPF_REVIEW_GROUP_CREATED_AT" indexType="btree">
+            <column name="review_group"/>
+            <column name="created_at"/>
+        </index>
+        <index referenceId="IXPF_REVIEW_GROUP_RATING_CREATED_AT" indexType="btree">
+            <column name="review_group"/>
+            <column name="rating"/>
+            <column name="created_at"/>
+        </index>
+        <index referenceId="IXPF_REVIEW_GROUP_PHOTOS_CREATED_AT" indexType="btree">
+            <column name="review_group"/>
+            <column name="has_photos"/>
+            <column name="created_at"/>
+        </index>
+    </table>
+
+    <!-- Separate table rather than a JSON column so a read fetches two locales, not all fourteen. -->
+    <table name="ixpf_review_text" engine="innodb" comment="IXPF Review Text Per Locale">
+        <column xsi:type="int" name="review_entity_id" unsigned="true" nullable="false"/>
+        <column xsi:type="varchar" name="locale" length="12" nullable="false"/>
+        <!-- No title column: IXPF removed `title` from the payload in the 2026-09-07 spec. The
+             whitelist entry for it stays, which is what authorises the DROP. -->
+        <column xsi:type="text" name="body" nullable="true"/>
+        <column xsi:type="text" name="reply_body" nullable="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="review_entity_id"/>
+            <column name="locale"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="IXPF_REVIEW_TEXT_REVIEW_FK"
+                    table="ixpf_review_text" column="review_entity_id"
+                    referenceTable="ixpf_review" referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+
+    <table name="ixpf_review_photo" engine="innodb" comment="IXPF Review Photos">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="int" name="review_entity_id" unsigned="true" nullable="false"/>
+        <column xsi:type="varchar" name="bucket_path" length="500" nullable="false"/>
+        <column xsi:type="varchar" name="local_path" length="500" nullable="true" comment="Null until fetched"/>
+        <column xsi:type="int" name="width" unsigned="true" nullable="true"/>
+        <column xsi:type="int" name="height" unsigned="true" nullable="true"/>
+        <column xsi:type="smallint" name="position" nullable="false" default="0"/>
+        <column xsi:type="datetime" name="downloaded_at" nullable="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="IXPF_REVIEW_PHOTO_REVIEW_FK"
+                    table="ixpf_review_photo" column="review_entity_id"
+                    referenceTable="ixpf_review" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="IXPF_REVIEW_PHOTO_REVIEW_ENTITY_ID" indexType="btree">
+            <column name="review_entity_id"/>
+        </index>
+    </table>
 </schema>

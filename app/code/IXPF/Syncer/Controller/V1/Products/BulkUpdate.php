@@ -122,13 +122,17 @@ class BulkUpdate extends AbstractController implements HttpPostActionInterface, 
                 $this->productUpdateLogger->writeDaily("Bulk update products Store ID: " . $store);
                 $this->productUpdateLogger->writeDaily(json_encode($updatedAttributesWithValue));
 
-                // Split: non-null values go to updateAttributes,
-                // null values on a non-default store trigger a "reset to default" (EAV row delete).
-                $toUpdate = array_filter($updatedAttributesWithValue, fn($v) => $v !== null);
-                $toReset  = array_filter($updatedAttributesWithValue, fn($v) => $v === null);
+                // Keep every non-null value. Keep 'special_price' even when null so it is
+                // written through updateAttributes (null clears the special price). A null
+                // on any other attribute is dropped — never sent to updateAttributes.
+                $toUpdate = array_filter(
+                    $updatedAttributesWithValue,
+                    fn($v, $k) => $v !== null || $k === 'special_price',
+                    ARRAY_FILTER_USE_BOTH
+                );
 
                 if (!empty($toUpdate)) {
-                    //-- update attributes (non-null values only)
+                    //-- update attributes (special_price kept even when null)
                     $this->productAction->updateAttributes($payload['product_ids'], $toUpdate, $store);
 
                     //-- Recalculate otto_price if price or special_price was updated

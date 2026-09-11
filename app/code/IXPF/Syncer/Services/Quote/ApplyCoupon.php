@@ -18,7 +18,8 @@ class ApplyCoupon
     public function __construct(
         protected readonly CartRepositoryInterface $cartRepository,
         protected readonly Emulation               $emulation,
-        protected readonly QuoteLogger             $logger
+        protected readonly QuoteLogger             $logger,
+        protected readonly CustomerGroupTaxScope   $customerGroupTaxScope
     ) {
     }
 
@@ -39,6 +40,7 @@ class ApplyCoupon
         $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
         try {
             $quote->setIsSuperMode(true);
+            $this->customerGroupTaxScope->apply($quote);
             if (!$quote->isVirtual()) {
                 $quote->getShippingAddress()->setCollectShippingRates(true);
             }
@@ -48,6 +50,7 @@ class ApplyCoupon
             $quote->collectTotals();
             $this->cartRepository->save($quote);
         } finally {
+            $this->customerGroupTaxScope->release();
             $this->emulation->stopEnvironmentEmulation();
         }
 

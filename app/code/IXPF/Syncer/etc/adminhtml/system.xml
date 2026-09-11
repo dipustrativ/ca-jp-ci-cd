@@ -409,6 +409,56 @@
             </group>
         </section>
 
+        <section id="ixpf_reviews" translate="label" type="text" sortOrder="111" showInDefault="1" showInWebsite="1"
+                 showInStore="1">
+            <label>Product Reviews</label>
+            <tab>ixpfng</tab>
+            <resource>Magento_Backend::admin</resource>
+
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>General</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Enable Reviews</label>
+                    <comment>Master switch for the review read service and cleanup cron. Ingest is NOT affected — IXPF can backfill while this is off.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="show_on_frontend" translate="label comment" type="select" sortOrder="15" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Show On Storefront</label>
+                    <comment>Renders the rating on product pages and the review drawer. Turn off to hide reviews from customers while keeping the read service available. Requires Enable Reviews above.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="per_page" translate="label comment" type="text" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Reviews Per Page</label>
+                    <comment>Default page size for the review list.</comment>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="warn_threshold" translate="label comment" type="text" sortOrder="30" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Payload Warn Threshold</label>
+                    <comment>Log a warning when one push carries more reviews than this. The payload is still processed.</comment>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+            </group>
+
+            <group id="media" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Media</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable Media Download</label>
+                    <comment>Download review photos and bought-item thumbnails from the GCS bucket.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+
     </system>
 </config>
 

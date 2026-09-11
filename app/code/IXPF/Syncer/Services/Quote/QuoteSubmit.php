@@ -5,6 +5,7 @@ namespace IXPF\Syncer\Services\Quote;
 
 use Exception;
 use IXPF\Syncer\Helper\Logger\QuoteLogger;
+use IXPF\Syncer\Observer\QuoteSubmitBefore;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\QuoteManagement;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -27,7 +28,8 @@ class QuoteSubmit
         protected readonly OrderCommentSender       $orderCommentSender,
         protected readonly OrderRepositoryInterface $orderRepository,
         protected readonly Emulation                $emulation,
-        protected readonly QuoteLogger              $logger
+        protected readonly QuoteLogger              $logger,
+        protected readonly CustomerGroupTaxScope    $customerGroupTaxScope
     ) {
     }
 
@@ -42,9 +44,15 @@ class QuoteSubmit
         $comment        = trim((string)($payload['comment'] ?? ''));
         $commentVisible = !empty($payload['comment_visible_storefront']);
         $notifyComment  = !empty($payload['comment_notify_customer']);
+        // Optional order email (admin parity) — becomes the order's email so all
+        // order mails go there. Empty = keep the customer's email on the quote.
+        $orderEmail     = trim((string)($payload['order_email'] ?? ''));
 
         if ($paymentMethod === '') {
             throw new Exception('payment_method is required');
+        }
+        if ($orderEmail !== '' && !filter_var($orderEmail, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception('order_email is not a valid email');
         }
 
         $quote   = $this->cartRepository->get($quoteId);
@@ -59,13 +67,34 @@ class QuoteSubmit
             $quote->setIsSuperMode(true);
             $quote->setIgnoreOldQty(true);
 
+            // Drive the new-order email off the API's send_email flag. Core
+            // SubmitObserver reads the order's canSendNewEmailFlag on
+            // submit_success; QuoteSubmitBefore copies this quote flag onto the
+            // order so send_email:false actually suppresses the mail (and
+            // send_email:true sends it exactly once, via core).
+            $quote->setData(QuoteSubmitBefore::QUOTE_FLAG, $sendEmail);
+
+            // Keep tax on the quote's customer group for the final order totals.
+            $this->customerGroupTaxScope->apply($quote);
+
             if (!$quote->isVirtual()) {
+                $shipping = $quote->getShippingAddress();
+                // Fall back to a method already set on the quote (via SetShippingMethod).
+                if ($shippingMethod === '') {
+                    $shippingMethod = (string)$shipping->getShippingMethod();
+                }
                 if ($shippingMethod === '') {
                     throw new Exception('shipping_method is required for a physical order');
                 }
-                $shipping = $quote->getShippingAddress();
                 $shipping->setCollectShippingRates(true);
                 $shipping->setShippingMethod($shippingMethod);
+            }
+
+            // Override the order email when provided — all order mails
+            // (confirmation + comment notifications) then go to this address.
+            if ($orderEmail !== '') {
+                $quote->setCustomerEmail($orderEmail);
+                $quote->getBillingAddress()->setEmail($orderEmail);
             }
 
             $quote->getPayment()->importData(['method' => $paymentMethod]);
@@ -76,12 +105,18 @@ class QuoteSubmit
 
             $order = $this->quoteManagement->submit($quote);
         } finally {
+            $this->customerGroupTaxScope->release();
             $this->emulation->stopEnvironmentEmulation();
         }
 
         if (!$order || !$order->getId()) {
             throw new Exception("Order could not be placed for quote #$quoteId");
         }
+
+        // Mark order as placed via IXPF — internal note, not shown to customer.
+        $ixpfHistory = $order->addCommentToStatusHistory('Order placed using IXPF', false, false);
+        $ixpfHistory->setIsCustomerNotified(false);
+        $this->orderRepository->save($order);
 
         if ($comment !== '') {
             $history = $order->addCommentToStatusHistory($comment, false, $commentVisible);
@@ -100,16 +135,9 @@ class QuoteSubmit
             }
         }
 
-        if ($sendEmail) {
-            try {
-                $this->orderSender->send($order);
-            } catch (Exception $e) {
-                $this->logger->writeDaily(
-                    "[quote_submit] Order #{$order->getIncrementId()} email failed: " . $e->getMessage(),
-                    'error'
-                );
-            }
-        }
+        // Order confirmation email is handled by core SubmitObserver, gated by
+        // the canSendNewEmailFlag that QuoteSubmitBefore set from $sendEmail.
+        // No explicit send here — that would double-send on send_email:true.
 
         $this->logger->writeDaily(
             "[quote_submit] Quote #$quoteId placed as order #{$order->getIncrementId()} (grand_total {$order->getGrandTotal()})"

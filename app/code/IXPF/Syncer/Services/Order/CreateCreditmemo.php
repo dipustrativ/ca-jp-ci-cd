@@ -69,6 +69,10 @@ class CreateCreditmemo
             );
         }
 
+        // Flag items to return qty to salable source stock (MSI/legacy).
+        // Without back_to_stock the refund observer never returns qty to source.
+        $this->applyBackToStock($creditmemo, $payload);
+
         // Offline refund by default. Parse "false"/"0"/0/false all as false.
         $offlineRequested = filter_var(
             $payload['offline'] ?? true,
@@ -105,6 +109,11 @@ class CreateCreditmemo
             'status'                    => $order->getStatus(),
             'offline'                   => $offlineRequested,
             'notified'                  => $notify,
+            'back_to_stock'             => filter_var(
+                $payload['back_to_stock'] ?? true,
+                FILTER_VALIDATE_BOOLEAN,
+                FILTER_NULL_ON_FAILURE
+            ) ?? true,
         ];
     }
 
@@ -162,6 +171,53 @@ class CreateCreditmemo
         }
 
         return $data;
+    }
+
+    /**
+     * Set back_to_stock flag on creditmemo items so refund returns qty to salable source.
+     *
+     * Default: return all items to stock. Override globally with payload['back_to_stock']=false,
+     * or per item with items[].back_to_stock (identified by order_item_id or sku).
+     */
+    private function applyBackToStock(Order\Creditmemo $creditmemo, array $payload): void
+    {
+        $default = filter_var(
+            $payload['back_to_stock'] ?? true,
+            FILTER_VALIDATE_BOOLEAN,
+            FILTER_NULL_ON_FAILURE
+        ) ?? true;
+
+        // Per-item overrides keyed by order_item_id.
+        $perItem = [];
+        if (!empty($payload['items']) && is_array($payload['items'])) {
+            $skuToItemId = $this->buildSkuMap($creditmemo->getOrder());
+            foreach ($payload['items'] as $item) {
+                if (!array_key_exists('back_to_stock', $item)) {
+                    continue;
+                }
+                $orderItemId = null;
+                if (!empty($item['order_item_id'])) {
+                    $orderItemId = (int) $item['order_item_id'];
+                } elseif (!empty($item['sku'])) {
+                    $orderItemId = $skuToItemId[$item['sku']] ?? null;
+                }
+                if ($orderItemId) {
+                    $perItem[$orderItemId] = filter_var(
+                        $item['back_to_stock'],
+                        FILTER_VALIDATE_BOOLEAN,
+                        FILTER_NULL_ON_FAILURE
+                    ) ?? $default;
+                }
+            }
+        }
+
+        foreach ($creditmemo->getAllItems() as $cmItem) {
+            if ($cmItem->getQty() <= 0) {
+                continue;
+            }
+            $orderItemId = (int) $cmItem->getOrderItemId();
+            $cmItem->setBackToStock($perItem[$orderItemId] ?? $default);
+        }
     }
 
     private function buildSkuMap(Order $order): array
