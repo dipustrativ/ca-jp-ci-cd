@@ -13,6 +13,8 @@
 <?php if ($block->canShowBlock()) : ?>
     <?php
     $filters = $block->getFilters();
+    // Quick-pick presets under the sliders (CarpetAvenue_Productify).
+    $presets = $block->getData('filter_presets_view_model');
     $activeFilters = $block->getLayer()->getState()->getFilters();
     $filtered = count($activeFilters);
 
@@ -20,11 +22,19 @@
     // single "Size" section holding both range sliders. Order fixed to
     // Length-then-Width to match the reference design.
     $dimensionVars = ['height2', 'width2'];
+    // Shown as a row inside the 価格 panel rather than a panel of its own, which
+    // is where carpetavenue.jp puts it.
+    $onSaleVar = 'am_on_sale';
+    $onSaleFilter = null;
     $sections = [];
     $sizeGroup = [];
     $sizeSectionIdx = null;
     foreach ($filters as $filter) {
         if (!$filter->getItemsCount()) {
+            continue;
+        }
+        if ($filter->getRequestVar() === $onSaleVar) {
+            $onSaleFilter = $filter;
             continue;
         }
         if (in_array($filter->getRequestVar(), $dimensionVars, true)) {
@@ -81,14 +91,81 @@
                                 </button>
                                 <h2 class="filter-options-content__title"><?= $escaper->escapeHtml($itemTitle) ?></h2>
                                 <?php if ($isSize) : ?>
+                                    <?php // Everything under the title scrolls as one block, so the
+                                          // pinned クリア / 表示 bar is never overlapped however short
+                                          // the viewport. ?>
+                                    <div class="filter-options-scroll">
                                     <?php foreach ($sizeFilters as $dimFilter) : ?>
                                         <div class="filter-dimension filter-dimension--<?= $escaper->escapeHtmlAttr($dimFilter->getRequestVar()) ?>">
                                             <div class="filter-dimension__label"><?= $escaper->escapeHtml(__($dimFilter->getName())) ?></div>
                                             <?= /* @noEscape */ $block->getChildBlock('renderer')->render($dimFilter) ?>
                                         </div>
                                     <?php endforeach; ?>
+                                    <?php if ($presets) : ?>
+                                        <ul class="filter-presets filter-presets--size">
+                                            <?php foreach ($presets->getSizePresets() as $preset) : ?>
+                                                <li class="filter-presets__item">
+                                                    <button type="button" class="button action filter-presets__button"
+                                                            data-preset-length="<?= $escaper->escapeHtmlAttr($preset['length'][0] . '-' . $preset['length'][1]) ?>"
+                                                            data-preset-width="<?= $escaper->escapeHtmlAttr($preset['width'][0] . '-' . $preset['width'][1]) ?>">
+                                                        <?= $escaper->escapeHtml($preset['label']) ?>
+                                                    </button>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    <?php endif; ?>
+                                    </div>
                                 <?php else : ?>
+                                    <?php
+                                    //  Price is the only non-size panel that needs the
+                                    //  wrapper: every attribute panel already scrolls via
+                                    //  .am-filter-items, and nesting a second scroller
+                                    //  around that would break it.
+                                    $isPrice = $section['filter']->getRequestVar() === 'price'
+                                        && $section['filter'] instanceof \CarpetAvenue\Productify\LayeredNavigation\Model\Layer\Filter\SliderFilterInterface;
+                                    $showPricePresets = $presets && $isPrice && $presets->showPricePresets();
+                                    ?>
+                                    <?php if ($showPricePresets) : ?><div class="filter-options-scroll"><?php endif; ?>
                                     <?= /* @noEscape */ $block->getChildBlock('renderer')->render($section['filter']) ?>
+                                    <?php if ($showPricePresets) : ?>
+                                        <ul class="filter-presets filter-presets--price">
+                                            <?php foreach ($presets->getPricePresets($section['filter']) as $preset) : ?>
+                                                <li class="filter-presets__item">
+                                                    <button type="button" class="button action filter-presets__button"
+                                                            data-preset-price="<?= $escaper->escapeHtmlAttr($preset['from'] . '-' . $preset['to']) ?>">
+                                                        <?= $escaper->escapeHtml($preset['label']) ?>
+                                                    </button>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    <?php endif; ?>
+                                    <?php
+                                    $onSaleItem = ($isPrice && $presets && $onSaleFilter)
+                                        ? $presets->getOnSaleItem($onSaleFilter)
+                                        : null;
+                                    ?>
+                                    <?php if ($onSaleItem) : ?>
+                                        <?php // Same markup as any filter row, so the tick, the count
+                                              // pill and the batch-apply JS all work unchanged. ?>
+                                        <ol class="items am-filter-items am-filter--am_on_sale">
+                                            <li class="item am-filter-item<?= $onSaleItem['selected'] ? ' -selected' : '' ?>">
+                                                <a class="am-filter-link"
+                                                   href="<?= $escaper->escapeUrl($onSaleItem['url']) ?>"
+                                                   rel="nofollow"
+                                                   role="checkbox"
+                                                   aria-checked="<?= $onSaleItem['selected'] ? 'true' : 'false' ?>"
+                                                   data-req-var="am_on_sale"
+                                                   data-value="1"
+                                                   data-multi="0"
+                                                   data-selected="<?= $onSaleItem['selected'] ? '1' : '0' ?>">
+                                                    <span class="am-filter-checkbox" aria-hidden="true"></span>
+                                                    <span class="am-filter-label"><?= $escaper->escapeHtml($onSaleItem['label']) ?></span>
+                                                    <span class="count"><?= (int) $onSaleItem['count'] ?></span>
+                                                </a>
+                                            </li>
+                                        </ol>
+                                    <?php endif; ?>
+                                    <?php if ($showPricePresets) : ?></div><?php endif; ?>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -162,6 +239,52 @@
                 title: '<?= $escaper->escapeJs(__('Filter')) ?>',
                 buttons: []
             };
+
+            //  Quick-pick presets. Delegated from document so they survive the
+            //  AJAX filter swap, which replaces this whole block. Each button
+            //  drives the slider widget's public setRange(), so staging and the
+            //  live count in "Show" behave exactly as dragging the handles does.
+            //
+            //  Instance looked up the same way price-slider.js finds the AJAX
+            //  widget: jQuery camel-cases the widgetFullName it stores under.
+            function applyPreset($scope, range) {
+                var parts = String(range || '').split('-'),
+                    widget = $scope.find('.am-price-slider').data('carpetavenuePriceSlider');
+
+                //  No widget yet means the panel has never been opened, so
+                //  data-mage-init has not run on it. Nothing to move.
+                if (parts.length !== 2 || !widget || typeof widget.setRange !== 'function') {
+                    return;
+                }
+
+                widget.setRange(parts[0], parts[1]);
+            }
+
+            $(document).on('click.carpFilterPresets', '.filter-presets__button', function () {
+                var $button = $(this),
+                    $panel = $button.closest('.filter-options-content');
+
+                if ($button.is('[data-preset-price]')) {
+                    applyPreset($panel, $button.attr('data-preset-price'));
+
+                    return;
+                }
+
+                //  Size drives both dimension sliders from one button.
+                applyPreset($panel.find('.filter-dimension--height2'), $button.attr('data-preset-length'));
+                applyPreset($panel.find('.filter-dimension--width2'), $button.attr('data-preset-width'));
+            });
+
+            //  Mark the band you picked so the grey fill stays after the cursor
+            //  leaves. Scoped to the button's own list so the price and size
+            //  panels do not clear each other. Separate from the handler above
+            //  because that one returns early on the price branch.
+            $(document).on('click.carpFilterPresets', '.filter-presets__button', function () {
+                var $button = $(this);
+
+                $button.closest('.filter-presets').find('.filter-presets__button').removeClass('-active');
+                $button.addClass('-active');
+            });
 
             // (Re)wire the drawer. Runs on first load AND after every AJAX filter
             // apply/remove — that swap replaces #layered-filter-block / #filter-popup

@@ -6,6 +6,13 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+        <!-- Quick-pick presets under the price and size sliders, rendered by the
+             theme's layer/view.phtml. Ported from carpetavenue.jp's CarpetFinder. -->
+        <referenceBlock name="catalog.leftnav">
+            <arguments>
+                <argument name="filter_presets_view_model" xsi:type="object">CarpetAvenue\Productify\LayeredNavigation\ViewModel\FilterPresets</argument>
+            </arguments>
+        </referenceBlock>
         <referenceBlock name="catalog.navigation.renderer" template="CarpetAvenue_Productify::layer/filter.phtml">
             <arguments>
                 <argument name="category_image_view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\CategoryImages</argument>

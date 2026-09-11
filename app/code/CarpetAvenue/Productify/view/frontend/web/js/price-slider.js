@@ -146,6 +146,27 @@ define([
             }, this.options.inputDelay);
         },
 
+        /**
+         * Public: jump both handles to a range and apply it. Used by the
+         * quick-pick preset buttons, which are plain markup outside this
+         * widget — they should behave exactly as dragging the handles does,
+         * so they route through the same _apply() and therefore the same
+         * staging and live count.
+         */
+        setRange: function (from, to) {
+            from = Math.max(this.options.min, Math.min(this.options.max, Number(from)));
+            to = Math.max(this.options.min, Math.min(this.options.max, Number(to)));
+
+            if (from > to) {
+                return;
+            }
+
+            this._$slider.slider('values', [from, to]);
+            this._$from.val(from);
+            this._$to.val(to);
+            this._apply(from, to);
+        },
+
         _apply: function (from, to) {
             var url = new URL(window.location.href),
                 ajaxWidget = $('body').data('carpetavenueFilterAjax');
