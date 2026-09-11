@@ -11,6 +11,7 @@ use Magento\Eav\Api\AttributeOptionManagementInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Eav\Model\Entity\Attribute\Source\Table as TableSource;
+use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 
 class ProductAttribute
 {
@@ -172,9 +173,39 @@ class ProductAttribute
             ];
             $eavSetup->addAttributeOption($option);
 
+            //-- the attribute instance is kept in $cacheAttributes for the whole request and its
+            //-- source model caches the option list per store — without this reset the freshly
+            //-- created option is invisible and the value is silently dropped
+            $this->resetOptionCache($attributeCode);
+
             return $this->getAttributeOptionListWithLabelIdPair($attributeCode);
         } catch (\Exception $exception) {
             return null;
+        }
+    }
+
+    /**
+     * Drop both the local label/id maps and the attribute source model's own option cache.
+     *
+     * @param string $attributeCode
+     * @return void
+     */
+    public function resetOptionCache(string $attributeCode): void
+    {
+        $attributeCode = trim($attributeCode);
+        unset(
+            $this->cacheAttributesOptionValues[$attributeCode],
+            $this->cacheAttributesOptionIds[$attributeCode]
+        );
+
+        $attribute = $this->getAttribute($attributeCode);
+        if (!$attribute) {
+            return;
+        }
+
+        $source = $attribute->getSource();
+        if ($source instanceof ResetAfterRequestInterface) {
+            $source->_resetState();
         }
     }
 
@@ -191,9 +222,11 @@ class ProductAttribute
         foreach ($options as $option) {
             if (!empty($option['value']) && !empty($option['label'])) {
                 $attributeOptionValues[strtolower(trim($option['label']))] = $option['value'];
+                $attributeOptionIds[(string)(int)$option['value']] = $option['value'];
             }
         }
         $this->cacheAttributesOptionValues[trim($attributeCode)] = $attributeOptionValues;
+        $this->cacheAttributesOptionIds[trim($attributeCode)] = $attributeOptionIds;
         return $attributeOptionValues;
     }
 
@@ -215,7 +248,7 @@ class ProductAttribute
                 } elseif (is_string($value)) {
                     $values = explode(',', $value);
                 } else {
-                    return [];
+                    return '';
                 }
 
                 $result = [];
@@ -230,7 +263,10 @@ class ProductAttribute
                         $result[] = $optId;
                     }
                 }
-                return array_values(array_unique($result));
+                //-- comma string, not an array: on a *new* product model the ArrayBackend
+                //-- never runs over an untouched attribute, so an array value is dropped by
+                //-- AbstractEntity::_collectSaveData and nothing is written
+                return implode(',', array_unique($result));
             case 'date':
             case 'boolean':
             case 'text':
