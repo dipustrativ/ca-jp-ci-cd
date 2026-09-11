@@ -6,6 +6,7 @@
             <general>
                 <enabled>1</enabled>
                 <batch_size>500</batch_size>
+                <sync_order_totals>1</sync_order_totals>
             </general>
         </exportimport>
     </default>

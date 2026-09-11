@@ -22,6 +22,17 @@
                     <comment>Number of orders committed per batch during import.</comment>
                     <validate>validate-digits validate-greater-than-zero</validate>
                 </field>
+                <field id="sync_order_totals" translate="label comment" type="select" sortOrder="30"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Sync Order Totals After Document Import</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[After importing documents, recompute the figures the parent order derives
+                        from them: Total Invoiced / Total Paid / Total Refunded and the per-item invoiced and
+                        refunded quantities after invoices and credit memos, the per-item shipped quantities after
+                        shipments. Leave on: with it off, an imported invoice leaves the order showing Total Paid 0
+                        and an imported shipment leaves every item showing 0 shipped. Turn it off only when the
+                        order CSV is the authority for those figures.]]></comment>
+                </field>
             </group>
         </section>
     </system>

@@ -1,0 +1,84 @@
+<?php
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @var \CarpetAvenue\ExportImport\Block\Adminhtml\Transaction\Export\Form $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="carpetavenue-exportimport-transaction-export">
+    <form action="<?= $escaper->escapeUrl($block->getFormAction()) ?>" method="post" id="ca-transaction-export-form">
+        <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
+
+        <fieldset class="admin__fieldset">
+            <legend class="admin__legend">
+                <span><?= $escaper->escapeHtml(__('Transaction Export Filters')) ?></span>
+            </legend>
+            <br/>
+
+            <div class="admin__field">
+                <label class="admin__field-label" for="store_id"><span><?= $escaper->escapeHtml(__('Store View')) ?></span></label>
+                <div class="admin__field-control">
+                    <select name="store_id" id="store_id" class="admin__control-select">
+                        <option value=""><?= $escaper->escapeHtml(__('-- All Stores --')) ?></option>
+                        <?php foreach ($block->getStoreOptions() as $option): ?>
+                            <option value="<?= $escaper->escapeHtmlAttr($option['value']) ?>">
+                                <?= $escaper->escapeHtml($option['label']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <p class="admin__field-note">
+                        <?= $escaper->escapeHtml(__('The transaction table has no store column — this filters on the store of the order it belongs to.')) ?>
+                    </p>
+                </div>
+            </div>
+
+            <div class="admin__field">
+                <label class="admin__field-label" for="txn_type"><span><?= $escaper->escapeHtml(__('Transaction Type')) ?></span></label>
+                <div class="admin__field-control">
+                    <select name="txn_type[]" id="txn_type" multiple="multiple" size="6" class="admin__control-multiselect">
+                        <?php foreach ($block->getTypeOptions() as $option): ?>
+                            <option value="<?= $escaper->escapeHtmlAttr($option['value']) ?>">
+                                <?= $escaper->escapeHtml($option['label']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <p class="admin__field-note"><?= $escaper->escapeHtml(__('Leave empty for all. Ctrl/Cmd-click to select several.')) ?></p>
+                </div>
+            </div>
+
+            <div class="admin__field">
+                <label class="admin__field-label" for="from"><span><?= $escaper->escapeHtml(__('Created From')) ?></span></label>
+                <div class="admin__field-control">
+                    <input type="date" name="from" id="from" class="admin__control-text"/>
+                </div>
+            </div>
+
+            <div class="admin__field">
+                <label class="admin__field-label" for="to"><span><?= $escaper->escapeHtml(__('Created To')) ?></span></label>
+                <div class="admin__field-control">
+                    <input type="date" name="to" id="to" class="admin__control-text"/>
+                </div>
+            </div>
+
+            <div class="admin__field">
+                <label class="admin__field-label" for="order_increment_id">
+                    <span><?= $escaper->escapeHtml(__('Order Increment IDs')) ?></span>
+                </label>
+                <div class="admin__field-control">
+                    <textarea name="order_increment_id" id="order_increment_id" rows="3"
+                              class="admin__control-textarea"></textarea>
+                    <p class="admin__field-note">
+                        <?= $escaper->escapeHtml(__('Optional. One per line, or comma-separated. Leave empty for all orders.')) ?>
+                    </p>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="admin__field">
+            <button type="submit" class="action-primary" title="<?= $escaper->escapeHtmlAttr(__('Export CSV')) ?>">
+                <span><?= $escaper->escapeHtml(__('Export CSV')) ?></span>
+            </button>
+        </div>
+    </form>
+</div>

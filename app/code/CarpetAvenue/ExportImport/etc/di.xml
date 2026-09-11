@@ -33,12 +33,247 @@
         </arguments>
     </type>
 
+    <!--
+        Invoice / credit-memo / shipment export-import.
+
+        Schema, Exporter, Validator and Importer under Model\Document\ are written
+        once and parameterised by a Model\Document\TypeInterface. One set of
+        virtualTypes per document type binds them; Model\Document\Pool maps the
+        type code used in URLs and CLI options to the right set.
+
+        Adding a further document type means one Type class plus a block of
+        virtualTypes here — no controller, block or command changes.
+
+        Each importer also gets the order-aggregate synchroniser for its type: the
+        money documents feed the invoiced / paid / refunded family, a shipment
+        feeds the per-item qty_shipped, and neither may rewrite the other's
+        figures. The preference is the default for anything constructing an
+        importer outside these virtualTypes.
+    -->
+    <preference for="CarpetAvenue\ExportImport\Model\Document\OrderAggregateSynchronizerInterface"
+                type="CarpetAvenue\ExportImport\Model\Document\OrderTotalsSynchronizer"/>
+
+    <virtualType name="CarpetAvenue\ExportImport\Model\Document\InvoiceSchema"
+                 type="CarpetAvenue\ExportImport\Model\Document\Schema">
+        <arguments>
+            <argument name="type" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Invoice</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="CarpetAvenue\ExportImport\Model\Document\InvoiceExporter"
+                 type="CarpetAvenue\ExportImport\Model\Document\Exporter">
+        <arguments>
+            <argument name="type" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Invoice</argument>
+            <argument name="schema" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\InvoiceSchema</argument>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="CarpetAvenue\ExportImport\Model\Document\InvoiceValidator"
+                 type="CarpetAvenue\ExportImport\Model\Document\Validator">
+        <arguments>
+            <argument name="type" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Invoice</argument>
+            <argument name="schema" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\InvoiceSchema</argument>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="CarpetAvenue\ExportImport\Model\Document\InvoiceImporter"
+                 type="CarpetAvenue\ExportImport\Model\Document\Importer">
+        <arguments>
+            <argument name="type" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Invoice</argument>
+            <argument name="schema" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\InvoiceSchema</argument>
+            <argument name="validator" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\InvoiceValidator</argument>
+            <argument name="orderSynchronizer" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\OrderTotalsSynchronizer</argument>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="CarpetAvenue\ExportImport\Model\Document\CreditmemoSchema"
+                 type="CarpetAvenue\ExportImport\Model\Document\Schema">
+        <arguments>
+            <argument name="type" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Creditmemo</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="CarpetAvenue\ExportImport\Model\Document\CreditmemoExporter"
+                 type="CarpetAvenue\ExportImport\Model\Document\Exporter">
+        <arguments>
+            <argument name="type" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Creditmemo</argument>
+            <argument name="schema" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\CreditmemoSchema</argument>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="CarpetAvenue\ExportImport\Model\Document\CreditmemoValidator"
+                 type="CarpetAvenue\ExportImport\Model\Document\Validator">
+        <arguments>
+            <argument name="type" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Creditmemo</argument>
+            <argument name="schema" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\CreditmemoSchema</argument>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="CarpetAvenue\ExportImport\Model\Document\CreditmemoImporter"
+                 type="CarpetAvenue\ExportImport\Model\Document\Importer">
+        <arguments>
+            <argument name="type" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Creditmemo</argument>
+            <argument name="schema" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\CreditmemoSchema</argument>
+            <argument name="validator" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\CreditmemoValidator</argument>
+            <argument name="orderSynchronizer" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\OrderTotalsSynchronizer</argument>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="CarpetAvenue\ExportImport\Model\Document\ShipmentSchema"
+                 type="CarpetAvenue\ExportImport\Model\Document\Schema">
+        <arguments>
+            <argument name="type" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Shipment</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="CarpetAvenue\ExportImport\Model\Document\ShipmentExporter"
+                 type="CarpetAvenue\ExportImport\Model\Document\Exporter">
+        <arguments>
+            <argument name="type" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Shipment</argument>
+            <argument name="schema" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\ShipmentSchema</argument>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="CarpetAvenue\ExportImport\Model\Document\ShipmentValidator"
+                 type="CarpetAvenue\ExportImport\Model\Document\Validator">
+        <arguments>
+            <argument name="type" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Shipment</argument>
+            <argument name="schema" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\ShipmentSchema</argument>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="CarpetAvenue\ExportImport\Model\Document\ShipmentImporter"
+                 type="CarpetAvenue\ExportImport\Model\Document\Importer">
+        <arguments>
+            <argument name="type" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Shipment</argument>
+            <argument name="schema" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\ShipmentSchema</argument>
+            <argument name="validator" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\ShipmentValidator</argument>
+            <!-- Shipments feed qty_shipped only — never the invoiced/paid totals. -->
+            <argument name="orderSynchronizer" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\ShipmentQtySynchronizer</argument>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="CarpetAvenue\ExportImport\Model\Document\Pool">
+        <arguments>
+            <argument name="types" xsi:type="array">
+                <item name="invoice" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Invoice</item>
+                <item name="creditmemo" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Creditmemo</item>
+                <item name="shipment" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\Type\Shipment</item>
+            </argument>
+            <argument name="exporters" xsi:type="array">
+                <item name="invoice" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\InvoiceExporter</item>
+                <item name="creditmemo" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\CreditmemoExporter</item>
+                <item name="shipment" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\ShipmentExporter</item>
+            </argument>
+            <argument name="validators" xsi:type="array">
+                <item name="invoice" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\InvoiceValidator</item>
+                <item name="creditmemo" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\CreditmemoValidator</item>
+                <item name="shipment" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\ShipmentValidator</item>
+            </argument>
+            <argument name="importers" xsi:type="array">
+                <item name="invoice" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\InvoiceImporter</item>
+                <item name="creditmemo" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\CreditmemoImporter</item>
+                <item name="shipment" xsi:type="object">CarpetAvenue\ExportImport\Model\Document\ShipmentImporter</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
+        Payment-transaction export-import.
+
+        Not a Model\Document\ type: sales_payment_transaction has no items, no
+        comments, no increment id and no store column, so it has its own Schema,
+        Exporter, Validator and Importer under Model\Transaction\. See that
+        Schema's docblock for the full reasoning.
+    -->
+    <type name="CarpetAvenue\ExportImport\Model\Transaction\Exporter">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="CarpetAvenue\ExportImport\Model\Transaction\Validator">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="CarpetAvenue\ExportImport\Model\Transaction\Importer">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
+    <!--
+        Customer / customer-address export-import.
+
+        Two more entities with their own engines, for the reason their Schemas
+        state: `customer_entity` and `customer_address_entity` are EAV, so their
+        column set is install-specific and the shared document engine (built
+        around a document row + item table + comment table) does not fit them.
+    -->
+    <type name="CarpetAvenue\ExportImport\Model\Customer\Exporter">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="CarpetAvenue\ExportImport\Model\Customer\Validator">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="CarpetAvenue\ExportImport\Model\Customer\Importer">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
+    <!--
+        Writes the customer_grid_flat rows of the customers an import touched —
+        the admin grid reads that table, not customer_entity. Used by both the
+        customer and the address import; see the class docblock for why the
+        model's own afterSave() hook cannot be relied on.
+    -->
+    <type name="CarpetAvenue\ExportImport\Model\Customer\GridReindexer">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="CarpetAvenue\ExportImport\Model\CustomerAddress\Exporter">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="CarpetAvenue\ExportImport\Model\CustomerAddress\Validator">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="CarpetAvenue\ExportImport\Model\CustomerAddress\Importer">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
+        </arguments>
+    </type>
+
     <!-- CLI commands -->
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="carpetavenue_exportimport_orders_export" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ExportOrdersCommand</item>
                 <item name="carpetavenue_exportimport_orders_import" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ImportOrdersCommand</item>
+                <item name="carpetavenue_exportimport_documents_export" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ExportDocumentsCommand</item>
+                <item name="carpetavenue_exportimport_documents_import" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ImportDocumentsCommand</item>
+                <item name="carpetavenue_exportimport_transactions_export" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ExportTransactionsCommand</item>
+                <item name="carpetavenue_exportimport_transactions_import" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ImportTransactionsCommand</item>
+                <item name="carpetavenue_exportimport_customers_export" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ExportCustomersCommand</item>
+                <item name="carpetavenue_exportimport_customers_import" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ImportCustomersCommand</item>
+                <item name="carpetavenue_exportimport_customer_addresses_export" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ExportCustomerAddressesCommand</item>
+                <item name="carpetavenue_exportimport_customer_addresses_import" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ImportCustomerAddressesCommand</item>
             </argument>
         </arguments>
     </type>

@@ -1,0 +1,86 @@
+<?php
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @var \CarpetAvenue\ExportImport\Block\Adminhtml\CustomerAddress\Export\Form $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="carpetavenue-exportimport-customer-address-export">
+    <form action="<?= $escaper->escapeUrl($block->getFormAction()) ?>" method="post" id="ca-customer-address-export-form">
+        <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
+
+        <fieldset class="admin__fieldset">
+            <legend class="admin__legend">
+                <span><?= $escaper->escapeHtml(__('Customer Address Export Filters')) ?></span>
+            </legend>
+            <br/>
+
+            <div class="admin__field">
+                <label class="admin__field-label" for="website_id"><span><?= $escaper->escapeHtml(__('Website')) ?></span></label>
+                <div class="admin__field-control">
+                    <select name="website_id" id="website_id" class="admin__control-select">
+                        <option value=""><?= $escaper->escapeHtml(__('-- All Websites --')) ?></option>
+                        <?php foreach ($block->getWebsiteOptions() as $option): ?>
+                            <option value="<?= $escaper->escapeHtmlAttr($option['value']) ?>">
+                                <?= $escaper->escapeHtml($option['label']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <p class="admin__field-note">
+                        <?= $escaper->escapeHtml(__('A customer account belongs to one website — that is half of the CSV key.')) ?>
+                    </p>
+                </div>
+            </div>
+
+            <div class="admin__field">
+                <label class="admin__field-label" for="group_id"><span><?= $escaper->escapeHtml(__('Customer Group')) ?></span></label>
+                <div class="admin__field-control">
+                    <select name="group_id[]" id="group_id" multiple="multiple" size="5" class="admin__control-multiselect">
+                        <?php foreach ($block->getGroupOptions() as $option): ?>
+                            <option value="<?= $escaper->escapeHtmlAttr($option['value']) ?>">
+                                <?= $escaper->escapeHtml($option['label']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <p class="admin__field-note"><?= $escaper->escapeHtml(__('Leave empty for all. Ctrl/Cmd-click to select several.')) ?></p>
+                </div>
+            </div>
+
+            <div class="admin__field">
+                <label class="admin__field-label" for="from"><span><?= $escaper->escapeHtml(__('Registered From')) ?></span></label>
+                <div class="admin__field-control">
+                    <input type="date" name="from" id="from" class="admin__control-text"/>
+                </div>
+            </div>
+
+            <div class="admin__field">
+                <label class="admin__field-label" for="to"><span><?= $escaper->escapeHtml(__('Registered To')) ?></span></label>
+                <div class="admin__field-control">
+                    <input type="date" name="to" id="to" class="admin__control-text"/>
+                    <p class="admin__field-note">
+                        <?= $escaper->escapeHtml(__('Both dates filter the customer\'s registration date.')) ?>
+                    </p>
+                </div>
+            </div>
+
+            <div class="admin__field">
+                <label class="admin__field-label" for="customer_email">
+                    <span><?= $escaper->escapeHtml(__('Customer Emails')) ?></span>
+                </label>
+                <div class="admin__field-control">
+                    <textarea name="customer_email" id="customer_email" rows="3" class="admin__control-textarea"></textarea>
+                    <p class="admin__field-note">
+                        <?= $escaper->escapeHtml(__('Optional. One per line, or comma-separated. Leave empty for all customers.')) ?>
+                    </p>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="admin__field">
+            <button type="submit" class="action-primary" title="<?= $escaper->escapeHtmlAttr(__('Export CSV')) ?>">
+                <span><?= $escaper->escapeHtml(__('Export CSV')) ?></span>
+            </button>
+        </div>
+    </form>
+</div>

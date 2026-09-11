@@ -1,0 +1,143 @@
+<?php
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @var \CarpetAvenue\ExportImport\Block\Adminhtml\Document\Import\Form $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$report = $block->getReport();
+$hasPending = $block->hasPendingFile();
+$label = $block->getDocumentLabel();
+?>
+<div class="carpetavenue-exportimport-document-import">
+    <div class="message message-notice">
+        <?= $escaper->escapeHtml(__(
+            'Every %1 must belong to an order that already exists here. Import the orders first — a row whose '
+            . 'order_increment_id is unknown is reported as an error and nothing is written.',
+            $label
+        )) ?>
+    </div>
+
+    <fieldset class="admin__fieldset">
+        <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Step 1 — Upload &amp; Validate')) ?></span></legend>
+        <br/>
+        <form action="<?= $escaper->escapeUrl($block->getValidateAction()) ?>" method="post"
+              enctype="multipart/form-data" id="ca-document-import-validate-form">
+            <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
+            <div class="admin__field">
+                <label class="admin__field-label" for="import_file"><span><?= $escaper->escapeHtml(__('CSV File')) ?></span></label>
+                <div class="admin__field-control">
+                    <input type="file" name="import_file" id="import_file" accept=".csv" required="required"/>
+                    <p class="admin__field-note">
+                        <?= $escaper->escapeHtml(__('Required columns: %1', implode(', ', $block->getRequiredColumns()))) ?>
+                    </p>
+                </div>
+            </div>
+            <div class="admin__field">
+                <button type="submit" class="action-secondary">
+                    <span><?= $escaper->escapeHtml(__('Validate CSV')) ?></span>
+                </button>
+            </div>
+        </form>
+    </fieldset>
+
+    <?php if ($report): ?>
+        <?php $summary = $report['summary'] ?? []; ?>
+        <fieldset class="admin__fieldset">
+            <legend class="admin__legend">
+                <span><?= $escaper->escapeHtml($report['phase'] === 'imported' ? __('Import Result') : __('Validation Report')) ?></span>
+            </legend>
+            <br/>
+            <ul>
+                <li><strong><?= $escaper->escapeHtml(__('Documents:')) ?></strong> <?= (int)($summary['orders'] ?? 0) ?>
+                    (<?= (int)($summary['creates'] ?? 0) ?> <?= $escaper->escapeHtml(__('to create')) ?>,
+                    <?= (int)($summary['updates'] ?? 0) ?> <?= $escaper->escapeHtml(__('to update')) ?>)</li>
+                <?php if (isset($summary['errors'])): ?>
+                    <li><strong><?= $escaper->escapeHtml(__('Errors:')) ?></strong> <?= (int)$summary['errors'] ?></li>
+                <?php endif; ?>
+                <li><strong><?= $escaper->escapeHtml(__('Warnings:')) ?></strong> <?= (int)($summary['warnings'] ?? 0) ?></li>
+            </ul>
+
+            <?php if (!empty($report['errors'])): ?>
+                <p class="message message-error"><?= $escaper->escapeHtml(__('Errors (import blocked):')) ?></p>
+                <table class="data-grid">
+                    <thead><tr>
+                        <th><?= $escaper->escapeHtml(__('Line')) ?></th>
+                        <th><?= $escaper->escapeHtml(__('Column')) ?></th>
+                        <th><?= $escaper->escapeHtml(__('Message')) ?></th>
+                    </tr></thead>
+                    <tbody>
+                    <?php foreach ($report['errors'] as $err): ?>
+                        <tr>
+                            <td><?= $escaper->escapeHtml((string)$err['line']) ?></td>
+                            <td><?= $escaper->escapeHtml((string)$err['column']) ?></td>
+                            <td><?= $escaper->escapeHtml((string)$err['message']) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+
+            <?php if (!empty($report['warnings'])): ?>
+                <p class="message message-warning"><?= $escaper->escapeHtml(__('Warnings (import allowed):')) ?></p>
+                <table class="data-grid">
+                    <thead><tr>
+                        <th><?= $escaper->escapeHtml(__('Line')) ?></th>
+                        <th><?= $escaper->escapeHtml(__('Column')) ?></th>
+                        <th><?= $escaper->escapeHtml(__('Message')) ?></th>
+                    </tr></thead>
+                    <tbody>
+                    <?php foreach ($report['warnings'] as $warn): ?>
+                        <tr>
+                            <td><?= $escaper->escapeHtml((string)$warn['line']) ?></td>
+                            <td><?= $escaper->escapeHtml((string)$warn['column']) ?></td>
+                            <td><?= $escaper->escapeHtml((string)$warn['message']) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+
+            <?php if ($report['phase'] === 'imported'): ?>
+                <ul>
+                    <li><strong><?= $escaper->escapeHtml(__('Created:')) ?></strong> <?= count($report['created'] ?? []) ?></li>
+                    <li><strong><?= $escaper->escapeHtml(__('Updated:')) ?></strong> <?= count($report['updated'] ?? []) ?></li>
+                    <li><strong><?= $escaper->escapeHtml(__('Orders resynced:')) ?></strong> <?= count($report['orders_synced'] ?? []) ?></li>
+                    <li><strong><?= $escaper->escapeHtml(__('Failed:')) ?></strong> <?= count($report['failed'] ?? []) ?></li>
+                </ul>
+                <?php if (!empty($report['failed'])): ?>
+                    <table class="data-grid">
+                        <thead><tr>
+                            <th><?= $escaper->escapeHtml(__('Document')) ?></th>
+                            <th><?= $escaper->escapeHtml(__('Reason')) ?></th>
+                        </tr></thead>
+                        <tbody>
+                        <?php foreach ($report['failed'] as $inc => $reason): ?>
+                            <tr>
+                                <td><?= $escaper->escapeHtml((string)$inc) ?></td>
+                                <td><?= $escaper->escapeHtml((string)$reason) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            <?php endif; ?>
+        </fieldset>
+
+        <?php if ($report['phase'] === 'validated' && (int)($summary['errors'] ?? 1) === 0 && $hasPending): ?>
+            <fieldset class="admin__fieldset">
+                <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Step 2 — Run Import')) ?></span></legend>
+                <br/>
+                <form action="<?= $escaper->escapeUrl($block->getSubmitAction()) ?>" method="post"
+                      id="ca-document-import-submit-form">
+                    <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
+                    <p><?= $escaper->escapeHtml(__('The validated file is ready. Click below to create/update the documents.')) ?></p>
+                    <button type="submit" class="action-primary"
+                            onclick="return confirm('<?= $escaper->escapeJs(__('Run the import now?')) ?>');">
+                        <span><?= $escaper->escapeHtml(__('Run Import')) ?></span>
+                    </button>
+                </form>
+            </fieldset>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>
