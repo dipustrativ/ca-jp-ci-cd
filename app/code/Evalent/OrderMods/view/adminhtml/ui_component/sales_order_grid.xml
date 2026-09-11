@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <!-- listingToolbar name="listing_top">
+        <filters name="listing_filters">
+            <filterSelect name="exclude_store_id" provider="${ $.parentName }">
+                <settings>
+                    <options class="Magento\Store\Ui\Component\Listing\Column\Store\Options"/>
+                    <caption translate="true">None</caption>
+                    <label translate="true">Exclude Purchase Point</label>
+                    <dataScope>exclude_store_id</dataScope>
+                </settings>
+            </filterSelect>
+        </filters>
+    </listingToolbar -->
+    <listingToolbar name="listing_top">
+        <filters name="listing_filters">
+            <filterSelect name="store_id" provider="${ $.parentName }" component="Magento_Ui/js/form/element/ui-select" template="ui/grid/filters/elements/ui-select">
+                <settings>
+                    <options class="Evalent\OrderMods\Ui\Component\Listing\Column\Store\Options"/>
+                </settings>
+            </filterSelect>
+        </filters>
+    </listingToolbar>
+    <columns name="sales_order_columns">
+        <column name="store_id">
+            <settings>
+                <filter>multiselect</filter>
+                <dataType>select</dataType>
+            </settings>
+        </column>
+        <column name="payment_table_additional_information">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Payment Method (Additional)</label>
+                <sortable>true</sortable>
+            </settings>
+        </column>
+    </columns>
+</listing>

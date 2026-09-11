@@ -1,0 +1,10 @@
+<?php
+ /** @var \Evalent\OrderMods\Block\Adminhtml\Items\Column\Thumbnail $block */
+    $product = $block->getProduct();
+?>
+
+<?php if (isset($product)): ?>
+<span>
+    <?= number_format($product->getWeight(), 2)  . " KG"?>
+</span>
+<?php endif; ?>

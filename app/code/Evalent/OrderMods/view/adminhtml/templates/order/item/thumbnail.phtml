@@ -1,0 +1,32 @@
+<?php
+ /** @var \Evalent\OrderMods\Block\Adminhtml\Items\Column\Thumbnail $block */
+    $imageUrl = $block->getImageUrl();
+
+    $_product = $block->getProduct();
+
+    $isRound = false;
+    $sizeValue = '';
+
+    if (isset($_product)) {
+		// Checking if shape is round
+		if ($_product->getData('shape') == 20) {
+			$isRound = true;
+		}
+
+		// Compiling size string
+		if ($_product->getData('width') && $_product->getData('length')) {
+			if (!$isRound) {
+				$sizeValue = $_product->getData('width') . ' x ' . $_product->getData('length') . ' cm';
+			} else {
+				$sizeValue = "∅ " . $_product->getData('width') . ' cm';
+			}
+		}
+    }
+?>
+
+<?php if (isset($_product)): ?>
+<img class="admin__control-thumbnail" src="<?= $imageUrl ?>" />
+<div class="admin__control-thumbnail-additional">
+    <span><?= $sizeValue ?></span>
+</div>
+<?php endif; ?>

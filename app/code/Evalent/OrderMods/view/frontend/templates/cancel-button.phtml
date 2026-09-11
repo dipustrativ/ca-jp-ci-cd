@@ -1,0 +1,9 @@
+<?php
+/** @var \Evalent\OrderMods\Block\Order\Info\CancelButton $block */
+$order = $block->getOrder()
+?>
+<?php if ($order->canCancel()) : ?>
+    <a href="<?= $this->getUrl('cancelorder/order/cancel').'?order_id='.$order->getEntityId(); ?>" class="action cancel_order">
+        <span><?= ('Cancel Order') ?></span>
+    </a>
+<?php endif ?>

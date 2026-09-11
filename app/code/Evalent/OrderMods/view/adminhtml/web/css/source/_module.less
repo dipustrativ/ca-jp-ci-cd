@@ -1,0 +1,45 @@
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+    .sales-order-view,
+    .adminhtml-order_shipment-view,
+    .adminhtml-order_shipment-new {
+
+        .edit-order-table,
+        .order-shipment-table {
+
+            img.admin__control-thumbnail {
+                max-width: 75px;
+                max-height: 75px;
+            }
+        }
+    }
+
+    .sales-order-index {
+
+        // Multiselect box (Purchase point)
+        .action-select-wrap {
+            .action-select.admin__action-multiselect {
+                &:before {
+                    //right: 15px;
+                }
+
+                &:after {
+                    //right: 2.5rem;
+                }
+            }
+        }
+        .action-select.admin__action-multiselect {
+            max-height: 100px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            padding-right: 0;
+
+            .admin__action-multiselect-crumb {
+                max-width: 44%;
+            }
+        }
+    }
+}
