@@ -89,6 +89,10 @@ a:visited, .alink:visited {
     margin: 0 0 20px !important;
 }
 
+.white-border a {
+    border: 1px solid #fff;
+}
+
 //
 //  USP announcement bar
 //  _____________________________________________
@@ -1639,6 +1643,8 @@ a:visited, .alink:visited {
     border-bottom: 1px solid #d1d1d1;
     padding-bottom: 30px;
     margin-bottom: 30px;
+    margin-left: -20px;
+    margin-right: -20px;
 }
 
 .ca-pricing-features-container {
@@ -1860,6 +1866,9 @@ a:visited, .alink:visited {
         height: 1px;
     }
 }
+
+//  jQuery.scrollbar base CSS (product sliders, similar-products slider).
+@import '_scrollbar';
 
 //  Search suggestion dropdown — last, so its panel rules land after the
 //  header's .block-search block above.
