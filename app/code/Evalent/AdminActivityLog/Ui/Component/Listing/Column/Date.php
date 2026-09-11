@@ -2,7 +2,6 @@
 
 namespace Evalent\AdminActivityLog\Ui\Component\Listing\Column;
 
-    use Evalent\OnlineCustomers\Api\Data\SingleWarmupInterface;
     use Magento\Framework\App\Config\ScopeConfigInterface;
     use Magento\Store\Model\ScopeInterface;
 

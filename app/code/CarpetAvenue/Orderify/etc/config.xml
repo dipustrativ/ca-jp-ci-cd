@@ -21,6 +21,11 @@
                 <sender>general</sender>
                 <template>orderify_failed_payment_email_template</template>
             </failed_payment_email>
+            <order_reminder_email>
+                <enabled>1</enabled>
+                <sender>general</sender>
+                <template>orderify_order_reminder_email_template</template>
+            </order_reminder_email>
             <adyen_auto_invoice>
                 <enabled>0</enabled>
                 <min_order_age_minutes>10</min_order_age_minutes>

@@ -31,6 +31,10 @@ class Config extends AbstractHelper
     public const XML_PATH_FAILED_PAYMENT_EMAIL_SENDER   = 'orderify/failed_payment_email/sender';
     public const XML_PATH_FAILED_PAYMENT_EMAIL_TEMPLATE = 'orderify/failed_payment_email/template';
 
+    public const XML_PATH_ORDER_REMINDER_EMAIL_ENABLED  = 'orderify/order_reminder_email/enabled';
+    public const XML_PATH_ORDER_REMINDER_EMAIL_SENDER   = 'orderify/order_reminder_email/sender';
+    public const XML_PATH_ORDER_REMINDER_EMAIL_TEMPLATE = 'orderify/order_reminder_email/template';
+
     public const XML_PATH_ADYEN_AUTO_INVOICE_ENABLED   = 'orderify/adyen_auto_invoice/enabled';
     public const XML_PATH_ADYEN_AUTO_INVOICE_MIN_AGE   = 'orderify/adyen_auto_invoice/min_order_age_minutes';
     public const XML_PATH_ADYEN_AUTO_INVOICE_BATCH     = 'orderify/adyen_auto_invoice/batch_size';
@@ -121,6 +125,33 @@ class Config extends AbstractHelper
     {
         return (string) $this->scopeConfig->getValue(
             self::XML_PATH_FAILED_PAYMENT_EMAIL_TEMPLATE,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    public function isOrderReminderEmailEnabled($storeId = null): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_ORDER_REMINDER_EMAIL_ENABLED,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    public function getOrderReminderEmailSender($storeId = null): string
+    {
+        return (string) $this->scopeConfig->getValue(
+            self::XML_PATH_ORDER_REMINDER_EMAIL_SENDER,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    public function getOrderReminderEmailTemplate($storeId = null): string
+    {
+        return (string) $this->scopeConfig->getValue(
+            self::XML_PATH_ORDER_REMINDER_EMAIL_TEMPLATE,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );

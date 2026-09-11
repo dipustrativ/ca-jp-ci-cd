@@ -34,15 +34,24 @@
         </job>
     </group>
 
-    <!-- Prune old events (> 40 days) to keep the table tiny -->
+    <!-- TODO: both omnibus maintenance jobs are disabled — CarpetAvenue\Productify\Cron\PruneEvents
+         and CarpetAvenue\Productify\Cron\RefreshAgedOut do not exist in Cron/, so cron logged
+         "Class does not exist" on every run. The tables they maintain
+         (carpetavenue_productify_omni_price_event, carpetavenue_productify_omni_lowest) and
+         Model/ResourceModel/Lowest.php are present, so only the two cron classes are missing.
+         Until they land, price events are never pruned and aged-out lowest snapshots are never
+         refreshed.
+
+    Prune old events (> 40 days) to keep the table tiny
     <group id="default">
         <job name="productify_omni_prune_events" instance="CarpetAvenue\Productify\Cron\PruneEvents" method="execute">
             <schedule>10 0 * * *</schedule>
         </job>
 
-        <!-- Refresh snapshots whose minimum may have aged out of the 30d window -->
+        Refresh snapshots whose minimum may have aged out of the 30d window
         <job name="productify_omni_refresh_aged_out" instance="CarpetAvenue\Productify\Cron\RefreshAgedOut" method="execute">
             <schedule>*/15 * * * *</schedule>
         </job>
     </group>
+    -->
 </config>

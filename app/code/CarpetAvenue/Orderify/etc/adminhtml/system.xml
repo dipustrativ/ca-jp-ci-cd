@@ -66,6 +66,24 @@
                 </field>
             </group>
 
+            <group id="order_reminder_email" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Order Reminder Email</label>
+                <comment><![CDATA[Reminder sent for orders still in the <em>new</em> state awaiting payment (bank transfer / advance payment).]]></comment>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+                <field id="template" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <comment>Select "Order Reminder" or use a custom template configured in Marketing > Email Templates.</comment>
+                </field>
+            </group>
+
             <group id="adyen_auto_invoice" translate="label" type="text" sortOrder="35" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Adyen Automatic Invoice Processing</label>
                 <comment><![CDATA[Cron verifies Adyen payments using locally synchronized webhook data and automatically invoices paid orders that have no invoice. Bank transfer orders are excluded.]]></comment>

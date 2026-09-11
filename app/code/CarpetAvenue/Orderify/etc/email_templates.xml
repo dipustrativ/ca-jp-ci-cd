@@ -17,4 +17,10 @@
               type="html"
               module="CarpetAvenue_Orderify"
               area="frontend"/>
+    <template id="orderify_order_reminder_email_template"
+              label="Order Reminder"
+              file="order_reminder.html"
+              type="html"
+              module="CarpetAvenue_Orderify"
+              area="frontend"/>
 </config>
