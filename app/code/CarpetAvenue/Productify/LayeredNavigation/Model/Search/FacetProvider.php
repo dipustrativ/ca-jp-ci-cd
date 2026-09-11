@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace CarpetAvenue\Productify\LayeredNavigation\Model\Search;
 
 use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Catalog\Model\Layer;
 use Magento\Catalog\Model\Layer\Category\CollectionFilter as CategoryCollectionFilter;
 use Magento\Catalog\Model\Layer\Filter\AbstractFilter;
@@ -63,6 +64,79 @@ class FacetProvider
             );
 
             return [];
+        }
+    }
+
+    /**
+     * Keeps only the option values that still have products in the given category.
+     *
+     * Used when a category filter moves the shopper to a child category: a colour
+     * that had matches in the parent may have none in the child, and carrying it
+     * over would land them on an empty page. Deliberately independent of the layer
+     * state, because the SEO redirect runs before the layer is built.
+     *
+     * One search query per attribute code, and only on the redirect itself, not on
+     * every page render. Returns the input unchanged if the query fails, so a
+     * search outage degrades to carrying everything rather than to an error.
+     *
+     * @param array<string, string> $attributeParams attributeCode => "5,6"
+     * @return array<string, string>
+     */
+    public function keepMatchingValues(CategoryInterface $category, array $attributeParams): array
+    {
+        $kept = [];
+
+        foreach ($attributeParams as $code => $values) {
+            $requested = array_values(array_filter(explode(',', (string)$values), 'strlen'));
+            if ($requested === []) {
+                continue;
+            }
+
+            $counts = $this->getCategoryFacets($category, (string)$code);
+            if ($counts === null) {
+                //  Could not ask — keep what we were given.
+                $kept[$code] = (string)$values;
+                continue;
+            }
+
+            $surviving = array_values(array_filter(
+                $requested,
+                static fn ($optionId) => (int)($counts[$optionId]['count'] ?? 0) > 0
+            ));
+
+            if ($surviving !== []) {
+                $kept[$code] = implode(',', $surviving);
+            }
+        }
+
+        return $kept;
+    }
+
+    /**
+     * Facet counts for one attribute across a category, with no other filter applied.
+     *
+     * @return array<int|string, array{value?: mixed, count: int}>|null null on failure
+     */
+    private function getCategoryFacets(CategoryInterface $category, string $attributeCode): ?array
+    {
+        try {
+            /** @var FulltextCollection $collection */
+            $collection = $this->categoryCollectionFactory->create();
+            $this->isolateCriteriaBuilders($collection);
+            $collection->addCategoryFilter($category);
+
+            return $collection->getFacetedData($attributeCode);
+        } catch (\Exception $e) {
+            $this->logger->warning(
+                sprintf(
+                    'LayeredNavigation category facet check failed for "%s" in category %s: %s',
+                    $attributeCode,
+                    (string)$category->getId(),
+                    $e->getMessage()
+                )
+            );
+
+            return null;
         }
     }
 

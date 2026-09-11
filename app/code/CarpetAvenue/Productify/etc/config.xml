@@ -37,8 +37,13 @@
                     <enabled>1</enabled>
                     <step>1</step>
                 </slider>
+                <!-- SEO filter paths (/color-beige) off: the store matches the
+                     live site's ?color=<id> query params. Turning this on also
+                     re-enables the router that resolves the path form. The
+                     category filter's jump to the child category is deliberately
+                     independent of this switch. -->
                 <seo>
-                    <enabled>1</enabled>
+                    <enabled>0</enabled>
                     <allow_index_single_filter>0</allow_index_single_filter>
                     <multi_value_separator>_</multi_value_separator>
                 </seo>

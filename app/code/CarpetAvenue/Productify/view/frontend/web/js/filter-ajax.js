@@ -31,6 +31,7 @@ define([
             batchApply: false,
             baseUrl: '',
             pageParam: 'p',
+            categoryParam: 'cat',
             countSource: '.toolbar-number',
             countTarget: '.am-items',
             countDelay: 300,
@@ -144,6 +145,18 @@ define([
 
         _onApplyStaged: function () {
             var url = this._buildStagedUrl();
+
+            //  A category change is a different page, not a filtered view of this
+            //  one. The breadcrumb, the page title and the category description all
+            //  live outside the swapped column, and the server 301s the staged
+            //  ?cat= URL onto the child category — which an AJAX fetch would follow
+            //  silently, leaving the address bar on the pre-redirect URL. Hand it
+            //  to the browser instead.
+            if (this._staged[this.options.categoryParam]) {
+                window.location.assign(url);
+
+                return;
+            }
 
             if (this._countUrl === url && this._countHtml) {
                 try {

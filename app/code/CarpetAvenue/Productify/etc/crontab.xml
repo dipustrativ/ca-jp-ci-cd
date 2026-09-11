@@ -23,6 +23,11 @@
         <job name="carpetavenue_productify_queue_maintenance" instance="CarpetAvenue\Productify\Cron\QueueMaintenance" method="execute">
             <schedule>*/15 * * * *</schedule>
         </job>
+        <!-- Discounts can start or stop by date with nobody touching the
+             product, so the on-sale flag is recomputed on a timer. -->
+        <job name="carpetavenue_productify_update_on_sale_flag" instance="CarpetAvenue\Productify\Cron\UpdateOnSaleFlag" method="execute">
+            <schedule>0 * * * *</schedule>
+        </job>
         <job name="carpetavenue_productify_campaign_cache_clean" instance="CarpetAvenue\Productify\Cron\CampaignCacheClean" method="execute">
             <schedule>1 * * * *</schedule>
         </job>

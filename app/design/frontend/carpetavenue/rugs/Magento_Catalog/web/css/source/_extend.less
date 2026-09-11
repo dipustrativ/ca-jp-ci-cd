@@ -665,6 +665,132 @@
         }
 
         //  "Size" section groups Length + Width sliders, each under its own label.
+        //  Quick-pick presets under the price and size sliders.
+        //
+        //  Card aligns with the slider cards above it (same 20px panel padding,
+        //  so no horizontal margin of its own); the generous side padding is
+        //  what insets the buttons, matching carpetavenue.jp.
+        //
+        //  flex-shrink with min-height:0 is the same trick .am-filter-items uses:
+        //  the card hugs its buttons when they fit, and scrolls its own list when
+        //  they do not — which is what the size panel needs for six of them. The
+        //  panel itself must never scroll or the pinned クリア / 表示 bar drifts.
+        //  Everything under the panel title scrolls as one block, so the pinned
+        //  クリア / 表示 bar is never overlapped however short the viewport. Only
+        //  wraps the price and size panels; attribute panels already scroll via
+        //  .am-filter-items and must not get a second scroller around them.
+        .filter-options-scroll {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .filter-presets {
+            //  15px bottom gap is live's own value on the card
+            //  (.carpetfinder__step-price.price-slider), which separates it from
+            //  the カーペット販売中 row underneath.
+            margin: 20px 0 15px;
+            padding: 28px 44px;
+            list-style: none;
+            background: #fff;
+
+            &__item {
+                margin: 0 0 14px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+
+            &__button {
+                display: block;
+                width: 100%;
+                padding: 14px 16px;
+                border: 1px solid #d6d6d6;
+                border-radius: 0;
+                background: #fff;
+                color: #515151;
+                font-size: 1.4rem;
+                font-weight: 600;
+                line-height: 1.2;
+                text-align: center;
+
+                //  The grey fill marks the band you picked and stays put
+                //  (-active, set by the click handler in the layer template).
+                &:hover,
+                &.-active {
+                    background: #ebebeb;
+                    color: #333333;
+                }
+
+                //  The green ring is hover feedback only — an outline rather than
+                //  a border so nothing reflows as the cursor moves across.
+                &:hover {
+                    outline: 2px solid @ca-green;
+                    outline-offset: 3px;
+                }
+
+                &:focus {
+                    outline: none;
+                }
+
+                //  Keyboard users still get a ring; matching the hover one keeps
+                //  the two from fighting when a click leaves focus behind.
+                &:focus-visible {
+                    outline: 2px solid @ca-green;
+                    outline-offset: 3px;
+                }
+            }
+        }
+
+        //  カーペット販売中 — a row of its own below the price presets, not part of
+        //  their card. Inherits the shared .am-filter-item treatment, so the tick
+        //  and the count pill come from there; only the metrics differ.
+        .am-filter--am_on_sale {
+            flex: 0 0 auto;
+            margin: 0;
+
+            .am-filter-item {
+                margin: 0;
+                padding: 8px 16px;
+            }
+
+            //  The renderer emits an empty .am-filter-checkbox for options with
+            //  no image, and the modal hides it everywhere else. Here it is the
+            //  anchor for the tick live shows to the left of the label — box
+            //  only, no chrome of its own, or it reads as a filled square.
+            .am-filter-checkbox {
+                display: block;
+                position: relative;
+                flex: 0 0 auto;
+                width: 18px;
+                height: 18px;
+                margin-right: 10px;
+                border: 0;
+                background: none;
+            }
+
+            .am-filter-item.-selected {
+                .am-filter-checkbox:after {
+                    content: '';
+                    position: absolute;
+                    top: 1px;
+                    left: 5px;
+                    width: 6px;
+                    height: 12px;
+                    border: solid @ca-black;
+                    border-width: 0 2px 2px 0;
+                    transform: rotate(45deg);
+                }
+
+                //  Live colours the chosen label like a link.
+                .am-filter-label {
+                    color: #1979c3;
+                }
+            }
+        }
+
         .filter-dimension {
             margin: 0 0 24px;
 
@@ -1224,7 +1350,7 @@
                 height: 32px;
                 margin: 0;
                 padding: 0 26px 0 0;
-                border: 0;
+                border: none !important;
                 border-radius: 0;
                 background: none;
                 .lib-font-size(16);
