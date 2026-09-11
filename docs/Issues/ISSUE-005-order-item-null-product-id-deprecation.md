@@ -11,6 +11,7 @@
 | **Trigger data** | Any `sales_order_item` row with `product_id IS NULL` — product deleted after purchase, or an order imported with a SKU absent from this catalog. On this install: order `CA-20211000000001` (`entity_id` 5), item 5, sku `VAN2112641`. |
 | **Fix applied here** | `CarpetAvenue\Orderify\Plugins\Sales\Order\GuardItemProduct` — `aroundGetProduct` returns `null` before the repository call when `product_id` is empty. |
 | **Upstream ticket** | None linked. Search `magento/magento2` for `getProduct` + `getById(null)` / `null array offset` before each upgrade. |
+| **Follow-up** | [ISSUE-007](ISSUE-007-order-item-null-product-id-msi-sku-deprecation.md) — the same NULL id reaches MSI's `GetSkuFromOrderItem` by a route this plugin does not cover, killing the ship / invoice / credit-memo / cancel screens. Fixing this one is what exposed it. |
 
 ---
 

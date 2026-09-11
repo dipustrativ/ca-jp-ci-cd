@@ -20,6 +20,8 @@
             <module name="Magento_Email"/>
             <module name="Magento_InventoryApi"/>
             <module name="Magento_InventoryIndexer"/>
+            <module name="Magento_InventorySalesApi"/>
+            <module name="Magento_InventoryConfigurableProduct"/>
             <module name="Magento_AdminNotification"/>
             <module name="Adyen_Payment"/>
         </sequence>
