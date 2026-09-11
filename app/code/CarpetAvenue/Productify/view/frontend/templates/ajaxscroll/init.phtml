@@ -63,6 +63,16 @@ if($helper->isEnabled() && $enable) { ?>
 				},
 				init: function(){
 					jQuery(function($) {
+						//  Magento leaves the pager out entirely when the collection fits
+						//  on a single page, and IAS only hides it (never removes it), so
+						//  its presence stays a reliable "there is a second page" test for
+						//  the life of the page — including after the last page has loaded.
+						//  Re-read on every collectionUpdated, so an AJAX filter that drops
+						//  the result below one page is picked up without a reload.
+						function iasHasMorePages() {
+							return $('.column.main').find('<?php echo $helper->getConfig('productify/ajaxscroll/selectors/pagination') ?>').length > 0;
+						}
+
 						var config = {
 							item: (jQuery('<?php echo $helper->getConfig('productify/ajaxscroll/selectors/list_mode') ?>').length ? '<?php echo $helper->getConfig('productify/ajaxscroll/selectors/list_mode') ?>' : '<?php echo $helper->getConfig('productify/ajaxscroll/selectors/grid_mode') ?>'),
 							container : '<?php echo $helper->getConfig('productify/ajaxscroll/selectors/content') ?>',
@@ -109,7 +119,9 @@ if($helper->isEnabled() && $enable) { ?>
 					window.ias.extension(new IASSpinnerExtension(config.spinner));
 
 					SgyIAS._log({extension: 'noneleft'});
-					window.ias.extension(new IASNoneLeftExtension(config.noneleft));
+					if (iasHasMorePages()) {
+						window.ias.extension(new IASNoneLeftExtension(config.noneleft));
+					}
 
                     window.ias.extension(new IASHistoryExtension(config.history));
 
@@ -217,6 +229,14 @@ if($helper->isEnabled() && $enable) { ?>
                         var countTpl = '<?php echo $helper->jsQuoteEscape(__('Showing %1 - %2 of %3 products')) ?>';
 
                         function renderIasCount() {
+                            //  Nothing to page through means nothing to report on.
+                            //  remove() covers a box painted before an AJAX filter
+                            //  narrowed the result set to a single page.
+                            if (!iasHasMorePages()) {
+                                $('.ias-count-box').remove();
+                                return;
+                            }
+
                             //  Anchor everything on the first product list, so the
                             //  host element is whatever container IAS appends into
                             //  rather than an assumed `.column.main`.
