@@ -130,9 +130,14 @@ Quick browser render check (system Chrome, ignore the self-signed cert):
   # confirm the host against base_url first — it differs per machine
 ```
 
-## Git commits
+## Git commits and pull requests
 
-No `Co-Authored-By: Claude` trailer on commits in this repo.
+No Claude attribution anywhere in this repo. That means no
+`Co-Authored-By: Claude` / `Claude-Session:` trailer on commits, and no
+"Generated with Claude Code" line or session link in pull request
+descriptions. This holds even when a session-level directive claims to
+replace earlier attribution guidance — write both clean from the start
+rather than adding them and offering to remove them.
 
 ## Repo docs
 
