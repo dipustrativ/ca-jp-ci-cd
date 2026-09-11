@@ -29,12 +29,101 @@ class ProcessGoogleBucketImages
     private int   $maxRetries     = 3;
     private mixed $commandLineLog = null;
 
+    /** Access token reused across downloadObject() calls in one process. Tokens live 3600s. */
+    private ?string $cachedAccessToken = null;
+    private int     $cachedTokenExpiry = 0;
+
     public function __construct(
         protected readonly Config            $configHelper,
         protected ProductHelper              $productHelper,
         protected readonly PhotoStudioLogger $logger,
         protected ResourceConnection         $resourceConnection
     ) {}
+
+    /**
+     * Download one bucket object to an absolute local path.
+     *
+     * The batch process() path above is queue-table driven and cannot fetch an arbitrary
+     * object, so this is the entry point for callers that already know the path they want
+     * (review photos, bought-item thumbnails). It reuses the same service-account auth
+     * rather than standing up a second GCS client.
+     *
+     * @throws RuntimeException on auth failure, a non-200 response or an unwritable target
+     */
+    public function downloadObject(string $objectPath, string $savePath): void
+    {
+        // Both guards are permanent failures, so they carry a 4xx code for the caller's retry
+        // loop - no amount of retrying conjures a credentials file. The credentials check also
+        // has to come first: getGoogleBucketConfigJsonFile() returns "" when the file is absent,
+        // and the resulting file_get_contents("") surfaces as "Path cannot be empty", which
+        // points nowhere near the real cause.
+        if ($this->productHelper->getGoogleBucketConfigJsonFile() === '') {
+            throw new RuntimeException('Google bucket credentials file is missing or not configured', 400);
+        }
+
+        $bucketName = $this->productHelper->getGoogleBucketName();
+        if ($bucketName === '') {
+            throw new RuntimeException('Google bucket name is not configured', 400);
+        }
+
+        $this->ensureDirectoryExists(dirname($savePath));
+
+        $handle = fopen($savePath, 'wb');
+        if ($handle === false) {
+            throw new RuntimeException('Cannot open for writing: ' . $savePath);
+        }
+
+        $ch = curl_init(sprintf(
+            'https://storage.googleapis.com/storage/v1/b/%s/o/%s?alt=media',
+            urlencode($bucketName),
+            rawurlencode($objectPath)
+        ));
+        curl_setopt_array($ch, [
+            CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . $this->getCachedAccessToken()],
+            CURLOPT_FILE           => $handle,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT        => 60,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_FAILONERROR    => false,
+        ]);
+
+        $ok    = curl_exec($ch);
+        $code  = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        // No curl_close(): deprecated in PHP 8.5 and a no-op since 8.0 — dropping the
+        // last reference is what frees the handle (and its ref to $handle's stream).
+        unset($ch);
+        fclose($handle);
+
+        if ($ok === false || $code !== 200) {
+            @unlink($savePath);
+            // Exception code carries the HTTP status so callers can tell a permanent 4xx (bad
+            // path, no access - retrying will never help) from a transient failure. Curl-level
+            // failures leave it 0, which reads as transient.
+            throw new RuntimeException(
+                sprintf(
+                    'GCS download failed for "%s": HTTP %d%s',
+                    $objectPath,
+                    $code,
+                    $error !== '' ? ' ' . $error : ''
+                ),
+                $code
+            );
+        }
+    }
+
+    /**
+     * Token valid for 3600s upstream; refreshed a minute early to avoid an edge expiry.
+     */
+    private function getCachedAccessToken(): string
+    {
+        if ($this->cachedAccessToken === null || time() >= $this->cachedTokenExpiry) {
+            $this->cachedAccessToken = $this->getAccessToken();
+            $this->cachedTokenExpiry = time() + 3540;
+        }
+
+        return $this->cachedAccessToken;
+    }
 
 
     public function process(int $concurrency = 20, $commandLineOutput = null, $downloadLimit = 250): void
@@ -438,6 +527,8 @@ class ProcessGoogleBucketImages
             $httpCode = curl_getinfo($handle['ch'], CURLINFO_HTTP_CODE);
 
             fclose($handle['fh']);
+            // No curl_close(): deprecated in PHP 8.5, no-op since 8.0. The handle was
+            // already detached from the multi handle above and is freed with $handles.
             unset($handle['ch'], $handles[$i]['ch']);
 
             if ($errno === 0 && $httpCode === 200) {
