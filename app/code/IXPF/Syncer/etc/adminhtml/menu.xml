@@ -49,6 +49,22 @@
              action="ixpfsyncer/orderapiactivity/index"
              resource="IXPF_Syncer::order_api_activity"/>
 
+        <add id="IXPF_Syncer::product_reviews"
+             title="Product Reviews"
+             module="IXPF_Syncer"
+             sortOrder="55"
+             parent="IXPF_Syncer::ixpf_syncer"
+             action="ixpfsyncer/review/index"
+             resource="IXPF_Syncer::product_reviews"/>
+
+        <add id="IXPF_Syncer::review_pools"
+             title="Review Pools"
+             module="IXPF_Syncer"
+             sortOrder="56"
+             parent="IXPF_Syncer::ixpf_syncer"
+             action="ixpfsyncer/reviewgroup/index"
+             resource="IXPF_Syncer::review_pools"/>
+
         <add id="IXPF_Syncer::docs"
              title="API Docs"
              module="IXPF_Syncer"

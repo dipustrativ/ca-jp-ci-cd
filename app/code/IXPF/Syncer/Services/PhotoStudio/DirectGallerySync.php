@@ -33,12 +33,12 @@ class DirectGallerySync
     const DEFAULT_IMAGE_ROLES = ['image', 'small_image', 'thumbnail'];
 
     /**
-     * Image role EAV attribute codes handled by this sync.
+     * EAV attribute_id → role name map.
      *
-     * The attribute_id for each is resolved at runtime from eav_attribute per
-     * instance — NEVER hardcode the IDs, they differ between databases (a wrong
-     * ID raises an FK 1452 on catalog_product_entity_varchar or silently writes
-     * the wrong role). See {@see self::getRoleAttributeMap()}.
+     * Verify these IDs match your instance:
+     *   SELECT attribute_id, attribute_code FROM eav_attribute
+     *   WHERE entity_type_id = 4
+     *   AND attribute_code IN ('image','small_image','thumbnail','swatch_image');
      */
     const ROLE_ATTRIBUTE_CODES = ['image', 'small_image', 'thumbnail', 'swatch_image'];
 

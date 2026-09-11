@@ -7,5 +7,6 @@
 
     <extension_attributes for="Magento\Sales\Api\Data\OrderItemInterface">
         <attribute code="default_name" type="string" />
+        <attribute code="eco_par_price" type="float" />
     </extension_attributes>
 </config>

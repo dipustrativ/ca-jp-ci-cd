@@ -23,6 +23,7 @@ class OrderItemDefaultName
                 }
 
                 $extAttrs->setDefaultName($product->getName());
+                $extAttrs->setEcoParPrice((float)$item->getData('eco_par_price') ?? 0.0);
                 $item->setExtensionAttributes($extAttrs);
             } catch (\Exception $e) {
                 $extAttrs = $item->getExtensionAttributes();
@@ -31,6 +32,7 @@ class OrderItemDefaultName
                         ->create(\Magento\Sales\Api\Data\OrderItemExtensionInterface::class);
                 }
                 $extAttrs->setDefaultName($item->getName());
+                $extAttrs->setEcoParPrice((float)$item->getData('eco_par_price') ?? 0.0);
                 $item->setExtensionAttributes($extAttrs);
             }
         }

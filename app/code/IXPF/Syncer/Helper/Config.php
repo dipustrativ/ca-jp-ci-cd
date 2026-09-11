@@ -34,8 +34,17 @@ class Config extends AbstractHelper
 
     const XML_PATH_PURCHASE_ROOT_CATEGORY_ID    = 'ixpfng_purchase/purchase/root_category_id';
 
+    const XML_PATH_REVIEWS_ENABLED          = 'ixpf_reviews/general/enabled';
+    const XML_PATH_REVIEWS_SHOW_ON_FRONTEND = 'ixpf_reviews/general/show_on_frontend';
+    const XML_PATH_REVIEWS_PER_PAGE         = 'ixpf_reviews/general/per_page';
+    const XML_PATH_REVIEWS_WARN_THRESHOLD   = 'ixpf_reviews/general/warn_threshold';
+    const XML_PATH_REVIEWS_MEDIA_ENABLED    = 'ixpf_reviews/media/enabled';
+
     const DEFAULT_WEBHOOK_DISPATCH_LIMIT    = 50;
     const DEFAULT_WEBHOOK_PARALLEL_WORKERS  = 4;
+
+    const DEFAULT_REVIEWS_PER_PAGE          = 10;
+    const DEFAULT_REVIEWS_WARN_THRESHOLD    = 2000;
 
     /**
      * Root catalog category id (parent of every store root, e.g. "Default Category").
@@ -162,4 +171,58 @@ class Config extends AbstractHelper
         return $value > 0 ? $value : self::DEFAULT_PURCHASE_ROOT_CATEGORY_ID;
     }
 
+    /**
+     * Master switch for the review read service and cleanup cron.
+     * Ingest is deliberately NOT behind this — IXPF backfills while everything downstream is off.
+     */
+    public function isReviewsEnabled(?int $storeId = null): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_REVIEWS_ENABLED,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Whether reviews are shown to customers.
+     *
+     * Deliberately ANDed with the master switch rather than checked on its own: with the master
+     * off the read service returns zeros, so honouring this flag alone would render a trigger
+     * that opens an empty drawer.
+     */
+    public function isReviewsFrontendEnabled(?int $storeId = null): bool
+    {
+        return $this->isReviewsEnabled($storeId)
+            && $this->scopeConfig->isSetFlag(
+                self::XML_PATH_REVIEWS_SHOW_ON_FRONTEND,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+    }
+
+    public function getReviewsPerPage(?int $storeId = null): int
+    {
+        $value = (int)$this->scopeConfig->getValue(
+            self::XML_PATH_REVIEWS_PER_PAGE,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+        return $value > 0 ? $value : self::DEFAULT_REVIEWS_PER_PAGE;
+    }
+
+    /**
+     * Review count in one payload above which the push is processed anyway but logged as a
+     * warning. That number is the early signal for the payload-size problem.
+     */
+    public function getReviewWarnThreshold(): int
+    {
+        $value = (int)$this->scopeConfig->getValue(self::XML_PATH_REVIEWS_WARN_THRESHOLD);
+        return $value > 0 ? $value : self::DEFAULT_REVIEWS_WARN_THRESHOLD;
+    }
+
+    public function isReviewMediaEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_REVIEWS_MEDIA_ENABLED);
+    }
 }

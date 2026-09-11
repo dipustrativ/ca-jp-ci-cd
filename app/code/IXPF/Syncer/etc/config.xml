@@ -13,5 +13,16 @@
                 <root_category_id>1</root_category_id>
             </purchase>
         </ixpfng_purchase>
+        <ixpf_reviews>
+            <general>
+                <enabled>0</enabled>
+                <show_on_frontend>1</show_on_frontend>
+                <per_page>10</per_page>
+                <warn_threshold>2000</warn_threshold>
+            </general>
+            <media>
+                <enabled>1</enabled>
+            </media>
+        </ixpf_reviews>
     </default>
 </config>

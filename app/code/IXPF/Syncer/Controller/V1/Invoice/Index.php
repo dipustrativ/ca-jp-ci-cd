@@ -55,8 +55,8 @@ class Index extends AbstractController
                 // Normalize date-only strings to include full day boundary
                 $fromDate = (strlen($paramFromDate) === 10) ? $paramFromDate . ' 00:00:00' : $paramFromDate;
                 $toDate   = (strlen($paramToDate)   === 10) ? $paramToDate   . ' 23:59:59' : $paramToDate;
-                $invoiceCollection->addFieldToFilter('updated_at', ['gteq' => $fromDate]);
-                $invoiceCollection->addFieldToFilter('updated_at', ['lteq' => $toDate]);
+                $invoiceCollection->addFieldToFilter('created_at', ['gteq' => $fromDate]);
+                $invoiceCollection->addFieldToFilter('created_at', ['lteq' => $toDate]);
                 $invoiceCollection->setPageSize($pageSize);
                 $invoiceCollection->setCurPage($page);
             } elseif ($paramLatestInvoice) {

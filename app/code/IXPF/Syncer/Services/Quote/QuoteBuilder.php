@@ -9,6 +9,7 @@ use IXPF\Syncer\Helper\Logger\QuoteLogger;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\GroupRepositoryInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
@@ -43,7 +44,9 @@ class QuoteBuilder
         protected readonly Config                      $config,
         protected readonly StockByWebsiteIdResolverInterface      $stockByWebsiteIdResolver,
         protected readonly IsProductSalableForRequestedQtyInterface $isProductSalableForRequestedQty,
-        protected readonly GetProductSalableQtyInterface           $getProductSalableQty
+        protected readonly GetProductSalableQtyInterface           $getProductSalableQty,
+        protected readonly GroupRepositoryInterface                $groupRepository,
+        protected readonly CustomerGroupTaxScope                   $customerGroupTaxScope
     ) {
     }
 
@@ -109,6 +112,10 @@ class QuoteBuilder
                 $this->assignCustomer($quote, $payload);
             }
 
+            // Optional admin-parity group override — must win over the group
+            // assignCustomer() copied from the customer record.
+            $this->applyGroupOverride($quote, $payload);
+
             // Items are full-replace: the payload is the desired state.
             if ($isUpdate) {
                 $quote->removeAllItems();
@@ -121,6 +128,10 @@ class QuoteBuilder
             if (array_key_exists('coupon_code', $payload)) {
                 $quote->setCouponCode(trim((string)$payload['coupon_code']));
             }
+
+            // Make tax follow the quote's customer group (admin parity) for this
+            // and the shipping recollect below.
+            $this->customerGroupTaxScope->apply($quote);
 
             $quote->setInventoryProcessed(false);
             $quote->setTotalsCollectedFlag(false);
@@ -141,6 +152,7 @@ class QuoteBuilder
 
             $this->cartRepository->save($quote);
         } finally {
+            $this->customerGroupTaxScope->release();
             $this->emulation->stopEnvironmentEmulation();
         }
 
@@ -172,6 +184,35 @@ class QuoteBuilder
         $quote->setCustomerIsGuest(true);
         $quote->setCustomerEmail($email);
         $quote->setCustomerGroupId(\Magento\Customer\Model\Group::NOT_LOGGED_IN_ID);
+    }
+
+    /**
+     * Optional customer_group_id override (admin "select customer group" parity).
+     * Only meaningful for a registered customer — the EU-VAT tax plugin honours
+     * the group for tax only when a customer id is present. Validated against the
+     * group table so an unknown id can't silently zero the tax.
+     *
+     * @throws Exception
+     */
+    private function applyGroupOverride($quote, array $payload): void
+    {
+        if (!array_key_exists('customer_group_id', $payload) || $payload['customer_group_id'] === '') {
+            return;
+        }
+
+        $groupId = (int)$payload['customer_group_id'];
+
+        if ((int)$quote->getCustomerId() <= 0) {
+            throw new Exception('customer_group_id override requires a registered customer_id');
+        }
+
+        try {
+            $this->groupRepository->getById($groupId);
+        } catch (NoSuchEntityException) {
+            throw new Exception("customer_group_id '$groupId' does not exist");
+        }
+
+        $quote->setCustomerGroupId($groupId);
     }
 
     /**

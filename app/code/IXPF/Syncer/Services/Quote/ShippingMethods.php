@@ -18,7 +18,8 @@ class ShippingMethods
     public function __construct(
         protected readonly CartRepositoryInterface $cartRepository,
         protected readonly Emulation               $emulation,
-        protected readonly PriceCurrencyInterface  $priceCurrency
+        protected readonly PriceCurrencyInterface  $priceCurrency,
+        protected readonly CustomerGroupTaxScope   $customerGroupTaxScope
     ) {
     }
 
@@ -45,6 +46,7 @@ class ShippingMethods
         $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
         try {
             $quote->setIsSuperMode(true);
+            $this->customerGroupTaxScope->apply($quote);
             $address = $quote->getShippingAddress();
             // Let the Shipping total collector run: it populates free_method_weight
             // (weight-based carriers like matrixrate rate on this, NOT package weight)
@@ -76,6 +78,7 @@ class ShippingMethods
                 }
             }
         } finally {
+            $this->customerGroupTaxScope->release();
             $this->emulation->stopEnvironmentEmulation();
         }
 
