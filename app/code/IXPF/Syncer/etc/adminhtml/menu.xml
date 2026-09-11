@@ -49,6 +49,9 @@
              action="ixpfsyncer/orderapiactivity/index"
              resource="IXPF_Syncer::order_api_activity"/>
 
+        <!-- PARKED with the reviews read service — both actions point at adminhtml controllers
+             (ixpfsyncer/review, ixpfsyncer/reviewgroup) that were never committed, so the menu
+             entries 404. See dev/parked/ixpf-syncer-reviews/README.md.
         <add id="IXPF_Syncer::product_reviews"
              title="Product Reviews"
              module="IXPF_Syncer"
@@ -64,6 +67,7 @@
              parent="IXPF_Syncer::ixpf_syncer"
              action="ixpfsyncer/reviewgroup/index"
              resource="IXPF_Syncer::review_pools"/>
+        -->
 
         <add id="IXPF_Syncer::docs"
              title="API Docs"
