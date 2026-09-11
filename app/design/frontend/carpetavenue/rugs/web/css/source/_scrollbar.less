@@ -1,0 +1,124 @@
+//
+//  jQuery.scrollbar (gromo 0.2.10) base stylesheet — web/js/scrollbar.js ships no CSS,
+//  so without this the injected .scroll-element has no geometry and the native
+//  scrollbar shows through instead. Per-slider colours live in
+//  Magento_Catalog/web/css/source/_slider.less.
+//  _____________________________________________
+
+& when (@media-common = true) {
+
+    .scroll-wrapper {
+        overflow: hidden !important;
+        padding: 0 !important;
+        position: relative;
+
+        & > .scroll-content {
+            border: none !important;
+            box-sizing: content-box !important;
+            height: auto;
+            left: 0;
+            margin: 0;
+            max-height: none;
+            max-width: none !important;
+            overflow: scroll !important;
+            padding: 0;
+            position: relative !important;
+            top: 0;
+            width: auto !important;
+
+            &::-webkit-scrollbar {
+                height: 0;
+                width: 0;
+            }
+        }
+    }
+
+    .scroll-element {
+        display: none;
+        box-sizing: content-box;
+
+        div {
+            box-sizing: content-box;
+        }
+
+        &.scroll-x.scroll-scrollx_visible,
+        &.scroll-y.scroll-scrolly_visible {
+            display: block;
+        }
+
+        .scroll-bar,
+        .scroll-arrow {
+            cursor: default;
+        }
+    }
+
+    .items > .scroll-element,
+    .items > .scroll-element div {
+        border: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        z-index: 10;
+    }
+
+    .items > .scroll-element div {
+        display: block;
+        height: 100%;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    .items > .scroll-element.scroll-x {
+        bottom: 2px;
+        height: 8px;
+        left: 0;
+        width: 100%;
+    }
+
+    .items > .scroll-element.scroll-y {
+        height: 100%;
+        right: 2px;
+        top: 0;
+        width: 8px;
+    }
+
+    .items > .scroll-element .scroll-element_outer {
+        overflow: hidden;
+    }
+
+    .items > .scroll-element .scroll-element_outer,
+    .items > .scroll-element .scroll-element_track,
+    .items > .scroll-element .scroll-bar {
+        border-radius: 8px;
+    }
+
+    .items > .scroll-element .scroll-element_track,
+    .items > .scroll-element .scroll-bar {
+        opacity: .4;
+    }
+
+    .items > .scroll-element .scroll-element_track {
+        background-color: #e0e0e0;
+    }
+
+    .items > .scroll-element .scroll-bar {
+        background-color: #c2c2c2;
+    }
+
+    .items > .scroll-element:hover .scroll-bar,
+    .items > .scroll-element.scroll-draggable .scroll-bar {
+        background-color: #919191;
+    }
+
+    //  Offsets when both scrollbars are visible
+    .items > .scroll-element.scroll-x.scroll-scrolly_visible .scroll-element_track,
+    .items > .scroll-element.scroll-x.scroll-scrolly_visible .scroll-element_size {
+        left: -12px;
+    }
+
+    .items > .scroll-element.scroll-y.scroll-scrollx_visible .scroll-element_track,
+    .items > .scroll-element.scroll-y.scroll-scrollx_visible .scroll-element_size {
+        top: -12px;
+    }
+}
