@@ -34,6 +34,7 @@ define([
             categoryParam: 'cat',
             countSource: '.toolbar-number',
             countTarget: '.am-items',
+            applySelectors: '.am-apply-close, .am-apply-filters',
             countDelay: 300,
             timeout: 20000
         },
@@ -46,6 +47,7 @@ define([
             if (this.options.batchApply) {
                 this._staged = {};
                 this._syncStagedFromDom();
+                this._syncApplyState();
 
                 $(document)
                     .on('click.carpFilterAjax', '.am-filter-link[data-req-var]', this._onStageOption.bind(this))
@@ -53,7 +55,7 @@ define([
                     // (query URL) — no need to also press "Show".
                     .on('click.carpFilterAjax', '.am-chip-remove[data-req-var]', this._onRemoveApply.bind(this))
                     .on('click.carpFilterAjax', '.filter-clear', this._onClearApply.bind(this))
-                    .on('click.carpFilterAjax', '.am-apply-close, .am-apply-filters', this._onApplyStaged.bind(this));
+                    .on('click.carpFilterAjax', this.options.applySelectors, this._onApplyStaged.bind(this));
             } else {
                 $(document).on('click.carpFilterAjax', this.options.linkSelectors, this._interceptClick.bind(this));
             }
@@ -225,10 +227,25 @@ define([
         _refreshCount: function () {
             var self = this;
 
+            // Immediate, not debounced: the button should react on the same
+            // frame as the click or slider drag, only the count waits.
+            this._syncApplyState();
+
             clearTimeout(this._countTimer);
             this._countTimer = setTimeout(function () {
                 self._fetchCount();
             }, this.options.countDelay);
+        },
+
+        /**
+         * Enable-look for the Show button whenever anything is staged. Live
+         * (Amasty) sets .active on the button itself, so the slider and the
+         * option lists share one signal — CSS alone can only see the option
+         * lists' .-selected items and so never reacted to a price drag.
+         */
+        _syncApplyState: function () {
+            $(this.options.applySelectors)
+                .toggleClass('active', Object.keys(this._staged).length > 0);
         },
 
         _fetchCount: function () {

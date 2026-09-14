@@ -874,11 +874,25 @@
             }
 
             //  Our layered nav never disables the button, so mirror the same two
-            //  states off the selection itself: dimmed while nothing is ticked,
-            //  green once something is. `:has()` reads the panel's state from the
-            //  bar, which sits in the same modal.
+            //  states off the staged selection: dimmed while nothing is picked,
+            //  green once something is — live's enabled state is #429a3c on
+            //  `button.amshopby-button.active`.
+            //
+            //  .active comes from filter-ajax.js rather than from
+            //  `:has(.am-filter-item.-selected)` as before: that selector could
+            //  only see the option lists, so dragging the price slider — which
+            //  stages a range and marks no option — left the button grey while
+            //  its count updated. Kept in this block so it outranks the dimming
+            //  rule beside it; as a top-level selector it lost on specificity
+            //  and only the background changed.
             &:not(.filter-clear) {
                 opacity: 0.5;
+            }
+
+            &.active:not(.filter-clear) {
+                background: #429a3c;
+                border-color: #429a3c;
+                opacity: 1;
             }
 
             &.filter-clear.action.clear {
@@ -892,17 +906,6 @@
     }
 }
 
-//  Apply turns green the moment a filter is ticked — live's enabled state
-//  (#429a3c). Kept out of the block above because it has to qualify the modal,
-//  not the button: `:has()` lets the bar react to the panel's selection without
-//  the layered-nav JS having to touch the button.
-.modal-slide.filter-modal:has(.am-filter-item.-selected) {
-    .am_shopby_apply_filters .amshopby-button:not(.filter-clear) {
-        background: #429a3c;
-        border-color: #429a3c;
-        opacity: 1;
-    }
-}
 
 //
 //  Bottom category description — Read more / Read less (parity with base)
