@@ -101,11 +101,13 @@
             align-items: center;
           }
 
-          //  Logo column: shrink to the logo, pinned left.
+          //  Logo column: keep the col-lg-4 third of the row, pinned left.
+          //  Measured against live (carpetavenue.jp/onestepcheckout) at a
+          //  1512px viewport: 483px.
           .col-xs-7 {
-            flex: 0 0 auto;
+            flex: 0 0 33.3333%;
             width: auto;
-            max-width: none;
+            max-width: 33.3333%;
             text-align: left;
           }
 
@@ -115,11 +117,20 @@
             transform: none;
           }
 
-          //  Trustpilot column: take the remaining width beside the logo.
+          //  Trustpilot column: the col-lg-8 two thirds, as on live.
+          //
+          //  Trustpilot's carousel has no "number of reviews" attribute — it
+          //  fits as many cards as the iframe width allows. Letting the column
+          //  stretch (flex: 1 1 auto) gave a 1138px column / 1108px widget and
+          //  three review cards; live keeps the plain grid split, so its widget
+          //  measures 935px and shows the score panel plus two cards. Restoring
+          //  the percentages reproduces live exactly (483 / 965 / 935px at a
+          //  1512px viewport) — so the count comes from the same widths live
+          //  uses, not from a hard cap on the widget.
           .col-trustpilot {
-            flex: 1 1 auto;
+            flex: 0 0 66.6667%;
             width: auto;
-            max-width: none;
+            max-width: 66.6667%;
             margin-top: 0;
             text-align: left;
           }
