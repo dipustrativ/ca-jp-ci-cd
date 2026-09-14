@@ -200,6 +200,16 @@ class Price extends \Magento\CatalogSearch\Model\Layer\Filter\Price implements S
      * Excludes this price filter itself so the slider does not collapse to the
      * selected range.
      *
+     * Always off a stateless collection, never the layer's own. By the time the
+     * filters render, the toolbar has already put the page size on the layer
+     * collection, and getMinPrice()/getMaxPrice() aggregate over the collection's
+     * select — so the handles spanned whatever 50 products page 1 happened to
+     * hold. On this category that read ¥13,591–¥2,749,948 against a true
+     * ¥2,040–¥4,471,451, hiding 51 products below the lower handle and 1 above
+     * the upper one. The bounds cache key ignores pagination (correctly — bounds
+     * are a property of the result set, not the page), so page 2 then re-served
+     * page 1's numbers and the error looked stable rather than obviously wrong.
+     *
      * @return array{0: float, 1: float}
      */
     private function getSliderBounds(): array
@@ -219,14 +229,22 @@ class Price extends \Magento\CatalogSearch\Model\Layer\Filter\Price implements S
             }
         }
 
-        $collection = $this->currentRange !== null
-            ? $this->facetProvider->createStatelessCollection(
-                $this->getLayer(),
-                $this->getAttributeModel()->getAttributeCode()
-            )
-            : $this->getLayer()->getProductCollection();
+        $collection = $this->facetProvider->createStatelessCollection(
+            $this->getLayer(),
+            $this->getAttributeModel()->getAttributeCode()
+        );
 
         try {
+            if ($collection !== null) {
+                //  Resolve the search first. A fulltext collection only puts its
+                //  `entity_id IN (...)` clause on the select once the search has
+                //  run, and getMinPrice()/getMaxPrice() aggregate straight off
+                //  that select — ask them too early and every attribute filter is
+                //  missing from the SQL, so the handles span the whole category
+                //  however narrow the current result set is.
+                $collection->getSize();
+            }
+
             $min = $collection !== null ? (float)$collection->getMinPrice() : 0.0;
             $max = $collection !== null ? (float)$collection->getMaxPrice() : 0.0;
         } catch (\Exception $e) {
