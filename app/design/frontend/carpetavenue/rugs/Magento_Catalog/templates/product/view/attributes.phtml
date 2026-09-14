@@ -15,6 +15,8 @@
 <?php
     $_helper = $this->helper(Magento\Catalog\Helper\Output::class);
     $_product = $block->getProduct();
+    /** @var \CarpetAvenue\Productify\ViewModel\SizeFormatter $sizeFormatter */
+    $sizeFormatter = $block->getData('size_formatter');
 ?>
 <?php if ($_additional = $block->getAdditionalData()) :?>
     <div class="additional-attributes-wrapper table-wrapper" id="product-attributes-collapsible">
@@ -40,9 +42,9 @@
             //-- Motifs (Display both Anatomy and Patterns if either exists)
             $motifs = [];
 
-            // NOTE: check if the attribute 'shape' is round.
-            // I also remove the shape attribute from frontend
-            $isRound = false;
+            // Round rugs (shape option id from productify/general/round_shape_option_id)
+            // show a single "Diameter" row instead of "Size".
+            $isRound = $sizeFormatter->isRound($_product);
             $shapeKey = '';
 
             foreach ($_additional as $key => $_data) {
@@ -55,11 +57,6 @@
                 }
                 if ($_data['code'] == 'shape') {
                     $shapeKey = $key;
-
-                    // Trouble arises here if attribute is changed in admin
-                    if ($_product->getData('shape') == 20) {
-                        $isRound = true;
-                    }
                 }
 
                 if ($_data['code'] == 'anatomy' || $_data['code'] == 'patterns') {
