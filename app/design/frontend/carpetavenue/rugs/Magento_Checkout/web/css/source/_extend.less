@@ -262,6 +262,17 @@
                 }
             }
 
+            //  "Estimate Shipping and Tax" hidden for now — delete this rule to
+            //  bring it back. Hidden here rather than removed in layout: the
+            //  block carries the jsLayout that renders the totals, and
+            //  cart/shipping.phtml nests the #block-summary KO host inside it,
+            //  so removing it empties the summary completely. #cart-totals is a
+            //  sibling of #block-shipping, not a child, so this only hides the
+            //  estimate UI. See the matching NOTE in checkout_cart_index.xml.
+            #block-shipping {
+                display: none;
+            }
+
             .checkout-methods-items {
                 .action.primary.checkout {
                     font-size: 1.6rem;
@@ -269,10 +280,42 @@
                 }
             }
         }
+        //  Totals table. Live gets its row rhythm and the larger, rule-separated
+        //  grand totals from Luma's .abs-sidebar-totals; blank's version of that
+        //  abstract sets neither a font-size nor the row border, so our totals
+        //  came out uniformly small and run together. Ported here to match.
         .cart-totals {
+            tbody,
+            tfoot {
+                .mark {
+                    padding: 6px 0;
+                }
+
+                .amount {
+                    padding: 6px 0 6px 14px;
+                }
+            }
+
             .grand {
+                th,
+                td {
+                    padding: 11px 0;
+                }
+
+                .mark,
+                .amount {
+                    font-size: 1.8rem;
+                    border-top: 1px solid @border-color__base;
+                }
+
+                .mark {
+                    padding-right: @indent__s;
+                }
+
                 strong {
-                    font-weight: @font-weight__bold;
+                    display: inline-block;
+                    font-weight: @font-weight__semibold;
+                    padding: 3px 0 0;
                 }
             }
         }
@@ -287,25 +330,109 @@
         // Discount
         .cart-discount {
             .block {
+                //  Collapse chevron. It used to come from the
+                //  `.cart-summary .block > .title` rule, which stopped matching
+                //  once the coupon moved out of the summary box — leaving an
+                //  unmarked click target over a collapsed field. Live renders it
+                //  inline after the heading rather than pinned to the right edge.
                 & > .title {
+                    cursor: pointer;
+                    .lib-icon-font(
+                        @icon-down,
+                        @_icon-font-size: 24px,
+                        @_icon-font-line-height: 1,
+                        @_icon-font-color: inherit,
+                        @_icon-font-margin: 0 0 0 10px,
+                        @_icon-font-position: after
+                    );
+
                     strong {
                         font-weight: @font-weight__bold;
                     }
+
+                    &:after {
+                        position: static;
+                        display: inline;
+                        font-family: 'luma-icons';
+                        font-size: 12px;
+                        line-height: 12px;
+                    }
+                }
+
+                &.active > .title:after {
+                    content: @icon-up;
                 }
             }
 
             .fieldset.coupon {
                 margin-top: 15px;
+                //  Input and Apply button on one row, as on live. Luma gets this
+                //  from .abs-discount-block-desktop; blank has no .cart-discount
+                //  styling at all, so it is spelled out here.
+                .lib-vendor-prefix-display(flex);
+                align-items: flex-start;
+
+                .field {
+                    margin-bottom: 0;
+
+                    //  Placeholder already reads "Enter discount code" — live
+                    //  shows no separate label above the input.
+                    .label {
+                        .lib-visually-hidden();
+                    }
+                }
 
                 .control {
                     margin-right: 10px;
+                    //  Blank floats .control and sizes it to 74.2% to leave room
+                    //  for an inline label. The label is hidden here, so unfloat
+                    //  it and let the input keep its intrinsic width — live sits
+                    //  a ~170px input next to the button rather than stretching
+                    //  it across the column.
+                    float: none;
+                    width: auto;
+
+                    //  The global `height: auto` input reset
+                    //  (web/css/source/_extend.less) leaves this at its 22px line
+                    //  box — half the Apply button. Live sits the two at matching
+                    //  heights, so track the button: its 16px line-height plus
+                    //  @button__padding and 1px borders.
+                    input {
+                        height: (16px + (2 * 15px) + 2px);
+                        padding-left: 15px;
+                        padding-right: 15px;
+
+                        //  Luma sets @form-element-input-placeholder__color to
+                        //  @color-gray34, which is what live shows; blank leaves
+                        //  it at @color-gray76 (#c2c2c2) and the hint washes out.
+                        //  The placeholder carries the field's only label here,
+                        //  since the real one is visually hidden.
+                        &::placeholder {
+                            color: @color-gray34;
+                        }
+                    }
                 }
             }
 
+            //  Apply button. Live is Luma-parented with no _theme.less, so this
+            //  button keeps Magento's default light/outlined look; our theme
+            //  repaints every .action.primary with @ca-green, which made it a
+            //  solid green block. Restated here rather than changing the global
+            //  primary, which the checkout and payment buttons rely on.
             .actions-toolbar {
                 .action.primary {
-                    border-bottom-left-radius: 5px;
-                    border-top-left-radius: 5px;
+                    background: #ffffff;
+                    border: 1px solid #cccccc;
+                    color: @ca-black;
+                    font-weight: @font-weight__bold;
+
+                    &:hover,
+                    &:focus,
+                    &:active {
+                        background: #f5f5f5;
+                        border: 1px solid #b3b3b3;
+                        color: @ca-black;
+                    }
                 }
             }
         }
@@ -514,13 +641,16 @@
         }
     }
 
-    // Hide the "Clear" / "Update" cart action buttons (cart page)
+    // Hide the "Clear" / "Update" / "Continue Shopping" cart action buttons
+    // (cart page). Core renders all three in cart/form.phtml's .cart.main.actions;
+    // hiding rather than editing the template keeps our override in step with core.
     .checkout-cart-index {
         .cart-container {
             .form-cart {
                 .actions.main {
                     .clear,
-                    .action.update {
+                    .action.update,
+                    .action.continue {
                         display: none;
                     }
                 }
@@ -829,12 +959,31 @@
         }
 
         .cart-container {
-            padding: 0 15px;
+            //  No side padding here. Live carries `padding: 0 15px` on this
+            //  because its .page-main does not pad the cart page; ours does
+            //  (15px each side), so repeating it insets every child to 315px
+            //  inside a 345px column — enough to wrap the product name and drop
+            //  the qty value onto its own line. Live measures 345px at 375px
+            //  wide; this matches it.
             .lib-vendor-prefix-display(flex);
             .lib-vendor-prefix-flex-direction(column);
 
             .form-cart {
                 .lib-vendor-prefix-order(1);
+            }
+
+            //  Live keeps the coupon, crosssell and badges as direct children of
+            //  .cart-container and orders each one, ending items → coupon →
+            //  crosssell → summary → badges. Ours are wrapped in
+            //  .cart-form-after (see checkout_cart_index.xml), which the wrapper
+            //  only needs on desktop to hold the 65% column. `display: contents`
+            //  dissolves it for layout here so its children order individually —
+            //  otherwise the wrapper takes one slot and drags the badges up in
+            //  front of the summary. The order values it feeds are on
+            //  .cart-discount below and on .cart-trustpilot__wrapper /
+            //  .icon-usps__wrapper above.
+            .cart-form-after {
+                display: contents;
             }
 
             .cart-discount {
@@ -909,13 +1058,22 @@
             .cart.item {
                 width: 100%;
                 padding: 0 15px;
+                //  Without this the row is content-box, so width:100% resolves to
+                //  the parent's width and the 15px side padding is added on top —
+                //  the card runs 2px past the viewport and the page scrolls
+                //  sideways at 375px.
+                box-sizing: border-box;
 
-                // Kill grid negative gutters so left/right spacing is symmetric
-                // (image col has padding:0, was pulling the row off-centre).
+                //  Live's grid gutters, restored. These used to be zeroed out
+                //  "so left/right spacing is symmetric" — but that was treating
+                //  the double .cart-container padding above, which pushed the
+                //  row off-centre. With the padding gone the negative margins
+                //  cancel the item's own 15px as live intends, giving the
+                //  product name its full column instead of a wrapped 131px.
                 .item-info,
                 .nested-table-row {
-                    margin-left: 0;
-                    margin-right: 0;
+                    margin-left: -15px;
+                    margin-right: -15px;
                 }
 
                 .item-info {
@@ -927,17 +1085,32 @@
         // Discount
         .cart-discount {
             .block {
-                .title {
-                    padding-top: 15px;
-                    padding-bottom: 20px;
+                //  Mobile turns the heading into a full-width bar with a rule
+                //  above it and the chevron pinned right, instead of desktop's
+                //  inline chevron beside the text. Measured off live at 375px.
+                & > .title {
+                    //  Desktop's .lib-icon-font() leaves this inline-block, which
+                    //  shrinks the box to the text and drags the right-anchored
+                    //  chevron in with it. Full width here so it pins to the edge.
+                    display: block;
+                    padding: 15px 40px 15px 15px;
+                    position: relative;
+                    border-top: 1px solid #cccccc;
+                    border-bottom: 1px solid #cccccc;
 
                     &:after {
+                        position: absolute;
+                        right: 20px;
+                        top: 10px;
+                        font-size: 12px;
                         line-height: 2;
+                        display: block;
+                        margin: 3px 0 0;
                     }
                 }
 
                 .content {
-                    padding: 0 15px;
+                    padding: 0 0px;
                 }
             }
         }
@@ -987,8 +1160,18 @@
 
         // Items
         .cart-container {
-            .form-cart {
+            //  .cart-form-after holds the coupon, Trustpilot list and trust
+            //  badges. It has to be a sibling of the form rather than inside it
+            //  (see checkout_cart_index.xml — nested forms), so it repeats the
+            //  column width and clears the float to stack under the item list.
+            .form-cart,
+            .cart-form-after {
                 width: 65%;
+            }
+
+            .cart-form-after {
+                float: left;
+                clear: left;
             }
         }
         .cart.items.table {
@@ -1001,9 +1184,11 @@
 
         // Discount
         .cart-discount {
-            width: 50%;
-            position: relative;
-            top: -25px;
+            //  Live's `width: 50%` / `top: -25px` are gone: those positioned the
+            //  block as a sibling beside the floated .form-cart column, and ours
+            //  sits inside that column directly under the item list, so it just
+            //  takes the column width.
+            margin: 20px 0 0;
         }
 
         .icon-usps {

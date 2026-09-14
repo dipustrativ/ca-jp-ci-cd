@@ -338,6 +338,9 @@
     }
 
     .table-totals {
+        border: 1px solid #ccc !important;
+        margin-top: 10px;
+
       .totals {
         &.sub,
         &.shipping.incl,
@@ -512,6 +515,10 @@
 //  _____________________________________________
 
 .media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+
+    .minicart-wrapper .action.showcart .counter.qty{
+        background: #2c8e3b;
+    }
   .onestepcheckout-index-index {
 
     .columns {
@@ -583,6 +590,7 @@
       &__wrapper {
         position: absolute;
         top: 118px;
+          margin-top: 0px !important;
       }
     }
 

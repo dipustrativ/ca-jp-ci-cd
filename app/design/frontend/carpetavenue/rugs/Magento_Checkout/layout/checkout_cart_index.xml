@@ -20,29 +20,53 @@
             </container>
         </referenceContainer>
 
-        <!-- Trustpilot review list + icon-usps trust badges inside the cart form
-             (.form-cart, the 65% left column), below the item list + actions.
-             Rendered through dedicated cart_trustpilot / cart_iconusps slots in
-             cart/form.phtml so they sit inside the column and scroll with it, never
-             spanning full-width under the sticky cart-summary. -->
-        <referenceBlock name="checkout.cart.form">
-            <container name="checkout.cart.trustpilot.container" as="cart_trustpilot"
-                       htmlTag="div" htmlClass="cart-trustpilot__wrapper">
-                <block class="Magento\Cms\Block\Block" name="trustpilot.cart.horizontal.list">
-                    <arguments>
-                        <argument xsi:type="string" name="block_id">trustpilot-horizontal-list</argument>
-                    </arguments>
-                </block>
+        <!-- Everything that stacks under the cart item list: coupon form, then
+             the Trustpilot review list, then the icon-usps trust badges.
+
+             These sit in their own container rather than inside
+             checkout.cart.form because the coupon block renders its own
+             <form id="discount-coupon-form">, and nested forms are invalid HTML —
+             the parser closes .form-cart at that point and everything after it
+             spills out of the 65% column (the hidden Clear/Update/Continue
+             buttons reappear with it, since their rule is scoped to .form-cart).
+             cart.form.after is therefore a sibling of the form, carrying the same
+             column width so the blocks still stay inside the left column and
+             never span full-width under the sticky cart-summary.
+
+             The coupon needs the move at all because core 2.4.9 nests
+             checkout.cart.coupon inside cart.summary, which renders it stacked
+             inside the white summary card. Live sits it under the item list:
+             Luma adds a cart.discount container and moves the block into it
+             (vendor/magento/theme-frontend-luma/Magento_Checkout/layout/checkout_cart_index.xml),
+             and we parent Magento/blank so none of that is inherited. The theme's
+             .cart-discount LESS was already carried over from live and was dead
+             until this container existed to match it. -->
+        <referenceContainer name="checkout.cart.container">
+            <container name="cart.form.after" htmlTag="div" htmlClass="cart-form-after"
+                       after="checkout.cart.form">
+                <container name="cart.discount" label="Cart Discount Container"
+                           htmlTag="div" htmlClass="cart-discount" />
+                <container name="checkout.cart.trustpilot.container"
+                           htmlTag="div" htmlClass="cart-trustpilot__wrapper"
+                           after="cart.discount">
+                    <block class="Magento\Cms\Block\Block" name="trustpilot.cart.horizontal.list">
+                        <arguments>
+                            <argument xsi:type="string" name="block_id">trustpilot-horizontal-list</argument>
+                        </arguments>
+                    </block>
+                </container>
+                <container name="checkout.cart.bottom.container"
+                           htmlTag="div" htmlClass="icon-usps__wrapper"
+                           after="checkout.cart.trustpilot.container">
+                    <block class="Magento\Cms\Block\Block" name="icon.usps">
+                        <arguments>
+                            <argument xsi:type="string" name="block_id">icon-usps</argument>
+                        </arguments>
+                    </block>
+                </container>
             </container>
-            <container name="checkout.cart.bottom.container" as="cart_iconusps"
-                       htmlTag="div" htmlClass="icon-usps__wrapper">
-                <block class="Magento\Cms\Block\Block" name="icon.usps">
-                    <arguments>
-                        <argument xsi:type="string" name="block_id">icon-usps</argument>
-                    </arguments>
-                </block>
-            </container>
-        </referenceBlock>
+        </referenceContainer>
+        <move element="checkout.cart.coupon" destination="cart.discount" />
 
         <!-- Crosssell heading. Uses the default Magento_Catalog product/list/items.phtml template -->
         <referenceBlock name="checkout.cart.crosssell">
@@ -53,6 +77,12 @@
             </arguments>
         </referenceBlock>
 
+        <!-- NOTE: do not remove="true" this block to hide the "Estimate Shipping
+             and Tax" UI. It carries the jsLayout that renders the whole
+             block-summary scope, totals included, and cart/shipping.phtml nests
+             #block-summary inside #block-shipping — dropping either empties
+             .cart-totals and the summary loses every row. The estimate UI is
+             hidden in LESS instead; see "Estimate Shipping and Tax" there. -->
         <referenceBlock name="checkout.cart.shipping">
             <container name="checkout.cart.shipping.after"
                        as="after_shipping"

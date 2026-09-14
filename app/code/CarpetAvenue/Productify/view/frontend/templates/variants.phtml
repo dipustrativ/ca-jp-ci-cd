@@ -145,9 +145,8 @@ function getVariantBySizeAndColorAndShape($variants, $color, $size, $shapeKey) {
         margin-top: 10px;
     }
     .color-swatches a {
-        width: 67px;
-        height: auto;
-        padding: 9px 0px;
+        width: 40px;
+        height: 40px;
         overflow: hidden;
         margin: 4px;
         display: flex;
@@ -175,7 +174,8 @@ function getVariantBySizeAndColorAndShape($variants, $color, $size, $shapeKey) {
     }
 
     .color-swatches a.selected {
-        border: 1px solid black;
+        border: 3px solid black;
+        box-shadow: 0 0 0 2px #00000033;
     }
     @media (min-width: 769px) {
         .group-products-wrap>div{
