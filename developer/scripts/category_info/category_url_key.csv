@@ -1,0 +1,136 @@
+"entity_id","name_all_stores","name_store17","url_key_store17"
+"1","Root Catalog",NULL,NULL
+"2","Default Category",NULL,NULL
+"3","Oriental Carpets","オリエンタルカーペット","orientaru-ka-petto"
+"4","Modern Carpets","モダンカーペット","modan"
+"5","Sale","セール","se-ru"
+"6","Persian - Classical","ペルシャ／クラシック","perusha-jutan-kurashikku"
+"7","Bidjar","ビジャー","bija"
+"8","Nomad - Village","遊牧民／村","yubokumin-mura"
+"9","Abadeh","アバデ","abade"
+"10","Afshar","アフシャール","ahushiyaru"
+"11","Bakhtiar","バクティアリ","bakuthiari"
+"12","Baluch","バルーチ","baruchi"
+"13","Hamadan","ハマダン",NULL
+"14","Silk - Exclusive"," シルク高級","shiruku-kokyu"
+"15","Isfahan - Isfahan Silk","イスファハーン ー イスファハーンシルク","isuhuahan-shiruku"
+"16","Kerman","ケルマン","keruman"
+"17","Keshan","カシャーン","kashiyan"
+"18","Lori","ロリ","rori"
+"19","Mashad","マシュハド","mashuhado"
+"20","Moud","ムード","mudo"
+"21","Nahavand","ナハバンド","nahavand"
+"22","Nain","ナイン",NULL
+"23","Ghashghai","カシュガイ","kashiyugai"
+"24","Nain 4La - Nain 6La","ナイン4ラ ／ ナイン6ラ","nain-4-la-nain-6-la"
+"26","Qom Silk","クム シルク","kumu-shiruku"
+"27","Sarough","サルーク","saruku"
+"28","Senneh","セネ","sene"
+"29","Tabriz 50-60-70 Raj","タブリーズ 50 ／ 60 ／ 70ラジ","taburizu-50-60-70-raj"
+"30","Tabriz","タブリーズ","taburizu"
+"31","Vintage - Patchwork","ヴィンテージ／パッチワーク","patchwork-bintaz"
+"32","Patchwork","パッチワーク","patchwork"
+"33","Vintage","ヴィンテージ","bintaz"
+"34","Kilim - Oriental","キリム・オリエンタル","kirimu-orientaru"
+"35","Kilim Afghan","キリム・アフガン","kirimu-afugan"
+"36","Ziegler - Kazak","ジーグラー・カザック","ziegler-kazakku"
+"37","Gabbeh","ギャッベ","gyabbe"
+"38","Persian Gabbeh","ペルシャギャッベ","perushagyabbe"
+"39","Indo Gabbeh","インドギャッベ","indogyabbe"
+"40","Kashmir silk","カシミール シルク","kashimi-ru-shiruku"
+"41","Ardebil","アルデビル","aru-de-biru"
+"42","Koliai","コリアイ","koriai"
+"43","Kashmar","カシュマール","kashimaru"
+"44","Ziegler","ジーグラー",NULL
+"45","Kazak","カザック","kazakku"
+"46","Kilim - Modern","モダンキリム","modern-kilim"
+"47","Designer carpets","デザイナー絨毯","modan-dezaina"
+"48","Patina","パティナ","pateina"
+"49","Kilim Fars","キリム・ファールス","kirimu-fars"
+"50","Kilim Maimane","キリム マイマネ","kirimu-maimane"
+"51","Single Colored - Solid","単色／ソリッド","tanshoku"
+"52","Kilim Patchwork","キリム・パッチワーク","kilim-patchwork"
+"53","Berber - Morocco","ベルベル－シャギー","shaggy"
+"54","Yalameh","ヤラメ","yarame"
+"55","Heriz","ヘリーズ","herizu"
+"56","Kashkooli Gabbeh","カシュクーリ・ギャッベ","kashkuri-gyabbe"
+"59","Varamin","バラーミーン","baramin"
+"60","Yazd","ヤズド","yazu-do"
+"61","Ardekan","アルダカーン","arudakan"
+"63","Najafabad","ナジャファバード","najaf-abado"
+"64","Turkaman","トルクメン","torukumen"
+"65","Sirjan","シールジャン","shi-ru-jan"
+"66","Arak","アラク",NULL
+"67","Mahal","マハル",NULL
+"68","Nain 9La","ナイン9ラ","nain-9-la"
+"69","Zanjan","ザンジャーン","sanjan"
+"70","Meimeh","メイメー","meime"
+"71","Qom","クム","kum"
+"72","Suzani","スザニ",NULL
+"74","China","中国","zhong-guo"
+"75","Afghan - Pakistan","アフガンーパキスタン","ahugan-pakisutan"
+"78","Pakistan Bokhara","パキスタン ２＆３プライ","pakisutan-2-3-ply"
+"79","Afghan","アフガン・アクチェ",NULL
+"80","Clearance Sale 30-60%","29周年感謝セール　大好評の為続行中！","haru-no-seru-saidai-70-pasento-ofu"
+"81","Persian 20-50%","ペルシャ絨毯 最大70％オフ","perusha-jutan-20-60"
+"85","All Carpets","すべての絨毯","subete-no-jutan"
+"91","Mehraban",NULL,NULL
+"93","Shiraz","シラーズ","shirazu"
+"94","Klardasht","クラルダシュト",NULL
+"98","Shirvan","シルヴァン","shiruan"
+"99","Hereke","ヘレケ",NULL
+"100","About","当社について","about"
+"101","Contact","お問い合わせ","contact"
+"106","Persian Carpets","ペルシャ絨毯","perusha-jutan"
+"107","Vintage Patchwork 30-60%","ヴィンテージ／パッチワーク  最大60％オフ","vintage-patchwork"
+"140","Wool carpets","ウールカーペット","uru-kapetto"
+"141","Poshti","ポシュティ",NULL
+"147","Afghan Khal Mohammadi","アフガン・カルモハマディ","khal-mohammadi"
+"148","Antique / Semi-Antique","アンティーク ／ セミ・アンティーク","anthiku-semianthiku"
+"149","Ziegler Modern","ジーグラー モダン","ziegler-modan"
+"155","Bargain Carpets & Seconds","バーゲンコーナー / 二級品",NULL
+"156","Oriental Deco","オリエンタル家具アクセサリー",NULL
+"158","Carpient",NULL,NULL
+"159","Oriental Carpets","オリエンタルカーペット","orientaru-ka-petto"
+"160","Modern Carpets","モダンカーペット","modan"
+"161","Persian Classical","ペルシャ／クラシック","perusha-jutan-kurashikku"
+"162","Nain","ナイン",NULL
+"163","Afghan","アフガン",NULL
+"164","Pakistan","パキスタン ",NULL
+"165","Ziegler","ジーグラー",NULL
+"166","Kilim","キリム","kirimu"
+"167","Gabbeh","ギャッベ","gyabbe"
+"168","Designer","デザイナー絨毯","modan-dezaina"
+"169","Berber Shaggy","ベルベル－シャギー","shaggy"
+"170","Vintage","ヴィンテージ","bintaz"
+"171","Turkish / Anatolian","トルコ絨毯","toruko-jutan"
+"172","クム シルク 最大50％オフ",NULL,"kumu-shiruku-50"
+"173","Carpient Clearance : 129 € / 199 € / 299 € regardless of previous price","カーピエントセール：￥50,000 /￥74,000","kapientoseru-kikan-gentei-ofa"
+"174","Carpet Diem : €399 / €599 / €999","Carpet Diem – ￥99,000 /￥148,000 /￥247,000","carpet-diem-seru-gentei-ofa"
+"175","Carpient Clearance - 30%","Carpient -30%",NULL
+"176","Exclusive Carpets : €1,299 / €1,999 / €2,999","極上の手織り絨毯：￥321,000 / ￥494,000 /￥741,000","gokujo-no-teori-jutan-seru-gentei-ofa"
+"177","JP Fixed price ","スペシャルプライス　年に1度：￥80,000 /￥160,000","supesharu-puraisu-toshi-ni-1-do-seru-gentei-ofa"
+"178","Bargains","お買い得カーペット",NULL
+"179","Minimalist","シンプル＆モダン",NULL
+"180","Kelim Carpets","キリムカーペット","kirimu-kapetto"
+"181","Kelim Artweave","キリム・タブロー・Artweave",NULL
+"182","Kelim up to 50%"," キリム 絨毯 最大50％オフ","https-carpetavenue-jp-subete-no-jutan-kirimu-kapetto-am-on-sale-1"
+"183","憧れのペルシャ絨毯を、卸価格で。 1,000円 / 98,000円 / 198,000円","憧れのペルシャ絨毯を、卸価格で。 79,000円 / 159,000円 / 999,000円",gyabbefea
+"184","Collectors",NULL,NULL
+"185","Exclusive Carpets : €1",NULL,NULL
+"186","299 / €1",NULL,NULL
+"187","999 / €2",NULL,NULL
+"188","999",NULL,NULL
+"189","Nomad Carpets : €199 / €299","ノマド・カーペット — ￥50,000 /￥74,000","nomado-kapetto"
+"190","Antique / Semi-Antique","アンティーク ／ セミ・アンティーク",NULL
+"191","Isfahan - Isfahan Silk","イスファハーン ー イスファハーンシルク",NULL
+"192","Nain 4La - Nain 6La","ナイン4ラ ／ ナイン6ラ",NULL
+"193","Qom Silk","クム シルク",NULL
+"194","Tabriz 50-60-70 Raj","タブリーズ 50 ／ 60 ／ 70ラジ",NULL
+"195","Kashmir silk","カシミール シルク",NULL
+"196","Hereke","ヘレケ",NULL
+"197","29周年感謝セール 3/1〜3/31",NULL,NULL
+"198","DiningRoom","ダイニングルーム用カーペット","dainingu-ruumu-you-kaapetto"
+"199","New Era Grand Inventory Sale",NULL,NULL
+"200","Washable",NULL,NULL
+"201","Kids",NULL,NULL
