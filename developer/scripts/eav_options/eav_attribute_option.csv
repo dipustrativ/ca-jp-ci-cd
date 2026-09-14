@@ -1,0 +1,895 @@
+"attribute_code","attribute_id","option_id","label_store_0","label_store_17"
+"age","168","26","0-20 new","コンテンポラリー（～20年）"
+"age","168","30","20-50 Heritage","Heritage（20～50年）"
+"age","168","35","50-80 semi antique","セミアンティーク（50～80年）"
+"age","168","40",">80 years antique","アンティーク（80年～）"
+"age","168","5931",,NULL
+"anatomy","366","6314","Floral / Round Medallion","花柄・円形メダリオン"
+"anatomy","366","6315","Pendants / Anchors","ペンダント / アンカー"
+"anatomy","366","6316","Spandrels / Corner Pieces","隅飾り / コーナーピース"
+"anatomy","366","6325","Diamond Medallion","ダイヤ型メダリオン / 菱形メダリオン"
+"anatomy","366","6326","Concentric Medallions","同心円状メダリオン"
+"anatomy","366","6327","Stepped / Polygon Medallion","階段状メダリオン"
+"anatomy","366","6331","Open Field","オープンフィールド / 無地場"
+"anatomy","366","6337","Mihrab / Arch","ミフラーブ / アーチ"
+"anatomy","366","6352","Khesti / Panel Box","ケシュティ / パネル区画"
+"border_color","359","5991","Navy Blue","ネイビーブルー"
+"border_color","359","6003","True Black","漆黒"
+"border_color","359","6011","Cream","クリーム"
+"border_color","359","6021","True Red","真紅"
+"border_color","359","6029","Terracotta","煉瓦色"
+"border_color","359","6037","Ruby","ルビー"
+"border_color","359","6040","Slate Blue","スレートブルー"
+"border_color","359","6041","Sand","サンド"
+"border_color","359","6049","Teal","ティールブルー"
+"border_color","359","6058","Ochre","オーカー"
+"border_color","359","6061","Dusty Rose","ダスティローズ"
+"border_color","359","6064","Taupe","灰褐色"
+"border_color","359","6070","Beige","サンドベージュ"
+"border_color","359","6073","Ivory","アイボリー"
+"border_color","359","6086","Charcoal","チャコールグレー"
+"border_color","359","6087","Burnt Orange","バーントオレンジ"
+"border_color","359","6114","Cognac","琥珀色"
+"border_color","359","6117","Mocha","モカ"
+"border_color","359","6122","Espresso","深焙煎色"
+"border_color","359","6136","Slate","スレート"
+"border_color","359","6138","Sky Blue","スカイブルー"
+"border_color","359","6139","Alabaster","雪花石膏色"
+"border_color","359","6140","Walnut","ウォールナット"
+"border_color","359","6143","Old Gold","アンティークゴールド"
+"border_color","359","6147","Moss","モスグリーン"
+"border_color","359","6151","Ash","アッシュグレー"
+"border_color","359","6156","Camel","駱駝色"
+"border_color","359","6159","Aubergine","Nasukon"
+"border_color","359","6165","Sage","セージ"
+"border_color","359","6168","Blush Pink","ブラッシュピンク"
+"border_color","359","6170","Silver","白銀色"
+"border_color","359","6173","Salmon Pink","サーモンピンク"
+"border_color","359","6180","Saffron","サフラン"
+"border_color","359","6187","Burgundy","バーガンディ"
+"border_color","359","6188","Mint","ミントグリーン"
+"border_color","359","6194","Dove Dove Grey","ダブグレー"
+"border_color","359","6196","Mauve","薄藤色"
+"border_color","359","6211","Slate Dove Grey","ダブグレー"
+"border_color","359","6215","Indigo","藍色"
+"border_color","359","6218","Royal Blue","ロイヤルブルー"
+"border_color","359","6219","Forest Green","フォレストグリーン"
+"border_color","359","6220","Olive","オリーブ"
+"border_color","359","6223","Mushroom","トープ"
+"border_color","359","6224","Oatmeal","オートミール"
+"border_color","359","6230","Mustard","マスタード"
+"border_color","359","6234","True Red and Navy Blue","真紅 と ネイビーブルー"
+"border_color","359","6235","Brick","レンガ色"
+"border_color","359","6236","Plum","プラム"
+"border_color","359","6242","Multicolor","マルチカラー"
+"border_color","359","6243","Turquoise","トルコ石色"
+"border_color","359","6250","Lilac","ライラック"
+"border_color","359","6253","Champagne","琥珀泡色"
+"border_color","359","6254","Coral","珊瑚色"
+"border_color","359","6267","Jade","ジェイドグリーン"
+"border_color","359","6268","True Red and Slate Blue","真紅 と スレートブルー"
+"border_color","359","6272","Emerald","エメラルドグリーン"
+"border_color","359","6284","Terracotta and Alabaster","煉瓦色 と 雪花石膏色"
+"border_color","359","6285","Lime Green","ライムグリーン"
+"border_color","359","6304","Espresso and Alabaster","深焙煎色 と 雪花石膏色"
+"color","159","4","White / Beige","白 / ベージュ "
+"color","159","5","Black / Grey","黒 / グレー"
+"color","159","6","Blue / Turquoise","青 / ターコイズ"
+"color","159","7","Brown","茶"
+"color","159","9","Green","緑"
+"color","159","11","Orange / Yellow","オレンジ / 黄"
+"color","159","12","Pink / Purple","ピンク / 紫"
+"color","159","14","Red","赤"
+"color","159","18","Multicolor","多色"
+"configurable_size","222","5548","60x90","60x90"
+"configurable_size","222","5542","70x140","70x140"
+"configurable_size","222","5543","90x160","90x160"
+"configurable_size","222","5544","120x180","120x180"
+"configurable_size","222","5545","140x200","140x200"
+"configurable_size","222","5575","160x230","160x230"
+"configurable_size","222","5546","170x240","170x240"
+"configurable_size","222","5547","200x300","200x300"
+"configurable_size","222","5549","250x300","250x300"
+"configurable_size","222","5550","250x350","250x350"
+"configurable_size","222","5551","80x250","80x250"
+"configurable_size","222","5552","80x300","80x300"
+"configurable_size","222","5553","200x200","200x200"
+"configurable_size","222","5554","200x250","200x250"
+"configurable_size","222","5557","250x250","250x250"
+"configurable_size","222","5574","80x350","80x350"
+"configurable_size","222","5576","300x400","300x400"
+"configurable_size","222","5577","180x180","180x180"
+"configurable_size","222","5578","160x160","160x160"
+"configurable_size","222","5579","240x300","240x300"
+"configurable_size","222","5580","240x340","240x340"
+"configurable_size","222","5581","300x300","300x300"
+"configurable_size","222","5600","80x150","80x150"
+"configurable_size","222","5601","120x170","120x170"
+"configurable_size","222","5602","150x250","150x250"
+"configurable_size","222","5612","100x100","100x100"
+"configurable_size","222","5613","150x150","150x150"
+"configurable_size","222","5614","100x150","100x150"
+"configurable_size","222","5615","80x200","80x200"
+"configurable_size","222","5708","100x200","100x200"
+"configurable_size","222","5709","350x450","350x450"
+"configurable_size","222","5710","80x400","80x400"
+"configurable_size","222","5711","300x500","300x500"
+"configurable_size","222","5712","140x140","140x140"
+"configurable_size","222","5713","240x240","240x240"
+"configurable_size","222","5714","80x340","80x340"
+"config_color","223","5715","NMJ71",NULL
+"config_color","223","5716","NMJ47",NULL
+"config_color","223","5717","NMJ58",NULL
+"config_color","223","5718","NMJ52",NULL
+"config_color","223","5719","CRY87",NULL
+"config_color","223","5720","NMA85",NULL
+"config_color","223","5721","NMA25",NULL
+"config_color","223","5722","NM668",NULL
+"config_color","223","5723","CRY64",NULL
+"config_color","223","5724","NMI38",NULL
+"config_color","223","5725","NMI73",NULL
+"config_color","223","5726","NMI43",NULL
+"config_color","223","5727","NMI16",NULL
+"config_color","223","5728","NM635",NULL
+"config_color","223","5729","NM625",NULL
+"config_color","223","5730","NMI74",NULL
+"config_color","223","5731","NMI27",NULL
+"config_color","223","5732","NMI47",NULL
+"config_color","223","5733","NMI46",NULL
+"config_color","223","5734","NMI41",NULL
+"config_color","223","5735","NMI75",NULL
+"config_color","223","5736","NMI35",NULL
+"config_color","223","5737","NMI15",NULL
+"config_color","223","5738","NMI24",NULL
+"config_color","223","5739","NMI25",NULL
+"config_color","223","5740","NMI14",NULL
+"config_color","223","5741","NMI18",NULL
+"config_color","223","5742","NMI45",NULL
+"config_color","223","5743","NMJ41",NULL
+"config_color","223","5744","NMI42",NULL
+"config_color","223","5745","NMJ38",NULL
+"config_color","223","5746","NMI17",NULL
+"config_color","223","5747","NMI71",NULL
+"config_color","223","5748","NMJ27",NULL
+"config_color","223","5749","NMI23",NULL
+"config_color","223","5750","NMA15",NULL
+"config_color","223","5751","NMJ23",NULL
+"config_color","223","5752","NMJ21",NULL
+"config_color","223","5753","NMJ74",NULL
+"config_color","223","5754","NMJ13",NULL
+"config_color","223","5755","NM578",NULL
+"config_color","223","5756","NMI62",NULL
+"config_color","223","5757","NMJ51",NULL
+"config_color","223","5758","NMJ35",NULL
+"config_color","223","5759","NMI48",NULL
+"config_color","223","5760","CRY82",NULL
+"config_color","223","5761","NM572",NULL
+"config_color","223","5762","NMI32",NULL
+"config_color","223","5763","ZHX15",NULL
+"config_color","223","5764","NMI87",NULL
+"config_color","223","5765","ZHX18",NULL
+"config_color","223","5766","CRY56",NULL
+"config_color","223","5767","CRY15",NULL
+"config_color","223","5768","NMJ75",NULL
+"config_color","223","5769","NMJ15",NULL
+"config_color","223","5770","NMJ46",NULL
+"config_color","223","5771","NMJ43",NULL
+"config_color","223","5772","NMJ17",NULL
+"config_color","223","5773","CRY67",NULL
+"config_color","223","5774","NMI83",NULL
+"config_color","223","5775","ZHX12",NULL
+"config_color","223","5776","CRY84",NULL
+"config_color","223","5777","NMJ14",NULL
+"config_color","223","5778","NMJ56",NULL
+"config_color","223","5779","ROR47",NULL
+"config_color","223","5780","ROR67",NULL
+"config_color","223","5781","ROR57",NULL
+"config_color","223","5782","ROR27",NULL
+"config_color","223","5783","ROR37",NULL
+"config_color","223","5784","ROR17",NULL
+"config_color","223","5785","VLV35_0029",NULL
+"config_color","223","5786","SVN24_0029",NULL
+"config_color","223","5787","SVN28_0029",NULL
+"config_color","223","5788","HRC85_2555",NULL
+"config_color","223","5789","HRC68_2555",NULL
+"config_color","223","5790","SOS72_4430",NULL
+"config_color","223","5791","VLV37_0029",NULL
+"config_color","223","5792","HRC56_2555",NULL
+"config_color","223","5793","HRC54_2555",NULL
+"config_color","223","5794","HRC46_2555",NULL
+"config_color","223","5795","HRC34_2555",NULL
+"config_color","223","5796","OSS83_0029",NULL
+"config_color","223","5797","VLV31_0029",NULL
+"config_color","223","5798","AAA44_0029",NULL
+"config_color","223","5799","VLV63_0029",NULL
+"config_color","223","5800","NAI15_0010",NULL
+"config_color","223","5801","NAI12_0010",NULL
+"config_color","223","5802","SOS23_4430",NULL
+"config_color","223","5803","TLV12_4430",NULL
+"config_color","223","5804","TLV52_4430",NULL
+"config_color","223","5805","TLV51_4430",NULL
+"config_color","223","5806","TLV17_4430",NULL
+"config_color","223","5807","TLV15_4430",NULL
+"config_color","223","5808","TLV58_4430",NULL
+"config_color","223","5809","TLV18_4430",NULL
+"config_color","223","5810","TLV14_4430",NULL
+"config_color","223","5811","TLV71_2555",NULL
+"config_color","223","5812","TLV57_2555",NULL
+"config_color","223","5813","TLV52_2555",NULL
+"config_color","223","5814","TLV51_2555",NULL
+"config_color","223","5815","TLV28_2555",NULL
+"config_color","223","5816","TLV25_2555",NULL
+"config_color","223","5817","VLV36_0029",NULL
+"config_color","223","5818","VLV75_0029",NULL
+"config_color","223","5819","NAI51_0010",NULL
+"config_color","223","5820","NAI21_0010",NULL
+"config_color","223","5821","NAI14_0010",NULL
+"config_color","223","5822","VLV72_0029",NULL
+"config_color","223","5823","TLV82_2555",NULL
+"config_color","223","5824","TLV61_2555",NULL
+"config_color","223","5825","TLV47_2555",NULL
+"config_color","223","5826","TLV18_2555",NULL
+"config_color","223","5827","TLV16_2555",NULL
+"config_color","223","5828","TLV15_2555",NULL
+"config_color","223","5829","AAA43_0029",NULL
+"config_color","223","5830","OSS41_0029",NULL
+"config_color","223","5831","OSS37_0029",NULL
+"config_color","223","5832","OSS34_0029",NULL
+"config_color","223","5833","OSS13_0029",NULL
+"config_color","223","5834","OSS33_0029",NULL
+"config_color","223","5835","TLV57_4430",NULL
+"config_color","223","5836","TLV47_4430",NULL
+"config_color","223","5837","AAA42_0029",NULL
+"config_color","223","5838","VLV73_0029",NULL
+"config_color","223","5839","OSS47_0029",NULL
+"config_color","223","5840","VLV17_0029",NULL
+"config_color","223","5841","VLV13_0029",NULL
+"config_color","223","5842","SOS27_4430",NULL
+"config_color","223","5843","OSS31_0029",NULL
+"config_color","223","5844","SOS21_4430",NULL
+"config_color","223","5845","OSS84_0029",NULL
+"config_color","223","5846","OSS82_0029",NULL
+"config_color","223","5847","SVN26_0029",NULL
+"config_color","223","5848","SOR31_2555",NULL
+"config_color","223","5849","OSS38_0029",NULL
+"config_color","223","5850","HRC71_2555",NULL
+"config_color","223","5851","HRC51_2555",NULL
+"config_color","223","5852","HRC65_2555",NULL
+"config_color","223","5853","OSS17_0029",NULL
+"config_color","223","5854","HRC61_2555",NULL
+"config_color","223","5855","TLV74_4430",NULL
+"config_color","223","5856","TLV73_4430",NULL
+"config_color","223","5857","TLV72_4430",NULL
+"config_color","223","5858","TLV28_4430",NULL
+"config_color","223","5859","TLV27_4430",NULL
+"config_color","223","5860","HRC15_2555",NULL
+"config_color","223","5861","OSS87_0029",NULL
+"config_color","223","5862","OSS24_0029",NULL
+"config_color","223","5863","OSS18_0029",NULL
+"config_color","223","5864","HRC36_2555",NULL
+"config_color","223","5865","TLV58_2555",NULL
+"config_color","223","5866","TLV45_2555",NULL
+"config_color","223","5867","TLV14_2555",NULL
+"config_color","223","5868","SOR81_2555",NULL
+"config_color","223","5869","SVN65_0029",NULL
+"config_color","223","5870","SOS31_4430",NULL
+"config_color","223","5871","VLV57_0029",NULL
+"config_color","223","5872","OSS88_0029",NULL
+"config_color","223","5873","OSS77_0029",NULL
+"config_color","223","5874","OSS44_0029",NULL
+"config_color","223","5875","OSS22_0029",NULL
+"config_color","223","5876","OSS11_0029",NULL
+"config_color","223","5877","SOR38_2555",NULL
+"config_color","223","5878","OSS14_0029",NULL
+"config_color","223","5879","OSS81_0029",NULL
+"config_color","223","5880","Ivory",NULL
+"config_color","223","5881","Light_Blue",NULL
+"config_color","223","5882","Antracite",NULL
+"config_color","223","5883","Orange",NULL
+"config_color","223","5884","Brown",NULL
+"config_color","223","5885","Yellow",NULL
+"config_color","223","5886","Grey_green",NULL
+"config_color","223","5887","Ice_Blue",NULL
+"config_color","223","5888","Wine_Red",NULL
+"config_color","223","5889","Light_Green",NULL
+"config_color","223","5890","Black_Grey",NULL
+"config_color","223","5891","Dark_Grey",NULL
+"config_color","223","5892","White / Red",NULL
+"config_color","223","5893","Star",NULL
+"config_color","223","5894","Off White / Black",NULL
+"config_color","223","5895","Diamond",NULL
+"config_color","223","5896","Rust",NULL
+"config_color","223","5897","Natural",NULL
+"config_color","223","5898","Olive",NULL
+"config_color","223","5899","Mint",NULL
+"config_color","223","5900","Forest_Green",NULL
+"config_color","223","5901","Mustard",NULL
+"config_color","223","5555","Multi",NULL
+"config_color","223","5556","Blue",NULL
+"config_color","223","5558","Silver",NULL
+"config_color","223","5582","Black / Grey",NULL
+"config_color","223","5583","Dark Blue",NULL
+"config_color","223","5584","Dark Red",NULL
+"config_color","223","5585","Green",NULL
+"config_color","223","5586","Greige",NULL
+"config_color","223","5587","Light Blue",NULL
+"config_color","223","5588","Light Grey / Beige",NULL
+"config_color","223","5589","Off White",NULL
+"config_color","223","5590","Rust Red",NULL
+"config_color","223","5591","Black",NULL
+"config_color","223","5592","Dark Grey",NULL
+"config_color","223","5593","Grey / Beige",NULL
+"config_color","223","5596","Beige / Brown",NULL
+"config_color","223","5597","Terra",NULL
+"config_color","223","5598","Red / Orange",NULL
+"config_color","223","5599","Beige / Off White",NULL
+"config_color","223","5603","Grey",NULL
+"config_color","223","5604","Beige",NULL
+"config_color","223","5616","Red",NULL
+"config_color","223","5617","Gold",NULL
+"design","368","6363","Medallions","メダリオン"
+"design","368","6368","All-over","総柄"
+"design","368","6372","Pictorial","絵画風"
+"design","368","6377","Solid","無地"
+"design","368","6378","Checkered","市松模様"
+"design","368","6379","Color Block","カラーブロック"
+"design","368","6381","Striped","ストライプ"
+"design","368","6383","Garden","庭園文様"
+"detail_color","362","5992","Navy Blue","ネイビーブルー"
+"detail_color","362","5993","Slate Blue","スレートブルー"
+"detail_color","362","5994","Cream","クリーム"
+"detail_color","362","6001","Teal","ティールブルー"
+"detail_color","362","6004","Ochre","オーカー"
+"detail_color","362","6005","Alabaster","雪花石膏色"
+"detail_color","362","6008","Burnt Orange","バーントオレンジ"
+"detail_color","362","6012","Ruby","ルビー"
+"detail_color","362","6013","Sky Blue","スカイブルー"
+"detail_color","362","6014","Old Gold","アンティークゴールド"
+"detail_color","362","6018","Forest Green","フォレストグリーン"
+"detail_color","362","6022","True Red","真紅"
+"detail_color","362","6023","Saffron","サフラン"
+"detail_color","362","6030","Olive","オリーブ"
+"detail_color","362","6035","Moss","モスグリーン"
+"detail_color","362","6038","Blush Pink","ブラッシュピンク"
+"detail_color","362","6043","Mustard","マスタード"
+"detail_color","362","6047","Beige","サンドベージュ"
+"detail_color","362","6050","Espresso","深焙煎色"
+"detail_color","362","6051","Burgundy","バーガンディ"
+"detail_color","362","6053","Dusty Rose","ダスティローズ"
+"detail_color","362","6059","Ivory","アイボリー"
+"detail_color","362","6060","Terracotta","煉瓦色"
+"detail_color","362","6062","Sage","セージ"
+"detail_color","362","6065","Cognac","琥珀色"
+"detail_color","362","6068","Taupe","灰褐色"
+"detail_color","362","6074","True Black","漆黒"
+"detail_color","362","6076","Slate","スレート"
+"detail_color","362","6078","Mushroom","トープ"
+"detail_color","362","6079","Sand","サンド"
+"detail_color","362","6080","Mauve","薄藤色"
+"detail_color","362","6081","Silver","白銀色"
+"detail_color","362","6088","Brick","レンガ色"
+"detail_color","362","6093","Charcoal","チャコールグレー"
+"detail_color","362","6098","Turquoise","トルコ石色"
+"detail_color","362","6102","Ash","アッシュグレー"
+"detail_color","362","6104","Salmon Pink","サーモンピンク"
+"detail_color","362","6108","Lilac","ライラック"
+"detail_color","362","6111","Champagne","琥珀泡色"
+"detail_color","362","6126","Mocha","モカ"
+"detail_color","362","6132","Oatmeal","オートミール"
+"detail_color","362","6163","Coral","珊瑚色"
+"detail_color","362","6172","Dove Grey","ダブグレー"
+"detail_color","362","6178","Mint","ミントグリーン"
+"detail_color","362","6197","Royal Blue","ロイヤルブルー"
+"detail_color","362","6202","Walnut","ウォールナット"
+"detail_color","362","6203","Plum","プラム"
+"detail_color","362","6207","Aubergine","Nasukon"
+"detail_color","362","6208","Camel","駱駝色"
+"detail_color","362","6213","Indigo","藍色"
+"detail_color","362","6216","Black","漆黒"
+"detail_color","362","6238","Moss Green","モスグリーン"
+"detail_color","362","6239","Emerald","エメラルドグリーン"
+"detail_color","362","6240","Muted Teal","ティールブルー"
+"detail_color","362","6249","Pearl","パール"
+"detail_color","362","6251","Gold","ゴールド"
+"detail_color","362","6257","Ash Grey","アッシュグレー"
+"detail_color","362","6258","Faded Teal","ティールブルー"
+"detail_color","362","6260","White","ホワイト"
+"detail_color","362","6261","Jade","ジェイドグリーン"
+"detail_color","362","6270","Slate Grey","スレートグレー"
+"detail_color","362","6275","Light Sage","ライトセージ"
+"detail_color","362","6280","Lime Green","ライムグリーン"
+"detail_color","362","6299","Brown","ショコラブラウン"
+"detail_color","362","6305","Light Blue","ライトブルー"
+"detail_color","362","6308","Orange","マンダリン"
+"developer_attribute","348","5902","Was IRAN Origin",NULL
+"developer_attribute","348","5903","Was Iran Origin",NULL
+"developer_attribute","348","5942","Tax Class",NULL
+"developer_attribute","348","5990","Backup",NULL
+"field_color","361","5995","Ruby","ルビー"
+"field_color","361","6015","Cream","クリーム"
+"field_color","361","6019","True Red","真紅"
+"field_color","361","6024","Navy Blue","ネイビーブルー"
+"field_color","361","6031","Alabaster","雪花石膏色"
+"field_color","361","6044","Ivory","アイボリー"
+"field_color","361","6048","Beige","サンドベージュ"
+"field_color","361","6054","Sky Blue","スカイブルー"
+"field_color","361","6057","Burgundy","バーガンディ"
+"field_color","361","6067","Terracotta","煉瓦色"
+"field_color","361","6071","Blush Pink","ブラッシュピンク"
+"field_color","361","6082","True Black","漆黒"
+"field_color","361","6084","Charcoal","チャコールグレー"
+"field_color","361","6089","Burnt Orange","バーントオレンジ"
+"field_color","361","6092","Slate","スレート"
+"field_color","361","6094","Teal","ティールブルー"
+"field_color","361","6100","Taupe and Beige","灰褐色"
+"field_color","361","6103","Ash","アッシュグレー"
+"field_color","361","6106","Sand","サンド"
+"field_color","361","6109","Mauve","薄藤色"
+"field_color","361","6112","Champagne","琥珀泡色"
+"field_color","361","6115","Cognac","琥珀色"
+"field_color","361","6118","Mocha","モカ"
+"field_color","361","6123","Espresso","深焙煎色"
+"field_color","361","6127","Slate Blue","スレートブルー"
+"field_color","361","6130","Moss","モスグリーン"
+"field_color","361","6134","Saffron","サフラン"
+"field_color","361","6141","Walnut","ウォールナット"
+"field_color","361","6144","Mushroom","トープ"
+"field_color","361","6148","Sage","セージ"
+"field_color","361","6154","Ochre","オーカー"
+"field_color","361","6157","Camel","駱駝色"
+"field_color","361","6160","Aubergine","Nasukon"
+"field_color","361","6166","Coral","珊瑚色"
+"field_color","361","6174","Silver","白銀色"
+"field_color","361","6176","Dove Dove Grey","ダブグレー"
+"field_color","361","6179","Old Gold","アンティークゴールド"
+"field_color","361","6183","Salmon Pink","サーモンピンク"
+"field_color","361","6185","Royal Blue","ロイヤルブルー"
+"field_color","361","6200","Dusty Rose","ダスティローズ"
+"field_color","361","6201","Mustard","マスタード"
+"field_color","361","6205","Oatmeal","オートミール"
+"field_color","361","6209","Mint","ミントグリーン"
+"field_color","361","6221","Indigo","藍色"
+"field_color","361","6225","Plum","プラム"
+"field_color","361","6227","Multicolor","マルチカラー"
+"field_color","361","6229","Forest Green","フォレストグリーン"
+"field_color","361","6231","Brick","レンガ色"
+"field_color","361","6233","Cream/Oatmeal","クリーム/オートミール"
+"field_color","361","6244","Turquoise","トルコ石色"
+"field_color","361","6247","Beige and Ash","サンドベージュ と アッシュグレー"
+"field_color","361","6248","Beige and Mocha striped","サンドベージュ と モカ (ストライプ)"
+"field_color","361","6255","Olive","オリーブ"
+"field_color","361","6263","Emerald","エメラルドグリーン"
+"field_color","361","6265","Jade","ジェイドグリーン"
+"field_color","361","6271","Ruby and Navy Blue","ルビー と ネイビーブルー"
+"field_color","361","6273","Alternating Navy Blue and Dusty Rose","ネイビーブルー と ダスティローズ (交互)"
+"field_color","361","6276","Gradient of Charcoal","チャコールグレー (グラデーション)"
+"field_color","361","6279","Lilac","ライラック"
+"field_color","361","6286","Dove Grey","ダブグレー"
+"field_color","361","6287","Alabaster and Sand","雪花石膏色 と サンド"
+"field_color","361","6288","Pearl","パール"
+"field_color","361","6290","Oatmeal with Slate stripes","オートミール + スレート (ストライプ)"
+"field_color","361","6292","Alabaster with Burgundy pattern","雪花石膏色 + バーガンディ (パターン)"
+"field_color","361","6293","Ombre Beige to Espresso with Charcoal speckles","サンドベージュ–深焙煎色 (オンブレ) + チャコールグレー (斑点)"
+"field_color","361","6294","True Red and True Black","真紅 と 漆黒"
+"field_color","361","6295","Slate Dove Grey","ダブグレー"
+"field_color","361","6297","Ash and Taupe striped",NULL
+"field_color","361","6298","Alabaster to Charcoal Ombre","雪花石膏色–チャコールグレー (オンブレ)"
+"field_color","361","6300","Brown","ショコラブラウン"
+"field_color","361","6301","Espresso and Oatmeal","深焙煎色 と オートミール"
+"field_color","361","6302","Mocha and Alabaster blend","モカ と 雪花石膏色 (ブレンド)"
+"field_color","361","6303","Mocha and Alabaster","モカ と 雪花石膏色"
+"field_color","361","6306","Light Blue","ライトブルー"
+"field_color","361","6307","Alabaster and Dove Dove Grey","雪花石膏色 と ダブグレー"
+"field_color","361","6310","Oatmeal with Slate flecks","オートミール + スレート (斑点)"
+"field_color","361","6311","Alabaster and Dove Dove Grey blend","雪花石膏色 と ダブグレー (ブレンド)"
+"field_color","361","6313","Charcoal and True Black","チャコールグレー と 漆黒"
+"gender","20","1","Male",NULL
+"gender","20","2","Female",NULL
+"gender","20","3","Not Specified",NULL
+"google_feed_category","220","5932",,NULL
+"google_feed_category","220","5539","Oriental Carpet","オリエンタルラグ"
+"google_feed_category","220","5540","Modern Carpet","現代の敷物"
+"google_feed_category","220","5541","Oriental Carpet Persian Carpet","ペルシャ絨毯"
+"jpy_lowest_sale_price","325","5699",,NULL
+"main_name","226","5560",,NULL
+"manufacturer","83","34","Handwoven",NULL
+"manufacturer","83","39","Handloom",NULL
+"manufacturer","83","45","Handknotted",NULL
+"medallion_color","363","5996","Slate Blue","スレートブルー"
+"medallion_color","363","5997","Navy Blue","ネイビーブルー"
+"medallion_color","363","5998","Ruby","ルビー"
+"medallion_color","363","5999","Cream","クリーム"
+"medallion_color","363","6002","Teal","ティールブルー"
+"medallion_color","363","6006","Ochre","オーカー"
+"medallion_color","363","6007","Alabaster","雪花石膏色"
+"medallion_color","363","6009","Burnt Orange","バーントオレンジ"
+"medallion_color","363","6010","Sky Blue","スカイブルー"
+"medallion_color","363","6017","Beige","サンドベージュ"
+"medallion_color","363","6025","True Red","真紅"
+"medallion_color","363","6026","Saffron","サフラン"
+"medallion_color","363","6028","Forest Green","フォレストグリーン"
+"medallion_color","363","6032","Terracotta","煉瓦色"
+"medallion_color","363","6033","Olive","オリーブ"
+"medallion_color","363","6036","Blush Pink","ブラッシュピンク"
+"medallion_color","363","6042","Sand","サンド"
+"medallion_color","363","6045","Ivory","アイボリー"
+"medallion_color","363","6052","Espresso","深焙煎色"
+"medallion_color","363","6055","Burgundy","バーガンディ"
+"medallion_color","363","6063","Dusty Rose","ダスティローズ"
+"medallion_color","363","6066","Cognac","琥珀色"
+"medallion_color","363","6069","Taupe","灰褐色"
+"medallion_color","363","6072","Old Gold","アンティークゴールド"
+"medallion_color","363","6075","True Black","漆黒"
+"medallion_color","363","6090","Brick","レンガ色"
+"medallion_color","363","6095","Silver","白銀色"
+"medallion_color","363","6096","Charcoal","チャコールグレー"
+"medallion_color","363","6099","Turquoise","トルコ石色"
+"medallion_color","363","6119","Mocha","モカ"
+"medallion_color","363","6124","Sage","セージ"
+"medallion_color","363","6133","Oatmeal","オートミール"
+"medallion_color","363","6137","Champagne","琥珀泡色"
+"medallion_color","363","6145","Mint","ミントグリーン"
+"medallion_color","363","6149","Moss","モスグリーン"
+"medallion_color","363","6153","Mauve","薄藤色"
+"medallion_color","363","6162","Ash","アッシュグレー"
+"medallion_color","363","6169","Slate","スレート"
+"medallion_color","363","6171","Salmon Pink","サーモンピンク"
+"medallion_color","363","6182","Mushroom","トープ"
+"medallion_color","363","6189","Mustard","マスタード"
+"medallion_color","363","6192","Coral","珊瑚色"
+"medallion_color","363","6195","Dove Dove Grey","ダブグレー"
+"medallion_color","363","6198","Royal Blue","ロイヤルブルー"
+"medallion_color","363","6204","Plum","プラム"
+"medallion_color","363","6210","Camel","駱駝色"
+"medallion_color","363","6212","Slate Dove Grey","ダブグレー"
+"medallion_color","363","6214","Indigo","藍色"
+"medallion_color","363","6217","Aubergine","Nasukon"
+"medallion_color","363","6237","Walnut","ウォールナット"
+"medallion_color","363","6241","Muted Teal","ティールブルー"
+"medallion_color","363","6245","Lilac","ライラック"
+"medallion_color","363","6252","Gold","ゴールド"
+"medallion_color","363","6259","Faded Teal","ティールブルー"
+"medallion_color","363","6262","Emerald","エメラルドグリーン"
+"medallion_color","363","6274","Ash Dove Grey","ダブグレー"
+"medallion_color","363","6278","Pearl","パール"
+"medallion_color","363","6281","Lime Green","ライムグリーン"
+"medallion_color","363","6282","Jade","ジェイドグリーン"
+"medallion_color","363","6309","Orange","マンダリン"
+"origin","163","59","Iran","イラン"
+"origin","163","60","China","中国"
+"origin","163","61","Pakistan","パキスタン"
+"origin","163","62","India","インド"
+"origin","163","64","Afghanistan","アフガニスタン"
+"origin","163","5594","Tibet","チベット"
+"origin","163","5933",,NULL
+"origin","163","5522","Morocco","モロッコ"
+"origin","163","5524","Turkey","トルコ"
+"origin","163","5534","Russia","ロシア"
+"origin","163","5561","Nepal","ネパール"
+"origin","163","5562","Egypt","エジプト"
+"origin","163","5566","Germany","ドイツ"
+"origin","163","5567","Azerbaijan","アゼルバイジャン"
+"origin","163","5635","Armenia","アルメニア"
+"origin","163","5658","Romania","ルーマニア"
+"origin","163","5661","France","フランス"
+"origin","163","5676","Moldavia","モルダビア"
+"origin","163","5705","Japan","日本"
+"origin_backup","349","5905","Afghanistan","アフガニスタン"
+"origin_backup","349","5906","China","中国"
+"origin_backup","349","5909","India","インド"
+"origin_backup","349","5912","Iran","イラン"
+"origin_backup","349","5914","Pakistan","パキスタン"
+"origin_backup","349","5915","Tibet","チベット"
+"origin_backup","349","5916","TURKEY","トルコ"
+"origin_backup","349","5917","Morocco","モロッコ"
+"origin_backup","349","5919","Turkey","トルコ"
+"origin_backup","349","5920","Russia","ロシア"
+"origin_backup","349","5921","Nepal","ネパール"
+"origin_backup","349","5922","Egypt","エジプト"
+"origin_backup","349","5923","Germany","ドイツ"
+"origin_backup","349","5924","Azerbaijan","アゼルバイジャン"
+"origin_backup","349","5925","Armenia","アルメニア"
+"origin_backup","349","5926","Romania","ルーマニア"
+"origin_backup","349","5927","France","フランス"
+"origin_backup","349","5928","Moldavia","モルダビア"
+"origin_backup","349","5929","Japan","日本"
+"otto_price","308","5692",,NULL
+"patterns","367","6317","Herati / Mahi","ヘラティ / マヒ（フィッシュ）"
+"patterns","367","6318","Arabesque / Islimi","アラベスク (唐草文様)"
+"patterns","367","6319","Shah Abbasi","パルメット文様"
+"patterns","367","6323","Mina Khani","ミーナ・ハニー (雛菊格子)"
+"patterns","367","6324","Lattice / Trellis","格子模様"
+"patterns","367","6328","Boteh","ボテ (カシミール)"
+"patterns","367","6329","Gol Farang","フランスの薔薇模様 / 洋花文様"
+"patterns","367","6330","Animals / Birds","動物 / 鳥"
+"patterns","367","6332","Pictorial / People / Scenes","絵画的 / 人物 / 情景"
+"patterns","367","6334","Vase / Goldangi","ゴルダンギ (花瓶)"
+"patterns","367","6335","Scattered / Folk Art","散らし模様 / フォークアート"
+"patterns","367","6338","Tree of Life","生命の樹"
+"patterns","367","6340","Texture / Abrash Focus","アブラッシュ"
+"patterns","367","6341","Tribal Polygons / Stars","遊牧民の星文様"
+"patterns","367","6342","Hooks / Latch-hooks","ラッチフック"
+"patterns","367","6343","Ziegler / Chobi Florals","ジグラー / チョビ・フローラル"
+"patterns","367","6344","Zirkhaki / Artifacts","ジルハキ (考古遺物)"
+"patterns","367","6346","Modern Geometric Shapes","モダン幾何学模様"
+"patterns","367","6347","Slit-weave / Kilim Technique","スリット織り / キリム技法"
+"patterns","367","6350","Lines / Waves","線 / 波模様"
+"patterns","367","6353","East Asian / Chinese Motifs","東アジア・中国文様"
+"patterns","367","6356","Stepped Diagonals / Zigzag","ジグザグ"
+"patterns","367","6358","Brushstrokes / Splatters","筆跡 / スパッター"
+"patterns","367","6359","Gombad / Dome","ゴンバド (ドーム)"
+"patterns","367","6360","Golbarjasta / Mixed Pile","ゴルバジャスタ / 立体織り"
+"patterns","367","6361","Gul / Elephant Foot","ギュル (エレファントフット)"
+"patterns","367","6362","Soumak / Embroidered Details","スマック / 刺繍装飾"
+"pile","249","27","Wool","ウール"
+"pile","249","31","Silk","シルク"
+"pile","249","36","Cotton","綿"
+"pile","249","41","Wool/Silk","ウール／シルク"
+"pile","249","5934",,NULL
+"pile","249","5501","Artificial Silk","レーヨン"
+"pile","249","5538","Wool/Bamboo Silk","ウール／バンブーシルク"
+"pile","249","5563","Viscose","ビスコース"
+"pile","249","5564","Wool/Artificial Silk","ウール／レーヨン"
+"pile","249","5565","Polyester","ポリエステル"
+"pile","249","5568","Wool/Sari Silk","Wool/Sari Silk"
+"pile","249","5570","Sari Silk","Wool/Sari Silk"
+"pile","249","5572","Polypropylene","Polypropylene"
+"pile","249","5605","Bamboo Silk","バンブーシルク"
+"pile","249","5608","Acrylic","アクリル"
+"pile","249","5611","Cowhide","牛革"
+"pile","249","5634","Bamboo Silk/Viscose","バンブーシルク／ビスコース"
+"pile","249","5637","Felt fabric","フェルト生地"
+"pile","249","5654","Wool/Viscose","ウール／ビスコース"
+"pile","249","5656","Artificial Wool / Viscose",NULL
+"pile","249","5660","Jute","ジュート"
+"pile","249","5662","Wool/Tencel","ウール / テンセル"
+"pile","249","5664","Tencel","テンセル"
+"pile","249","5667","PP / Polyester","ポリプロピレン／ポリエステル"
+"pile","249","5668","Viscose / Polyester","Viscose/Polyester"
+"pile","249","5698","Modal","モダール糸"
+"pile","249","5700","Polyester fleece","ポリエステル・フリース"
+"pricing","218","5678","No Sale",NULL
+"pricing","218","5943","1%",NULL
+"pricing","218","5944","2%",NULL
+"pricing","218","5945","3%",NULL
+"pricing","218","5946","4%",NULL
+"pricing","218","5626","5%",NULL
+"pricing","218","5638","6%",NULL
+"pricing","218","5639","7%",NULL
+"pricing","218","5625","8%",NULL
+"pricing","218","5640","9%",NULL
+"pricing","218","5610","10%",NULL
+"pricing","218","5641","11%",NULL
+"pricing","218","5619","12%",NULL
+"pricing","218","5642","13%",NULL
+"pricing","218","5620","14%",NULL
+"pricing","218","5609","15%",NULL
+"pricing","218","5643","16%",NULL
+"pricing","218","5644","17%",NULL
+"pricing","218","5645","18%",NULL
+"pricing","218","5646","19%",NULL
+"pricing","218","5526","20%",NULL
+"pricing","218","5623","21%",NULL
+"pricing","218","5618","22%",NULL
+"pricing","218","5624","23%",NULL
+"pricing","218","5647","24%",NULL
+"pricing","218","5532","25%",NULL
+"pricing","218","5648","26%",NULL
+"pricing","218","5649","27%",NULL
+"pricing","218","5650","28%",NULL
+"pricing","218","5651","29%",NULL
+"pricing","218","5527","30%",NULL
+"pricing","218","5652","31%",NULL
+"pricing","218","5622","32%",NULL
+"pricing","218","5621","33%",NULL
+"pricing","218","5681","34%",NULL
+"pricing","218","5531","35%",NULL
+"pricing","218","5682","36%",NULL
+"pricing","218","5627","37%",NULL
+"pricing","218","5683","38%",NULL
+"pricing","218","5684","39%",NULL
+"pricing","218","5528","40%",NULL
+"pricing","218","5628","41%",NULL
+"pricing","218","5685","42%",NULL
+"pricing","218","5686","43%",NULL
+"pricing","218","5665","44%",NULL
+"pricing","218","5533","45%",NULL
+"pricing","218","5687","46%",NULL
+"pricing","218","5688","47%",NULL
+"pricing","218","5689","48%",NULL
+"pricing","218","5690","49%",NULL
+"pricing","218","5529","50%",NULL
+"pricing","218","5691","51%",NULL
+"pricing","218","5947","52%",NULL
+"pricing","218","5697","53%",NULL
+"pricing","218","5703","54%",NULL
+"pricing","218","5677","55%",NULL
+"pricing","218","5948","56%",NULL
+"pricing","218","5949","57%",NULL
+"pricing","218","5702","58%",NULL
+"pricing","218","5950","59%",NULL
+"pricing","218","5530","60%",NULL
+"pricing","218","5951","61%",NULL
+"pricing","218","5952","62%",NULL
+"pricing","218","5953","63%",NULL
+"pricing","218","5694","64%",NULL
+"pricing","218","5954","65%",NULL
+"pricing","218","5955","66%",NULL
+"pricing","218","5956","67%",NULL
+"pricing","218","5957","68%",NULL
+"pricing","218","5958","69%",NULL
+"pricing","218","5959","70%",NULL
+"pricing","218","5960","71%",NULL
+"pricing","218","5961","72%",NULL
+"pricing","218","5962","73%",NULL
+"pricing","218","5963","74%",NULL
+"pricing","218","5964","75%",NULL
+"pricing","218","5965","76%",NULL
+"pricing","218","5966","77%",NULL
+"pricing","218","5967","78%",NULL
+"pricing","218","5968","79%",NULL
+"pricing","218","5904","80%",NULL
+"pricing","218","5969","81%",NULL
+"pricing","218","5970","82%",NULL
+"pricing","218","5971","83%",NULL
+"pricing","218","5972","84%",NULL
+"pricing","218","5973","85%",NULL
+"pricing","218","5974","86%",NULL
+"pricing","218","5975","87%",NULL
+"pricing","218","5976","88%",NULL
+"pricing","218","5977","89%",NULL
+"pricing","218","5978","90%",NULL
+"pricing","218","5979","91%",NULL
+"pricing","218","5980","92%",NULL
+"pricing","218","5981","93%",NULL
+"pricing","218","5982","94%",NULL
+"pricing","218","5983","95%",NULL
+"pricing","218","5984","96%",NULL
+"pricing","218","5985","97%",NULL
+"pricing","218","5986","98%",NULL
+"pricing","218","5987","99%",NULL
+"primary_color","364","6000","Ruby","ルビー"
+"primary_color","364","6016","Cream","クリーム"
+"primary_color","364","6020","True Red","真紅"
+"primary_color","364","6027","Navy Blue","ネイビーブルー"
+"primary_color","364","6034","Terracotta","煉瓦色"
+"primary_color","364","6039","Alabaster","雪花石膏色"
+"primary_color","364","6046","Ivory","アイボリー"
+"primary_color","364","6056","Burgundy","バーガンディ"
+"primary_color","364","6077","Multicolor","マルチカラー"
+"primary_color","364","6083","True Black","漆黒"
+"primary_color","364","6085","Charcoal","チャコールグレー"
+"primary_color","364","6091","Burnt Orange","バーントオレンジ"
+"primary_color","364","6097","Teal","ティールブルー"
+"primary_color","364","6101","Taupe","灰褐色"
+"primary_color","364","6105","Beige","サンドベージュ"
+"primary_color","364","6107","Sand","サンド"
+"primary_color","364","6110","Mauve","薄藤色"
+"primary_color","364","6113","Dusty Rose","ダスティローズ"
+"primary_color","364","6116","Cognac","琥珀色"
+"primary_color","364","6120","Mocha","モカ"
+"primary_color","364","6121","Champagne","琥珀泡色"
+"primary_color","364","6125","Espresso","深焙煎色"
+"primary_color","364","6128","Slate Blue","スレートブルー"
+"primary_color","364","6129","Turquoise","トルコ石色"
+"primary_color","364","6131","Moss","モスグリーン"
+"primary_color","364","6135","Saffron","サフラン"
+"primary_color","364","6142","Walnut","ウォールナット"
+"primary_color","364","6146","Mint","ミントグリーン"
+"primary_color","364","6150","Sage","セージ"
+"primary_color","364","6152","Slate","スレート"
+"primary_color","364","6155","Ochre","オーカー"
+"primary_color","364","6158","Camel","駱駝色"
+"primary_color","364","6161","Aubergine","Nasukon"
+"primary_color","364","6164","Old Gold","アンティークゴールド"
+"primary_color","364","6167","Coral","珊瑚色"
+"primary_color","364","6175","Silver","白銀色"
+"primary_color","364","6177","Dove Grey","ダブグレー"
+"primary_color","364","6181","Sky Blue","スカイブルー"
+"primary_color","364","6184","Salmon Pink","サーモンピンク"
+"primary_color","364","6186","Royal Blue","ロイヤルブルー"
+"primary_color","364","6190","Mustard","マスタード"
+"primary_color","364","6191","Ash","アッシュグレー"
+"primary_color","364","6193","Mushroom","トープ"
+"primary_color","364","6199","Blush Pink","ブラッシュピンク"
+"primary_color","364","6206","Oatmeal","オートミール"
+"primary_color","364","6222","Indigo","藍色"
+"primary_color","364","6226","Plum","プラム"
+"primary_color","364","6228","Forest Green","フォレストグリーン"
+"primary_color","364","6232","Brick","レンガ色"
+"primary_color","364","6246","Grey","アッシュグレー"
+"primary_color","364","6256","Olive","オリーブ"
+"primary_color","364","6264","Emerald","エメラルドグリーン"
+"primary_color","364","6266","Jade","ジェイドグリーン"
+"primary_color","364","6269","Olive Green","オリーブグリーン"
+"primary_color","364","6283","Lilac","ライラック"
+"primary_color","364","6289","Pearl","パール"
+"primary_color","364","6291","Cream/Alabaster","クリーム/雪花石膏色"
+"primary_color","364","6296","Slate Grey","スレートグレー"
+"primary_color","364","6312","Black","漆黒"
+"production_type","193","5502","Handknotted","手織り"
+"production_type","193","5520","Handloom","ハンドルーム"
+"production_type","193","5521","Handwoven","手機織り"
+"production_type","193","5571","Machine knotted","機械織り"
+"production_type","193","5595","Handtufted","ハンドタフテッド"
+"production_type","193","5632","Machine knotted & Hand-finished","機械織り手仕上げ"
+"production_type","193","5633","Loomknotted","Loomknotted"
+"production_type","193","5659","Hand & Machine",NULL
+"production_type","193","6387","Printed","プリント"
+"product_layout","365","6320","Central Medallion","センターメダリオン / 中央メダリオン"
+"product_layout","365","6321","Bordered / Framed","縁取りあり / 額縁風"
+"product_layout","365","6322","All-Over","総柄"
+"product_layout","365","6333","Pictorial / Scenic","絵画風"
+"product_layout","365","6336","Multiple / Pole Medallions","複数 / 連続メダリオン"
+"product_layout","365","6339","Prayer / Mihrab","祈祷用 / ミフラーブ"
+"product_layout","365","6345","Plain / Solid","無地"
+"product_layout","365","6348","Checkerboard / Grid","市松模様 / 格子柄"
+"product_layout","365","6349","Color Block","カラーブロック"
+"product_layout","365","6351","Striped / Banded","ストライプ"
+"product_layout","365","6354","Panel / Compartment","区画・パネル模様"
+"product_layout","365","6355","Stacked / Column","スタック / コラム模様"
+"product_layout","365","6357","Patchwork","パッチワーク"
+"product_pattern","369","6364","Medallions","メダリオン"
+"product_pattern","369","6365","Herati / Mahi (Fish)","ヘラティ / マヒ"
+"product_pattern","369","6366","Arabesque","唐草模様"
+"product_pattern","369","6367","Floral","花柄"
+"product_pattern","369","6369","Lattice","格子模様"
+"product_pattern","369","6370","Boteh (Paisley)","ボテ (カシミール)"
+"product_pattern","369","6371","Animals","動物文様"
+"product_pattern","369","6373","Solid","無地"
+"product_pattern","369","6374","Pictorial","絵画風"
+"product_pattern","369","6375","Tribal","遊牧民文様"
+"product_pattern","369","6376","Tree of Life","生命の樹"
+"product_pattern","369","6380","Geometric","幾何学模様"
+"product_pattern","369","6382","Waves","波模様"
+"product_pattern","369","6384","Zigzag","稲妻文様"
+"product_pattern","369","6385","Bokhara Octagons","ブハラ・オクタゴン"
+"shape","164","19","Rectangle","長方形"
+"shape","164","5936",,NULL
+"shape","164","20","Round","円形"
+"shape","164","21","Runner","ランナー（廊下敷き）"
+"shape","164","22","Square","正方形"
+"shape","164","63","Oval","楕円形"
+"shape","164","5663","Cube",NULL
+"signature","224","5559",,NULL
+"size_group","189","5525","60x90 & smaller","～60×90cm"
+"size_group","189","5569","75x125","75x125"
+"size_group","189","5509","100x150","100x150"
+"size_group","189","5510","140x200","140x200"
+"size_group","189","5511","160x230","160x230"
+"size_group","189","5537","200x200","200x200"
+"size_group","189","5512","200x250","200x250"
+"size_group","189","5513","200x300","200x300"
+"size_group","189","5514","250x300","250x300"
+"size_group","189","5515","250x350","250x350"
+"size_group","189","5516","300x400 & larger","300×400cm～"
+"size_group","189","5535","200–250 cm Runner","ランナー 200–250 cm"
+"size_group","189","5536","250–300 cm Runner","ランナー 250–300 cm"
+"size_group","189","5669","150x150",NULL
+"size_group","189","5670","250x250",NULL
+"size_group","189","5671","300X300",NULL
+"size_group","189","5672","240x340","240x340 cm240x340"
+"size_group","189","5673","100X100",NULL
+"size_group","189","5674","350x350",NULL
+"size_group","189","5675","300x350",NULL
+"size_group","189","5680","80x150","80x150 cm"
+"size_group","189","5704","400x400",NULL
+"size_group","189","5706","≤  200 Runner","ランナー ≤ 200cm ～200cm"
+"size_group","189","5707","≥ 300 Runner","ランナー ≥ 300cme couloir"
+"tax_class_id","154","5930","2",NULL
+"tax_class_id","154","5937",,NULL
+"tax_class_id","154","6386","0",NULL
+"warp","174","28","Wool","ウール"
+"warp","174","32","Silk","シルク"
+"warp","174","37","Cotton","綿"
+"warp","174","5938",,NULL
+"warp","174","5939","PP / Polyester",NULL
+"warp","174","5500","Artificial Silk","レーヨン"
+"warp","174","5573","Jute","ジュート"
+"warp","174","5636","Felt fabric","フェルト生地"
+"warp","174","5657","Viscose","ビスコース"
+"warp","174","5679","Tencel","テンセル"
+"warp","174","5695","Polypropylene","Polypropylene"
+"warp","174","5696","Polyester","ポリエステル"
+"warp","174","5701","Cowhide","Cowhide"
+"weight_per_sqm","309","5693",,NULL
