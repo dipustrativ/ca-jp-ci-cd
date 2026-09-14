@@ -401,7 +401,7 @@
                 .lib-css(border, @_submenu-border-width @_submenu-border-style @_submenu-border-color);
                 .lib-css(box-shadow, @_submenu-box-shadow);
                 .lib-css(font-size, @_submenu-font-size);
-                .lib-css(font-weight, @_submenu-font-weight);
+                .lib-css(font-weight, @_submenu-font-weight) !important;
                 .lib-css(min-width, @_submenu-min-width);
                 .lib-css(padding, @_submenu-padding);
                 display: none;
@@ -469,7 +469,7 @@
                 li {
                     margin: 0;
                     position: relative;
-                    
+
                     &.parent {
                         > a {
                             > .ui-menu-icon {
