@@ -65,8 +65,8 @@ class CampaignHelper
             ->where(
                 'wi.instance_type IN (?)',
                 [
-                    'Evalent\Callout\Block\Widget\CalloutWidget',
-                    'Evalent\Callout\Block\Widget\CalloutProductWidget'
+                    'CarpetAvenue\Widget\Block\Widget\CalloutWidget',
+                    'CarpetAvenue\Widget\Block\Widget\CalloutProductWidget'
                 ]
             )
             ->where("wi.widget_parameters IS NOT NULL AND wi.widget_parameters != ''")
@@ -134,8 +134,8 @@ class CampaignHelper
             ->where(
                 'wi.instance_type IN (?)',
                 [
-                    'Evalent\Callout\Block\Widget\CalloutWidget',
-                    'Evalent\Callout\Block\Widget\CalloutProductWidget'
+                    'CarpetAvenue\Widget\Block\Widget\CalloutWidget',
+                    'CarpetAvenue\Widget\Block\Widget\CalloutProductWidget'
                 ]
             );
 
@@ -447,7 +447,7 @@ class CampaignHelper
                 }
                 $widgetParameters['message'] = $message ?? '';
 
-                if ($campaign['instance_type'] == "Evalent\Callout\Block\Widget\CalloutProductWidget") {
+                if ($campaign['instance_type'] == "CarpetAvenue\Widget\Block\Widget\CalloutProductWidget") {
                     $widgetParameters['discount'] = $campaignRun['Discount'];
                 }
 

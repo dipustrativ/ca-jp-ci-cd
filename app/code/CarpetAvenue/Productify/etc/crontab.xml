@@ -31,6 +31,11 @@
         <job name="carpetavenue_productify_campaign_cache_clean" instance="CarpetAvenue\Productify\Cron\CampaignCacheClean" method="execute">
             <schedule>1 * * * *</schedule>
         </job>
+        <!-- Campaigns roll over by date with nobody touching a widget, so the
+             Google Sheet is re-read hourly. Runs after the cache-clean job. -->
+        <job name="carpetavenue_productify_campaign_import" instance="CarpetAvenue\Productify\Cron\CampaignImport" method="execute">
+            <schedule>5 * * * *</schedule>
+        </job>
         <job name="carpetavenue_productify_generate_missing_urls" instance="CarpetAvenue\Productify\Cron\GenerateMissingUrls" method="execute">
             <schedule>*/10 * * * *</schedule>
         </job>

@@ -38,10 +38,18 @@ class ShippingVatManager
     ) {
     }
 
-    public function forceShippingNotTaxfree(?Store $store = null): bool
+    /**
+     * Magento\Tax\Model\Config passes the scope as null|string|bool|int|Store, so
+     * this must not narrow to Store — a store id reaches here from every caller
+     * that resolves tax config by scope id and used to fatal on the typehint.
+     *
+     * @param null|string|bool|int|Store $store
+     * @return bool
+     */
+    public function forceShippingNotTaxfree($store = null): bool
     {
         // Called repeatedly per price calculation from two plugins – memoize.
-        $key = $store !== null ? (string)$store->getId() : 'default';
+        $key = $store instanceof Store ? (string)$store->getId() : (string)($store ?? 'default');
         if (isset($this->memo[$key])) {
             return $this->memo[$key];
         }
@@ -49,7 +57,13 @@ class ShippingVatManager
         return $this->memo[$key] = $this->resolve($store);
     }
 
-    private function resolve(?Store $store): bool
+    /**
+     * Resolve the decision for a scope, uncached.
+     *
+     * @param null|string|bool|int|Store $store
+     * @return bool
+     */
+    private function resolve($store): bool
     {
         if (!$this->config->shippingNotTaxfree($store)) {
             return false;
