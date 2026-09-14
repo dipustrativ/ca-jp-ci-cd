@@ -20,6 +20,28 @@ server {
     set $MAGE_ROOT /var/www/html;
     set $MAGE_MODE production;
 
+    # Must precede the include: prefix match beats the sample's `location /`.
+    #
+    # Rule: one client never holds more than HALF the pool. pm.max_children is 16
+    # (docker/php/www.conf), so 8 here — the storefront always keeps 8 workers no
+    # matter what an integration does. Re-derive this if max_children changes.
+    #
+    # Deliberately generous because IXPF Syncer is a heavy REST surface and bulk
+    # calls legitimately run concurrently. This is not a throttle on normal use:
+    # it only engages once ONE source has 8 requests in flight at the same instant,
+    # which means responses are already overlapping — the exact failure it exists
+    # for. Per-IP, so a real customer is never affected by the ERP's traffic.
+    #
+    # limit_conn works here despite the try_files hand-off: it runs in the
+    # preaccess phase, before the internal redirect re-matches the .php location.
+    # fastcgi_* would NOT — those are read in the final location, so a read_timeout
+    # set here is silently dead. The hard bound on a stuck worker is
+    # request_terminate_timeout in docker/php/www.conf, not anything in nginx.
+    location /rest/ {
+        limit_conn apiconn 8;
+        try_files $uri $uri/ /index.php$is_args$args;
+    }
+
     # Magento sample already sets `root $MAGE_ROOT/pub;` (document_root_is_pub=true)
     include /etc/nginx/magento.conf;
 }
