@@ -80,16 +80,70 @@ class Price extends \Magento\CatalogSearch\Model\Layer\Filter\Price implements S
 
     /**
      * @inheritdoc
+     *
+     * ?price= carries STORE currency, because that is what the slider shows and
+     * what the shopper types — live uses the same (?price=7754.00-165000.00 in
+     * JPY). The price index behind addFieldToFilter('price', ...) holds BASE
+     * currency, and core passes the request values straight through, so every
+     * bound was compared against base figures: with EUR base and JPY display at
+     * 170, a ¥13,591–¥2,749,948 slider asked the index for €13,591–€2,749,948.
+     * Only the few products above €13,591 came back, and raising the minimum
+     * past the base-currency maximum returned nothing at all.
+     *
+     * Core offers no seam between "value used for the query" and "value used for
+     * the label", so apply() is reimplemented rather than delegated: the range is
+     * converted to base for the collection while the state item — which feeds the
+     * chip label and its remove URL — keeps the store-currency values.
      */
     public function apply(RequestInterface $request)
     {
         $param = $request->getParam($this->getRequestVar());
-        if (is_string($param) && $param !== '' && preg_match('/^\d*(\.\d+)?-\d*(\.\d+)?$/', $param)) {
-            [$from, $to] = explode('-', $param, 2);
-            $this->currentRange = [$from === '' ? null : (float)$from, $to === '' ? null : (float)$to];
+        if (!is_string($param) || $param === '' || !preg_match('/^\d*(\.\d+)?-\d*(\.\d+)?$/', $param)) {
+            // Not a range we recognise (comma-separated drilldown, junk) — core
+            // knows what to do with it, currency mismatch and all.
+            return parent::apply($request);
         }
 
-        return parent::apply($request);
+        [$from, $to] = explode('-', $param, 2);
+        $this->currentRange = [$from === '' ? null : (float)$from, $to === '' ? null : (float)$to];
+
+        $rate = $this->getStoreCurrencyRate();
+        $baseFrom = $from === '' ? '' : (float)$from / $rate;
+        $baseTo = $to === '' ? '' : (float)$to / $rate;
+
+        $this->getLayer()->getProductCollection()->addFieldToFilter(
+            'price',
+            [
+                'from' => $baseFrom,
+                // Core's delta keeps the upper bound exclusive so adjacent
+                // ranges don't both claim a product sitting exactly on it.
+                'to' => $baseTo === '' || $baseFrom == $baseTo ? $baseTo : $baseTo - self::PRICE_DELTA,
+            ]
+        );
+
+        $this->getLayer()->getState()->addFilter(
+            $this->_createItem(
+                $this->_renderRangeLabel($from === '' ? 0 : $from, $to),
+                [$from, $to]
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Base → store currency rate (1.0 if unset, so a misconfigured store filters
+     * on raw base values rather than dividing everything to nothing).
+     */
+    private function getStoreCurrencyRate(): float
+    {
+        try {
+            $rate = (float)$this->_storeManager->getStore($this->getStoreId())->getCurrentCurrencyRate();
+        } catch (\Exception $e) {
+            return 1.0;
+        }
+
+        return $rate > 0 ? $rate : 1.0;
     }
 
     /**

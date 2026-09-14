@@ -266,6 +266,12 @@ class FacetProvider
                     ? $this->buildRange((string)($value[0] ?? ''), (string)($value[1] ?? ''))
                     : $this->parseRange((string)$value);
                 if ($range !== null) {
+                    // Price state values are store currency (see Filter\Price::apply);
+                    // the index is base currency. Decimal filters are dimensions in
+                    // cm — no currency, so they pass through untouched.
+                    if ($filter instanceof PriceFilter) {
+                        $range = $this->toBaseCurrency($range, $layer);
+                    }
                     $collection->addFieldToFilter($code, $range);
                 }
                 continue;
@@ -277,6 +283,34 @@ class FacetProvider
         foreach ($attributeValues as $code => $values) {
             $collection->addFieldToFilter($code, count($values) > 1 ? $values : $values[0]);
         }
+    }
+
+    /**
+     * Divide a store-currency range down to the base currency the price index
+     * holds. Rate of 0/failure leaves the range alone rather than collapsing it.
+     *
+     * @param array{from?: string, to?: string} $range
+     * @return array{from?: float|string, to?: float|string}
+     */
+    private function toBaseCurrency(array $range, Layer $layer): array
+    {
+        try {
+            $rate = (float)$layer->getCurrentStore()->getCurrentCurrencyRate();
+        } catch (\Exception $e) {
+            return $range;
+        }
+
+        if ($rate <= 0 || $rate === 1.0) {
+            return $range;
+        }
+
+        foreach (['from', 'to'] as $key) {
+            if (isset($range[$key]) && $range[$key] !== '') {
+                $range[$key] = (float)$range[$key] / $rate;
+            }
+        }
+
+        return $range;
     }
 
     /**
