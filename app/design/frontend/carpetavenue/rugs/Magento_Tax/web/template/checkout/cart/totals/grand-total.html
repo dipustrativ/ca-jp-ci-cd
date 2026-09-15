@@ -1,0 +1,39 @@
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * Override of Magento_Tax/checkout/cart/totals/grand-total. Identical to stock except
+ * the 税抜 (exclTaxLabel) row is rendered before the 税込 (inclTaxLabel) row.
+ *
+ * The cart page uses this template; the checkout summary uses
+ * Magento_Tax/checkout/summary/grand-total — both need the same row order.
+ */
+-->
+<!-- ko if: isTaxDisplayedInGrandTotal && isDisplayed() -->
+<tr class="grand totals excl">
+    <th class="mark" scope="row">
+        <strong data-bind="i18n: exclTaxLabel"></strong>
+    </th>
+    <td data-bind="attr: {'data-th': exclTaxLabel}" class="amount">
+        <strong><span class="price" data-bind="text: getGrandTotalExclTax()"></span></strong>
+    </td>
+</tr>
+<tr class="grand totals incl">
+    <th class="mark" scope="row">
+        <strong data-bind="i18n: inclTaxLabel"></strong>
+    </th>
+    <td data-bind="attr: {'data-th': inclTaxLabel}" class="amount">
+        <strong><span class="price" data-bind="text: getValue()"></span></strong>
+    </td>
+</tr>
+<!-- /ko -->
+<!-- ko if: !isTaxDisplayedInGrandTotal && isDisplayed() -->
+<tr class="grand totals">
+    <th class="mark" scope="row">
+        <strong data-bind="i18n: title"></strong>
+    </th>
+    <td data-bind="attr: {'data-th': title}" class="amount">
+        <strong><span class="price" data-bind="text: getValue()"></span></strong>
+    </td>
+</tr>
+<!-- /ko -->
