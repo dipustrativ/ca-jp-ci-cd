@@ -1,0 +1,33 @@
+{
+    "carpetavenue_japan_price_action_log": {
+        "column": {
+            "log_id": true,
+            "rule_code": true,
+            "product_id": true,
+            "sku": true,
+            "store_id": true,
+            "attribute_code": true,
+            "old_value": true,
+            "new_value": true,
+            "threshold_value": true,
+            "basis_value": true,
+            "price": true,
+            "owner": true,
+            "action": true,
+            "reason": true,
+            "message": true,
+            "run_id": true,
+            "dry_run": true,
+            "created_at": true
+        },
+        "index": {
+            "CAJ_PRICE_LOG_RUN_ID": true,
+            "CAJ_PRICE_LOG_RULE_PRODUCT": true,
+            "CAJ_PRICE_LOG_CREATED_AT": true,
+            "CAJ_PRICE_LOG_ACTION": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

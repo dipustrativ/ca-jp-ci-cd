@@ -12,5 +12,8 @@
         <route id="reports">
             <module name="CarpetAvenue_Japan" after="Magento_Reports"/>
         </route>
+        <route id="carpetavenue_japan" frontName="carpetavenue_japan">
+            <module name="CarpetAvenue_Japan" before="Magento_Backend"/>
+        </route>
     </router>
 </config>

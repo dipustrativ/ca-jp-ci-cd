@@ -13,6 +13,7 @@ once. If something is not in this index, it is not findable — add the row.
 | Add a new website (own domain) | [runbooks/add-website.md](runbooks/add-website.md) |
 | Add a new store view (`/xx/`) | [runbooks/add-store-view.md](runbooks/add-store-view.md) |
 | Work on LESS / theme styles | [runbooks/frontend-less-grunt.md](runbooks/frontend-less-grunt.md) |
+| Enable, re-tune or undo the minimum special price rule | [runbooks/special-price-guard.md](runbooks/special-price-guard.md) |
 | Fix anything broken in production (cache, arch, 404s, CI) | [../docker/TROUBLESHOOTING.md](../docker/TROUBLESHOOTING.md) |
 | Run a Magento CLI command in production, upload media | [../docker/INFRA-CI.md](../docker/INFRA-CI.md#part-3--server-ops) |
 | Work locally (containers, CLI, static, tests) | [../CLAUDE.md](../CLAUDE.md) |
@@ -32,6 +33,7 @@ Imperative, copy-pasteable, no theory. Each opens with **Use when**.
 | [add-website.md](runbooks/add-website.md) | New website on its own domain: nginx map, Dokploy, Cloudflare, base URLs, verification |
 | [add-store-view.md](runbooks/add-store-view.md) | New `/xx/` store view: create, locale, static locales, verify |
 | [frontend-less-grunt.md](runbooks/frontend-less-grunt.md) | grunt watch with source maps instead of redeploying static content |
+| [special-price-guard.md](runbooks/special-price-guard.md) | Turn on the JP minimum-special-price cron: dry run, parity check against the old rule, blast-radius cap, formula changes, undo |
 
 ### 2. Architecture — how it is built and why
 

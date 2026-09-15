@@ -33,6 +33,101 @@
                     </depends>
                 </field>
             </group>
+            <group id="special_price_guard" showInDefault="1" translate="label comment" sortOrder="20">
+                <label>Special Price Guard</label>
+                <comment><![CDATA[Raises <b>special_price</b> up to a cost-derived minimum:
+                    <code>round(cost * multiplier + shipping * (1 + tax/100), 2)</code>.
+                    It only ever moves prices <b>up</b> — if the minimum later drops, the product keeps
+                    its raised price until the ERP sends a new one.
+                    Every change is recorded under <b>CarpetAvenue &rarr; Price Action Log</b>.]]></comment>
+                <field id="enabled" canRestore="1" showInDefault="1" sortOrder="10" translate="label comment" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Master switch. Off means neither the cron nor the CLI changes any price.</comment>
+                </field>
+                <field id="cron_enabled" canRestore="1" showInDefault="1" sortOrder="20" translate="label comment" type="select">
+                    <label>Run on Schedule</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>The CLI command ignores this and always runs.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="cron_expr" canRestore="1" showInDefault="1" sortOrder="30" translate="label comment" type="text">
+                    <label>Schedule (cron expression)</label>
+                    <validate>required-entry</validate>
+                    <comment>Default 40 * * * * — hourly at :40, before the on-sale flag job at :00.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                        <field id="cron_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="cost_multiplier" canRestore="1" showInDefault="1" sortOrder="40" translate="label comment" type="text">
+                    <label>Cost Multiplier</label>
+                    <validate>required-entry validate-number validate-greater-than-zero</validate>
+                    <comment>Separate from Carpet Avenue Reporting — changing this does not move the royalty report.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="shipping_base" canRestore="1" showInDefault="1" sortOrder="50" translate="label comment" type="text">
+                    <label>Shipping / Handling Amount</label>
+                    <validate>required-entry validate-number validate-zero-or-greater</validate>
+                    <comment>Flat amount in base currency (EUR) added on top of the multiplied cost.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="tax_percent" canRestore="1" showInDefault="1" sortOrder="60" translate="label comment" type="text">
+                    <label>Tax on Shipping (%)</label>
+                    <validate>required-entry validate-number validate-zero-or-greater</validate>
+                    <comment>Applied to the shipping amount only. 5 reproduces the base store's 100 * 1.05.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="excluded_owners" canRestore="1" showInDefault="1" sortOrder="70" translate="label comment" type="text">
+                    <label>Excluded Owners</label>
+                    <comment><![CDATA[Comma-separated values of the <b>owner</b> product attribute the rule ignores.
+                        Empty applies the rule to every owner. Their products are filtered out in SQL, so prices already
+                        raised before the exclusion stay raised.]]></comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="store_id" canRestore="1" showInDefault="1" sortOrder="80" translate="label comment" type="text">
+                    <label>Store View ID</label>
+                    <validate>required-entry validate-digits</validate>
+                    <comment>Scope read and written. 0 = default scope, which is where ERP writes prices on this install.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="max_affected_percent" canRestore="1" showInDefault="1" sortOrder="90" translate="label comment" type="text">
+                    <label>Abort Above (% of catalog)</label>
+                    <validate>required-entry validate-number validate-zero-or-greater</validate>
+                    <comment>A run that would reprice more than this share of the catalog refuses to write — usually a mistyped multiplier. 0 disables the cap. Override with the CLI's --force.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="batch_size" canRestore="1" showInDefault="1" sortOrder="100" translate="label comment" type="text">
+                    <label>Scan Batch Size</label>
+                    <validate>required-entry validate-digits validate-greater-than-zero</validate>
+                    <comment>Products read per query. Paging is keyset, so a large catalog costs no more per page.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="log_retention_days" canRestore="1" showInDefault="1" sortOrder="120" translate="label comment" type="text">
+                    <label>Log Retention (days)</label>
+                    <validate>required-entry validate-digits</validate>
+                    <comment>Older log rows are pruned at the end of each run. 0 keeps everything.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
         </section>
         <!--
             Swap the receipt email-template fields to a guarded source model. These

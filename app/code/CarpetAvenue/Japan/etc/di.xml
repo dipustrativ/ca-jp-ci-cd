@@ -4,4 +4,39 @@
                 type="CarpetAvenue\Japan\Model\PriceStepItem"/>
     <preference for="CarpetAvenue\Japan\Api\ReportsConfigInterface"
                 type="CarpetAvenue\Japan\Model\ReportsConfig"/>
+    <preference for="CarpetAvenue\Japan\Api\SpecialPriceGuardConfigInterface"
+                type="CarpetAvenue\Japan\Model\SpecialPriceGuardConfig"/>
+    <!-- Shared write surface for the Japan price tables. Any rule that changes
+         price, pricing or special_price records through this. -->
+    <preference for="CarpetAvenue\Japan\Api\PriceActionRecorderInterface"
+                type="CarpetAvenue\Japan\Model\PriceAction\Recorder"/>
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="carpetavenue_japan_special_price_guard"
+                      xsi:type="object">CarpetAvenue\Japan\Console\Command\SpecialPriceGuardCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Price action log admin grid data source -->
+    <virtualType name="CarpetAvenue\Japan\Model\ResourceModel\PriceActionLog\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">carpetavenue_japan_price_action_log</argument>
+            <argument name="resourceModel" xsi:type="string">CarpetAvenue\Japan\Model\ResourceModel\PriceActionLog</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Keep every grid data source in this single <type> block — di.xml's XSD
+         enforces unique <type name="…"> entries per file. -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="carpetavenue_japan_price_action_listing_data_source"
+                      xsi:type="string">CarpetAvenue\Japan\Model\ResourceModel\PriceActionLog\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

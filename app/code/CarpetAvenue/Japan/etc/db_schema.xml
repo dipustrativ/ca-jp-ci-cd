@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Japan
+ * @author    Strativ Magento Team
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <!--
+        carpetavenue_japan_price_action_log
+        ────────────────────────────────────
+        Append-only audit shared by every Japan price rule: which product took
+        which action, why, and when.
+
+        Only real actions are logged — never skips — so a run that changes
+        nothing writes nothing. run_id groups every row from one cron or CLI run.
+    -->
+    <table name="carpetavenue_japan_price_action_log" resource="default" engine="innodb"
+           comment="CarpetAvenue Japan — Price Rule Action Log">
+
+        <column xsi:type="int"       name="log_id"          unsigned="true" nullable="false" identity="true" comment="Primary Key"/>
+        <column xsi:type="varchar"   name="rule_code"       length="32"     nullable="false"                 comment="Which rule acted, e.g. special_price_guard"/>
+        <column xsi:type="int"       name="product_id"      unsigned="true" nullable="false"                 comment="Catalog Product Entity ID"/>
+        <column xsi:type="varchar"   name="sku"             length="64"     nullable="true"                  comment="Product SKU"/>
+        <column xsi:type="smallint"  name="store_id"        unsigned="true" nullable="false" default="0"     comment="Store View ID written to"/>
+        <column xsi:type="varchar"   name="attribute_code"  length="64"     nullable="false"                 comment="Attribute written, e.g. special_price | price | pricing"/>
+
+        <column xsi:type="decimal"   name="old_value"       precision="20" scale="6" nullable="true"        comment="Attribute value before the action"/>
+        <column xsi:type="decimal"   name="new_value"       precision="20" scale="6" nullable="true"        comment="Attribute value after the action"/>
+        <column xsi:type="decimal"   name="threshold_value" precision="20" scale="6" nullable="true"        comment="Limit used for the decision"/>
+        <column xsi:type="decimal"   name="basis_value"     precision="20" scale="6" nullable="true"        comment="Figure the threshold was derived from, e.g. cost"/>
+        <column xsi:type="decimal"   name="price"           precision="20" scale="6" nullable="true"        comment="Regular price at decision time (context)"/>
+        <column xsi:type="varchar"   name="owner"           length="255"    nullable="true"                  comment="Owner attribute value at decision time (context)"/>
+
+        <column xsi:type="varchar"   name="action"          length="16"     nullable="false"                 comment="raise | skip | error"/>
+        <column xsi:type="varchar"   name="reason"          length="32"     nullable="false"                 comment="below_min | no_cost | no_special_price | in_range | error"/>
+        <column xsi:type="text"      name="message"                         nullable="true"                  comment="Free-text detail (error message)"/>
+
+        <column xsi:type="varchar"   name="run_id"          length="40"     nullable="false"                 comment="Groups every row written by one run"/>
+        <column xsi:type="tinyint"   name="dry_run"         unsigned="true" nullable="false" default="0"     comment="1 = nothing was written to the catalog"/>
+        <column xsi:type="timestamp" name="created_at"                      nullable="false" default="CURRENT_TIMESTAMP" comment="Row creation timestamp"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="log_id"/>
+        </constraint>
+
+        <index referenceId="CAJ_PRICE_LOG_RUN_ID" indexType="btree">
+            <column name="run_id"/>
+        </index>
+        <!-- Rule-scoped history for one product: the common grid filter. -->
+        <index referenceId="CAJ_PRICE_LOG_RULE_PRODUCT" indexType="btree">
+            <column name="rule_code"/>
+            <column name="product_id"/>
+        </index>
+        <!-- Drives both the grid's default sort and the retention prune. -->
+        <index referenceId="CAJ_PRICE_LOG_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
+        <index referenceId="CAJ_PRICE_LOG_ACTION" indexType="btree">
+            <column name="action"/>
+        </index>
+    </table>
+
+</schema>

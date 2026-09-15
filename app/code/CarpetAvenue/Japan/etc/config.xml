@@ -8,6 +8,27 @@
                 <step_size_enabled>1</step_size_enabled>
                 <mobile_hide>0</mobile_hide>
             </carpet_finder>
+            <!--
+                Special-price guard. Defaults reproduce the base store's cron
+                exactly: round(cost * 1.5 + 100 * 1.05, 2).
+
+                Deliberately NOT sharing carpet_reports/jp/cost_multiplier and
+                cost_base — that group's cost_base is 60 and the JP royalty
+                report depends on it.
+            -->
+            <special_price_guard>
+                <enabled>0</enabled>
+                <cron_enabled>1</cron_enabled>
+                <cron_expr>40 * * * *</cron_expr>
+                <store_id>0</store_id>
+                <cost_multiplier>1.5</cost_multiplier>
+                <shipping_base>100</shipping_base>
+                <tax_percent>5</tax_percent>
+                <excluded_owners/>
+                <batch_size>500</batch_size>
+                <max_affected_percent>20</max_affected_percent>
+                <log_retention_days>90</log_retention_days>
+            </special_price_guard>
         </japan>
         <carpet_reports>
             <jp>
