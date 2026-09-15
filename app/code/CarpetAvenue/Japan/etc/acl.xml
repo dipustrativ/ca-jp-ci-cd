@@ -17,6 +17,7 @@
             <resource id="Magento_Backend::admin">
                 <resource id="CarpetAvenue_Core::carpetavenue">
                     <resource id="CarpetAvenue_Japan::config" title="Japan" translate="title" sortOrder="35"/>
+                    <resource id="CarpetAvenue_Japan::price_action_log" title="Price Action Log" translate="title" sortOrder="36"/>
                 </resource>
                 <resource id="Magento_Reports::report">
                     <resource id="Magento_Reports::report_products">

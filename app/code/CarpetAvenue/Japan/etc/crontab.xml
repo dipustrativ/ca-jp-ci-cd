@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_Japan
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <!-- Runs at :40 so the price index (mview, every minute) has picked up
+             the writes before Productify's on-sale flag job at :00 and
+             Evalent_CatalogPriceHistory at :10 read catalog_product_index_price.
+             Schedule is admin-editable via japan/special_price_guard/cron_expr. -->
+        <job name="carpetavenue_japan_fix_special_price"
+             instance="CarpetAvenue\Japan\Cron\FixSpecialPrice"
+             method="execute">
+            <config_path>japan/special_price_guard/cron_expr</config_path>
+        </job>
+    </group>
+</config>
