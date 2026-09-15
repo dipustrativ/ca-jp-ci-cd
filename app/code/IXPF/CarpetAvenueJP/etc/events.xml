@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * Global area on purpose: product saves happen in adminhtml, in the webapi
+ * (IXPF Syncer) and in CLI, and jpy_lowest_sale_price must follow cost in all
+ * of them.
+ *
+ * @package IXPF_CarpetAvenueJP
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_product_save_before">
+        <observer instance="IXPF\CarpetAvenueJP\Observer\Product\SetJpyLowestSalePrice"
+                  name="ixpf_carpetavenuejp_set_jpy_lowest_sale_price"/>
+    </event>
+</config>

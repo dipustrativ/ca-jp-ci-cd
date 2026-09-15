@@ -12,4 +12,11 @@
                 type="IXPF\CarpetAvenueJP\Plugin\Syncer\Orders\BulkActionReadyForHandling"/>
     </type>
 
+    <!-- Cost written straight to EAV (IXPF bulk endpoints) fires no save event,
+         so jpy_lowest_sale_price is recalculated here instead. -->
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Action">
+        <plugin name="ixpf_carpetavenuejp_recalculate_jpy_lowest_sale_price"
+                type="IXPF\CarpetAvenueJP\Plugin\Catalog\RecalculateJpyLowestSalePrice"/>
+    </type>
+
 </config>
