@@ -543,11 +543,175 @@
             background: @color-white;
         }
 
+        // Cross-sell grid under the coupon form. Mirrors base: left-aligned
+        // heading, one card per product with a centred name / size / price, and
+        // the add-to-cart button revealed on hover.
         .block.crosssell {
+            margin: 0 0 25px;
             padding-right: 0;
 
-            .title {
+            // .column.main .block.crosssell .title centres it and is declared
+            // later in the cascade at equal specificity — the extra class here
+            // wins it back.
+            .block-title.title {
+                text-align: left;
+            }
+
+            .block-title {
+                margin: 0 0 20px;
+
+                strong {
+                    color: @ca-black;
+                    font-size: 2rem;
+                    font-weight: @font-weight__bold;
+                    line-height: 1.3;
+                }
+            }
+
+            .products.list.items {
+                .lib-vendor-prefix-display(flex);
+                flex-wrap: wrap;
+                list-style: none none;
+                margin: 0;
+                padding: 0;
+            }
+
+            .product-item {
+                box-sizing: border-box;
+                flex: 0 0 189px;
+                margin: 0 0 20px;
+                max-width: 189px;
+                padding: 0 15px;
+            }
+
+            .product-item-info {
+                position: relative;
+                width: 100%;
+
+                //  Hover lift, same geometry the similar-products cards use
+                //  (Magento_Catalog/_extend.less). The negative margin cancels
+                //  the padding + border so the card grows outward without
+                //  reflowing the grid.
+                &:hover {
+                    background: @color-white;
+                    border: 1px solid #e6e6e6;
+                    border-radius: 5px;
+                    // Same value as @product-item__hover__box-shadow; inlined so
+                    // this file does not depend on Magento_Catalog's _extend.less
+                    // being compiled first.
+                    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+                    margin: -20px;
+                    padding: 19px;
+                    z-index: 9;
+                }
+            }
+
+            .product-item-photo {
+                display: block;
+
+                .product-image-container {
+                    display: block;
+                    width: 100% !important;
+                }
+
+                img {
+                    display: block;
+                    height: auto;
+                    width: 100%;
+                }
+            }
+
+            .product-item-details {
+                padding-top: 10px;
                 text-align: center;
+            }
+
+            .product-item-name {
+                display: block;
+                margin: 0 0 4px;
+
+                a {
+                    color: @ca-black;
+                    font-size: 1.6rem;
+                    font-weight: @font-weight__bold;
+                }
+            }
+
+            .product-item-size {
+                color: @ca-black;
+                display: block;
+                font-size: 1.4rem;
+                margin: 0 0 4px;
+            }
+
+            .price-box {
+                margin: 0;
+
+                // One price, as on base: no Special/Regular labels, no tax note,
+                // no struck-through old price.
+                .price-label,
+                .vat-incl,
+                .old-price {
+                    display: none;
+                }
+
+                .price {
+                    color: @price-color;
+                    font-size: 1.6rem;
+                    font-weight: @font-weight__bold;
+                }
+            }
+
+            .product-item-actions {
+                margin: 10px 0 0;
+
+                .actions-primary {
+                    opacity: 0;
+                    transition: opacity .25s ease;
+                }
+
+                .action.tocart {
+                    font-size: 1.3rem;
+                    padding: 8px 15px;
+                }
+
+                //  Heart pinned to the card's top-right corner, same treatment
+                //  as the similar-products cards.
+                .towishlist {
+                    background: rgba(255, 255, 255, 0.95);
+                    border-radius: 50px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.13);
+                    font-size: 0;
+                    margin: 0;
+                    opacity: 0;
+                    position: absolute;
+                    right: 10px;
+                    top: 10px;
+                    transition: opacity .25s ease, visibility .25s ease;
+                    visibility: hidden;
+                    z-index: 2;
+
+                    &:before {
+                        line-height: 29px;
+                    }
+                }
+            }
+
+            .product-item-info:hover {
+                .actions-primary,
+                .towishlist {
+                    opacity: 1;
+                    visibility: visible;
+                }
+            }
+
+            //  Touch devices have no hover — keep both reachable.
+            @media (hover: none) {
+                .actions-primary,
+                .towishlist {
+                    opacity: 1;
+                    visibility: visible;
+                }
             }
         }
 
@@ -857,6 +1021,193 @@
             padding: 5px 10px;
         }
     }
+
+    //
+    //  Minicart cross-sell ("We recommend the following products:")
+    //  Injected into .block-minicart by Evalent_CheckoutModsJP as a
+    //  customer-data section, below the cart actions.
+    //  _____________________________________________
+
+    // Scoped under .block-minicart so these rules out-specify the dropdown's own
+    // .block-title / .product-item-actions overrides.
+    .block-minicart .minicart-crosssell {
+        // Keep the padding tight — a width here pushed the block past the panel,
+        // where overflow:hidden clipped the add-to-cart icon.
+        margin: 0;
+        padding: 5px 10px 10px;
+        text-align: left;
+        width: auto;
+
+        .block-title {
+            // .block .block-title is display:none inside the minicart dropdown.
+            display: block;
+            margin: 0 0 15px;
+            padding: 0;
+            text-align: left;
+
+            strong {
+                color: @ca-black;
+                font-size: 1.8rem;
+                font-weight: @font-weight__bold;
+                line-height: 1.2;
+            }
+        }
+
+        .products.list.items {
+            margin: 0;
+            padding: 0;
+            list-style: none none;
+        }
+
+        .product-item {
+            border: 0;
+            margin: 0 0 20px;
+            padding: 0;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        .product-item-info {
+            .lib-vendor-prefix-display(flex);
+            align-items: flex-start;
+            position: relative;
+            // Product-list styling pins this to the grid tile width (152px).
+            width: 100%;
+        }
+
+        // 78 x 78 square, same as the minicart rows above.
+        .product-item-photo {
+            display: block;
+            flex: 0 0 78px;
+            max-width: 78px;
+            margin-right: 10px;
+
+            // The image helper prints a per-product <style> block that pins
+            // .product-image-container to the thumbnail's own width (156px).
+            // Three classes here out-specify it without !important.
+            .product-image-container {
+                display: block;
+                width: 78px;
+            }
+
+            .product-image-wrapper {
+                display: block;
+                height: 78px;
+                padding-bottom: 0;
+                width: 78px;
+            }
+
+            img {
+                // The wrapper's padding-bottom ratio trick is disabled above, so
+                // the absolutely-positioned thumbnail would collapse out of flow.
+                position: static;
+                display: block;
+                height: 78px;
+                object-fit: contain;
+                width: 78px;
+            }
+        }
+
+        .product-item-details {
+            flex: 1 1 auto;
+            min-width: 0;
+            // Room for the cart icon parked on the right.
+            padding-right: 45px;
+            position: static;
+        }
+
+        .product-item-name {
+            display: block;
+            margin: 0 0 4px;
+
+            a {
+                color: @ca-black;
+                font-size: 1.6rem;
+                font-weight: @font-weight__bold;
+                line-height: 1.2;
+            }
+        }
+
+        .product-item-size {
+            display: block;
+            color: @ca-black;
+            font-size: 1.5rem;
+            margin: 0 0 6px;
+        }
+
+        .product-item-pricing {
+            display: block;
+        }
+
+        .price-box {
+            margin: 0;
+
+            // Base shows one price here, as on the reference store: no
+            // "Special price" / "Regular price" labels, no struck-through old
+            // price, no tax note.
+            .price-label,
+            .vat-incl,
+            .old-price {
+                display: none;
+            }
+
+            .price {
+                color: @price-color;
+                font-size: 1.8rem;
+                font-weight: @font-weight__bold;
+            }
+        }
+
+        .product-item-actions {
+            // Icon-only add-to-cart parked at the right edge of the row, as on
+            // the reference store.
+            float: none;
+            margin: 0;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+
+            .actions-primary {
+                display: block;
+            }
+
+            form {
+                margin: 0;
+            }
+
+            .action.tocart {
+                background: none;
+                border: 0;
+                box-shadow: none;
+                padding: 0;
+                width: auto;
+
+                span {
+                    display: none;
+                }
+
+                &:before {
+                    color: @ca-black;
+                    content: '\e66e';
+                    font-family: 'Pe-icon-7-stroke';
+                    font-size: 3.4rem;
+                    font-weight: @font-weight__regular;
+                    line-height: 1;
+                }
+
+                &:hover:before {
+                    color: @price-color;
+                }
+            }
+
+            .stock.unavailable {
+                font-size: 1.2rem;
+            }
+        }
+    }
 }
 
 
@@ -1133,6 +1484,14 @@
 
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
 
+    // Minicart dropdown width — base uses 420px on desktop; the cross-sell rows
+    // are laid out against that inner width.
+    .minicart-wrapper {
+        .block-minicart {
+            width: 420px;
+        }
+    }
+
     .cart-empty {
 
         &:before {
@@ -1224,22 +1583,6 @@
             .cart-container {
                 .cart-discount {
                     padding-left: @layout-indent__width;
-
-                    /* Crosssell right below discount field */
-                    & + .block.crosssell {
-                        width: 66%;
-                        position: relative;
-                        display: block;
-                        float: left;
-                        padding-right: @layout-indent__width;
-                        padding-left: @layout-indent__width;
-
-                        .title {
-                            text-align: left;
-                            margin-top: 0;
-                            margin-bottom: 0;
-                        }
-                    }
                 }
             }
         }

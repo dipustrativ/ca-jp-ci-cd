@@ -1,0 +1,138 @@
+<?php
+/**
+ * Cart page cross-sell grid.
+ *
+ * Replaces Magento_Catalog::product/list/items.phtml for checkout.cart.crosssell.
+ * Core's template hardcodes the "More Choices:" heading and ignores the
+ * block_title argument the layout passes; base uses the argument and shows the
+ * dimension line.
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\App\ActionInterface;
+
+/** @var \Magento\Checkout\Block\Cart\Crosssell $block */
+
+$items = $block->getItems();
+if (!$items) {
+    return;
+}
+
+// block_title arrives from layout XML as a raw string, so translate it here.
+$title = $block->getData('block_title') ? __($block->getData('block_title')) : __('More Choices:');
+$showCart = (bool)$block->getData('show_cart');
+
+/** Round rugs carry shape option 20; base renders those as a diameter. */
+$roundShapeId = 20;
+?>
+<div class="block crosssell cart-crosssell">
+    <div class="block-title title">
+        <strong id="block-cart-crosssell-heading" role="heading" aria-level="2">
+            <?= $block->escapeHtml($title) ?>
+        </strong>
+    </div>
+    <div class="block-content content" aria-labelledby="block-cart-crosssell-heading">
+        <div class="products wrapper grid products-grid products-crosssell">
+            <ol class="products list items product-items">
+                <?php foreach ($items as $item): ?>
+                    <li class="item product product-item">
+                        <div class="product-item-info">
+                            <a href="<?= $block->escapeUrl($block->getProductUrl($item)) ?>"
+                               class="product photo product-item-photo">
+                                <?= $block->getImage($item, 'cart_cross_sell_products')->toHtml() ?>
+                            </a>
+                            <div class="product details product-item-details">
+                                <strong class="product name product-item-name">
+                                    <a class="product-item-link"
+                                       title="<?= $block->escapeHtmlAttr($item->getName()) ?>"
+                                       href="<?= $block->escapeUrl($block->getProductUrl($item)) ?>">
+                                        <?= $block->escapeHtml($item->getName()) ?>
+                                    </a>
+                                </strong>
+
+                                <?php
+                                $width = (int)$item->getData('width');
+                                $length = (int)$item->getData('length');
+                                $isRound = (int)$item->getData('shape') === $roundShapeId;
+                                ?>
+                                <?php if ($width): ?>
+                                    <span class="product-item-size">
+                                        <?php if ($isRound): ?>
+                                            &#8709; <?= /* @noEscape */ $width ?> cm
+                                        <?php elseif ($length): ?>
+                                            <?= /* @noEscape */ $width ?> x <?= /* @noEscape */ $length ?> cm
+                                        <?php endif; ?>
+                                    </span>
+                                <?php endif; ?>
+
+                                <div class="product-item-pricing">
+                                    <?= /* @noEscape */ $block->getProductPrice($item) ?>
+                                </div>
+
+                                <?php if ($showCart): ?>
+                                    <div class="product actions product-item-actions">
+                                        <div class="actions-primary">
+                                            <?php if (!$item->isSaleable()): ?>
+                                                <div class="stock unavailable">
+                                                    <span><?= $block->escapeHtml(__('Out of stock')) ?></span>
+                                                </div>
+                                            <?php elseif (!$item->getTypeInstance()->isPossibleBuyFromList($item)): ?>
+                                                <button class="action tocart primary"
+                                                        type="button"
+                                                        title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>"
+                                                        data-mage-init='{"redirectUrl": {"url": "<?= $block->escapeUrl($block->getAddToCartUrl($item)) ?>"}}'>
+                                                    <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                                </button>
+                                            <?php else: ?>
+                                                <form data-role="tocart-form"
+                                                      data-product-sku="<?= $block->escapeHtmlAttr($item->getSku()) ?>"
+                                                      action="<?= $block->escapeUrl($block->getAddToCartUrl($item)) ?>"
+                                                      method="post">
+                                                    <input type="hidden" name="product"
+                                                           value="<?= /* @noEscape */ (int)$item->getEntityId() ?>">
+                                                    <input type="hidden"
+                                                           name="<?= /* @noEscape */ ActionInterface::PARAM_NAME_URL_ENCODED ?>"
+                                                           value="<?= $block->escapeHtmlAttr(
+                                                               $this->helper(Magento\Framework\Url\Helper\Data::class)
+                                                                   ->getEncodedUrl()
+                                                           ) ?>">
+                                                    <?= $block->getBlockHtml('formkey') ?>
+                                                    <button type="submit"
+                                                            class="action tocart primary"
+                                                            title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>">
+                                                        <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <?php
+                                        // Wishlist heart. The layout's
+                                        // crosssell.product.addto container still
+                                        // carries it; the theme removes only the
+                                        // compare link.
+                                        ?>
+                                        <?php if ($addToBlock = $block->getChildBlock('addto')): ?>
+                                            <div class="secondary-addto-links actions-secondary"
+                                                 data-role="add-to-links">
+                                                <?= $addToBlock->setProduct($item)->getChildHtml() ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
+        </div>
+    </div>
+</div>
+<script type="text/x-magento-init">
+{
+    ".cart-crosssell [data-role=tocart-form]": {
+        "catalogAddToCart": {}
+    }
+}
+</script>

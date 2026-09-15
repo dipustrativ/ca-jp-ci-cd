@@ -1,0 +1,133 @@
+<?php
+/**
+ * Cross-sell list for the minicart dropdown.
+ *
+ * Trimmed down from Magento_Catalog::product/list/items.phtml — only the
+ * 'crosssell' branch, no wishlist/compare links, and the heading comes from the
+ * block's block_title argument instead of the hardcoded "More Choices:".
+ */
+
+declare(strict_types=1);
+
+/** @var \Magento\Checkout\Block\Cart\Crosssell $block */
+
+$items = $block->getItems();
+if (!$items) {
+    return;
+}
+
+$title = $block->getData('block_title') ?: __('More Choices:');
+$showCart = (bool)$block->getData('show_cart');
+
+/** Round rugs carry shape option 20; base renders those as a diameter. */
+$roundShapeId = 20;
+?>
+<div class="block crosssell minicart-crosssell">
+    <div class="block-title title">
+        <strong id="block-minicart-crosssell-heading" role="heading" aria-level="2">
+            <?= $block->escapeHtml($title) ?>
+        </strong>
+    </div>
+    <div class="block-content content" aria-labelledby="block-minicart-crosssell-heading">
+        <ol class="products list items product-items">
+            <?php foreach ($items as $item): ?>
+                <li class="item product product-item">
+                    <div class="product-item-info">
+                        <a href="<?= $block->escapeUrl($block->getProductUrl($item)) ?>"
+                           class="product photo product-item-photo">
+                            <?php // Same square thumbnail the minicart rows use. ?>
+                            <?= $block->getImage($item, 'mini_cart_product_thumbnail')->toHtml() ?>
+                        </a>
+                        <div class="product details product-item-details">
+                            <strong class="product name product-item-name">
+                                <a class="product-item-link"
+                                   title="<?= $block->escapeHtmlAttr($item->getName()) ?>"
+                                   href="<?= $block->escapeUrl($block->getProductUrl($item)) ?>">
+                                    <?= $block->escapeHtml($item->getName()) ?>
+                                </a>
+                            </strong>
+
+                            <?php
+                            // Same dimension line the minicart items show, so the
+                            // cross-sell row reads like the rows above it.
+                            $width = (int)$item->getData('width');
+                            $length = (int)$item->getData('length');
+                            $isRound = (int)$item->getData('shape') === $roundShapeId;
+                            ?>
+                            <?php if ($width): ?>
+                                <span class="product-item-size">
+                                    <?php if ($isRound): ?>
+                                        &#8709; <?= /* @noEscape */ $width ?> cm
+                                    <?php elseif ($length): ?>
+                                        <?= /* @noEscape */ $width ?> x <?= /* @noEscape */ $length ?> cm
+                                    <?php endif; ?>
+                                </span>
+                            <?php endif; ?>
+
+                            <div class="product-item-pricing">
+                                <?= /* @noEscape */ $block->getProductPrice($item) ?>
+                            </div>
+
+                            <?php if ($showCart): ?>
+                                <div class="product actions product-item-actions">
+                                    <div class="actions-primary">
+                                        <?php if (!$item->isSaleable()): ?>
+                                            <div class="stock unavailable">
+                                                <span><?= $block->escapeHtml(__('Out of stock')) ?></span>
+                                            </div>
+                                        <?php elseif (!$item->getTypeInstance()->isPossibleBuyFromList($item)): ?>
+                                            <button class="action tocart primary"
+                                                    type="button"
+                                                    title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>"
+                                                    data-mage-init='{"redirectUrl": {"url": "<?= $block->escapeUrl($block->getAddToCartUrl($item)) ?>"}}'>
+                                                <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                            </button>
+                                        <?php else: ?>
+                                            <?php
+                                            // Deliberately no `uenc`: this block is rendered inside the
+                                            // /customer/section/load/ request, so the cart helper would encode
+                                            // that JSON endpoint as the return URL. Without it the cart
+                                            // controller falls back to the referer — the page the shopper is
+                                            // actually on.
+                                            $addUrl = $block->getUrl(
+                                                'checkout/cart/add',
+                                                ['product' => (int)$item->getEntityId(), '_secure' => true]
+                                            );
+                                            ?>
+                                            <form data-role="tocart-form"
+                                                  data-product-sku="<?= $block->escapeHtmlAttr($item->getSku()) ?>"
+                                                  action="<?= $block->escapeUrl($addUrl) ?>"
+                                                  method="post">
+                                                <input type="hidden" name="product"
+                                                       value="<?= /* @noEscape */ (int)$item->getEntityId() ?>">
+                                                <?php
+                                                // No form key here on purpose. This markup is cached in the
+                                                // customer-data section in localStorage, so a server-rendered key
+                                                // goes stale as soon as the session rotates and every add fails
+                                                // with "Your session has expired". minicart-crosssell.js injects
+                                                // the current key from the form_key cookie at render time.
+                                                ?>
+                                                <button type="submit"
+                                                        class="action tocart primary"
+                                                        title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>">
+                                                    <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ol>
+    </div>
+</div>
+<script type="text/x-magento-init">
+{
+    ".minicart-crosssell [data-role=tocart-form]": {
+        "catalogAddToCart": {}
+    }
+}
+</script>
