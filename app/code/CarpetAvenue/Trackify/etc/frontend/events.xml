@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="checkout_cart_product_add_after">
+        <observer name="carpetavenue_trackify_add_to_cart" instance="CarpetAvenue\Trackify\Observer\AddToCart"/>
+    </event>
+    <!-- Logged-in customers -->
+    <event name="wishlist_add_product">
+        <observer name="carpetavenue_trackify_add_to_wishlist" instance="CarpetAvenue\Trackify\Observer\AddToWishlist"/>
+    </event>
+    <!-- Guests go through BelVG_GuestWishlist, which dispatches its own event -->
+    <event name="guestwishlist_add_product">
+        <observer name="carpetavenue_trackify_add_to_wishlist_guest" instance="CarpetAvenue\Trackify\Observer\AddToWishlist"/>
+    </event>
+    <!-- No wishlist controller dispatches a remove event; they all call $item->delete().
+         Listen at the model instead, for both the stock and the guest item classes. -->
+    <event name="wishlist_item_delete_commit_after">
+        <observer name="carpetavenue_trackify_remove_from_wishlist" instance="CarpetAvenue\Trackify\Observer\RemoveFromWishlist"/>
+    </event>
+    <event name="guest_wishlist_item_delete_commit_after">
+        <observer name="carpetavenue_trackify_remove_from_wishlist_guest" instance="CarpetAvenue\Trackify\Observer\RemoveFromWishlist"/>
+    </event>
+    <event name="sales_quote_remove_item">
+        <observer name="carpetavenue_trackify_remove_from_cart" instance="CarpetAvenue\Trackify\Observer\RemoveFromCart"/>
+    </event>
+</config>

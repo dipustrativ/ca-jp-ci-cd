@@ -21,6 +21,15 @@ use CarpetAvenue\Core\Helper\SysConfig;
 
 class TagManagerHelper extends AbstractHelper
 {
+    /**
+     * @var string setting for activating GTM
+     */
+    public const XML_PATH_ACTIVE = 'carpetavenue_analytics/tagmanager/active';
+
+    /**
+     * @var string setting for the GTM container ID
+     */
+    public const XML_PATH_CONTAINER_ID = 'carpetavenue_analytics/tagmanager/container_id';
 
     /**
      * @param Context $context
@@ -33,23 +42,10 @@ class TagManagerHelper extends AbstractHelper
         parent::__construct($context);
     }
 
-    /** @var string setting for activating GTM
-     */
-    const XML_PATH_ACTIVE = 'carpetavenue_analytics/tagmanager/active';
-
-    /**
-     * @var string setting for the GTM container
-     */
-    const XML_PATH_CONTAINER = 'carpetavenue_analytics/tagmanager/container';
-    
-    /**
-     * @var string setting for the GTM no-script container
-     */
-    const XML_PATH_NOSCRIPT_CONTAINER = 'carpetavenue_analytics/tagmanager/noscript_container';
-
     /**
      * Check if GTM is enabled.
-     * @return boolean
+     *
+     * @return bool
      */
     public function isGoogleTagManagerEnabled(): bool
     {
@@ -57,25 +53,18 @@ class TagManagerHelper extends AbstractHelper
     }
 
     /**
+     * Configured GTM container ID, or an empty string if it is not a usable one.
      *
-     * Get GTM container code.
+     * The value lands in a JS string literal, and the field is the obvious place for
+     * somebody to paste an entire <script> snippet copied out of the GTM UI. Validate
+     * the shape here, once, rather than trusting the admin input downstream.
      *
-     * @return string the tag manager container (script)
+     * @return string
      */
-    public function getContainer(): string
+    public function getContainerId(): string
     {
-        return (string) $this->sysConfig->getConfig(self::XML_PATH_CONTAINER);
-    }
+        $containerId = trim((string) $this->sysConfig->getConfig(self::XML_PATH_CONTAINER_ID));
 
-    /**
-     *
-     * Get the GTM no-script container.
-     *
-     * @return string the tag manager container (script)
-     */
-    public function getNoScriptContainer(): string
-    {
-        return (string) $this->sysConfig->getConfig(self::XML_PATH_NOSCRIPT_CONTAINER);
+        return preg_match('/^GTM-[A-Z0-9]+$/', $containerId) === 1 ? $containerId : '';
     }
-
 }

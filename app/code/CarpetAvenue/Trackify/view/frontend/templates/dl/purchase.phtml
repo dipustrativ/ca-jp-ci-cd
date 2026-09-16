@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/**
+ * GA4 purchase. The blob re-renders on every success-page load, so datalayer.js keeps a
+ * per-transaction sessionStorage guard — a reload must not book a second purchase.
+ *
+ * Mageplaza OSC delegates to this same stock checkout_onepage_success handle, so no
+ * OSC-specific variant is needed.
+ *
+ * @var Magento\Framework\View\Element\Template $block
+ * @var CarpetAvenue\Trackify\ViewModel\Checkout $viewModel
+ */
+
+$viewModel = $block->getData('trackify_view_model');
+$payload = $viewModel->getPurchasePayload();
+
+if (!$payload) {
+    return;
+}
+?>
+<script type="application/json" class="trackify-dl"><?= /* @noEscape */ $viewModel->toJson($payload) ?></script>

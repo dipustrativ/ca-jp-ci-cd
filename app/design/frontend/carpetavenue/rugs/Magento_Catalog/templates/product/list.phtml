@@ -46,6 +46,10 @@ if ($hoverHelper->isEnableListHoverImage()) {
     $pos = $block->getPositioned();
     ?>
     <div class="products wrapper <?= /* @noEscape */ $viewMode ?> products-<?= /* @noEscape */ $viewMode ?>">
+        <?php /* CarpetAvenue_Trackify: GA4 view_item_list blob. Must stay inside this
+                 wrapper — layered nav replaces .column.main via innerHTML, and infinite
+                 scroll appends whole wrappers, so the payload has to travel with them. */ ?>
+        <?= $block->getChildHtml('trackify.item.list') ?>
         <ol class="products list items product-items">
             <?php /** @var \Magento\Catalog\Model\Product $_product */ ?>
             <?php foreach ($_productCollection as $_product) : ?>

@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/**
+ * GA4 view_cart / begin_checkout — same payload, different event name, so one template
+ * with the name passed in from layout. Both pages are cacheable="false" in core, so the
+ * quote can be read straight here.
+ *
+ * @var Magento\Framework\View\Element\Template $block
+ * @var CarpetAvenue\Trackify\ViewModel\Checkout $viewModel
+ */
+
+$viewModel = $block->getData('trackify_view_model');
+$payload = $viewModel->getQuotePayload((string) $block->getData('event_name'));
+
+if (!$payload) {
+    return;
+}
+?>
+<script type="application/json" class="trackify-dl"><?= /* @noEscape */ $viewModel->toJson($payload) ?></script>

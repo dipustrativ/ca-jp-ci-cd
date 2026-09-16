@@ -13,26 +13,11 @@
  */
 
 /**
- * @var $block CarpetAvenue\Trackify\Block\TagManager
+ * Google Tag Manager no-script fallback. Page variables live in head.phtml — pushing
+ * them from here would put them after gtm.js has already fired its Page View trigger.
+ *
+ * @var CarpetAvenue\Trackify\Block\TagManager $block
  */
 ?>
-
-<?php
-    //-- Google Tag Manager (noscript)
-    echo $block->getNoScriptContainer();
-?>
-
-<?php $pageType = $block->getPageType(); ?>
-
-<script type="text/javascript">
-    /*
-     Data Layer Necessary Variable
-     For Both Google Analytics & Google Tag Manager
-     */
-    dataLayer = window.dataLayer || [];
-    dataLayer.push(
-        {
-            'page_type': '<?php echo $pageType;?>'
-        }
-    );
-</script>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=<?= $block->escapeUrl($block->getContainerId()) ?>"
+                  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
