@@ -626,8 +626,14 @@
             .product-item-photo {
                 display: block;
 
+                //  aspect-ratio reset for the same reason as the minicart's:
+                //  the helper's per-product block is keyed on ID, so another
+                //  grid on the page can hand this one a foreign ratio. Height
+                //  comes from the image's own aspect-ratio below.
                 .product-image-container {
+                    aspect-ratio: auto;
                     display: block;
+                    height: auto;
                     width: 100% !important;
                 }
 
@@ -1223,10 +1229,17 @@
             margin-right: 10px;
 
             // The image helper prints a per-product <style> block that pins
-            // .product-image-container to the thumbnail's own width.
-            // Three classes here out-specify it without !important.
+            // .product-image-container. Three classes here out-specify it
+            // without !important — but only for what we actually declare, and
+            // that block is keyed on product ID rather than image role. A page
+            // that also shows this rug in a grid emits a second block for the
+            // same ID with the grid's ratio, which won and stretched the row
+            // (134px on the home page, 100px on the cart page). Pin the whole
+            // box so the row is the same height wherever it renders.
             .product-image-container {
+                aspect-ratio: auto;
                 display: block;
+                height: 100px;
                 width: 100px;
             }
 
