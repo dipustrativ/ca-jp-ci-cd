@@ -7,4 +7,12 @@
     -->
     <preference for="Mageplaza\Osc\Controller\Router"
                 type="Evalent\CheckoutModsJP\Overwrite\Mageplaza\Osc\Controller\Router"/>
+
+    <type name="Magento\Customer\CustomerData\SectionPoolInterface">
+        <arguments>
+            <argument name="sectionSourceMap" xsi:type="array">
+                <item name="minicart-crosssell" xsi:type="string">Evalent\CheckoutModsJP\CustomerData\MinicartCrosssell</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
