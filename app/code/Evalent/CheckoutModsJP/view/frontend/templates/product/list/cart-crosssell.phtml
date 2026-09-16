@@ -40,7 +40,7 @@ $roundShapeId = 20;
                         <div class="product-item-info">
                             <a href="<?= $block->escapeUrl($block->getProductUrl($item)) ?>"
                                class="product photo product-item-photo">
-                                <?= $block->getImage($item, 'cart_cross_sell_products')->toHtml() ?>
+                                <?= $block->getImage($item, 'cart_cross_sell_products-2')->toHtml() ?>
                             </a>
                             <div class="product details product-item-details">
                                 <strong class="product name product-item-name">
@@ -72,39 +72,49 @@ $roundShapeId = 20;
 
                                 <?php if ($showCart): ?>
                                     <div class="product actions product-item-actions">
-                                        <div class="actions-primary">
-                                            <?php if (!$item->isSaleable()): ?>
-                                                <div class="stock unavailable">
-                                                    <span><?= $block->escapeHtml(__('Out of stock')) ?></span>
-                                                </div>
-                                            <?php elseif (!$item->getTypeInstance()->isPossibleBuyFromList($item)): ?>
-                                                <button class="action tocart primary"
-                                                        type="button"
-                                                        title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>"
-                                                        data-mage-init='{"redirectUrl": {"url": "<?= $block->escapeUrl($block->getAddToCartUrl($item)) ?>"}}'>
-                                                    <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
-                                                </button>
-                                            <?php else: ?>
-                                                <form data-role="tocart-form"
-                                                      data-product-sku="<?= $block->escapeHtmlAttr($item->getSku()) ?>"
-                                                      action="<?= $block->escapeUrl($block->getAddToCartUrl($item)) ?>"
-                                                      method="post">
-                                                    <input type="hidden" name="product"
-                                                           value="<?= /* @noEscape */ (int)$item->getEntityId() ?>">
-                                                    <input type="hidden"
-                                                           name="<?= /* @noEscape */ ActionInterface::PARAM_NAME_URL_ENCODED ?>"
-                                                           value="<?= $block->escapeHtmlAttr(
-                                                               $this->helper(Magento\Framework\Url\Helper\Data::class)
-                                                                   ->getEncodedUrl()
-                                                           ) ?>">
-                                                    <?= $block->getBlockHtml('formkey') ?>
-                                                    <button type="submit"
-                                                            class="action tocart primary"
-                                                            title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>">
+                                        <?php
+                                        // Base wraps the add-to-cart in
+                                        // .product-item-inner and reveals it as a
+                                        // drawer on hover, so the button takes no
+                                        // room in the card at rest. The wishlist
+                                        // heart stays outside it, pinned over the
+                                        // image like every other card on the site.
+                                        ?>
+                                        <div class="product-item-inner">
+                                            <div class="actions-primary">
+                                                <?php if (!$item->isSaleable()): ?>
+                                                    <div class="stock unavailable">
+                                                        <span><?= $block->escapeHtml(__('Out of stock')) ?></span>
+                                                    </div>
+                                                <?php elseif (!$item->getTypeInstance()->isPossibleBuyFromList($item)): ?>
+                                                    <button class="action tocart primary"
+                                                            type="button"
+                                                            title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>"
+                                                            data-mage-init='{"redirectUrl": {"url": "<?= $block->escapeUrl($block->getAddToCartUrl($item)) ?>"}}'>
                                                         <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
                                                     </button>
-                                                </form>
-                                            <?php endif; ?>
+                                                <?php else: ?>
+                                                    <form data-role="tocart-form"
+                                                          data-product-sku="<?= $block->escapeHtmlAttr($item->getSku()) ?>"
+                                                          action="<?= $block->escapeUrl($block->getAddToCartUrl($item)) ?>"
+                                                          method="post">
+                                                        <input type="hidden" name="product"
+                                                               value="<?= /* @noEscape */ (int)$item->getEntityId() ?>">
+                                                        <input type="hidden"
+                                                               name="<?= /* @noEscape */ ActionInterface::PARAM_NAME_URL_ENCODED ?>"
+                                                               value="<?= $block->escapeHtmlAttr(
+                                                                   $this->helper(Magento\Framework\Url\Helper\Data::class)
+                                                                       ->getEncodedUrl()
+                                                               ) ?>">
+                                                        <?= $block->getBlockHtml('formkey') ?>
+                                                        <button type="submit"
+                                                                class="action tocart primary"
+                                                                title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>">
+                                                            <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                                        </button>
+                                                    </form>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
 
                                         <?php

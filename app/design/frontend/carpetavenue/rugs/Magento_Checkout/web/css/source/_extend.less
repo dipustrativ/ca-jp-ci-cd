@@ -3,6 +3,20 @@
 //  Deliberately excludes all header / minicart / checkout-step chrome.
 //  _____________________________________________
 
+//  Cross-sell card hover lift. Base applies the same treatment to the cart-page
+//  cards and the minicart rows, so both surfaces read from these.
+//  The shadow matches base's @product-item__hover__box-shadow; inlined so this
+//  file does not depend on Magento_Catalog's _extend.less compiling first.
+@crosssell-card__hover__border-color: #e6e6e6;
+@crosssell-card__hover__box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+//  Cart-page lift, same 20px the similar-products cards use (those were
+//  measured against live). The drawer's top margin reads from this so the two
+//  cannot drift: it has to land exactly on the card's bottom border to cover
+//  the seam under the price.
+@crosssell-card__hover__padding: 19px;
+//  Minicart row lift. Smaller than the cart page's — see the rule for why.
+@crosssell-row__hover__padding: 9px;
+
 //
 //  Common
 //  _____________________________________________
@@ -543,26 +557,24 @@
             background: @color-white;
         }
 
-        // Cross-sell grid under the coupon form. Mirrors base: left-aligned
-        // heading, one card per product with a centred name / size / price, and
-        // the add-to-cart button revealed on hover.
-        .block.crosssell {
+        // Cross-sell grid under the coupon form. Mirrors base: one card per
+        // product with a centred name / size / price, the heading centred on
+        // mobile and left-aligned on desktop, and the add-to-cart revealed in a
+        // drawer on hover. Scoped to .cart-crosssell because the minicart's
+        // block also carries .block.crosssell and is in the page on this route.
+        .block.crosssell.cart-crosssell {
             margin: 0 0 25px;
             padding-right: 0;
 
-            // .column.main .block.crosssell .title centres it and is declared
-            // later in the cascade at equal specificity — the extra class here
-            // wins it back.
-            .block-title.title {
-                text-align: left;
-            }
-
+            // Base centres the heading below @screen__m and only left-aligns it
+            // on desktop, where the block sits beside the coupon form. The
+            // desktop rule lives in the min-width @screen__m block below.
             .block-title {
                 margin: 0 0 20px;
 
                 strong {
                     color: @ca-black;
-                    font-size: 2rem;
+                    font-size: 2.5rem;
                     font-weight: @font-weight__bold;
                     line-height: 1.3;
                 }
@@ -572,7 +584,9 @@
                 .lib-vendor-prefix-display(flex);
                 flex-wrap: wrap;
                 list-style: none none;
-                margin: 0;
+                // Base pulls the row out by the card padding so the first card
+                // aligns with the block edge.
+                margin: 0 -15px;
                 padding: 0;
             }
 
@@ -594,14 +608,17 @@
                 //  reflowing the grid.
                 &:hover {
                     background: @color-white;
-                    border: 1px solid #e6e6e6;
-                    border-radius: 5px;
+                    border: 1px solid @crosssell-card__hover__border-color;
+                    // Only the top corners: the drawer below supplies the
+                    // bottom pair, so the two read as a single rounded card.
+                    border-top-left-radius: @button__border-radius;
+                    border-top-right-radius: @button__border-radius;
                     // Same value as @product-item__hover__box-shadow; inlined so
                     // this file does not depend on Magento_Catalog's _extend.less
                     // being compiled first.
-                    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-                    margin: -20px;
-                    padding: 19px;
+                    box-shadow: @crosssell-card__hover__box-shadow;
+                    margin: -(@crosssell-card__hover__padding + 1);
+                    padding: @crosssell-card__hover__padding;
                     z-index: 9;
                 }
             }
@@ -614,9 +631,27 @@
                     width: 100% !important;
                 }
 
+                //  The role is generated with frame=false, so every product's
+                //  file comes out a different shape. Base pins the box to the
+                //  same 1:1.3392 portrait the category grid uses (560x750) and
+                //  crops to it.
+                //
+                //  Magento's helper sizes the box by giving the wrapper a
+                //  padding-bottom ratio and taking the image out of flow.
+                //  Overriding half of that left the two mechanisms fighting and
+                //  a dead gap under the photo, so switch both off and let one
+                //  aspect-ratio on the image own the shape.
+                .product-image-wrapper {
+                    height: auto;
+                    padding-bottom: 0;
+                }
+
                 img {
+                    aspect-ratio: 560 / 750;
                     display: block;
                     height: auto;
+                    object-fit: cover;
+                    position: static;
                     width: 100%;
                 }
             }
@@ -663,26 +698,53 @@
             }
 
             .product-item-actions {
-                margin: 10px 0 0;
+                margin: 0;
 
-                .actions-primary {
-                    opacity: 0;
-                    transition: opacity .25s ease;
+                //  Base hides the add-to-cart in a .product-item-inner drawer
+                //  that is out of flow until hover, so the card carries no empty
+                //  button row at rest. Unhiding has to undo every property
+                //  .lib-visually-hidden() sets.
+                .product-item-inner {
+                    .lib-visually-hidden();
+                }
+
+                //  Both shrink-to-fit by default, which left the button
+                //  narrower than the drawer with its label spilling out.
+                .actions-primary,
+                .actions-primary form {
+                    display: block;
+                    margin: 0;
+                    width: 100%;
                 }
 
                 .action.tocart {
+                    border-radius: @button__border-radius;
                     font-size: 1.3rem;
-                    padding: 8px 15px;
+                    padding: 10px 5px;
+                    // Base lets the label wrap rather than overflow the card.
+                    white-space: normal;
+                    width: 100%;
                 }
 
                 //  Heart pinned to the card's top-right corner, same treatment
-                //  as the similar-products cards.
+                //  as the category-grid cards (Magento_Catalog/_extend.less).
+                //
+                //  It is only ever visible while the card is lifted, so it is
+                //  placed against the LIFTED card's corner. The negative margin
+                //  puts it at that same screen position at rest too — otherwise
+                //  it snapped back the moment hover ended and then fading out
+                //  from the old spot read as the icon sliding. Invisible at
+                //  rest, so sitting outside the un-lifted box costs nothing.
+                //
+                //  Offset is the hover PADDING alone, not padding + border:
+                //  top/right resolve against the padding box, which the border
+                //  sits outside of. Counting the border left it 1px adrift.
                 .towishlist {
                     background: rgba(255, 255, 255, 0.95);
                     border-radius: 50px;
                     box-shadow: 0 0 10px rgba(0, 0, 0, 0.13);
                     font-size: 0;
-                    margin: 0;
+                    margin: -@crosssell-card__hover__padding -@crosssell-card__hover__padding 0 0;
                     opacity: 0;
                     position: absolute;
                     right: 10px;
@@ -698,17 +760,65 @@
             }
 
             .product-item-info:hover {
-                .actions-primary,
+                //  Drawer geometry copied from base: no `top`, so it drops at
+                //  its own static position just under the price, and the
+                //  negative right margin laps the card's 1px border.
+                .product-item-inner {
+                    background: @color-white;
+                    border: 1px solid @crosssell-card__hover__border-color;
+                    display: block;
+                    border-bottom-left-radius: @button__border-radius;
+                    border-bottom-right-radius: @button__border-radius;
+                    border-top: 0;
+                    clip: auto;
+                    height: auto;
+                    left: 0;
+                    margin: @crosssell-card__hover__padding 0 0 -1px;
+                    overflow: visible;
+                    padding: 0 @crosssell-card__hover__padding @crosssell-card__hover__padding;
+                    position: absolute;
+                    right: -1px;
+                    width: auto;
+                    z-index: 2;
+                }
+
+                //  The hover padding pushes this element's padding box out on
+                //  every side, and that padding box is the heart's containing
+                //  block — so the heart would sit a padding's width up-and-right
+                //  of where it belongs, then slide back while its 250ms fade
+                //  ran on hover-out. Give the padding back so it never moves.
+                //
+                //  Compensate with `margin`, not `top`/`right`: same reason the
+                //  similar-products discount badge does (Magento_Catalog
+                //  _extend.less) — a mixed-property override stacks instead of
+                //  replacing, and margin needs no knowledge of the base insets.
                 .towishlist {
+                    margin: 0;
                     opacity: 1;
                     visibility: visible;
                 }
             }
 
-            //  Touch devices have no hover — keep both reachable.
+            //  Touch devices have no hover — keep both reachable. Undo
+            //  .lib-visually-hidden() and leave the button in flow rather than
+            //  as a drawer overlapping whatever sits below the card.
             @media (hover: none) {
-                .actions-primary,
+                //  display, not just the clip reset: base ships
+                //  `.products-grid .product-item-inner { display: none }` and
+                //  relies on its own :hover rule to flip it back, so anything
+                //  that reveals the drawer without hover has to do it here.
+                .product-item-inner {
+                    clip: auto;
+                    display: block;
+                    height: auto;
+                    margin: @indent__s 0 0;
+                    overflow: visible;
+                    position: static;
+                    width: auto;
+                }
+
                 .towishlist {
+                    margin: 0;
                     opacity: 1;
                     visibility: visible;
                 }
@@ -1041,7 +1151,7 @@
         .block-title {
             // .block .block-title is display:none inside the minicart dropdown.
             display: block;
-            margin: 0 0 15px;
+            margin: 0 0 20px;
             padding: 0;
             text-align: left;
 
@@ -1075,28 +1185,56 @@
             position: relative;
             // Product-list styling pins this to the grid tile width (152px).
             width: 100%;
+
+            //  Base lifts the minicart row on hover like a cart-page card.
+            //  One rounded box here, not a card plus drawer, because the cart
+            //  icon is always visible in the minicart.
+            //
+            //  Smaller lift than the cart page on purpose: .block-minicart is
+            //  overflow:hidden, and a 20px grow leaves too little room for the
+            //  15px shadow blur before the panel clips it. Live shows the box
+            //  inset from the panel edge too.
+            &:hover {
+                background: @color-white;
+                border: 1px solid @crosssell-card__hover__border-color;
+                border-radius: @button__border-radius;
+                box-shadow: @crosssell-card__hover__box-shadow;
+                margin: -(@crosssell-row__hover__padding + 1);
+                padding: @crosssell-row__hover__padding;
+                z-index: 9;
+
+                //  The lift padding widens the padding box the icon is
+                //  positioned against, so `right: 0` would push it out to the
+                //  corner of the lifted box. Give the padding back.
+                .product-item-actions {
+                    margin-right: @crosssell-row__hover__padding;
+                }
+            }
         }
 
-        // 78 x 78 square, same as the minicart rows above.
+        // 100px box, as base. `contain` rather than a crop so a portrait rug
+        // is never sliced, and left-aligned so the row reads flush; base gets
+        // away with a free-height image because its cross-sell is always the
+        // one landscape anti-slip shot, ours has to take any rug.
         .product-item-photo {
             display: block;
-            flex: 0 0 78px;
-            max-width: 78px;
+            flex: 0 0 100px;
+            max-width: 100px;
             margin-right: 10px;
 
             // The image helper prints a per-product <style> block that pins
-            // .product-image-container to the thumbnail's own width (156px).
+            // .product-image-container to the thumbnail's own width.
             // Three classes here out-specify it without !important.
             .product-image-container {
                 display: block;
-                width: 78px;
+                width: 100px;
             }
 
             .product-image-wrapper {
                 display: block;
-                height: 78px;
+                height: 100px;
                 padding-bottom: 0;
-                width: 78px;
+                width: 100px;
             }
 
             img {
@@ -1104,9 +1242,13 @@
                 // the absolutely-positioned thumbnail would collapse out of flow.
                 position: static;
                 display: block;
-                height: 78px;
+                // contain, not a width+max-height pair: with an explicit width,
+                // max-height squashes the photo instead of scaling it. Left
+                // aligned so the row reads flush like base's.
+                height: 100px;
                 object-fit: contain;
-                width: 78px;
+                object-position: left center;
+                width: 100px;
             }
         }
 
@@ -1133,8 +1275,8 @@
         .product-item-size {
             display: block;
             color: @ca-black;
-            font-size: 1.5rem;
-            margin: 0 0 6px;
+            font-size: 1.4rem;
+            margin: 0 0 5px;
         }
 
         .product-item-pricing {
@@ -1155,14 +1297,18 @@
 
             .price {
                 color: @price-color;
-                font-size: 1.8rem;
+                font-size: 1.6rem;
                 font-weight: @font-weight__bold;
             }
         }
 
         .product-item-actions {
-            // Icon-only add-to-cart parked at the right edge of the row, as on
-            // the reference store.
+            // Icon-only add-to-cart parked at the right edge of the row and
+            // vertically centred against it, as live shows it.
+            //
+            // Centring also survives the hover lift for free: `top: 50%`
+            // resolves against the padding box, which grows by the same amount
+            // above and below, so only the horizontal edge needs compensating.
             float: none;
             margin: 0;
             position: absolute;
@@ -1193,13 +1339,9 @@
                     color: @ca-black;
                     content: '\e66e';
                     font-family: 'Pe-icon-7-stroke';
-                    font-size: 3.4rem;
+                    font-size: 3rem;
                     font-weight: @font-weight__regular;
-                    line-height: 1;
-                }
-
-                &:hover:before {
-                    color: @price-color;
+                    line-height: normal;
                 }
             }
 
@@ -1255,6 +1397,13 @@
             .products-grid.grid.products-crosssell .product-items {
                 margin-bottom: 0 !important;
             }
+        }
+
+        //  Two per row on small phones. The @screen__m block above sets three,
+        //  which leaves ~130px of card at these widths.
+        .block.crosssell.cart-crosssell .product-item {
+            flex-basis: 50%;
+            max-width: 50%;
         }
     }
 }
@@ -1356,8 +1505,64 @@
             }
         }
 
-        .block.crosssell {
+        .block.crosssell.cart-crosssell {
             width: auto;
+
+            //  Base runs the grid as a 50%-wide scroll-snap carousel on phones.
+            //  We keep the wrapping grid and set the density by breakpoint
+            //  instead: three per row here, dropping to two below @screen__xs
+            //  (see the mobile-xs block) where a third of the width stops being
+            //  readable. Five-up from @screen__l, as base.
+            //  Escaped calc, not `100% / 3`: this compiler leaves the bare
+            //  division in the output verbatim and the browser drops it.
+            .product-item {
+                flex-basis: ~'calc(100% / 3)';
+                max-width: ~'calc(100% / 3)';
+            }
+
+            //  Phone widths get the touch layout whatever the pointer reports:
+            //  no lift, button in flow, heart shown. A 20px outward grow on a
+            //  ~165px card puts its left edge past the page gutter and drops
+            //  the drawer onto the summary below. Base does not lift here
+            //  either — its mobile grid is a carousel.
+            .product-item-actions {
+                .product-item-inner {
+                    clip: auto;
+                    display: block;
+                    height: auto;
+                    margin: @indent__s 0 0;
+                    overflow: visible;
+                    position: static;
+                    width: auto;
+                }
+
+                .towishlist {
+                    margin: 0;
+                    opacity: 1;
+                    visibility: visible;
+                }
+            }
+
+            .product-item-info:hover {
+                background: none;
+                border: 0;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+
+                .product-item-inner {
+                    background: none;
+                    border: 0;
+                    border-radius: 0;
+                    margin: @indent__s 0 0;
+                    padding: 0;
+                    position: static;
+                }
+
+                .towishlist {
+                    margin: 0;
+                }
+            }
         }
 
         &__bottom {
@@ -1503,8 +1708,27 @@
     .checkout-cart-index {
 
         // Crosssell
-        .block.crosssell {
+        .block.crosssell.cart-crosssell {
+            //  Gap between the coupon block and this one.
+            //
+            //  The @layout-indent__width indent that lines this heading up with
+            //  the coupon's sits on .block-title below, not on the block — so
+            //  the card grid still starts at the column edge rather than under
+            //  the heading. Move it up here if they should share an edge.
+            margin-top: @indent__l;
             width: 100%;
+
+            // Beside the coupon form on desktop, base left-aligns the heading.
+            // The extra class out-specifies .column.main .block.crosssell .title,
+            // which centres it and is declared later in the cascade.
+            .block-title.title {
+                text-align: left;
+                padding-left: @layout-indent__width;
+
+                strong {
+                    font-size: 2rem;
+                }
+            }
         }
 
         // Summary — pinned while the left column (items + Trustpilot + USP
@@ -1597,6 +1821,20 @@
             .form-cart {
                 padding-right: 0;
             }
+        }
+
+        //  Five per row, as base. Its template tags each card `col-lg-2` and
+        //  sizes that to 20% at this breakpoint (Evalent/carpet
+        //  Magento_Catalog/_extend.less). 20% lands exactly five-up because the
+        //  row is pulled out by the card padding, so the track is the block's
+        //  content width plus one gutter.
+        //
+        //  Only from @screen__l: the block is ~66% of the main column, and at
+        //  tablet widths a fifth of that is too narrow to read — base leaves
+        //  `col-md-3` unstyled there, so the fixed basis below stands in.
+        .block.crosssell.cart-crosssell .product-item {
+            flex-basis: 20%;
+            max-width: 20%;
         }
     }
 }

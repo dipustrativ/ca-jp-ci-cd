@@ -35,8 +35,8 @@ $roundShapeId = 20;
                     <div class="product-item-info">
                         <a href="<?= $block->escapeUrl($block->getProductUrl($item)) ?>"
                            class="product photo product-item-photo">
-                            <?php // Same square thumbnail the minicart rows use. ?>
-                            <?= $block->getImage($item, 'mini_cart_product_thumbnail')->toHtml() ?>
+                            <?php // Same role the cart-page cross-sell uses; base shares it across both surfaces. ?>
+                            <?= $block->getImage($item, 'cart_cross_sell_products-2')->toHtml() ?>
                         </a>
                         <div class="product details product-item-details">
                             <strong class="product name product-item-name">
