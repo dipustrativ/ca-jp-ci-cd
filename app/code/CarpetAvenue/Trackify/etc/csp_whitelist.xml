@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * Hosts reached by the Google Tag Manager container and the tags configured inside
+ * it (GA4, Google Ads, Bing UET, Yahoo! JAPAN, Meta, Klaviyo, CookieScript).
+ * CSP is report-only today; this keeps the violation log clean and means nothing
+ * breaks the day it is enforced.
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ */
+-->
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="gtm" type="host">*.googletagmanager.com</value>
+                <value id="ga" type="host">*.google-analytics.com</value>
+                <value id="ga-direct" type="host">*.analytics.google.com</value>
+                <value id="gads" type="host">*.googleadservices.com</value>
+                <value id="doubleclick" type="host">*.doubleclick.net</value>
+                <value id="bing" type="host">*.bing.com</value>
+                <value id="yahoo-jp" type="host">*.yimg.jp</value>
+                <value id="meta" type="host">*.facebook.net</value>
+                <value id="klaviyo" type="host">*.klaviyo.com</value>
+                <value id="cookiescript" type="host">*.cookie-script.com</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="gtm" type="host">*.googletagmanager.com</value>
+                <value id="ga" type="host">*.google-analytics.com</value>
+                <value id="ga-direct" type="host">*.analytics.google.com</value>
+                <value id="gads" type="host">*.googleadservices.com</value>
+                <value id="doubleclick" type="host">*.doubleclick.net</value>
+                <value id="bing" type="host">*.bing.com</value>
+                <value id="yahoo-jp" type="host">*.yimg.jp</value>
+                <value id="meta" type="host">*.facebook.com</value>
+                <value id="klaviyo" type="host">*.klaviyo.com</value>
+                <value id="cookiescript" type="host">*.cookie-script.com</value>
+            </values>
+        </policy>
+        <policy id="img-src">
+            <values>
+                <value id="gtm" type="host">*.googletagmanager.com</value>
+                <value id="ga" type="host">*.google-analytics.com</value>
+                <value id="gads" type="host">*.googleadservices.com</value>
+                <value id="google" type="host">*.google.com</value>
+                <value id="google-jp" type="host">*.google.co.jp</value>
+                <value id="doubleclick" type="host">*.doubleclick.net</value>
+                <value id="bing" type="host">*.bing.com</value>
+                <value id="yahoo-jp" type="host">*.yimg.jp</value>
+                <value id="meta" type="host">*.facebook.com</value>
+                <value id="klaviyo" type="host">*.klaviyo.com</value>
+            </values>
+        </policy>
+        <policy id="frame-src">
+            <values>
+                <value id="gtm" type="host">*.googletagmanager.com</value>
+                <value id="doubleclick" type="host">*.doubleclick.net</value>
+                <value id="bing" type="host">*.bing.com</value>
+                <value id="meta" type="host">*.facebook.com</value>
+            </values>
+        </policy>
+        <policy id="child-src">
+            <values>
+                <value id="gtm" type="host">*.googletagmanager.com</value>
+                <value id="doubleclick" type="host">*.doubleclick.net</value>
+            </values>
+        </policy>
+        <policy id="style-src">
+            <values>
+                <value id="gtm" type="host">*.googletagmanager.com</value>
+                <value id="cookiescript" type="host">*.cookie-script.com</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>

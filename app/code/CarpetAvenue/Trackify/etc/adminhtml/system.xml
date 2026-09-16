@@ -14,24 +14,22 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <section id="carpetavenue_analytics" translate="label" type="text" sortOrder="340" showInDefault="1">
+        <section id="carpetavenue_analytics" translate="label" type="text" sortOrder="340" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Trackify</label>
             <tab>carpetavenue</tab>
-            <resource>CarpetAvenue_Trackify::analytics</resource>
-            <group id="tagmanager" translate="label" type="text" sortOrder="10" showInDefault="1">
+            <resource>CarpetAvenue_Trackify::trackify</resource>
+            <group id="tagmanager" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Google Tag Manager (GTM)</label>
-                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1">
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="container" translate="label" type="textarea" sortOrder="20" showInDefault="1">
-                    <label>Container</label>
-                    <depends>
-                        <field id="*/*/active">1</field>
-                    </depends>
-                </field>
-                <field id="noscript_container" translate="label" type="textarea" sortOrder="20" showInDefault="1">
-                    <label>Noscript Container</label>
+                <field id="container_id" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Container ID</label>
+                    <validate>required-entry</validate>
+                    <comment><![CDATA[The GTM container ID only, e.g. <b>GTM-MNDVSZTS</b> (dev) or <b>GTM-TZ87GV2</b> (production).
+                    Do not paste the whole &lt;script&gt; snippet &mdash; the module renders it.
+                    Anything that is not a valid <code>GTM-XXXXXXX</code> ID is ignored and no container is rendered.]]></comment>
                     <depends>
                         <field id="*/*/active">1</field>
                     </depends>

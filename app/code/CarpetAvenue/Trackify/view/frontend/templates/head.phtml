@@ -13,12 +13,53 @@
  */
 
 /**
- * @var $block CarpetAvenue\Trackify\Block\TagManager
+ * Google Tag Manager container.
+ *
+ * Order matters and is the whole point of this template: the page variables have to be
+ * in the dataLayer *before* gtm.js loads, otherwise the container's Page View trigger
+ * fires without them. This block is pinned first in head.additional (default.xml).
+ *
+ * @var CarpetAvenue\Trackify\Block\TagManager $block
  */
-?>
 
-<?php
-    //-- Google Tag Manager
-    echo $block->getContainer();
-?>
+$jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 
+// json_encode rather than escapeJs: the helper already rejects anything that is not a
+// GTM-XXXXXXX id, and escapeJs would render it \u002D-escaped, so the container id would
+// no longer be greppable in view-source — which is the first thing anyone does when a
+// container misbehaves.
+$containerId = json_encode($block->getContainerId(), $jsonFlags);
+$pageVars = json_encode($block->getPageVars(), $jsonFlags);
+?>
+<script>
+    window.dataLayer = window.dataLayer || [];
+
+    /*
+     * Consent Mode v2 — switch this block on once a consent platform (CookieScript) is
+     * configured inside the GTM container to grant/deny it. It must stay above the
+     * dataLayer push and the container snippet. The dev container has no CMP, so leaving
+     * it off keeps GA4 DebugView usable.
+     *
+     * function gtag() { window.dataLayer.push(arguments); }
+     * gtag('consent', 'default', {
+     *     ad_storage: 'denied',
+     *     ad_user_data: 'denied',
+     *     ad_personalization: 'denied',
+     *     analytics_storage: 'denied',
+     *     wait_for_update: 500
+     * });
+     */
+
+    window.dataLayer.push(<?= /* @noEscape */ $pageVars ?>);
+
+    (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
+        var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l !== 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', <?= /* @noEscape */ $containerId ?>);
+</script>

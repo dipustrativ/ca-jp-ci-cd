@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
+    <action name="checkout/cart/add">
+        <section name="trackify"/>
+    </action>
+    <action name="checkout/cart/delete">
+        <section name="trackify"/>
+    </action>
+    <action name="checkout/cart/updatePost">
+        <section name="trackify"/>
+    </action>
+    <action name="checkout/sidebar/removeItem">
+        <section name="trackify"/>
+    </action>
+    <action name="checkout/sidebar/updateItemQty">
+        <section name="trackify"/>
+    </action>
+    <action name="wishlist/index/add">
+        <section name="trackify"/>
+    </action>
+    <action name="guestwishlist/index/add">
+        <section name="trackify"/>
+    </action>
+    <action name="wishlist/index/remove">
+        <section name="trackify"/>
+    </action>
+    <action name="guestwishlist/index/remove">
+        <section name="trackify"/>
+    </action>
+    <action name="guestwishlist/index/removeProduct">
+        <section name="trackify"/>
+    </action>
+    <!-- Moving a wishlist item to the cart deletes the wishlist row, so these carry both
+         a remove_from_wishlist and an add_to_cart. -->
+    <action name="wishlist/index/cart">
+        <section name="trackify"/>
+    </action>
+    <action name="wishlist/index/allcart">
+        <section name="trackify"/>
+    </action>
+    <action name="guestwishlist/index/cart">
+        <section name="trackify"/>
+    </action>
+    <action name="guestwishlist/index/allcart">
+        <section name="trackify"/>
+    </action>
+    <action name="customer/account/loginPost">
+        <section name="trackify"/>
+    </action>
+    <action name="customer/account/logout">
+        <section name="trackify"/>
+    </action>
+    <action name="customer/ajax/login">
+        <section name="trackify"/>
+    </action>
+</config>
