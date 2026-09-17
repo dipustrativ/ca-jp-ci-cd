@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/**
+ * Boots the dataLayer reader. x-magento-init rather than an inline require() so the
+ * markup stays inert for CSP.
+ *
+ * @var Magento\Framework\View\Element\Template $block
+ */
+?>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "CarpetAvenue_Trackify/js/datalayer": {}
+        }
+    }
+</script>

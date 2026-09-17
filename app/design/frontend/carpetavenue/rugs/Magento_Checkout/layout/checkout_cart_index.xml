@@ -68,14 +68,20 @@
         </referenceContainer>
         <move element="checkout.cart.coupon" destination="cart.discount" />
 
-        <!-- Crosssell heading. Uses the default Magento_Catalog product/list/items.phtml template -->
-        <referenceBlock name="checkout.cart.crosssell">
+        <!-- Crosssell. Core's Magento_Catalog product/list/items.phtml hardcodes
+             the "More Choices:" heading and ignores block_title, so it renders
+             the module template instead — same grid, base's heading, the
+             dimension line, and no wishlist/compare links. Base sits the block
+             under the coupon form inside the left column, not full-width below
+             the cart. -->
+        <referenceBlock name="checkout.cart.crosssell"
+                        template="Evalent_CheckoutModsJP::product/list/cart-crosssell.phtml">
             <arguments>
                 <argument xsi:type="string" name="block_title">We recommend the following products:</argument>
                 <argument xsi:type="boolean" name="show_cart">true</argument>
-                <argument xsi:type="boolean" name="show_description">true</argument>
             </arguments>
         </referenceBlock>
+        <move element="checkout.cart.crosssell" destination="cart.form.after" after="cart.discount"/>
 
         <!-- NOTE: do not remove="true" this block to hide the "Estimate Shipping
              and Tax" UI. It carries the jsLayout that renders the whole

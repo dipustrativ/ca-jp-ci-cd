@@ -44,6 +44,16 @@
                 <!-- ko template: getTemplate() --><!-- /ko -->
             </div>
             <?= $block->getChildHtml('minicart.addons') ?>
+
+            <!-- Cart cross-sells. Rendered server-side into the
+                 "minicart-crosssell" customer-data section by
+                 Evalent_CheckoutModsJP, because the minicart itself is
+                 knockout-rendered and has no block of its own. -->
+            <div data-bind="scope: 'minicart_crosssell'">
+                <!-- ko if: hasItems() -->
+                <div data-bind="bindHtml: crosssellHtml"></div>
+                <!-- /ko -->
+            </div>
         </div>
     <?php else: ?>
         <?php $scriptString = <<<script
@@ -66,7 +76,14 @@ script;
         "*": {
             "Magento_Ui/js/block-loader": "<?= $block->escapeJs(
                 $block->escapeUrl($block->getViewFileUrl('images/loader-1.gif'))
-            ) ?>"
+            ) ?>",
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "minicart_crosssell": {
+                        "component": "Evalent_CheckoutModsJP/js/view/minicart-crosssell"
+                    }
+                }
+            }
         }
     }
     </script>

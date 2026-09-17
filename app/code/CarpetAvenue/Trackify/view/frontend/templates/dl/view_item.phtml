@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/**
+ * GA4 view_item. Rendered as an inert JSON blob rather than an inline push — see
+ * CarpetAvenue_Trackify/js/datalayer for why.
+ *
+ * @var Magento\Catalog\Block\Product\View $block
+ * @var CarpetAvenue\Trackify\ViewModel\DataLayer $viewModel
+ */
+
+$viewModel = $block->getData('trackify_view_model');
+$product = $block->getProduct();
+
+if (!$product || !$product->getId()) {
+    return;
+}
+
+$payload = [
+    'event' => 'view_item',
+    'ecommerce' => [
+        'currency' => $viewModel->getCurrencyCode(),
+        'value' => $viewModel->toDisplayPrice((float) $product->getFinalPrice()),
+        'items' => [$viewModel->getProductItem($product, [], true)],
+    ],
+];
+?>
+<script type="application/json" class="trackify-dl"><?= /* @noEscape */ $viewModel->toJson($payload) ?></script>

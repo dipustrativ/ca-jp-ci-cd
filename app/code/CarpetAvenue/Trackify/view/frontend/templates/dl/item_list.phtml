@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/**
+ * GA4 view_item_list, for both category and search — core points category.products.list
+ * and search_result_list at the same product/list.phtml.
+ *
+ * This blob must sit INSIDE div.products.wrapper: layered navigation replaces
+ * .column.main via innerHTML (so the blob has to be part of that markup), and infinite
+ * scroll appends whole div.products.wrapper nodes (so each appended page brings its own
+ * blob along). The click handler in datalayer.js indexes select_item off this same blob.
+ *
+ * @var Magento\Framework\View\Element\Template $block
+ * @var CarpetAvenue\Trackify\ViewModel\DataLayer $viewModel
+ */
+
+$viewModel = $block->getData('trackify_view_model');
+$listBlock = $block->getParentBlock();
+
+if (!$listBlock || !method_exists($listBlock, 'getLoadedProductCollection')) {
+    return;
+}
+
+$collection = $listBlock->getLoadedProductCollection();
+
+if (!$collection || !$collection->count()) {
+    return;
+}
+
+$listId = (string) $block->getData('list_id');
+$listName = (string) $block->getData('list_name');
+
+if ($listId === '') {
+    $category = $listBlock->getLayer()->getCurrentCategory();
+    $listId = $category ? 'category_' . $category->getId() : 'catalog';
+    $listName = $category ? (string) $category->getName() : '';
+}
+
+$payload = [
+    'event' => 'view_item_list',
+    'ecommerce' => [
+        'item_list_id' => $listId,
+        'item_list_name' => $listName,
+        'currency' => $viewModel->getCurrencyCode(),
+        'items' => $viewModel->getListItems($collection),
+    ],
+];
+?>
+<script type="application/json" class="trackify-dl"><?= /* @noEscape */ $viewModel->toJson($payload) ?></script>

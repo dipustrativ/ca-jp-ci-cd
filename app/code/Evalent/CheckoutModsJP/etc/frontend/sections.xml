@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
+    <!-- Cross-sells are derived from what is in the quote, so they go stale on
+         every cart mutation. -->
+    <action name="checkout/cart/add">
+        <section name="minicart-crosssell"/>
+    </action>
+    <action name="checkout/cart/delete">
+        <section name="minicart-crosssell"/>
+    </action>
+    <action name="checkout/cart/updatePost">
+        <section name="minicart-crosssell"/>
+    </action>
+    <action name="checkout/sidebar/removeItem">
+        <section name="minicart-crosssell"/>
+    </action>
+    <action name="checkout/sidebar/updateItemQty">
+        <section name="minicart-crosssell"/>
+    </action>
+</config>

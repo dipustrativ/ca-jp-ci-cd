@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- Child of the list block: the theme's product/list.phtml echoes it inside div.products.wrapper -->
+        <referenceBlock name="category.products.list">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="trackify.item.list"
+                   as="trackify.item.list"
+                   template="CarpetAvenue_Trackify::dl/item_list.phtml">
+                <arguments>
+                    <argument name="trackify_view_model" xsi:type="object">CarpetAvenue\Trackify\ViewModel\DataLayer</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

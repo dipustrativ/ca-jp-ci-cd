@@ -14,11 +14,23 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-    	<referenceBlock name="head.additional">
-	        <block class="CarpetAvenue\Trackify\Block\TagManager" name="carpetAvenue.trackify.tag.manager.head" template="CarpetAvenue_Trackify::head.phtml" />
-	    </referenceBlock>
-    	<referenceContainer name="after.body.start">
-		    <block class="CarpetAvenue\Trackify\Block\TagManager" name="carpetAvenue.trackify.tag.manager.body" before="-" template="CarpetAvenue_Trackify::body.phtml" />
-		</referenceContainer>
+        <referenceBlock name="head.additional">
+            <!-- before="-" so the page variables land above every other head addition, and above gtm.js -->
+            <block class="CarpetAvenue\Trackify\Block\TagManager"
+                   name="carpetAvenue.trackify.tag.manager.head"
+                   before="-"
+                   template="CarpetAvenue_Trackify::head.phtml"/>
+        </referenceBlock>
+        <referenceContainer name="after.body.start">
+            <block class="CarpetAvenue\Trackify\Block\TagManager"
+                   name="carpetAvenue.trackify.tag.manager.body"
+                   before="-"
+                   template="CarpetAvenue_Trackify::body.phtml"/>
+        </referenceContainer>
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="carpetAvenue.trackify.datalayer.init"
+                   template="CarpetAvenue_Trackify::init.phtml"/>
+        </referenceContainer>
     </body>
 </page>

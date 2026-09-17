@@ -129,20 +129,45 @@
                 }
             }
 
+            //  Anchors the discount flag to the card (blank only makes the <li>
+            //  relative, below @screen__m) and the hover lift's z-index.
+            .product-item-info {
+                position: relative;
+            }
+
             .product-item-actions {
                 display: inline-block;
+                //  Blank floats it left below @screen__m, which pulled the trash icon
+                //  out of the add-to-cart row.
+                float: none;
                 width: 40px;
 
                 .action.edit {
                     display: none;
                 }
 
-                //  \e609 is a trash can in Pe-icon-7-stroke but a hamburger in blank's
-                //  icons-blank-theme, so the family has to be named here.
-                .action.delete:before {
-                    font-family: 'Pe-icon-7-stroke';
-                    content: '\e609';
-                    font-size: 2rem;
+                //  Icon only. Luma hides the 「商品を削除する」 label; blank does not,
+                //  and in this 40px box it wrapped one character per line.
+                .action.delete {
+                    color: #757575;
+                    display: inline-block;
+                    text-decoration: none;
+
+                    &:hover {
+                        color: @ca-black;
+                    }
+
+                    > span {
+                        .lib-visually-hidden();
+                    }
+
+                    //  \e609 is a trash can in Pe-icon-7-stroke but a hamburger in
+                    //  blank's icons-blank-theme, so the family has to be named here.
+                    &:before {
+                        font-family: 'Pe-icon-7-stroke';
+                        content: '\e609';
+                        font-size: 2rem;
+                    }
                 }
             }
 
@@ -164,6 +189,47 @@
             //  「特別価格:」 — in the DOM on live but not shown.
             .price-box .price-label {
                 display: none;
+            }
+        }
+
+        //  Guest wishlist grid (1column; the account wishlist keeps its sidebar
+        //  layout). carpetavenue.jp gets fixed 250px cards from Luma + Evalent;
+        //  here blank's 240px card inside 24.439% columns and this theme's 5-up
+        //  `.page-products` grid (Magento_Catalog/_extend.less) leaked in, leaving
+        //  the content stuck to the left of wide columns. Margins are pinned so
+        //  neither grid's nth-child offsets apply.
+        &.page-products.page-layout-1column .products-grid.wishlist {
+            .product-items {
+                //  Room for the hover drawer, which is out of flow.
+                margin: 0 0 60px;
+            }
+
+            .product-item {
+                border: 0;
+                margin: 0 0 20px;
+                max-width: 250px;
+                min-width: 175px;
+                padding: 0;
+                width: 25%;
+            }
+
+            .product-item-info {
+                width: auto;
+            }
+
+            //  Blank's mobile list floats an 80px thumbnail beside the text.
+            .product-item-photo {
+                float: none;
+                margin-right: 0;
+                max-width: 100%;
+            }
+
+            .product-image-container {
+                max-width: 100%;
+            }
+
+            .price-box {
+                margin-left: 0;
             }
         }
 
@@ -232,6 +298,81 @@
             &.no-display:before {
                 color: #333;
             }
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .wishlist-index-index.page-products.page-layout-1column .products-grid.wishlist {
+        //  Cards centred in the row, as on carpetavenue.jp.
+        .product-items {
+            text-align: center;
+        }
+
+        //  3-up on tablets, as live's Luma grid; phones override below.
+        .product-item {
+            width: ~"calc((100% - 4%) / 3)";
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__s) {
+    .wishlist-index-index {
+        &.page-products.page-layout-1column .products-grid.wishlist .product-item {
+            margin: 0;
+            padding: 20px 0;
+            width: 100%;
+        }
+
+        //  No hover on a phone, so the actions stay in flow and visible. The
+        //  theme root hides every `.products-grid .product-item-inner` until
+        //  :hover (web/css/source/_extend.less).
+        .products-grid.wishlist .product-item-inner {
+            display: block;
+        }
+    }
+}
+
+//
+//  Desktop
+//  _____________________________________________
+
+//  Hover lift + drawer, from @screen__s up as on carpetavenue.jp. Live inherits
+//  this from Luma's product listing (square corners, #bbb, a 10px lift), not
+//  from the rounded catalogue card this theme uses elsewhere.
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__s) {
+    .wishlist-index-index .products-grid.wishlist .product-item-info:hover {
+        background: @color-white;
+        border: 1px solid #bbb;
+        //  Evalent's @product-item__hover__box-shadow, inlined for the same
+        //  compile-order reason as the cross-sell card (Magento_Checkout).
+        box-shadow: 0 10px 15px rgba(0, 0, 0, .1);
+        //  Cancels the padding + border, so the card grows outward without
+        //  reflowing the grid.
+        margin: -10px;
+        padding: 9px;
+        z-index: 9;
+
+        //  Add-to-cart + trash drop out of flow under the price and overlay the
+        //  card's bottom padding and border, so the two read as one box.
+        //  `left: 0` + a -1px margin and `right: -1px` land the side borders on
+        //  the card's own.
+        .product-item-inner {
+            background: @color-white;
+            border: 1px solid #bbb;
+            border-top: 0;
+            left: 0;
+            margin: 0 0 0 -1px;
+            padding: 0 9px 9px;
+            position: absolute;
+            right: -1px;
+            z-index: 2;
+        }
+
+        //  The padding moves the flag's containing block (this padding box)
+        //  9px up-left; give it back so the badge holds still.
+        .product-item__flag--discount {
+            margin: 9px 0 0 9px;
         }
     }
 }
