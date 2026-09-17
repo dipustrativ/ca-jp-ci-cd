@@ -20,13 +20,21 @@ use CarpetAvenue\Trackify\Helper\Data;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
+use Magento\Quote\Model\Quote;
+use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Quote\Model\Quote\Item as QuoteItem;
+use Magento\SalesRule\Model\RuleFactory;
+use Throwable;
 
 /**
  * Builds GA4 ecommerce payloads for the catalog pages.
  *
  * Deliberately free of any session dependency so it can be attached to full-page-cached
  * blocks; the cart, checkout and success payloads live in ViewModel\Checkout instead.
+ *
+ * The quote-based builders here take their Quote as an argument rather than reading one
+ * from a session, which keeps that rule intact and lets the checkout plugins — which run
+ * in the webapi_rest area, where no checkout session exists — reuse them unchanged.
  */
 class DataLayer implements ArgumentInterface
 {
@@ -35,7 +43,8 @@ class DataLayer implements ArgumentInterface
 
     public function __construct(
         private readonly Data $helper,
-        private readonly PriceCurrencyInterface $priceCurrency
+        private readonly PriceCurrencyInterface $priceCurrency,
+        private readonly RuleFactory $ruleFactory
     ) {
     }
 
@@ -156,6 +165,226 @@ class DataLayer implements ArgumentInterface
                 ],
             ],
         ];
+    }
+
+    /**
+     * items[] for a quote. Shared by view_cart, begin_checkout, add_shipping_info,
+     * add_payment_info and the promotion events, so the line shape cannot drift between
+     * one funnel step and the next.
+     *
+     * @param iterable $quoteItems
+     * @return array
+     */
+    public function getQuoteItems(iterable $quoteItems): array
+    {
+        $items = [];
+        $index = 0;
+
+        foreach ($quoteItems as $item) {
+            $items[] = [
+                'item_id' => (string) $item->getSku(),
+                'item_name' => (string) $item->getName(),
+                'price' => $this->getQuoteItemPrice($item),
+                'quantity' => (int) $item->getQty(),
+                'index' => $index++,
+            ];
+        }
+
+        return $items;
+    }
+
+    /**
+     * GA4 payload for a mid-funnel checkout step (add_shipping_info / add_payment_info).
+     *
+     * `value` is the sum of the items sent, matching view_cart and begin_checkout — GA4
+     * defines it as the value of the items, and it is the only figure that cannot drift
+     * depending on whether shipping has been collected by the time this runs.
+     *
+     * @param string $event
+     * @param Quote $quote
+     * @param array $extra e.g. shipping_tier / payment_type
+     * @return array
+     */
+    public function getCheckoutStepPayload(string $event, Quote $quote, array $extra = []): array
+    {
+        $items = $this->getQuoteItems($quote->getAllVisibleItems());
+
+        if (!$items) {
+            return [];
+        }
+
+        $value = 0.0;
+
+        foreach ($items as $line) {
+            $value += $line['price'] * $line['quantity'];
+        }
+
+        $ecommerce = array_merge(
+            [
+                'currency' => $quote->getQuoteCurrencyCode() ?: $this->getCurrencyCode(),
+                'value' => round($value, 2),
+            ],
+            $extra
+        );
+
+        if ($quote->getCouponCode()) {
+            $ecommerce['coupon'] = (string) $quote->getCouponCode();
+        }
+
+        $ecommerce['items'] = $items;
+
+        return ['event' => $event, 'ecommerce' => $ecommerce];
+    }
+
+    /**
+     * GA4 payload for the promotion events (select_promotion / view_promotion).
+     *
+     * A coupon is the only promotion this storefront exposes, so the coupon IS the
+     * promotion: its code becomes promotion_id and the sales rule behind it supplies the
+     * readable promotion_name, without which GA4's promotion report shows "(not set)".
+     *
+     * Returns an empty array when no coupon is on the quote, which is what makes this
+     * safe to call unconditionally from the cart and checkout templates.
+     *
+     * @param string $event
+     * @param Quote $quote
+     * @param string $slot Where it was applied — 'cart' or 'checkout'.
+     * @return array
+     */
+    public function getPromotionPayload(string $event, Quote $quote, string $slot): array
+    {
+        $coupon = trim((string) $quote->getCouponCode());
+
+        if ($coupon === '') {
+            return [];
+        }
+
+        $promotion = [
+            'promotion_id' => $coupon,
+            'promotion_name' => $this->getAppliedRuleName($quote) ?: $coupon,
+            'creative_name' => 'Coupon Code',
+            'creative_slot' => $slot,
+        ];
+
+        // GA4 reads the promotion dimensions off the items, and the ecommerce object is
+        // what the container's variables read — so both carry them.
+        $items = array_map(
+            static fn (array $line): array => array_merge($line, $promotion),
+            $this->getQuoteItems($quote->getAllVisibleItems())
+        );
+
+        if (!$items) {
+            return [];
+        }
+
+        return [
+            'event' => $event,
+            'ecommerce' => array_merge(
+                $promotion,
+                [
+                    'currency' => $quote->getQuoteCurrencyCode() ?: $this->getCurrencyCode(),
+                    'items' => $items,
+                ]
+            ),
+        ];
+    }
+
+    /**
+     * GA4 `refund` in MEASUREMENT PROTOCOL shape, built from a credit memo.
+     *
+     * Note the shape differs from every other builder here: the Measurement Protocol takes
+     * `['name' => ..., 'params' => [...]]`, not the browser dataLayer's
+     * `['event' => ..., 'ecommerce' => [...]]`. Refund is the only event this module sends
+     * server-side, so it is the only one in this form.
+     *
+     * `value` is the credit memo's own grand total rather than the sum of the items,
+     * deliberately — unlike the browser funnel events, a refund has to reverse refunded
+     * shipping and tax too, and the credit memo is the only thing that knows how much of
+     * each was actually given back. Amounts are read in order currency with no conversion:
+     * they were fixed, ceiling included, when the order was placed.
+     *
+     * @param Creditmemo $creditmemo
+     * @return array
+     */
+    public function getRefundEvent(Creditmemo $creditmemo): array
+    {
+        $order = $creditmemo->getOrder();
+
+        if (!$order || !$order->getIncrementId()) {
+            return [];
+        }
+
+        $items = [];
+
+        foreach ($creditmemo->getAllItems() as $item) {
+            $qty = (float) $item->getQty();
+
+            // Credit memos carry a zero-qty line for every order item that was not
+            // refunded, and configurable children ride along with their parent.
+            if ($qty <= 0.0 || $item->getOrderItem()?->getParentItem()) {
+                continue;
+            }
+
+            $items[] = [
+                'item_id' => (string) $item->getSku(),
+                'item_name' => (string) $item->getName(),
+                'price' => round((float) ($item->getPriceInclTax() ?: $item->getPrice()), 2),
+                'quantity' => (int) $qty,
+            ];
+        }
+
+        // GA4 reads a refund carrying no items as a reversal of the ENTIRE transaction.
+        // A credit memo with no refundable lines is the opposite of that — it is a
+        // shipping-only or adjustment-only refund — so sending it would reverse the whole
+        // order instead of the few hundred yen actually returned. There is no way to
+        // express that case in GA4's model, so it is reported as nothing at all and the
+        // caller logs it. (It also covers a credit memo raised against an uninvoiced
+        // order, which has no lines to refund in the first place.)
+        if (!$items) {
+            return [];
+        }
+
+        $params = [
+            'currency' => (string) $order->getOrderCurrencyCode(),
+            // The credit memo's own grand total, not the sum of the items: this is what
+            // reverses refunded shipping and tax as well. GA4 uses `value` for the
+            // monetary reversal and `items` for the line-level detail.
+            'value' => round((float) $creditmemo->getGrandTotal(), 2),
+            'transaction_id' => (string) $order->getIncrementId(),
+            'items' => $items,
+        ];
+
+        if ($order->getCouponCode()) {
+            $params['coupon'] = (string) $order->getCouponCode();
+        }
+
+        return ['name' => 'refund', 'params' => $params];
+    }
+
+    /**
+     * Name of the first sales rule the quote has applied.
+     *
+     * applied_rule_ids is a comma-separated list; a cart can match several rules at once
+     * (a cart price rule plus the coupon), but GA4 wants one promotion name, so the first
+     * is used and the coupon code is the caller's fallback. Never let a missing or
+     * deleted rule cost us the event.
+     *
+     * @param Quote $quote
+     * @return string
+     */
+    private function getAppliedRuleName(Quote $quote): string
+    {
+        $ruleIds = array_filter(explode(',', (string) $quote->getAppliedRuleIds()));
+
+        if (!$ruleIds) {
+            return '';
+        }
+
+        try {
+            return (string) $this->ruleFactory->create()->load((int) reset($ruleIds))->getName();
+        } catch (Throwable) {
+            return '';
+        }
     }
 
     /**

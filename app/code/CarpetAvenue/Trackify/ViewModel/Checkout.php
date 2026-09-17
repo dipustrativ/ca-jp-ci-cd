@@ -18,7 +18,6 @@ namespace CarpetAvenue\Trackify\ViewModel;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
-use Magento\Quote\Model\Quote\Item as QuoteItem;
 use Magento\Sales\Model\Order;
 
 /**
@@ -49,12 +48,7 @@ class Checkout implements ArgumentInterface
             return [];
         }
 
-        $items = [];
-        $index = 0;
-
-        foreach ($quote->getAllVisibleItems() as $item) {
-            $items[] = $this->getQuoteItem($item, $index++);
-        }
+        $items = $this->dataLayer->getQuoteItems($quote->getAllVisibleItems());
 
         if (!$items) {
             return [];
@@ -80,6 +74,32 @@ class Checkout implements ArgumentInterface
                 'items' => $items,
             ],
         ];
+    }
+
+    /**
+     * GA4 view_promotion for a coupon already sitting on the quote.
+     *
+     * select_promotion reports the ACT of applying a coupon and is queued server-side by
+     * Plugin\Quote\Coupon / Observer\ApplyCouponCart. view_promotion is the other half:
+     * the discount being on display when the cart or checkout page renders. Rendering it
+     * from the page rather than queueing it means it repeats on every view of a
+     * discounted cart, which is exactly what "viewed" should mean.
+     *
+     * Returns an empty array when no coupon is applied, so the template can call it
+     * unconditionally.
+     *
+     * @param string $slot 'cart' or 'checkout'
+     * @return array
+     */
+    public function getPromotionPayload(string $slot): array
+    {
+        try {
+            $quote = $this->checkoutSession->getQuote();
+        } catch (\Exception) {
+            return [];
+        }
+
+        return $this->dataLayer->getPromotionPayload('view_promotion', $quote, $slot);
     }
 
     /**
@@ -136,21 +156,5 @@ class Checkout implements ArgumentInterface
     public function toJson(array $payload): string
     {
         return $this->dataLayer->toJson($payload);
-    }
-
-    /**
-     * @param QuoteItem $item
-     * @param int $index
-     * @return array
-     */
-    private function getQuoteItem(QuoteItem $item, int $index): array
-    {
-        return [
-            'item_id' => (string) $item->getSku(),
-            'item_name' => (string) $item->getName(),
-            'price' => $this->dataLayer->getQuoteItemPrice($item),
-            'quantity' => (int) $item->getQty(),
-            'index' => $index,
-        ];
     }
 }

@@ -32,6 +32,12 @@
     <event name="guest_wishlist_item_delete_commit_after">
         <observer name="carpetavenue_trackify_remove_from_wishlist_guest" instance="CarpetAvenue\Trackify\Observer\RemoveFromWishlist"/>
     </event>
+    <!-- Cart-page coupon. checkout/cart/couponPost sets the code straight on the quote
+         without going through CouponManagement, so the checkout plugin never sees it.
+         postdispatch rather than a controller plugin; success is read back off the quote. -->
+    <event name="controller_action_postdispatch_checkout_cart_couponPost">
+        <observer name="carpetavenue_trackify_select_promotion_cart" instance="CarpetAvenue\Trackify\Observer\ApplyCouponCart"/>
+    </event>
     <event name="sales_quote_remove_item">
         <observer name="carpetavenue_trackify_remove_from_cart" instance="CarpetAvenue\Trackify\Observer\RemoveFromCart"/>
     </event>

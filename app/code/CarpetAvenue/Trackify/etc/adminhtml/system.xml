@@ -35,6 +35,38 @@
                     </depends>
                 </field>
             </group>
+            <group id="measurement_protocol" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Server-Side Refunds (Measurement Protocol)</label>
+                <comment><![CDATA[Refunds are raised in the admin or pushed by IXPF from the ERP, where there is no browser to fire a tag &mdash; so <b>refund</b> is the one GA4 event this store sends server-side.
+                It needs the GA4 <b>client id</b>, which is captured from the customer's <code>_ga</code> cookie when the order is placed. Orders placed before this feature was switched on, and orders from customers who declined analytics consent, carry no id and are not reported.]]></comment>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="measurement_id" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Measurement ID</label>
+                    <comment><![CDATA[The GA4 data stream's measurement ID, e.g. <b>G-8LK5BJC80N</b>. Anything that is not a valid <code>G-XXXXXXX</code> ID is ignored and nothing is sent.]]></comment>
+                    <depends>
+                        <field id="*/*/active">1</field>
+                    </depends>
+                </field>
+                <field id="api_secret" translate="label comment" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API Secret</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment><![CDATA[GA4 Admin &rarr; Data Streams &rarr; your stream &rarr; <b>Measurement Protocol API secrets</b>. Stored encrypted.]]></comment>
+                    <depends>
+                        <field id="*/*/active">1</field>
+                    </depends>
+                </field>
+                <field id="debug" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Validation Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Sends to Google's <b>/debug/mp/collect</b> endpoint, which validates the payload and logs what is wrong with it instead of recording it. <b>Nothing reaches your reports while this is on</b>, and credit memos stay unflagged so they re-send once it is switched off. Leave it <b>No</b> in production.]]></comment>
+                    <depends>
+                        <field id="*/*/active">1</field>
+                    </depends>
+                </field>
+            </group>
         </section>
     </system>
 </config>

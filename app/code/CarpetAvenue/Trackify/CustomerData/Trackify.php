@@ -38,6 +38,12 @@ class Trackify implements SectionSourceInterface
      */
     private const QUEUE_KEY = 'trackify_event_queue';
 
+    /**
+     * Last value reported per event type, so a step that the checkout re-saves does not
+     * report itself twice. See queueOnce().
+     */
+    private const GUARD_KEY = 'trackify_event_guard';
+
     public function __construct(
         private readonly CustomerSession $customerSession,
         private readonly SessionManager $session,
@@ -75,6 +81,43 @@ class Trackify implements SectionSourceInterface
         // __call, so static analysis cannot see it. It is the framework's own idiom.
         /** @phpstan-ignore-next-line */
         $this->session->setData(self::QUEUE_KEY, $queue);
+    }
+
+    /**
+     * Queue a payload only when the thing it describes has actually changed.
+     *
+     * The mid-funnel checkout steps are re-saved constantly and would otherwise report a
+     * GA4 event every time. Mageplaza OSC calls saveAddressInformation() on practically
+     * every field change, and PaymentInformationManagement::savePaymentInformation()
+     * calls PaymentMethodManagement::set() a second time at place-order with the same
+     * method — so add_payment_info would double-count on every single order.
+     *
+     * Keying on the value rather than suppressing outright keeps the events that SHOULD
+     * repeat: a customer who switches from one shipping method or payment method to
+     * another gets a second, correct event.
+     *
+     * @param string $key Event name, e.g. 'add_shipping_info'.
+     * @param string $value The thing that must change for a re-report, e.g. the method code.
+     * @param array $payload
+     * @return void
+     */
+    public function queueOnce(string $key, string $value, array $payload): void
+    {
+        if ($payload === []) {
+            return;
+        }
+
+        $guard = (array) $this->session->getData(self::GUARD_KEY);
+
+        if (($guard[$key] ?? null) === $value) {
+            return;
+        }
+
+        $guard[$key] = $value;
+        /** @phpstan-ignore-next-line */
+        $this->session->setData(self::GUARD_KEY, $guard);
+
+        $this->queue($payload);
     }
 
     /**
