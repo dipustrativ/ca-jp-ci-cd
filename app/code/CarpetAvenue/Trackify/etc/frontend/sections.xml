@@ -57,6 +57,39 @@
     <action name="guestwishlist/index/allcart">
         <section name="trackify"/>
     </action>
+    <!-- Cart-page coupon form (full POST + redirect). -->
+    <action name="checkout/cart/couponPost">
+        <section name="trackify"/>
+    </action>
+    <!-- Checkout is driven entirely over REST, so the mid-funnel steps have to invalidate
+         on the REST routes rather than on controller actions. Wildcards are how Magento
+         matches these client-side (Magento_Customer/js/section-config); Mageplaza OSC's
+         own sections.xml uses the same form. -->
+    <action name="rest/*/V1/carts/*/coupons/*">
+        <section name="trackify"/>
+    </action>
+    <action name="rest/*/V1/guest-carts/*/coupons/*">
+        <section name="trackify"/>
+    </action>
+    <action name="rest/*/V1/carts/*/shipping-information">
+        <section name="trackify"/>
+    </action>
+    <action name="rest/*/V1/guest-carts/*/shipping-information">
+        <section name="trackify"/>
+    </action>
+    <action name="rest/*/V1/carts/*/selected-payment-method">
+        <section name="trackify"/>
+    </action>
+    <action name="rest/*/V1/guest-carts/*/selected-payment-method">
+        <section name="trackify"/>
+    </action>
+    <!-- Mageplaza OSC's own route; it calls saveAddressInformation() internally. -->
+    <action name="rest/*/V1/carts/*/checkout-information">
+        <section name="trackify"/>
+    </action>
+    <action name="rest/*/V1/guest-carts/*/checkout-information">
+        <section name="trackify"/>
+    </action>
     <action name="customer/account/loginPost">
         <section name="trackify"/>
     </action>

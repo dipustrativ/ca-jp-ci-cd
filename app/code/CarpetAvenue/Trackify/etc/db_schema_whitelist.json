@@ -1,0 +1,12 @@
+{
+    "sales_order": {
+        "column": {
+            "trackify_client_id": true
+        }
+    },
+    "sales_creditmemo": {
+        "column": {
+            "trackify_refund_sent_at": true
+        }
+    }
+}

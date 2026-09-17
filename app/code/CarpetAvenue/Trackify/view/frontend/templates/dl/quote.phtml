@@ -17,15 +17,27 @@
  * with the name passed in from layout. Both pages are cacheable="false" in core, so the
  * quote can be read straight here.
  *
+ * Also emits view_promotion when a coupon is already applied. That is the counterpart to
+ * select_promotion, which is queued server-side the moment a coupon is APPLIED
+ * (Plugin\Quote\Coupon / Observer\ApplyCouponCart); this one reports the discount being
+ * on display, so it repeats on every view of a discounted cart. Two separate blobs rather
+ * than one — datalayer.js drains every blob on the page, and GA4 needs them as distinct
+ * events with their own ecommerce object.
+ *
  * @var Magento\Framework\View\Element\Template $block
  * @var CarpetAvenue\Trackify\ViewModel\Checkout $viewModel
  */
 
 $viewModel = $block->getData('trackify_view_model');
-$payload = $viewModel->getQuotePayload((string) $block->getData('event_name'));
+$eventName = (string) $block->getData('event_name');
 
-if (!$payload) {
-    return;
-}
+$payloads = [
+    $viewModel->getQuotePayload($eventName),
+    $viewModel->getPromotionPayload($eventName === 'view_cart' ? 'cart' : 'checkout'),
+];
 ?>
-<script type="application/json" class="trackify-dl"><?= /* @noEscape */ $viewModel->toJson($payload) ?></script>
+<?php foreach ($payloads as $payload): ?>
+    <?php if ($payload): ?>
+        <script type="application/json" class="trackify-dl"><?= /* @noEscape */ $viewModel->toJson($payload) ?></script>
+    <?php endif; ?>
+<?php endforeach; ?>

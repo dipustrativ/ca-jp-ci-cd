@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * Two columns, both for the server-side GA4 refund.
+ *
+ * GA4's Measurement Protocol will not attribute an event without a client_id, and by the
+ * time a refund happens the customer's browser is long gone — so the id has to be taken
+ * off the _ga cookie at order placement and kept on the order.
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="sales_order">
+        <column xsi:type="varchar" name="trackify_client_id" nullable="true" length="64"
+                comment="GA4 client id from the _ga cookie, captured at order placement"/>
+    </table>
+    <table name="sales_creditmemo">
+        <!-- Written only after Google accepts the event, so a failed send retries on the
+             next save and a re-saved credit memo never reports the refund twice. -->
+        <column xsi:type="timestamp" name="trackify_refund_sent_at" nullable="true"
+                comment="When the GA4 refund was accepted by the Measurement Protocol"/>
+    </table>
+</schema>

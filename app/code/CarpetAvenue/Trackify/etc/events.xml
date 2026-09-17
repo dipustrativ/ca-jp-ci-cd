@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ *
+ * This source file is subject to the Carpet Avenue GmbH license
+ *
+ * GLOBAL, not area-specific, and both bindings need to be.
+ *
+ * An order is placed over REST (webapi_rest) by the storefront, and from the admin grid;
+ * a credit memo is raised in adminhtml, through the Sales API, and by the IXPF Syncer's
+ * ERP endpoints. Binding either of these to a single area would miss most of the traffic.
+ *
+ * @category  Marketing
+ * @package   CarpetAvenue_Trackify
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- Fires before the order is saved, so the client id persists with its own insert. -->
+    <event name="sales_model_service_quote_submit_before">
+        <observer name="carpetavenue_trackify_capture_client_id" instance="CarpetAvenue\Trackify\Observer\CaptureClientId"/>
+    </event>
+    <!-- commit_after, not sales_order_creditmemo_refund: that one fires inside the still
+         open refund transaction, so a rollback would report money that was never returned. -->
+    <event name="sales_order_creditmemo_save_commit_after">
+        <observer name="carpetavenue_trackify_report_refund" instance="CarpetAvenue\Trackify\Observer\ReportRefund"/>
+    </event>
+</config>
