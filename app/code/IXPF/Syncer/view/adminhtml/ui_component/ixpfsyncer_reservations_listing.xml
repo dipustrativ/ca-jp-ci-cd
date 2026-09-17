@@ -105,8 +105,13 @@
                 <dataScope>reservation_status</dataScope>
             </settings>
         </column>
+        <!-- No `component="…/columns/select"` here on purpose. That component renders
+             a cell by looking its value up in the options list, but the class below
+             has already swapped the value for a coloured HTML badge, so the lookup
+             misses and the cell comes out blank. The select *filter* still works:
+             it is driven by <filter> and <options>, not by the component. -->
         <column name="request_status" class="IXPF\Syncer\Ui\Component\Listing\Column\ReservationStatus"
-                component="Magento_Ui/js/grid/columns/select" sortOrder="90">
+                sortOrder="90">
             <settings>
                 <options class="IXPF\Syncer\Model\Source\ReservationStatus"/>
                 <label translate="true">Request Status</label>

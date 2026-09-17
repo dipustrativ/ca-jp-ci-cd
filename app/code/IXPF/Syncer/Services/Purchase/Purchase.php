@@ -226,6 +226,41 @@ class Purchase
                     ? $product['store_values']
                     : [];
 
+                // stock_source is either a single source code ("default") paired with the
+                // top-level qty, or a list of {source, qty} pairs. Normalise both to a list
+                // of ['sources' => code, 'qty' => int] entries; 'qty' stays unset when the
+                // payload omits it so assignMSI() keeps the source item's current quantity.
+                $sourceInfo = [];
+                if (is_array($stockSource)) {
+                    foreach ($stockSource as $stock) {
+                        if (!is_array($stock)) {
+                            // Plain list of codes: ["hamburg", "tokyo"]
+                            $stock = ['source' => $stock];
+                        }
+                        // IXPF sends the per-entry key as "stock_source"; "source" is accepted too.
+                        $sourceCode = trim((string)($stock['source'] ?? $stock['stock_source'] ?? ''));
+                        if ($sourceCode === '') {
+                            continue;
+                        }
+                        $entry = ['sources' => $sourceCode];
+                        if (isset($stock['qty'])) {
+                            $entry['qty'] = intval($stock['qty']);
+                        }
+                        $sourceInfo[] = $entry;
+                    }
+
+                    // No top-level qty with a per-source list: record their sum on the item.
+                    if ($purchaseQty === 0) {
+                        $purchaseQty = array_sum(array_column($sourceInfo, 'qty'));
+                    }
+                } elseif (trim((string)$stockSource) !== '') {
+                    $entry = ['sources' => trim((string)$stockSource)];
+                    if ($purchaseQty > 0) {
+                        $entry['qty'] = $purchaseQty;
+                    }
+                    $sourceInfo[] = $entry;
+                }
+
                 // Create the purchase order item record (initial state)
                 $purchaseOrderItem = [
                     'purchase_order_id' => $purchaseOrderId,
@@ -240,11 +275,6 @@ class Purchase
                     'attribute_data' => json_encode($product),
                     'ongoing_create' => $ongoing ? 1 : 0,
                 ];
-
-                $sourceInfo = ['sources' => $stockSource];
-                if ($purchaseQty > 0) {
-                    $sourceInfo['qty'] = $purchaseQty;
-                }
 
                 try {
                     $behavior = 'create';
@@ -374,10 +404,26 @@ class Purchase
             $this->fixCategoryPositions((int)$product->getId(), $productData['category_ids']);
         }
 
-        // Assign MSI source items (non-fatal: log and continue on failure)
-        if (isset($purchaseInfo['sources'])) {
+        // Assign MSI source items (non-fatal: log and continue on failure).
+        // A single ['sources' => ...] map is still accepted for callers that pass one source.
+        $sources = isset($purchaseInfo['sources']) ? [$purchaseInfo] : $purchaseInfo;
+
+        // "default" is only cleared when the payload itself doesn't assign it — otherwise a
+        // later non-default source would delete the default qty this same batch just wrote.
+        $keepDefault = false;
+        foreach ($sources as $source) {
+            if (isset($source['sources']) && trim(strtolower((string)$source['sources'])) === 'default') {
+                $keepDefault = true;
+                break;
+            }
+        }
+
+        foreach ($sources as $source) {
+            if (!isset($source['sources'])) {
+                continue;
+            }
             try {
-                $this->assignMSI($product, $purchaseInfo);
+                $this->assignMSI($product, $source, !$keepDefault);
             } catch (Exception $exception) {
                 $this->purchaseLogger->writeExceptionDaily($exception);
                 $this->purchaseLogger->writeDaily(
@@ -424,10 +470,11 @@ class Purchase
     /**
      * @param Product $product
      * @param array $purchaseInfo
+     * @param bool $removeDefault Clear the "default" source item when assigning a specific source
      * @return void
      * @throws Exception
      */
-    private function assignMSI(Product $product, array $purchaseInfo = []): void
+    private function assignMSI(Product $product, array $purchaseInfo = [], bool $removeDefault = true): void
     {
         if (!isset($purchaseInfo['sources'])) {
             throw new Exception('No source defined for MSI assignment');
@@ -435,7 +482,11 @@ class Purchase
 
         try {
             $sku = $product->getSku();
-            $sourceCode = trim(strtolower($purchaseInfo['sources']));
+            $sourceCode = trim(strtolower((string)$purchaseInfo['sources']));
+
+            if ($sourceCode === '') {
+                throw new Exception('Empty source code for MSI assignment');
+            }
 
             $sourceItem = $this->getStockSourceItem($sourceCode, $sku);
 
@@ -450,8 +501,9 @@ class Purchase
 
             $this->sourceItemsSaveInterface->execute([$sourceItem]);
 
-            // Remove from the "default" source when a specific source is used.
-            if ($sourceCode !== 'default') {
+            // Remove from the "default" source when a specific source is used — unless the
+            // same payload also assigns "default" (see updateOrCreateProduct).
+            if ($removeDefault && $sourceCode !== 'default') {
                 $defaultSourceItem = $this->getStockSourceItem('default', $sku);
                 $this->sourceItemsDelete->execute([$defaultSourceItem]);
                 // Evict the cached "default" entry since it no longer exists.

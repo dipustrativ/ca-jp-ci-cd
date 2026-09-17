@@ -40,7 +40,7 @@ Key behaviours:
   translations (name/description text + select/multiselect option labels).
 - `categories` paths are resolved to category ids (creating missing levels) and
   merged into `category_ids`.
-- MSI stock is assigned from `stock_source` + `qty`.
+- MSI stock is assigned from `stock_source` + `qty` — single source or a per-source list.
 - `special_price = 0` clears the special price (set to `null`).
 - Each product is wrapped independently: one failing SKU does not abort the batch.
 
@@ -141,8 +141,8 @@ Invalid/missing token → error response.
 | `categories` | CSV of path strings | `"A/B/C,A/D"` — resolved to ids (missing levels created), merged into `category_ids`. |
 | `website_ids` | CSV string | Comma list of website ids. |
 | `store_ids` | CSV string | Used to decide url_key generation (see rules). Not written as an attribute. |
-| `stock_source` | string | MSI source code for the qty. |
-| `qty` / `qty_ordered` | int | Stock quantity for the source. |
+| `stock_source` | string _or_ array | MSI source code for the qty, or a list of `{"stock_source": "<code>", "qty": <int>}` objects for multi-source stock. See [MSI stock assignment](#msi-stock-assignment). |
+| `qty` / `qty_ordered` | int | Stock quantity for the source. Ignored when `stock_source` is a list (each entry carries its own `qty`). |
 | `special_price` | float | `0` → cleared (`null`). |
 | `ongoing_create` | int (0/1) | Marks the purchase item `ready_for_ongoing`. |
 | `<attribute_code>` | mixed | Any product EAV attribute. Select/multiselect accept **option labels** (comma-separated for multiselect); missing options are created at store 0. |
@@ -160,6 +160,39 @@ Invalid/missing token → error response.
   from seo/google-feed category name + name + dimensions + sku.
 - **Update immutables** — on an existing SKU, `sku`, `ean_barcode`, `tepp_barcode`
   are not overwritten.
+
+### MSI Stock Assignment
+
+`stock_source` takes two shapes:
+
+```json
+"stock_source": "wh_tokyo", "qty": 3
+```
+
+```json
+"stock_source": [
+  { "stock_source": "hamburg", "qty": 3 },
+  { "stock_source": "tokyo",   "qty": 5 }
+]
+```
+
+Rules:
+
+- The per-entry source key may be `stock_source` (what IXPF sends) or `source`.
+  A plain list of codes — `["hamburg", "tokyo"]` — is also accepted; those entries
+  carry no `qty`, so existing quantities are kept.
+
+- Each entry writes one `inventory_source_item` row; `status` is `1` when its qty
+  is `> 0`, otherwise `0`.
+- **Omitting `qty`** (both shapes) keeps the source item's **current** quantity —
+  it is not reset to `0`. Send `"qty": 0` explicitly to zero a source.
+- Entries with an empty or missing `source` are skipped.
+- The **`default`** source item is deleted when a specific source is assigned —
+  *unless* the same payload also assigns `default`, in which case it is kept.
+- With the list shape and no top-level `qty`, the purchase order item records the
+  **sum** of the per-source quantities.
+- MSI failures are **non-fatal**: logged to the daily purchase log, the product
+  save still counts as success.
 
 ### Response
 
