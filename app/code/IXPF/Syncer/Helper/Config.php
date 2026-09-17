@@ -34,6 +34,11 @@ class Config extends AbstractHelper
 
     const XML_PATH_PURCHASE_ROOT_CATEGORY_ID    = 'ixpfng_purchase/purchase/root_category_id';
 
+    const XML_PATH_RESERVATION_ENABLED      = 'ixpfng_reservation/general/enabled';
+    const XML_PATH_RESERVATION_INBOUND_ENABLED = 'ixpfng_reservation/general/inbound_enabled';
+    const XML_PATH_RESERVATION_MAX_ATTEMPTS = 'ixpfng_reservation/general/max_attempts';
+    const XML_PATH_RESERVATION_DISPATCH_LIMIT = 'ixpfng_reservation/general/dispatch_limit';
+
     const XML_PATH_REVIEWS_ENABLED          = 'ixpf_reviews/general/enabled';
     const XML_PATH_REVIEWS_SHOW_ON_FRONTEND = 'ixpf_reviews/general/show_on_frontend';
     const XML_PATH_REVIEWS_PER_PAGE         = 'ixpf_reviews/general/per_page';
@@ -42,6 +47,9 @@ class Config extends AbstractHelper
 
     const DEFAULT_WEBHOOK_DISPATCH_LIMIT    = 50;
     const DEFAULT_WEBHOOK_PARALLEL_WORKERS  = 4;
+
+    const DEFAULT_RESERVATION_MAX_ATTEMPTS   = 10;
+    const DEFAULT_RESERVATION_DISPATCH_LIMIT = 50;
 
     const DEFAULT_REVIEWS_PER_PAGE          = 10;
     const DEFAULT_REVIEWS_WARN_THRESHOLD    = 2000;
@@ -169,6 +177,44 @@ class Config extends AbstractHelper
     {
         $value = (int)$this->scopeConfig->getValue(self::XML_PATH_PURCHASE_ROOT_CATEGORY_ID);
         return $value > 0 ? $value : self::DEFAULT_PURCHASE_ROOT_CATEGORY_ID;
+    }
+
+    /**
+     * Master switch for the outbound reservation webhook (placement and lifecycle).
+     * Off by default — nothing is sent until it is turned on deliberately.
+     */
+    public function isReservationEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_RESERVATION_ENABLED);
+    }
+
+    /**
+     * Whether the inbound endpoint may write source item quantities.
+     *
+     * Separate from the outbound switch on purpose: IXPF can be allowed to push
+     * adjustments before we start emitting reservations, and vice versa.
+     */
+    public function isReservationInboundEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_RESERVATION_INBOUND_ENABLED);
+    }
+
+    /**
+     * Give-up threshold for a reservation batch.
+     */
+    public function getReservationMaxAttempts(): int
+    {
+        $value = (int)$this->scopeConfig->getValue(self::XML_PATH_RESERVATION_MAX_ATTEMPTS);
+        return $value > 0 ? $value : self::DEFAULT_RESERVATION_MAX_ATTEMPTS;
+    }
+
+    /**
+     * Batches a single cron tick will send.
+     */
+    public function getReservationDispatchLimit(): int
+    {
+        $value = (int)$this->scopeConfig->getValue(self::XML_PATH_RESERVATION_DISPATCH_LIMIT);
+        return $value > 0 ? $value : self::DEFAULT_RESERVATION_DISPATCH_LIMIT;
     }
 
     /**

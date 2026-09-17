@@ -22,6 +22,53 @@
         </constraint>
     </table>
 
+    <!-- Append-only audit trail of every reservation exchanged with IXPF, both directions.
+         Two independent status columns: reservation_status is the business lifecycle stage
+         (what goes out as `status` in the payload), request_status is HTTP delivery state. -->
+    <table name="ixpf_reservations" engine="innodb" comment="IXPF stock reservations, both directions">
+        <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="batch_id" length="40" nullable="false" comment="Groups every row of one request, outbound or inbound"/>
+        <column xsi:type="varchar" name="direction" length="16" nullable="false" comment="outbound = sent to IXPF, inbound = received from IXPF"/>
+        <column xsi:type="bigint" name="order_id" unsigned="true" nullable="true" comment="sales_order.entity_id, outbound only"/>
+        <column xsi:type="varchar" name="sku" length="64" nullable="false"/>
+        <column xsi:type="varchar" name="stock_source" length="64" nullable="false" comment="inventory_source.source_code"/>
+        <column xsi:type="decimal" name="qty" scale="4" precision="12" nullable="false" default="0" comment="Signed. Negative removes stock, positive returns it"/>
+        <column xsi:type="varchar" name="reservation_type" length="16" nullable="false" comment="decrement / increment, derived from the sign of qty"/>
+        <column xsi:type="varchar" name="reservation_status" length="16" nullable="false" comment="Lifecycle stage sent to IXPF: pending / completed / cancelled / refunded"/>
+        <column xsi:type="varchar" name="event_ref" length="64" nullable="true" comment="Dedup key for the triggering event, example creditmemo entity_id"/>
+        <column xsi:type="varchar" name="request_status" length="16" nullable="false" comment="Delivery state: pending / processing / success / failed / applied"/>
+        <column xsi:type="text" name="information" nullable="true" comment="IXPF message when success is false, or the local error"/>
+        <column xsi:type="text" name="payload" nullable="true" comment="JSON body sent or received"/>
+        <column xsi:type="text" name="response" nullable="true" comment="Raw IXPF response, outbound only"/>
+        <column xsi:type="int" name="attempts" unsigned="true" nullable="false" default="0"/>
+        <column xsi:type="datetime" name="created_at" default="CURRENT_TIMESTAMP" on_update= "false"/>
+        <column xsi:type="datetime" name="updated_at" default="CURRENT_TIMESTAMP" on_update="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="IXPF_RESERVATIONS_BATCH_ID" indexType="btree">
+            <column name="batch_id"/>
+        </index>
+        <!-- Drives the dispatch and retry crons' claim query. -->
+        <index referenceId="IXPF_RESERVATIONS_STATUS_DIRECTION" indexType="btree">
+            <column name="request_status"/>
+            <column name="direction"/>
+        </index>
+        <!-- Serves both the lifecycle replay lookup and the "already sent this status?" guard. -->
+        <index referenceId="IXPF_RESERVATIONS_ORDER_STATUS" indexType="btree">
+            <column name="order_id"/>
+            <column name="reservation_status"/>
+        </index>
+        <index referenceId="IXPF_RESERVATIONS_SKU_SOURCE" indexType="btree">
+            <column name="sku"/>
+            <column name="stock_source"/>
+        </index>
+        <index referenceId="IXPF_RESERVATIONS_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
+    </table>
+
     <table name="ixpf_purchases_batch" engine="innodb" comment="Ixpf purchases batch">
         <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true"/>
         <column xsi:type="varchar" name="purchase_id" nullable="false" />

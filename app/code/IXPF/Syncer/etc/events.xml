@@ -3,8 +3,17 @@
     <event name="sales_model_service_quote_submit_before">
         <observer name="ixpf_syncer_quote_submit_before" instance="IXPF\Syncer\Observer\QuoteSubmitBefore" />
     </event>
+    <!-- Reservations. Placement runs source selection once; every later stage replays
+         what it recorded, so IXPF is always told about the same warehouse. -->
+    <event name="sales_model_service_quote_submit_success">
+        <observer name="ixpf_syncer_reservation_place" instance="IXPF\Syncer\Observer\ReservationPlace" />
+    </event>
+    <event name="order_cancel_after">
+        <observer name="ixpf_syncer_reservation_cancel" instance="IXPF\Syncer\Observer\ReservationCancel" />
+    </event>
     <event name="sales_order_save_after">
         <observer name="ixpf_syncer_order_save_webhook" instance="IXPF\Syncer\Observer\OrderSaveWebhook" />
+        <observer name="ixpf_syncer_reservation_complete" instance="IXPF\Syncer\Observer\ReservationComplete" />
     </event>
     <event name="sales_order_invoice_save_after">
         <observer name="ixpf_syncer_invoice_save_webhook" instance="IXPF\Syncer\Observer\InvoiceSaveWebhook" />
@@ -14,6 +23,7 @@
     </event>
     <event name="sales_order_creditmemo_save_after">
         <observer name="ixpf_syncer_creditmemo_save_webhook" instance="IXPF\Syncer\Observer\CreditmemoSaveWebhook" />
+        <observer name="ixpf_syncer_reservation_refund" instance="IXPF\Syncer\Observer\ReservationRefund" />
     </event>
     <event name="customer_save_after">
         <observer name="ixpf_syncer_customer_save_webhook" instance="IXPF\Syncer\Observer\CustomerSaveWebhook" />

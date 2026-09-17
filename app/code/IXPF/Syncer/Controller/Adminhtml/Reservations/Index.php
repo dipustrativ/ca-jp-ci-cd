@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace IXPF\Syncer\Controller\Adminhtml\Reservations;
+
+use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\View\Result\Page;
+use Magento\Framework\View\Result\PageFactory;
+
+class Index extends Action
+{
+    const ADMIN_RESOURCE = 'IXPF_Syncer::reservations';
+
+    public function __construct(
+        Context $context,
+        protected PageFactory $pageFactory
+    ) {
+        parent::__construct($context);
+    }
+
+    public function execute(): Page
+    {
+        $page = $this->pageFactory->create();
+        $page->setActiveMenu('Magento_Backend::system');
+        $page->getConfig()->getTitle()->prepend(__('IXPF Stock Reservations'));
+
+        return $page;
+    }
+}

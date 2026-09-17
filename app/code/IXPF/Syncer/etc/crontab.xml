@@ -16,6 +16,16 @@
         <job name="ixpf_webhook_failed_job_dispatch" instance="IXPF\Syncer\Cron\WebhookFailedJobDispatch" method="execute">
             <schedule>*/10 * * * *</schedule>
         </job>
+
+        <!-- Owns every reservation batch left pending: the fire-and-forget write
+             never opened, IXPF never acknowledged and the batch was released, or
+             the order was created somewhere no observer ran. -->
+        <job name="ixpf_reservation_pending_dispatch" instance="IXPF\Syncer\Cron\ReservationDispatch" method="execute">
+            <schedule>*/1 * * * *</schedule>
+        </job>
+        <job name="ixpf_reservation_retry" instance="IXPF\Syncer\Cron\ReservationRetry" method="execute">
+            <schedule>*/1 * * * *</schedule>
+        </job>
         <!--<job name="ixpf_purchase_product_create_and_response_to_ixpf" instance="IXPF\Syncer\Cron\Purchase" method="execute">
             <schedule>*/1 * * * *</schedule>
         </job>-->

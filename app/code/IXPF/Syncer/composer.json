@@ -8,6 +8,10 @@
     "magento/module-webapi": "*",
     "magento/module-catalog": "*",
     "magento/module-store": "*",
+    "magento/module-inventory-api": "*",
+    "magento/module-inventory-indexer": "*",
+    "magento/module-inventory-source-selection-api": "*",
+    "magento/module-inventory-catalog-api": "*",
     "google/cloud-storage": "^1.48"
   },
   "autoload": {

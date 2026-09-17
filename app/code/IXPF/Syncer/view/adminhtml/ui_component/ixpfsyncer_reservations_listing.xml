@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">ixpfsyncer_reservations_listing.ixpfsyncer_reservations_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>ixpfsyncer_reservations_listing.ixpfsyncer_reservations_listing_data_source</dep>
+        </deps>
+        <spinner>ixpfsyncer_reservations_columns</spinner>
+    </settings>
+
+    <dataSource name="ixpfsyncer_reservations_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">entity_id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>IXPF_Syncer::reservations</aclResource>
+        <dataProvider name="ixpfsyncer_reservations_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>entity_id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="ixpfsyncer_reservations_columns">
+        <column name="entity_id" sortOrder="10">
+            <settings>
+                <label translate="true">ID</label>
+                <filter>textRange</filter>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="order_id" sortOrder="20">
+            <settings>
+                <label translate="true">Order ID</label>
+                <filter>textRange</filter>
+                <dataScope>order_id</dataScope>
+            </settings>
+        </column>
+        <column name="direction" component="Magento_Ui/js/grid/columns/select" sortOrder="30">
+            <settings>
+                <options class="IXPF\Syncer\Model\Source\ReservationDirection"/>
+                <label translate="true">Direction</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <dataScope>direction</dataScope>
+            </settings>
+        </column>
+        <column name="sku" sortOrder="40">
+            <settings>
+                <label translate="true">SKU</label>
+                <filter>text</filter>
+                <dataScope>sku</dataScope>
+            </settings>
+        </column>
+        <column name="stock_source" sortOrder="50">
+            <settings>
+                <label translate="true">Source</label>
+                <filter>text</filter>
+                <dataScope>stock_source</dataScope>
+            </settings>
+        </column>
+        <column name="qty" sortOrder="60">
+            <settings>
+                <label translate="true">Qty</label>
+                <filter>textRange</filter>
+                <dataScope>qty</dataScope>
+            </settings>
+        </column>
+        <column name="reservation_type" sortOrder="70">
+            <settings>
+                <label translate="true">Type</label>
+                <filter>text</filter>
+                <dataScope>reservation_type</dataScope>
+            </settings>
+        </column>
+        <!-- Lifecycle stage. Distinct from Request Status below: this is what IXPF
+             was told, that is whether the telling succeeded. -->
+        <column name="reservation_status" component="Magento_Ui/js/grid/columns/select" sortOrder="80">
+            <settings>
+                <options class="IXPF\Syncer\Model\Source\ReservationLifecycleStatus"/>
+                <label translate="true">Reservation Status</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <dataScope>reservation_status</dataScope>
+            </settings>
+        </column>
+        <column name="request_status" class="IXPF\Syncer\Ui\Component\Listing\Column\ReservationStatus"
+                component="Magento_Ui/js/grid/columns/select" sortOrder="90">
+            <settings>
+                <options class="IXPF\Syncer\Model\Source\ReservationStatus"/>
+                <label translate="true">Request Status</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <dataScope>request_status</dataScope>
+            </settings>
+        </column>
+        <column name="attempts" sortOrder="100">
+            <settings>
+                <label translate="true">Attempts</label>
+                <filter>textRange</filter>
+                <dataScope>attempts</dataScope>
+            </settings>
+        </column>
+        <column name="information" sortOrder="110">
+            <settings>
+                <label translate="true">Information</label>
+                <filter>text</filter>
+                <dataScope>information</dataScope>
+            </settings>
+        </column>
+        <column name="batch_id" sortOrder="120">
+            <settings>
+                <label translate="true">Batch</label>
+                <filter>text</filter>
+                <dataScope>batch_id</dataScope>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date" sortOrder="130">
+            <settings>
+                <label translate="true">Created At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>created_at</dataScope>
+            </settings>
+        </column>
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date" sortOrder="140">
+            <settings>
+                <label translate="true">Updated At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>updated_at</dataScope>
+            </settings>
+        </column>
+    </columns>
+</listing>

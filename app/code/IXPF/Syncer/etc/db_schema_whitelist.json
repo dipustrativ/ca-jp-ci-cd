@@ -1,0 +1,265 @@
+{
+    "ixpf_webhook_jobs": {
+        "column": {
+            "entity_id": true,
+            "type": true,
+            "object_id": true,
+            "payload": true,
+            "last_response": true,
+            "trigger_status": true,
+            "total_trigger": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "IXPF_WEBHOOK_JOBS_TYPE_OBJECT_ID": true
+        }
+    },
+    "ixpf_reservations": {
+        "column": {
+            "entity_id": true,
+            "batch_id": true,
+            "direction": true,
+            "order_id": true,
+            "sku": true,
+            "stock_source": true,
+            "qty": true,
+            "reservation_type": true,
+            "reservation_status": true,
+            "event_ref": true,
+            "request_status": true,
+            "information": true,
+            "payload": true,
+            "response": true,
+            "attempts": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "IXPF_RESERVATIONS_BATCH_ID": true,
+            "IXPF_RESERVATIONS_REQUEST_STATUS_DIRECTION": true,
+            "IXPF_RESERVATIONS_ORDER_ID_RESERVATION_STATUS": true,
+            "IXPF_RESERVATIONS_SKU_STOCK_SOURCE": true,
+            "IXPF_RESERVATIONS_CREATED_AT": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ixpf_purchases_batch": {
+        "column": {
+            "entity_id": true,
+            "purchase_id": true,
+            "batch_id": true,
+            "products": true,
+            "status": true,
+            "ixpf_response": true,
+            "magento_response": true,
+            "exception": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ixpf_photo_studio_queue": {
+        "column": {
+            "entity_id": true,
+            "type": true,
+            "object_id": true,
+            "payload": true,
+            "response_result": true,
+            "ixpf_response": true,
+            "status": true,
+            "retry_count": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ixpf_photo_studio_bucket_images": {
+        "column": {
+            "entity_id": true,
+            "photo_studio_queue_id": true,
+            "bucket_image_path": true,
+            "status": true,
+            "error_message": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ixpf_purchase_orders": {
+        "column": {
+            "entity_id": true,
+            "purchase_name": true,
+            "ixpf_purchase_id": true,
+            "ixpf_payload": true,
+            "process_status": true,
+            "product_count": true,
+            "process_success_count": true,
+            "process_failed_count": true,
+            "process_response": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ixpf_purchase_order_items": {
+        "column": {
+            "entity_id": true,
+            "purchase_order_id": true,
+            "ixpf_purchase_id": true,
+            "behavior": true,
+            "sku": true,
+            "name": true,
+            "qty": true,
+            "price": true,
+            "cost": true,
+            "process_status": true,
+            "attribute_data": true,
+            "ongoing_create": true,
+            "error_message": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ixpf_order_api_activity": {
+        "column": {
+            "entity_id": true,
+            "activity_type": true,
+            "resource": true,
+            "reference_id": true,
+            "status": true,
+            "message": true,
+            "created_at": true
+        },
+        "index": {
+            "IXPF_ORDER_API_ACTIVITY_ACTIVITY_TYPE": true,
+            "IXPF_ORDER_API_ACTIVITY_RESOURCE": true,
+            "IXPF_ORDER_API_ACTIVITY_CREATED_AT": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ixpf_product_bulk_update_queue": {
+        "column": {
+            "entity_id": true,
+            "store_id": true,
+            "ixpf_batch_id": true,
+            "payload": true,
+            "response_result": true,
+            "ixpf_response": true,
+            "status": true,
+            "error_message": true,
+            "attempts": true,
+            "meta_data": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ixpf_review_group": {
+        "column": {
+            "review_group": true,
+            "review_count": true,
+            "with_text_count": true,
+            "review_average": true,
+            "dist_1": true,
+            "dist_2": true,
+            "dist_3": true,
+            "dist_4": true,
+            "dist_5": true,
+            "avg_quality": true,
+            "avg_delivery": true,
+            "avg_customer_service": true,
+            "group_label": true,
+            "generated_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ixpf_review": {
+        "column": {
+            "entity_id": true,
+            "review_id": true,
+            "review_group": true,
+            "payload_hash": true,
+            "sku": true,
+            "rating": true,
+            "rating_quality": true,
+            "rating_delivery": true,
+            "rating_customer_service": true,
+            "reviewer": true,
+            "created_at": true,
+            "purchased_at": true,
+            "source": true,
+            "source_locale": true,
+            "source_store_code": true,
+            "bought_name": true,
+            "bought_variant_text": true,
+            "thumbnail_path": true,
+            "thumbnail_local": true,
+            "has_photos": true,
+            "reply_author": true,
+            "reply_created_at": true
+        },
+        "index": {
+            "IXPF_REVIEW_REVIEW_GROUP_CREATED_AT": true,
+            "IXPF_REVIEW_REVIEW_GROUP_RATING_CREATED_AT": true,
+            "IXPF_REVIEW_REVIEW_GROUP_HAS_PHOTOS_CREATED_AT": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "IXPF_REVIEW_REVIEW_ID": true,
+            "IXPF_REVIEW_REVIEW_GROUP_IXPF_REVIEW_GROUP_REVIEW_GROUP": true
+        }
+    },
+    "ixpf_review_text": {
+        "column": {
+            "review_entity_id": true,
+            "locale": true,
+            "body": true,
+            "reply_body": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "IXPF_REVIEW_TEXT_REVIEW_ENTITY_ID_IXPF_REVIEW_ENTITY_ID": true
+        }
+    },
+    "ixpf_review_photo": {
+        "column": {
+            "entity_id": true,
+            "review_entity_id": true,
+            "bucket_path": true,
+            "local_path": true,
+            "width": true,
+            "height": true,
+            "position": true,
+            "downloaded_at": true
+        },
+        "index": {
+            "IXPF_REVIEW_PHOTO_REVIEW_ENTITY_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "IXPF_REVIEW_PHOTO_REVIEW_ENTITY_ID_IXPF_REVIEW_ENTITY_ID": true
+        }
+    }
+}

@@ -13,6 +13,16 @@
                 <root_category_id>1</root_category_id>
             </purchase>
         </ixpfng_purchase>
+        <!-- Both switches default off: nothing is sent to IXPF and no source item is
+             written until each side is turned on deliberately. -->
+        <ixpfng_reservation>
+            <general>
+                <enabled>1</enabled>
+                <inbound_enabled>0</inbound_enabled>
+                <max_attempts>10</max_attempts>
+                <dispatch_limit>50</dispatch_limit>
+            </general>
+        </ixpfng_reservation>
         <ixpf_reviews>
             <general>
                 <enabled>0</enabled>
