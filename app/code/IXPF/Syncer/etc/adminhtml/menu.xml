@@ -50,7 +50,7 @@
              resource="IXPF_Syncer::order_api_activity"/>
 
         <add id="IXPF_Syncer::reservations"
-             title="Stock Reservations"
+             title="IXPF Stock Reservations"
              module="IXPF_Syncer"
              sortOrder="52"
              parent="IXPF_Syncer::ixpf_syncer"

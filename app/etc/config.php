@@ -371,6 +371,7 @@ return [
         'CarpetAvenue_Orderify' => 1,
         'Evalent_InvoicePaymentMods' => 1,
         'CarpetAvenue_Proforma' => 1,
+        'CarpetAvenue_ReservationsFix' => 1,
         'CarpetAvenue_ThemeContent' => 1,
         'CarpetAvenue_Trackify' => 1,
         'CarpetAvenue_Utilities' => 1,

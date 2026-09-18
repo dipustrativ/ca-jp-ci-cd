@@ -404,6 +404,15 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[Allows POST /ixpfsyncer/V1_Reservations/Apply to add to or subtract from source item quantities. Independent of the switch above.]]></comment>
                 </field>
+                <field id="auto_assign_source" translate="label comment" type="select" sortOrder="25" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Assign Missing Sources Automatically</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[When an inbound adjustment names a source the SKU is not assigned to, create the assignment at qty 0 and apply the adjustment on top. The reservation row records that the source was missing and was assigned on IXPF's request. Off means the line is rejected instead. The source itself is never created.]]></comment>
+                    <depends>
+                        <field id="inbound_enabled">1</field>
+                    </depends>
+                </field>
                 <field id="max_attempts" translate="label comment" type="text" sortOrder="30" showInDefault="1"
                        showInWebsite="0" showInStore="0">
                     <label>Max Send Attempts</label>

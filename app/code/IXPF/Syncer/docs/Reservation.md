@@ -3,7 +3,7 @@
 **Version:** 1.0
 **Module:** IXPF_Syncer
 **Feature:** Two-way stock reservation sync between Magento and IXPF
-**Last Updated:** September 17, 2026
+**Last Updated:** September 18, 2026
 
 ---
 
@@ -76,9 +76,13 @@ resolved now — is a `skipped` row written instead.
 - `ixpfng/general/shop_object_id`, `ixpfng/product/webhook_url` and
   `ixpfng/product/secret_code` set — the reservation webhook reuses the product
   webhook endpoint.
-- The SKUs involved must already be assigned to the sources involved. Neither
-  direction creates a source item; use
-  [AssignSource](../../SyncerMsi/docs/AssignSource.md) for that.
+- The sources involved must exist and be enabled. Neither direction creates a
+  source — a warehouse missing from `inventory_source` is a configuration gap.
+- The SKUs involved should already be assigned to those sources. The **inbound**
+  endpoint will create a missing sku-source assignment itself when
+  [Assign Missing Sources Automatically](#missing-source-assignments) is on;
+  the outbound flow never does. To assign in bulk ahead of time use
+  [AssignSource](../../SyncerMsi/docs/AssignSource.md).
 
 ---
 
@@ -90,6 +94,7 @@ resolved now — is a `skipped` row written instead.
 |---|---|---|---|
 | Send Reservations to IXPF | `ixpfng_reservation/general/enabled` | `0` | Master switch for the outbound flow, placement and lifecycle |
 | Accept Adjustments from IXPF | `ixpfng_reservation/general/inbound_enabled` | `0` | Allows the inbound endpoint to write source item quantities |
+| Assign Missing Sources Automatically | `ixpfng_reservation/general/auto_assign_source` | `1` | Lets an inbound adjustment create the sku-source assignment it needs — see [Missing source assignments](#missing-source-assignments) |
 | Max Send Attempts | `ixpfng_reservation/general/max_attempts` | `10` | Attempts before a batch is given up on |
 | Batches Per Cron Run | `ixpfng_reservation/general/dispatch_limit` | `50` | Batches one cron tick will send |
 
@@ -409,7 +414,8 @@ reported in `failed` and **does not stop the others**.
 | Check | Failure reason |
 |---|---|
 | Source exists and is enabled | `Source '<code>' not found` |
-| SKU has a source item on that source | `SKU not assigned to source '<code>'` |
+| SKU has a source item on that source | `SKU not assigned to source '<code>'` — **only when auto-assign is off**, see below |
+| SKU exists in the catalogue | `SKU not assigned to source '<code>' and not found in the catalog, so the source could not be assigned automatically` |
 | `current + qty >= 0` | `Adjustment would drive quantity negative (...)` |
 | `qty != 0` | `qty must not be zero` |
 | `sku` and `source` present | `sku and source are required` |
@@ -417,6 +423,46 @@ reported in `failed` and **does not stop the others**.
 A negative result is **rejected, not clamped**. A negative physical quantity is a
 data bug, and flooring it at zero would hide the divergence between the two
 systems instead of surfacing it.
+
+### Missing source assignments
+
+IXPF is the system of record for which warehouse holds a carpet. When it names a
+source the SKU is not assigned to, that is usually an assignment Magento is
+missing rather than a bad request — so with
+`ixpfng_reservation/general/auto_assign_source` on (the default) the endpoint
+**creates the assignment at qty 0 and applies the adjustment on top**, instead of
+rejecting the line.
+
+Three things it deliberately will not do:
+
+| Situation | Outcome |
+|---|---|
+| The source itself is unknown or disabled | Rejected, `Source '<code>' not found`. A warehouse is configuration, not something an adjustment may invent |
+| The SKU is not in the catalogue | Rejected. MSI stores a source item for an unknown SKU happily, and the orphan row no index reads is worse than a refusal |
+| The adjustment is negative | Rejected, and **nothing is assigned**. Being told to take stock off a source the SKU never had is a divergence to surface, not a new assignment. The row reads `SKU <sku> is not stocked at source '<code>' and IXPF asked to remove <n> from it. The source was NOT assigned and no quantity was changed.` |
+
+What happened is recorded on the row, because the reservation table is the only
+place that says the assignment was Magento's doing rather than part of the
+catalogue already:
+
+```
+information: SKU VAN211069 was not stocked at source tokyo (no source item
+             existed). IXPF sent a stock update for tokyo, so Magento added
+             VAN211069 to that source and set its quantity to 1. Requested by
+             IXPF, not entered by an admin.
+```
+
+Read it as three facts: **the link did not exist**, **IXPF asked for it**, and
+**the quantity it ended up with**. `qty_after` in the response is the same
+number.
+
+The same line in the response carries `source_assigned: true` and the identical
+text in `note`. Both keys appear **only** on lines this happened to, so an
+ordinary line keeps the shape it has always had. Each auto-assignment is also
+written to `var/log/ixpf/reservation/reservation-<date>.log`.
+
+Turn the setting off to get the old behaviour — the line is rejected with
+`SKU not assigned to source '<code>'` and nothing is created.
 
 ### Response
 
@@ -432,6 +478,16 @@ systems instead of surfacing it.
     { "sku": "sku101", "source": "hamburg", "qty": -1, "qty_before": 10, "qty_after": 9 }
   ],
   "failed": []
+}
+```
+
+**A line whose source had to be assigned first** carries two extra keys:
+
+```json
+{
+  "sku": "VAN211069", "source": "tokyo", "qty": 1, "qty_before": 0, "qty_after": 1,
+  "source_assigned": true,
+  "note": "SKU VAN211069 was not stocked at source tokyo (no source item existed). IXPF sent a stock update for tokyo, so Magento added VAN211069 to that source and set its quantity to 1. Requested by IXPF, not entered by an admin."
 }
 ```
 
@@ -543,6 +599,9 @@ Logs: `var/log/ixpf/reservation/reservation-<date>.log`, exceptions under
 | `completed` never sent | The order never reached state `complete` |
 
 | Inbound returns 404 | Slash form of the URL — use `V1_Reservations` |
+| A source item appeared that nobody created by hand | An inbound adjustment auto-assigned it. The row's `information` names the SKU and source and says IXPF asked for it |
+| Inbound rejects with "not found in the catalog" | The SKU does not exist in Magento at all — auto-assign only creates the link, never the product |
+| Inbound rejects a negative qty on an unassigned source | Intended. Nothing is assigned on a negative adjustment; check whether IXPF's warehouse or Magento's assignment is the stale one |
 | Salable qty did not move after an inbound write | Check `cataloginventory/indexer/strategy` is `sync`, not `async` |
 
 The webhook secret is stripped from stored error messages and Slack alerts, so

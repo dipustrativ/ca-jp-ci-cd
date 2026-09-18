@@ -36,6 +36,7 @@ class Config extends AbstractHelper
 
     const XML_PATH_RESERVATION_ENABLED      = 'ixpfng_reservation/general/enabled';
     const XML_PATH_RESERVATION_INBOUND_ENABLED = 'ixpfng_reservation/general/inbound_enabled';
+    const XML_PATH_RESERVATION_AUTO_ASSIGN_SOURCE = 'ixpfng_reservation/general/auto_assign_source';
     const XML_PATH_RESERVATION_MAX_ATTEMPTS = 'ixpfng_reservation/general/max_attempts';
     const XML_PATH_RESERVATION_DISPATCH_LIMIT = 'ixpfng_reservation/general/dispatch_limit';
 
@@ -197,6 +198,21 @@ class Config extends AbstractHelper
     public function isReservationInboundEnabled(): bool
     {
         return $this->scopeConfig->isSetFlag(self::XML_PATH_RESERVATION_INBOUND_ENABLED);
+    }
+
+    /**
+     * Whether an inbound adjustment may create the source item it needs.
+     *
+     * IXPF is the system of record for which warehouse holds a carpet, so a SKU
+     * it names at a source it does not yet have there is normally a link Magento
+     * is missing rather than a bad request. With this on, the link is created at
+     * qty 0 and the adjustment applied on top; the reservation row says so in
+     * `information`. The source itself is never invented — only the sku-source
+     * assignment.
+     */
+    public function isReservationAutoAssignSourceEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_RESERVATION_AUTO_ASSIGN_SOURCE);
     }
 
     /**
