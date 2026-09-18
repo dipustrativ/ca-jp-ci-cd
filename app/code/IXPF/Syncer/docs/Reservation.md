@@ -380,6 +380,7 @@ X-Auth-Token: Bearer <your_magento_integration_token>
 
 ```json
 {
+  "idempotency_key": "ixpf-2026-09-18-9f3c",
   "products": [
     { "sku": "sku101", "qty": -1, "source": "hamburg" }
   ]
@@ -388,6 +389,7 @@ X-Auth-Token: Bearer <your_magento_integration_token>
 
 | Field | Type | Required | Description |
 |---|---|---|---|
+| `idempotency_key` | `string` | no | Single-use. Max 128 chars. A second request carrying a key already seen is refused with **409** and nothing is written — see below |
 | `products` | `array` | yes | Must be non-empty |
 | `products[].sku` | `string` | yes | Must already be assigned to `source` |
 | `products[].qty` | `float` | yes | **Signed and relative.** Negative removes stock, positive returns it. Must not be zero |
@@ -396,6 +398,49 @@ X-Auth-Token: Bearer <your_magento_integration_token>
 > **This endpoint is delta-adjust**: `new = current + qty`. Note the two other
 > conventions in this codebase — `SyncerMsi` `TransferSource` writes absolute
 > totals and `AssignSource` writes `0`.
+
+### Idempotency
+
+`idempotency_key` makes a request replay-safe. Send one per logical adjustment
+and reuse it on every retry of *that* adjustment — a timeout, a dropped
+connection, anything where the answer was not seen.
+
+This matters here specifically because the endpoint is **delta-adjust**. A
+replayed batch is not a no-op the way an absolute write would be: `qty: -1` sent
+twice takes two off. The key is what makes the second send harmless.
+
+| Situation | Result |
+|---|---|
+| Key not sent | Request is processed. No replay protection — old behaviour, unchanged |
+| Key new | Claimed, request processed normally. The response is the ordinary 200 / 422 |
+| Key already used | **409**, nothing recorded and nothing applied |
+| Key empty, blank, or not a string | **422**, `idempotency_key must be a non-empty string when supplied.` |
+| Key over 128 characters | **422**. Rejected rather than truncated — a cut key would collide with any other key sharing its first 128 characters |
+
+**A key is single-use whatever the outcome was.** A batch that failed does not
+release its key: the 422 is a considered answer, and repeating the identical
+request would fail identically. Fix the data and send a **new** key.
+
+The claim is written before anything else, so a duplicate leaves no rows behind
+and can never half-apply. Two concurrent retries of one key race on a unique
+index (`ixpf_reservation_idempotency`), so exactly one wins.
+
+**Duplicate — HTTP 409**
+
+```json
+{
+  "success": false,
+  "message": "Duplicate request: idempotency_key 'ixpf-2026-09-18-9f3c' was already taken. Nothing was applied. Send a new key to submit a new adjustment.",
+  "idempotency_key": "ixpf-2026-09-18-9f3c",
+  "original_batch_id": "res_68c9f1a2b3c4d5.67890123",
+  "original_received_at": "2026-09-18 12:14:18"
+}
+```
+
+`original_batch_id` is the batch the key was first claimed for — look it up in
+the reservations grid to see what that request actually did. Keys are also kept
+on the rows themselves in `ixpf_reservations.idempotency_key` (a hidden grid
+column, filterable).
 
 ### What it changes
 
@@ -508,6 +553,8 @@ Turn the setting off to get the old behaviour — the line is rejected with
 }
 ```
 
+**Duplicate `idempotency_key` — HTTP 409**, see *Idempotency* above.
+
 **Disabled in configuration — HTTP 422**, **bad or missing token / unexpected
 error — HTTP 500**, both as `{"success": false, "message": "..."}`.
 
@@ -521,7 +568,10 @@ rows `applied` and some `failed` rather than one status for the lot.
 curl -sk -X POST "https://<store-domain>/ixpfsyncer/V1_Reservations/Apply" \
   -H 'X-Auth-Token: Bearer <token>' \
   -H 'Content-Type: application/json' \
-  -d '{"products":[{"sku":"sku101","qty":-1,"source":"hamburg"}]}'
+  -d '{"idempotency_key":"ixpf-2026-09-18-9f3c","products":[{"sku":"sku101","qty":-1,"source":"hamburg"}]}'
+
+# Same key again -> 409, nothing applied
+
 ```
 
 ---
@@ -558,6 +608,20 @@ An order accumulates one batch at placement plus one per lifecycle event.
 
 ---
 
+## The ixpf_reservation_idempotency table
+
+One row per inbound request that carried an `idempotency_key`: the key, the
+`batch_id` it was claimed for, and when. `idempotency_key` is UNIQUE, and that
+index is the whole mechanism — the INSERT *is* the claim, so concurrent retries
+cannot both get through the way a SELECT-then-INSERT check would allow.
+
+It is separate from `ixpf_reservations` because uniqueness is per *request* and
+that table holds one row per *product line*, so the constraint cannot live
+there. Rows are never deleted: a key is a request's identity, and forgetting one
+would let an old retry through.
+
+---
+
 ## Field Reference
 
 | Column | Type | Description |
@@ -572,6 +636,7 @@ An order accumulates one batch at placement plus one per lifecycle event.
 | `reservation_type` | `varchar(16)` | `decrement` or `increment`, derived from the sign |
 | `reservation_status` | `varchar(16)` | Lifecycle stage — see above |
 | `event_ref` | `varchar(64)` | Dedup key for the triggering event, e.g. credit memo id |
+| `idempotency_key` | `varchar(128)` | Inbound only. The key the caller sent, null when none was sent. Uniqueness lives in `ixpf_reservation_idempotency`, not here — a request is one row per product line |
 | `request_status` | `varchar(16)` | Delivery state — see above |
 | `information` | `text` | IXPF's message on rejection, or the local error |
 | `payload` | `text` | JSON body sent or received |

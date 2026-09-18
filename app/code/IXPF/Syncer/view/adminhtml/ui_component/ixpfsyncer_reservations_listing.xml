@@ -141,6 +141,16 @@
                 <dataScope>batch_id</dataScope>
             </settings>
         </column>
+        <!-- Inbound only. Hidden by default: it answers "was this request a
+             duplicate" rather than anything about the stock movement itself. -->
+        <column name="idempotency_key" sortOrder="125">
+            <settings>
+                <label translate="true">Idempotency Key</label>
+                <filter>text</filter>
+                <dataScope>idempotency_key</dataScope>
+                <visible>false</visible>
+            </settings>
+        </column>
         <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date"
                 component="Magento_Ui/js/grid/columns/date" sortOrder="130">
             <settings>

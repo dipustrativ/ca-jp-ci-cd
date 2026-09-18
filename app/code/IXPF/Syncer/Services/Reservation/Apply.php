@@ -6,6 +6,7 @@ namespace IXPF\Syncer\Services\Reservation;
 
 use IXPF\Syncer\Helper\Config;
 use IXPF\Syncer\Helper\Logger\ReservationLogger;
+use IXPF\Syncer\Helper\Webhook;
 use IXPF\Syncer\Model\IxpfReservation;
 use IXPF\Syncer\Model\ResourceModel\IxpfReservation as ReservationResource;
 use Magento\Framework\App\ResourceConnection;
@@ -44,6 +45,7 @@ class Apply
         private readonly ResourceConnection $resourceConnection,
         private readonly ReservationResource $reservationResource,
         private readonly Config $config,
+        private readonly Webhook $webhook,
         private readonly ReservationLogger $logger
     ) {
     }
@@ -208,6 +210,10 @@ class Apply
             }
         }
 
+        // Outside the save try/catch on purpose: a webhook bookkeeping failure
+        // must not turn lines that were written into reported failures.
+        $this->queueInventoryWebhook($applied);
+
         $this->recordOutcome($applied, $failed);
 
         return [
@@ -219,6 +225,50 @@ class Apply
             'applied' => $this->shapeForResponse($applied),
             'failed' => $this->shapeForResponse($failed),
         ];
+    }
+
+    /**
+     * Queue an `inventory` webhook job per product whose stock this batch moved.
+     *
+     * The mview route already reaches the same place — the DB triggers on
+     * inventory_source_item fill inventory_cl, cron reindexes, and
+     * SyncerMsi's InventoryIndexerPlugin calls updateOrCreateJob('inventory')
+     * — but only on the next cron tick, and only while the indexer stays on
+     * Update by Schedule. Writing the row here makes the job exist the moment
+     * the adjustment lands. `type` + `object_id` is unique, so the two routes
+     * upsert the same row rather than queueing the product twice.
+     *
+     * @param array<int, array<string, mixed>> $applied
+     */
+    private function queueInventoryWebhook(array $applied): void
+    {
+        if (!$applied) {
+            return;
+        }
+
+        try {
+            $productIds = $this->getProductIds(array_unique(array_column($applied, 'sku')));
+
+            if ($productIds) {
+                $this->webhook->updateOrCreateJob('inventory', $productIds);
+            }
+        } catch (Throwable $e) {
+            $this->logger->writeExceptionDaily($e, 'Reservation apply webhook queue exception');
+        }
+    }
+
+    /**
+     * @param array<int, string> $skus
+     * @return array<int, int>
+     */
+    private function getProductIds(array $skus): array
+    {
+        $connection = $this->resourceConnection->getConnection();
+        $select = $connection->select()
+            ->from($this->resourceConnection->getTableName('catalog_product_entity'), ['entity_id'])
+            ->where('sku IN (?)', $skus);
+
+        return array_map('intval', $connection->fetchCol($select));
     }
 
     /**

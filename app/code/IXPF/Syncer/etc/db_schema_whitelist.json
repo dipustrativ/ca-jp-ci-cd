@@ -28,6 +28,7 @@
             "reservation_type": true,
             "reservation_status": true,
             "event_ref": true,
+            "idempotency_key": true,
             "request_status": true,
             "information": true,
             "payload": true,
@@ -41,10 +42,23 @@
             "IXPF_RESERVATIONS_REQUEST_STATUS_DIRECTION": true,
             "IXPF_RESERVATIONS_ORDER_ID_RESERVATION_STATUS": true,
             "IXPF_RESERVATIONS_SKU_STOCK_SOURCE": true,
-            "IXPF_RESERVATIONS_CREATED_AT": true
+            "IXPF_RESERVATIONS_CREATED_AT": true,
+            "IXPF_RESERVATIONS_IDEMPOTENCY_KEY": true
         },
         "constraint": {
             "PRIMARY": true
+        }
+    },
+    "ixpf_reservation_idempotency": {
+        "column": {
+            "entity_id": true,
+            "idempotency_key": true,
+            "batch_id": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "IXPF_RESERVATION_IDEMPOTENCY_IDEMPOTENCY_KEY": true
         }
     },
     "ixpf_purchases_batch": {

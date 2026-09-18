@@ -21,10 +21,24 @@ class Recorder
     }
 
     /**
+     * A batch id, for a caller that needs one before the rows exist.
+     *
+     * The inbound endpoint claims its idempotency key against the batch id
+     * before writing anything, so the id has to be mintable up front.
+     */
+    public static function generateBatchId(): string
+    {
+        return uniqid('res_', true);
+    }
+
+    /**
      * Write a batch and return its id.
      *
      * @param array<int, array{sku: string, qty: float, source: string}> $lines
      *        Quantities are signed by the caller: negative removes stock.
+     * @param string|null $idempotencyKey Inbound only — the key the caller sent, kept
+     *        on the rows so the grid shows which request produced them.
+     * @param string|null $batchId Pass one already generated; otherwise a new one is minted.
      */
     public function record(
         string $direction,
@@ -33,9 +47,11 @@ class Recorder
         array $lines,
         ?string $eventRef = null,
         string $requestStatus = IxpfReservation::REQUEST_PENDING,
-        ?string $information = null
+        ?string $information = null,
+        ?string $idempotencyKey = null,
+        ?string $batchId = null
     ): string {
-        $batchId = uniqid('res_', true);
+        $batchId = $batchId ?? self::generateBatchId();
 
         if (!$lines) {
             return $batchId;
@@ -54,6 +70,7 @@ class Recorder
                 'reservation_type' => IxpfReservation::typeForQty($qty),
                 'reservation_status' => $reservationStatus,
                 'event_ref' => $eventRef,
+                'idempotency_key' => $idempotencyKey,
                 'request_status' => $requestStatus,
                 'information' => $information,
                 'attempts' => 0,

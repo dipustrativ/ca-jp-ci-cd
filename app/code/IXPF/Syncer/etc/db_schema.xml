@@ -36,6 +36,7 @@
         <column xsi:type="varchar" name="reservation_type" length="16" nullable="false" comment="decrement / increment, derived from the sign of qty"/>
         <column xsi:type="varchar" name="reservation_status" length="16" nullable="false" comment="Lifecycle stage sent to IXPF: pending / completed / cancelled / refunded"/>
         <column xsi:type="varchar" name="event_ref" length="64" nullable="true" comment="Dedup key for the triggering event, example creditmemo entity_id"/>
+        <column xsi:type="varchar" name="idempotency_key" length="128" nullable="true" comment="Caller-supplied key of the request that created the row, inbound only"/>
         <column xsi:type="varchar" name="request_status" length="16" nullable="false" comment="Delivery state: pending / processing / success / failed / applied"/>
         <column xsi:type="text" name="information" nullable="true" comment="IXPF message when success is false, or the local error"/>
         <column xsi:type="text" name="payload" nullable="true" comment="JSON body sent or received"/>
@@ -67,6 +68,28 @@
         <index referenceId="IXPF_RESERVATIONS_CREATED_AT" indexType="btree">
             <column name="created_at"/>
         </index>
+        <index referenceId="IXPF_RESERVATIONS_IDEMPOTENCY_KEY" indexType="btree">
+            <column name="idempotency_key"/>
+        </index>
+    </table>
+
+    <!-- One row per inbound request that carried an idempotency_key. Separate from
+         ixpf_reservations because the uniqueness is per request and that table holds
+         one row per product line, so the constraint cannot live there. The INSERT is
+         the claim: two concurrent retries of the same key race on this unique index
+         and exactly one wins, which a SELECT-then-INSERT check could not guarantee. -->
+    <table name="ixpf_reservation_idempotency" engine="innodb" comment="Claimed inbound reservation idempotency keys">
+        <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="idempotency_key" length="128" nullable="false" comment="Caller-supplied key, unique across inbound requests"/>
+        <column xsi:type="varchar" name="batch_id" length="40" nullable="false" comment="ixpf_reservations.batch_id the key was first claimed for"/>
+        <column xsi:type="datetime" name="created_at" default="CURRENT_TIMESTAMP" on_update="false"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="IXPF_RESERVATION_IDEMPOTENCY_KEY_UNIQUE">
+            <column name="idempotency_key"/>
+        </constraint>
     </table>
 
     <table name="ixpf_purchases_batch" engine="innodb" comment="Ixpf purchases batch">

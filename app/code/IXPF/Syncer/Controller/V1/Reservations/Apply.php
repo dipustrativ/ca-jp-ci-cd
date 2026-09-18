@@ -10,6 +10,7 @@ use IXPF\Syncer\Helper\Logger\ReservationLogger;
 use IXPF\Syncer\Helper\TokenValidator;
 use IXPF\Syncer\Model\IxpfReservation;
 use IXPF\Syncer\Services\Reservation\Apply as ApplyService;
+use IXPF\Syncer\Services\Reservation\IdempotencyGuard;
 use IXPF\Syncer\Services\Reservation\Recorder;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -30,10 +31,15 @@ use Throwable;
  * segments and ActionList maps `_` to `\`, so the slash form used by some of the
  * older docs in this module 302s and never reaches a controller.
  *
- *   {"products":[{"sku":"sku101","qty":-1,"source":"hamburg"}]}
+ *   {"idempotency_key":"ixpf-9f3c","products":[{"sku":"sku101","qty":-1,"source":"hamburg"}]}
  *
  * qty is signed and relative: negative removes stock from that source, positive
  * returns it.
+ *
+ * idempotency_key is optional but single-use: a second request carrying a key
+ * already seen is refused with 409 and nothing is written. Because qty is
+ * relative, replaying a batch moves the stock again rather than landing on the
+ * same number, so a retry of a request that did go through has to be caught.
  */
 class Apply extends AbstractController implements HttpPostActionInterface, CsrfAwareActionInterface
 {
@@ -44,6 +50,7 @@ class Apply extends AbstractController implements HttpPostActionInterface, CsrfA
         private readonly Config $config,
         private readonly ApplyService $applyService,
         private readonly Recorder $recorder,
+        private readonly IdempotencyGuard $idempotencyGuard,
         private readonly ReservationLogger $logger
     ) {
         parent::__construct($context, $tokenValidator, $resultFactory);
@@ -75,10 +82,62 @@ class Apply extends AbstractController implements HttpPostActionInterface, CsrfA
                 ], 422);
             }
 
+            $idempotencyKey = $payload['idempotency_key'] ?? null;
+
+            if ($idempotencyKey !== null && (!is_string($idempotencyKey) || trim($idempotencyKey) === '')) {
+                return $this->jsonResponse([
+                    'success' => false,
+                    'message' => 'idempotency_key must be a non-empty string when supplied.',
+                ], 422);
+            }
+
+            $idempotencyKey = $idempotencyKey === null ? null : trim($idempotencyKey);
+
+            // Rejected rather than truncated: a key cut to fit the column would
+            // collide with a different request that shares its first 128 chars.
+            if ($idempotencyKey !== null && mb_strlen($idempotencyKey) > IdempotencyGuard::MAX_LENGTH) {
+                return $this->jsonResponse([
+                    'success' => false,
+                    'message' => sprintf(
+                        'idempotency_key must be %d characters or fewer.',
+                        IdempotencyGuard::MAX_LENGTH
+                    ),
+                ], 422);
+            }
+
             $this->logger->writeDaily('Inbound reservation: ' . json_encode($payload));
 
+            $batchId = Recorder::generateBatchId();
+
+            // Claimed before anything is recorded or applied, so a duplicate
+            // leaves no rows behind and cannot half-apply.
+            if ($idempotencyKey !== null) {
+                $original = $this->idempotencyGuard->claim($idempotencyKey, $batchId);
+
+                if ($original !== null) {
+                    $this->logger->writeDaily(sprintf(
+                        'Inbound reservation rejected: idempotency_key %s already used by batch %s at %s',
+                        $idempotencyKey,
+                        $original['batch_id'],
+                        $original['created_at']
+                    ));
+
+                    return $this->jsonResponse([
+                        'success' => false,
+                        'message' => sprintf(
+                            "Duplicate request: idempotency_key '%s' was already taken."
+                                . ' Nothing was applied. Send a new key to submit a new adjustment.',
+                            $idempotencyKey
+                        ),
+                        'idempotency_key' => $idempotencyKey,
+                        'original_batch_id' => $original['batch_id'],
+                        'original_received_at' => $original['created_at'],
+                    ], 409);
+                }
+            }
+
             // Record before applying, so a crash mid-write still leaves a trace.
-            $batchId = $this->recordIncoming($payload['products']);
+            $this->recordIncoming($payload['products'], $batchId, $idempotencyKey);
 
             $result = $this->applyService->execute($payload['products'], $batchId);
 
@@ -106,7 +165,7 @@ class Apply extends AbstractController implements HttpPostActionInterface, CsrfA
      *
      * @param array<int, mixed> $products
      */
-    private function recordIncoming(array $products): string
+    private function recordIncoming(array $products, string $batchId, ?string $idempotencyKey): string
     {
         $lines = [];
         foreach ($products as $product) {
@@ -124,7 +183,12 @@ class Apply extends AbstractController implements HttpPostActionInterface, CsrfA
             IxpfReservation::DIRECTION_INBOUND,
             IxpfReservation::RESERVATION_PENDING,
             null,
-            $lines
+            $lines,
+            null,
+            IxpfReservation::REQUEST_PENDING,
+            null,
+            $idempotencyKey,
+            $batchId
         );
     }
 
