@@ -38,5 +38,16 @@
                 <gid>0</gid>
             </payment_icons>
         </orderify>
+        <payment>
+            <!--
+                Adyen 10 defaults adyen_cc/title to "Cards" and Adapter::getTitle()
+                returns it untranslated, so the ja_JP storefront showed the English
+                string. Live sets this per-environment in core_config_data; keeping
+                it here ships the label with the repo.
+            -->
+            <adyen_cc>
+                <title>クレジットカード</title>
+            </adyen_cc>
+        </payment>
     </default>
 </config>
