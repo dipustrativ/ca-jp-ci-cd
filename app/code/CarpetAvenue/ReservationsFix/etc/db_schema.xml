@@ -1,0 +1,19 @@
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="carpet_inventory_move">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="varchar" name="sku" nullable="false" length="50" comment="sku"/>
+        <column xsi:type="varchar" name="source_from" nullable="false" length="50" comment="Move from source"/>
+        <column xsi:type="varchar" name="source_to" nullable="false" length="50" comment="Move to source"/>
+        <column xsi:type="decimal" name="quantity" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Quantity to move"/>
+        <column xsi:type="varchar" name="increment_id" nullable="false" length="50" comment="Order increment id"/>
+        <column xsi:type="boolean" name="processed" nullable="false" default="false" comment="True if processed"/>
+        <column xsi:type="text" name="process_status" nullable="true" comment="If and how move was processed"/>
+        <column xsi:type="int" name="stock_id" nullable="true" default="0" comment="In what stock order is placed"/>
+        <column xsi:type="int" name="object_id" nullable="true" default="0" comment="Object entity id"/>
+        <column xsi:type="timestamp" name="created_at" nullable="true" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="true" default="CURRENT_TIMESTAMP" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+</schema>

@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+        <section id="catalog">
+            <group id="reservationsfix" showInWebsite="1" showInStore="1" showInDefault="1" translate="label" sortOrder="1000">
+                <label>Reservations Fix</label>
+                <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInStore="0" showInWebsite="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[This fix the issue with reservations and saleable quantity calculations between websites
+                    with different sales channels]]></comment>
+                </field>
+                <field id="enabled_stock" translate="label" type="select" sortOrder="10" showInDefault="1" showInStore="0" showInWebsite="0">
+                    <label>Enabled for stock</label>
+                    <source_model>CarpetAvenue\ReservationsFix\Model\SourceModel\InventoryStock</source_model>
+                    <comment><![CDATA[For which stock should the function base on]]></comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="calculate_precise_qty_to_reserve" translate="label" type="select" sortOrder="11" showInDefault="1" showInStore="0" showInWebsite="0">
+                    <label>Calculate precise quantity to reserver</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Smart calculates the exact amount that needs to be reserved. If disabled fully ordered quantity will be reserved.]]></comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="calculate_precise_qty_to_move" translate="label" type="select" sortOrder="12" showInDefault="1" showInStore="0" showInWebsite="0">
+                    <label>Calculate precise quantity to move</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Smart calculates the exact amount that needs to be moved. If disabled fully ordered quantity will be moved.]]></comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="from_source" translate="label" type="select" sortOrder="20" showInDefault="1" showInStore="0" showInWebsite="0">
+                    <label>From Source</label>
+                    <source_model>CarpetAvenue\ReservationsFix\Model\SourceModel\InventorySource</source_model>
+                    <comment><![CDATA[From which source should the stock move from]]></comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="to_source" translate="label" type="select" sortOrder="30" showInDefault="1" showInStore="0" showInWebsite="0">
+                    <label>To Source</label>
+                    <source_model>CarpetAvenue\ReservationsFix\Model\SourceModel\InventorySource</source_model>
+                    <comment><![CDATA[From which source should the stock move to]]></comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="website_remove_enable" translate="label" type="select" sortOrder="40" showInDefault="1" showInStore="0" showInWebsite="0">
+                    <label>Remove unique carpets from websites</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Remove unique carpets from websites in stock not configuerd in enabled stock]]></comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="auto_fix_enabled" translate="label" type="select" sortOrder="50" showInDefault="1" showInStore="0" showInWebsite="0">
+                    <label>Automatically fix on order status change</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[This enables auto fix of reservations and move of items between sources]]></comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="auto_fix_order_status" translate="label" type="select" sortOrder="60" showInDefault="1" showInStore="0" showInWebsite="0">
+                    <label>Auto fix on order status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                    <depends>
+                        <field id="auto_fix_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="auto_fix_action" translate="label" type="select" sortOrder="60" showInDefault="1" showInStore="0" showInWebsite="0">
+                    <label>Auto fix action</label>
+                    <source_model>CarpetAvenue\ReservationsFix\Model\SourceModel\FixActions</source_model>
+                    <comment><![CDATA[What action to take on auto fix]]></comment>
+                    <depends>
+                        <field id="auto_fix_enabled">1</field>
+                    </depends>
+                </field>
+                <!-- field id="cli_include_custom_reservations" translate="label" type="select" sortOrder="70" showInDefault="1" showInStore="0" showInWebsite="0">
+                    <label>Ignore custom reservations in cli</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Ignores custom reservations in cli to remedy reporting false reporting of inconsistencies]]></comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field -->
+            </group>
+        </section>
+	</system>
+</config>

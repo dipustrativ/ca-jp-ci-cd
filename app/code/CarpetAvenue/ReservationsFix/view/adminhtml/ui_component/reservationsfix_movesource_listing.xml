@@ -1,0 +1,202 @@
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">reservationsfix_movesource_listing.reservationsfix_movesource_listing_data_source</item>
+            <item name="deps" xsi:type="string">reservationsfix_movesource_listing.reservationsfix_movesource_listing_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">reservationsfix_movesource_columns</item>
+    </argument>
+    <dataSource name="reservationsfix_movesource_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider</argument>
+            <argument name="name" xsi:type="string">reservationsfix_movesource_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="indexField" xsi:type="string">id</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="sticky" xsi:type="boolean">true</item>
+            </item>
+        </argument>
+        <bookmark name="bookmarks"/>
+		<columnsControls name="columns_controls"/>
+		<filters name="listing_filters"/>
+		<paging name="listing_paging"/>
+        <massaction name="listing_massaction">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="selectProvider" xsi:type="string">reservationsfix_movesource_listing.reservationsfix_movesource_listing.reservationsfix_movesource_columns.ids</item>
+					<item name="indexField" xsi:type="string">id</item>
+                </item>
+            </argument>
+            <action name="fix_reservation">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to process selected items?</message>
+                        <title translate="true">Fix reservations</title>
+                    </confirm>
+                    <url path="reservationsfix/movesource/massFixReservation"/>
+                    <type>reservation</type>
+                    <label translate="true">Fix reservations only</label>
+                </settings>
+            </action>
+            <action name="fix_reservation_destination">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to process selected items?</message>
+                        <title translate="true">Fix reservations and increase at destination</title>
+                    </confirm>
+                    <url path="reservationsfix/movesource/massFixReservationDestination"/>
+                    <type>reservation_destination</type>
+                    <label translate="true">Fix reservations, increase destination</label>
+                </settings>
+            </action>
+            <action name="fix_reservation_move">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to process selected items?</message>
+                        <title translate="true">Fix reservations and increase at destination</title>
+                    </confirm>
+                    <url path="reservationsfix/movesource/massFixReservationMove"/>
+                    <type>reservation_move</type>
+                    <label translate="true">Fix reservations, move quantity</label>
+                </settings>
+            </action>
+            <action name="skip">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to mark selected items as already processed?</message>
+                        <title translate="true">Skip items</title>
+                    </confirm>
+                    <url path="reservationsfix/movesource/massDelete"/>
+                    <type>skip</type>
+                    <label translate="true">Mark as processd, no action</label>
+                </settings>
+            </action>
+            <action name="fix_id">
+                <settings>
+                    <confirm>
+                        <message translate="true">Fix: "An ID is needed..."?</message>
+                        <title translate="true">Fix items</title>
+                    </confirm>
+                    <url path="reservationsfix/movesource/massFixId"/>
+                    <type>fix_id</type>
+                    <label translate="true">Fix: "An ID is needed..."</label>
+                </settings>
+            </action>
+        </massaction>
+    </listingToolbar>
+    <columns name="reservationsfix_movesource_columns">
+        <selectionsColumn name="ids">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="resizeEnabled" xsi:type="boolean">false</item>
+                    <item name="resizeDefaultWidth" xsi:type="string">55</item>
+                    <item name="indexField" xsi:type="string">id</item>
+                </item>
+            </argument>
+        </selectionsColumn>
+        <column name="id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sorting" xsi:type="string">asc</item>
+                    <item name="label" xsi:type="string" translate="true">ID</item>
+                </item>
+            </argument>
+        </column>
+        <column name="sku" class="CarpetAvenue\ReservationsFix\Component\Listing\Columns\Sku">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">SKU</item>
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                </item>
+            </argument>
+        </column>
+        <column name="increment_id" class="CarpetAvenue\ReservationsFix\Component\Listing\Columns\OrderId">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="sorting" xsi:type="string">asc</item>
+                    <item name="label" xsi:type="string" translate="true">Order id</item>
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                </item>
+            </argument>
+        </column>
+        <column name="order_status" class="CarpetAvenue\ReservationsFix\Component\Listing\Columns\OrderStatus">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Order status</item>
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                </item>
+            </argument>
+        </column>
+        <column name="source_from">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">From source</item>
+                </item>
+            </argument>
+        </column>
+        <column name="source_to">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">To source destination</item>
+                </item>
+            </argument>
+        </column>
+        <column name="quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Quantity</item>
+                </item>
+            </argument>
+        </column>
+        <column name="processed" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <label translate="true">Processed</label>
+            </settings>
+        </column>
+        <column name="process_status">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Info</item>
+                </item>
+            </argument>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="label" xsi:type="string" translate="true">Created</item>
+                </item>
+            </argument>
+        </column>
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="label" xsi:type="string" translate="true">Modified</item>
+                </item>
+            </argument>
+        </column>
+    </columns>
+</listing>

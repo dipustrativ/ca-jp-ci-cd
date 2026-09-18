@@ -1,0 +1,22 @@
+{
+    "name": "carpetavenue/module-reservationsfix",
+    "description": "Fixes issue with reservations from different sales channels and calculations of saleable quantity",
+    "type": "magento2-module",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Tobias Nilsson",
+            "email": "tobias.nilsson@lufinity.se"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "CarpetAvenue\\ReservationsFix\\": ""
+        }
+    }
+}

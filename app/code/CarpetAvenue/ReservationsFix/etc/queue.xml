@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/queue.xsd">
+    <broker topic="carpet_reserations_fix.process_move" exchange="magento-db" type="db">
+        <queue name="carpet_reserations_fix.process_move" consumer="carpet_reserations_fix.process_move" consumerInstance="Magento\Framework\MessageQueue\Consumer" handler="CarpetAvenue\ReservationsFix\Model\Queue\ProcessMoveConsumer::execute"/>
+    </broker>
+</config>

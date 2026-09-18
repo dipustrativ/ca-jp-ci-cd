@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="CarpetAvenue\ReservationsFix\Api\ReservationsManagerInterface" type="CarpetAvenue\ReservationsFix\Model\ReservationsManager"/>
+    <type name="Magento\InventoryReservations\Model\AppendReservations">
+        <plugin name="carpetavenue_fix_reservations" type="CarpetAvenue\ReservationsFix\Plugin\Inventory\AppendReservations"/>
+    </type>
+    <!-- type name="Magento\InventoryReservationCli\Model\ResourceModel\GetReservationsList">
+        <plugin name="carpetavenue_fix_reservations_cli" type="CarpetAvenue\ReservationsFix\Plugin\Inventory\Cli\GetReservationsList"/>
+    </type -->
+    <type name="CarpetAvenue\ReservationsFix\Model\Session">
+        <arguments>
+            <argument name="storage" xsi:type="object">CarpetAvenue\ReservationsFix\Model\Session\Storage</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Sales\Model\ResourceModel\Order">
+        <plugin name="carpetavenue_sales_resourcemodel_order" type="CarpetAvenue\ReservationsFix\Plugin\Sales\ResourceModel\Order" disabled="false" />
+    </type>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="reservationsfix_movesource_listing_data_source" xsi:type="string">CarpetAvenue\ReservationsFix\Model\ResourceModel\InventoryMove\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="CarpetAvenue\ReservationsFix\Model\ResourceModel\InventoryMove\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">carpet_inventory_move</argument>
+            <argument name="resourceModel" xsi:type="string">CarpetAvenue\ReservationsFix\Model\ResourceModel\InventoryMove</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="CarpetAvenue\ReservationsFix\Console\Reservation">
+      <arguments>
+         <argument name="name" xsi:type="string">reservation:fix:init</argument>
+      </arguments>
+   </type>
+    <type name="Magento\Framework\Console\CommandList">
+       <arguments>
+           <argument name="commands" xsi:type="array">
+               <item name="ReservationsFixReservation" xsi:type="object">CarpetAvenue\ReservationsFix\Console\Reservation</item>
+           </argument>
+       </arguments>
+   </type>
+</config>
