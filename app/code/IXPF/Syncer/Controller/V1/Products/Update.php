@@ -29,7 +29,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\StateException;
 use Magento\Store\Model\StoreFactory;
 use Magento\Framework\Registry;
-use Magento\Cms\Model\Wysiwyg\Config as WysiwygConfig;
 use Magento\Catalog\Api\ProductAttributeMediaGalleryManagementInterface;
 use Google\Cloud\Storage\StorageClient;
 use Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper\AttributeFilter;
@@ -44,7 +43,6 @@ class Update extends AbstractController implements HttpPostActionInterface, Csrf
         protected ProductHelper  $productHelper,
         protected Registry       $registry,
         protected Helper         $initializationHelper,
-        protected WysiwygConfig  $wysiwygConfig,
         protected ProductFactory $productFactory,
         protected StoreFactory   $storeFactory,
         protected ProductRepository $productRepository,
@@ -324,7 +322,14 @@ class Update extends AbstractController implements HttpPostActionInterface, Csrf
         $this->registry->register('current_product', $product);
         $this->registry->register('current_store', $store);
 
-        $this->wysiwygConfig->setStoreId($storeId);
+        // No wysiwygConfig->setStoreId() here, unlike
+        // Magento\Catalog\Controller\Adminhtml\Product\Builder::build(). That store id
+        // is only read by Wysiwyg\Config::isEnabled() to render the admin editor, so it
+        // does nothing for an API-driven save — and Magento\Cms\Model\Wysiwyg\Config
+        // cannot even be constructed outside the adminhtml area: its
+        // CompositeConfigProvider arguments are declared only in
+        // magento/module-cms/etc/adminhtml/di.xml, so building it on this frontend route
+        // fatals with "$variablePluginConfigProvider must be of type array, null given".
 
         return $product;
     }
