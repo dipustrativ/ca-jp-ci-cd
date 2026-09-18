@@ -20,7 +20,42 @@ class BaseLogger extends AbstractHelper
      * @param string $file
      * @return bool
      */
-    public function write($message, string $type = Logger::INFO, string $folder = self::FOLDER, string $file = self::FILE): bool
+    /**
+     * Severity name -> Monolog level.
+     *
+     * Every caller in this module passes a NAME ('error', 'warning', ...), while
+     * the switch this replaces compared against Monolog's integer constants.
+     * Under PHP 8 'error' == 400 is false, so every branch missed and the whole
+     * module logged at INFO — including the reservation and webhook failures.
+     * Grepping production for an error level found nothing because nothing had
+     * ever been written at one.
+     */
+    private const LEVELS = [
+        'emergency' => Logger::EMERGENCY,
+        'alert'     => Logger::ALERT,
+        'critical'  => Logger::CRITICAL,
+        'error'     => Logger::ERROR,
+        'warning'   => Logger::WARNING,
+        'notice'    => Logger::NOTICE,
+        'info'      => Logger::INFO,
+        'debug'     => Logger::DEBUG,
+    ];
+
+    /**
+     * Resolve a caller-supplied severity to a Monolog level.
+     *
+     * Accepts a name or an integer constant — older callers pass both.
+     */
+    private function resolveLevel($type): int
+    {
+        if (is_int($type) || ctype_digit((string)$type)) {
+            return (int)$type;
+        }
+
+        return self::LEVELS[strtolower(trim((string)$type))] ?? Logger::INFO;
+    }
+
+    public function write($message, $type = 'info', string $folder = self::FOLDER, string $file = self::FILE): bool
     {
         if (!file_exists($folder)) {
             mkdir($folder, 0777, true);
@@ -32,31 +67,7 @@ class BaseLogger extends AbstractHelper
             $logger = new Logger('ixpf_logger');
             $logger->pushHandler(new StreamHandler($filePath, Logger::DEBUG));
 
-            switch ($type) {
-                case Logger::EMERGENCY:
-                    $logger->emergency(print_r($message, true));
-                    break;
-                case Logger::ALERT:
-                    $logger->alert(print_r($message, true));
-                    break;
-                case Logger::CRITICAL:
-                    $logger->critical(print_r($message, true));
-                    break;
-                case Logger::ERROR:
-                    $logger->error(print_r($message, true));
-                    break;
-                case Logger::WARNING:
-                    $logger->warning(print_r($message, true));
-                    break;
-                case Logger::NOTICE:
-                    $logger->notice(print_r($message, true));
-                    break;
-                case Logger::DEBUG:
-                    $logger->debug(print_r($message, true));
-                    break;
-                default:
-                    $logger->info(print_r($message, true));
-            }
+            $logger->log($this->resolveLevel($type), print_r($message, true));
         } catch (\Exception $e) {
             return false;
         }

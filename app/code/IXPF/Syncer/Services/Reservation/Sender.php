@@ -36,10 +36,22 @@ class Sender
      * Cap on the TCP (and TLS) handshake for a fire-and-forget send.
      *
      * Shorter than CONNECT_TIMEOUT because this one runs inside a request a
-     * person is waiting on. The handshake is the only part that can block —
-     * after it we write and close without reading.
+     * person is waiting on, but it has to cover DNS + TCP + the full TLS
+     * handshake to a WAN endpoint. 1s was enough for a tunnel on the same
+     * continent and not enough for the real ERP.
      */
-    private const ASYNC_CONNECT_TIMEOUT = 1;
+    private const ASYNC_CONNECT_TIMEOUT = 3;
+
+    /**
+     * Cap on waiting for the status line after the request has been written.
+     *
+     * We read the first line only — never the body — so this costs the
+     * endpoint's time-to-first-byte, not its processing time. Without it a
+     * 401/403/500 is invisible: the write succeeds either way, and the batch
+     * sits in `processing` until the retry cron releases it, with nothing in
+     * the log to say why.
+     */
+    private const ASYNC_STATUS_TIMEOUT = 2;
 
     public function __construct(
         private readonly Config $config,
@@ -94,10 +106,16 @@ class Sender
                 return;
             }
 
-            $written = $this->fireAndForget($url, $payloadJson);
+            $error = null;
+            $written = $this->fireAndForget($url, $payloadJson, $error);
 
             if (!$written) {
-                $this->fail($batchId, 'Could not open a connection to IXPF', null, $payloadJson);
+                $this->fail(
+                    $batchId,
+                    'Could not deliver to IXPF: ' . ($error ?? 'unknown transport error'),
+                    null,
+                    $payloadJson
+                );
 
                 return;
             }
@@ -199,22 +217,39 @@ class Sender
     }
 
     /**
-     * Write the POST and hang up without reading the reply.
+     * Write the POST and hang up without reading the body.
      *
-     * Guzzle cannot do this — every transport it has reads the response before
-     * returning, which is the waiting we are trying to avoid. A raw socket can:
-     * connect, write, close. The only blocking part left is the handshake, capped
-     * at ASYNC_CONNECT_TIMEOUT.
+     * Guzzle cannot do this — every transport it has reads the whole response
+     * before returning, which is the waiting we are trying to avoid. A raw
+     * socket can: connect, write, take the status line, close.
      *
-     * The body is small enough to land in the kernel's send buffer in one write,
-     * so closing immediately does not truncate it.
+     * Three things here are not optional, all of them learned the hard way:
      *
-     * @return bool False when the connection could not be opened at all.
+     *  1. fwrite() has to be looped. It returns after handing bytes to the
+     *     stream's own buffer, so a short write on a busy socket is normal and
+     *     silent.
+     *  2. stream_socket_shutdown(STREAM_SHUT_WR) has to come before fclose().
+     *     fclose() on a stream that still has buffered bytes DISCARDS them —
+     *     measured: a 200 KB request arrived as 114 KB, truncated mid-body,
+     *     while fwrite() reported all 200 KB written and this method returned
+     *     true. Shutting the write side down first flushes, then sends FIN,
+     *     which is also what tells the endpoint the body is complete.
+     *  3. The status line has to be read. Closing the socket the instant the
+     *     request is out makes us a client that disconnected early, and every
+     *     reverse proxy in front of an ERP (nginx logs it 499) abandons the
+     *     request rather than passing it upstream. Reading one line both keeps
+     *     the connection alive long enough to be served and turns a silent
+     *     401/403/500 into something that reaches the log.
+     *
+     * We still never read the body, so IXPF's processing time is not ours.
+     *
+     * @return bool False when the request could not be delivered.
      */
-    private function fireAndForget(string $url, string $payloadJson): bool
+    private function fireAndForget(string $url, string $payloadJson, ?string &$error = null): bool
     {
         $parts = parse_url($url);
         if (!is_array($parts) || empty($parts['host'])) {
+            $error = 'Malformed webhook URL';
             return false;
         }
 
@@ -240,11 +275,16 @@ class Sender
         }
 
         if (!$socket) {
+            $error = sprintf('Connect failed [%d] %s', (int)$errno, (string)$errstr);
             return false;
         }
 
+        // User-Agent and Accept are not decoration: a WAF in front of the ERP
+        // will drop a POST that carries neither, and a fire-and-forget send has
+        // no way to notice.
         $request = sprintf(
-            "POST %s HTTP/1.1\r\nHost: %s\r\nContent-Type: application/json\r\n"
+            "POST %s HTTP/1.1\r\nHost: %s\r\nUser-Agent: CarpetAvenue-Magento/1.0\r\n"
+            . "Accept: application/json\r\nContent-Type: application/json\r\n"
             . "Content-Length: %d\r\nConnection: close\r\n\r\n%s",
             $path,
             $host . ($port === ($secure ? 443 : 80) ? '' : ':' . $port),
@@ -252,18 +292,52 @@ class Sender
             $payloadJson
         );
 
-        stream_set_timeout($socket, self::ASYNC_CONNECT_TIMEOUT);
+        $length = strlen($request);
+        $sent = 0;
+        $status = null;
 
+        stream_set_timeout($socket, self::ASYNC_CONNECT_TIMEOUT);
         set_error_handler(static fn (): bool => true);
 
         try {
-            $written = fwrite($socket, $request);
+            while ($sent < $length) {
+                $written = fwrite($socket, substr($request, $sent));
+                if ($written === false || $written === 0) {
+                    break;
+                }
+                $sent += $written;
+            }
+
+            if ($sent === $length) {
+                // Flush, then half-close. Without this fclose() throws away
+                // whatever is still buffered.
+                stream_socket_shutdown($socket, STREAM_SHUT_WR);
+
+                stream_set_timeout($socket, self::ASYNC_STATUS_TIMEOUT);
+                $status = fgets($socket, 128);
+            }
         } finally {
             restore_error_handler();
             fclose($socket);
         }
 
-        return $written !== false && $written > 0;
+        if ($sent !== $length) {
+            $error = sprintf('Short write: %d of %d bytes', $sent, $length);
+            return false;
+        }
+
+        // No status line inside the cap is not a failure — the endpoint may
+        // simply be slow to answer, and the acknowledgement settles the batch
+        // either way. Only a status we did read and did not like is.
+        if (is_string($status) && preg_match('#^HTTP/\d(?:\.\d)? (\d{3})#', $status, $m)) {
+            $code = (int)$m[1];
+            if ($code < 200 || $code >= 300) {
+                $error = sprintf('IXPF answered HTTP %d', $code);
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
