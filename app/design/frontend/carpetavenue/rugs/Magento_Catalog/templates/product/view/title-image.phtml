@@ -1,44 +1,33 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
-?>
-<?php
-/**
  * Category view template
  *
  * @var $block \Magento\Catalog\Block\Category\View
  */
 
 // phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
-// phpcs:disable Generic.WhiteSpace.ScopeIndent.IncorrectExact
 // phpcs:disable Magento2.Security.LanguageConstruct.DirectOutput
 ?>
 <?php
 $_helper    = $this->helper(Magento\Catalog\Helper\Output::class);
 $_category  = $block->getCurrentCategory();
-$_imgHtml   = '';
-$_catImgPath = '/media/catalog/category/';
-$thumbnail = $_category->getData('thumbnail');
-$_imgUrl = $_category->getImageUrl();
-$_finalUrl = $_imgUrl ? $_imgUrl : $thumbnail;
 
-if($_finalUrl == $thumbnail) {
-    $_finalUrl = $_catImgPath . $thumbnail;
-}
+/** @var \CarpetAvenue\Productify\ViewModel\CategoryImages|null $_images */
+$_images = $block->getData('category_image_view_model');
 
-if($_finalUrl == $_catImgPath) {
-    $_finalUrl = "";
-}
+// Null whenever the attribute is empty *or* names a file that is no longer in
+// pub/media — the banner is then skipped entirely instead of rendering a broken
+// image. Mobile falls back to the desktop image when it has none of its own.
+$_imgUrl       = $_images !== null ? $_images->getCategoryUrl($_category, 'image') : null;
+$_imgMobileUrl = $_images !== null ? $_images->getCategoryUrl($_category, 'mobile_image') : null;
+$_imgMobileUrl = $_imgMobileUrl ?? $_imgUrl;
 
-if ($_finalUrl && $_finalUrl != "") {
-    $_imgMobile = $_category->getMobileImage();
+if ($_imgUrl !== null) {
     $_imgHtml = '<div class="category-image cover">'
         . '<picture>'
-        . '<source media="(max-width: 767px)" srcset="'.($_imgMobile ? $_catImgPath.$_imgMobile : $block->escapeUrl($_finalUrl)).'">'
+        . '<source media="(max-width: 767px)" srcset="' . $block->escapeUrl($_imgMobileUrl) . '">'
         . '<img src="'
-        . $block->escapeUrl($_finalUrl)
+        . $block->escapeUrl($_imgUrl)
         . '" alt="'
         . $block->escapeHtmlAttr($_category->getName())
         . '" title="'
@@ -51,4 +40,3 @@ if ($_finalUrl && $_finalUrl != "") {
     /* @noEscape */ echo $_imgHtml;
 }
 ?>
-

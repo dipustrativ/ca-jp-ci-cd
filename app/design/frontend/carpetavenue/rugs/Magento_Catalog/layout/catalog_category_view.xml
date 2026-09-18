@@ -8,7 +8,13 @@
         <!-- Bottom category info holder (parity with base project):
              image.cover (picture) + description with title + read-more,
              pinned to the bottom of content. -->
-        <referenceBlock name="category.image" template="Magento_Catalog::product/view/title-image.phtml"/>
+        <referenceBlock name="category.image" template="Magento_Catalog::product/view/title-image.phtml">
+            <arguments>
+                <!-- Resolves image/mobile_image to a URL and drops values whose
+                     file is missing from pub/media, so no broken banner renders. -->
+                <argument name="category_image_view_model" xsi:type="object">CarpetAvenue\Productify\ViewModel\CategoryImages</argument>
+            </arguments>
+        </referenceBlock>
         <referenceContainer name="category.view.container" htmlTag="div" htmlClass="category-view-holder category-view"/>
         <move element="category.image" destination="category.view.container" before="-"/>
         <move element="page.main.title" destination="category.description" before="-"/>
