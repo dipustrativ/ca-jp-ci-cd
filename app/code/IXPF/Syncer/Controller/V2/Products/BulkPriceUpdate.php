@@ -13,7 +13,6 @@ use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use IXPF\Syncer\Helper\Logger\ProductUpdateLogger;
-use IXPF\Syncer\Services\OttoPrice\OttoPriceUpdater;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
 use Magento\Framework\App\ResourceConnection;
 
@@ -28,8 +27,7 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
         protected ProductRepositoryInterface $productRepository,
         protected ProductUpdateLogger $productUpdateLogger,
         protected Action $productAction,
-        protected ResourceConnection $resourceConnection,
-        protected OttoPriceUpdater $ottoPriceUpdater
+        protected ResourceConnection $resourceConnection
     )
     {
         parent::__construct($context, $tokenValidator, $resultFactory);
@@ -74,11 +72,6 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
             //-- Process all products
             $result = $this->processBulkUpdateOptimized($payload['products'], $store);
 
-            //-- Recalculate otto_price for all successfully updated products
-            if (!empty($result['product_ids'])) {
-                $this->ottoPriceUpdater->updateForProducts($result['product_ids']);
-            }
-
             //-- log end
             $this->productUpdateLogger->writeDaily(
                 "Bulk update completed: {$result['success_count']} success, {$result['failed_count']} failed"
@@ -105,8 +98,7 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
         $result = [
             'success_count' => 0,
             'failed_count' => 0,
-            'details' => [],
-            'product_ids' => []
+            'details' => []
         ];
 
         $validProducts = [];
@@ -213,7 +205,6 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
                         'success' => true
                     ];
                     $result['success_count']++;
-                    $result['product_ids'][] = $productId;
                 } catch (\Exception $e) {
                     $result['details'][] = [
                         'sku' => $data['sku'],
@@ -255,7 +246,6 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
                         'success' => true
                     ];
                     $result['success_count']++;
-                    $result['product_ids'][] = $productId;
                 } catch (\Exception $exception) {
                     $sku = $productData[$productId]['sku'];
                     $this->productUpdateLogger->writeDaily("Failed to update product ID: {$sku} Error: " . $exception->getMessage());

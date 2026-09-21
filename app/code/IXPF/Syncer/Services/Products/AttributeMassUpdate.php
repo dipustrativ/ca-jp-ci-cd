@@ -6,7 +6,6 @@ namespace IXPF\Syncer\Services\Products;
 
 use IXPF\Syncer\Helper\Helpers as ProductHelper;
 use IXPF\Syncer\Helper\Logger\ProductUpdateLogger;
-use IXPF\Syncer\Services\OttoPrice\OttoPriceUpdater;
 use Magento\Catalog\Model\ResourceModel\Product\Action as ProductAction;
 use Magento\Framework\App\ResourceConnection;
 
@@ -24,8 +23,7 @@ class AttributeMassUpdate
         protected ProductHelper        $productHelper,
         protected ProductAction        $productAction,
         protected ResourceConnection   $resourceConnection,
-        protected ProductUpdateLogger  $logger,
-        protected OttoPriceUpdater     $ottoPriceUpdater
+        protected ProductUpdateLogger  $logger
     ) {
     }
 
@@ -50,7 +48,6 @@ class AttributeMassUpdate
         $results       = [];
         $updatedCount  = 0;
         $errorCount    = 0;
-        $recalcPriceIds = [];
 
         foreach ($products as $index => $product) {
             $productId  = isset($product['product_id']) ? (int)$product['product_id'] : 0;
@@ -98,10 +95,6 @@ class AttributeMassUpdate
             try {
                 $this->productAction->updateAttributes([$productId], $valid, $storeId);
 
-                if (!empty(array_intersect(['price', 'special_price'], array_keys($valid)))) {
-                    $recalcPriceIds[] = $productId;
-                }
-
                 $updatedCount++;
                 $results[] = [
                     'product_id'         => $productId,
@@ -117,10 +110,6 @@ class AttributeMassUpdate
                 $this->logger->writeDaily("[ERROR] Mass update product {$productId}: " . $e->getMessage());
                 $results[] = $this->rowError($productId, $e->getMessage(), $invalid);
             }
-        }
-
-        if (!empty($recalcPriceIds)) {
-            $this->ottoPriceUpdater->updateForProducts(array_values(array_unique($recalcPriceIds)));
         }
 
         return [

@@ -40,7 +40,7 @@ class ReservationDispatch
 
         try {
             $batchIds = $this->reservationResource->getDispatchableBatchIds(
-                [IxpfReservation::REQUEST_PENDING],
+                [IxpfReservation::REQUEST_PENDING, IxpfReservation::REQUEST_PROCESSING],
                 $this->config->getReservationMaxAttempts(),
                 $this->config->getReservationDispatchLimit()
             );

@@ -15,7 +15,6 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
 use Magento\Eav\Model\Config as EavConfig;
 use IXPF\Syncer\Helper\Logger\ProductUpdateLogger;
-use IXPF\Syncer\Services\OttoPrice\OttoPriceUpdater;
 
 
 class BulkUpdate extends AbstractController implements HttpPostActionInterface, CsrfAwareActionInterface
@@ -28,8 +27,7 @@ class BulkUpdate extends AbstractController implements HttpPostActionInterface, 
         protected Action $productAction,
         protected ResourceConnection $resourceConnection,
         protected EavConfig $eavConfig,
-        protected ProductUpdateLogger $productUpdateLogger,
-        protected OttoPriceUpdater $ottoPriceUpdater
+        protected ProductUpdateLogger $productUpdateLogger
     )
     {
         parent::__construct($context, $tokenValidator, $resultFactory);
@@ -134,11 +132,6 @@ class BulkUpdate extends AbstractController implements HttpPostActionInterface, 
                 if (!empty($toUpdate)) {
                     //-- update attributes (special_price kept even when null)
                     $this->productAction->updateAttributes($payload['product_ids'], $toUpdate, $store);
-
-                    //-- Recalculate otto_price if price or special_price was updated
-                    if (!empty(array_intersect(['price', 'special_price'], array_keys($toUpdate)))) {
-                        $this->ottoPriceUpdater->updateForProducts($payload['product_ids']);
-                    }
                 }
 
                 if (!empty($toReset) && (int)$store !== 0) {

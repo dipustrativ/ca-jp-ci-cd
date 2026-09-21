@@ -8,7 +8,6 @@ use IXPF\Syncer\Helper\Config;
 use IXPF\Syncer\Helper\Logger\BulkUpdateRevertLogger;
 use IXPF\Syncer\Model\Config\Source\AllowAttributes;
 use IXPF\Syncer\Services\Notification\SlackNotifier;
-use IXPF\Syncer\Services\OttoPrice\OttoPriceUpdater;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Catalog\Model\ResourceModel\Product\Action as ProductAction;
 use Magento\Catalog\Model\Product\Action;
@@ -37,8 +36,7 @@ class ProductUpdate
         protected ClientInterface    $httpClient,
         protected SlackNotifier $slackNotifier,
         protected BulkUpdateRevertLogger $logger,
-        protected Config $config,
-        protected OttoPriceUpdater $ottoPriceUpdater
+        protected Config $config
     )
     {
     }
@@ -222,11 +220,6 @@ class ProductUpdate
 
             $connection->commit();
             $result['success'] = true;
-
-            //-- Recalculate otto_price if price or special_price was updated
-            if (!empty(array_intersect(['price', 'special_price'], array_keys($filteredData)))) {
-                $this->ottoPriceUpdater->updateForProducts([$productId]);
-            }
 
         } catch (Exception $e) {
             $connection->rollBack();

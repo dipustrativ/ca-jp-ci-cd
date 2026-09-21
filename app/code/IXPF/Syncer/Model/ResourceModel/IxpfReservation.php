@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IXPF\Syncer\Model\ResourceModel;
 
 use IXPF\Syncer\Model\IxpfReservation as ReservationModel;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Throwable;
 use Zend_Db_Expr;
@@ -241,6 +242,7 @@ class IxpfReservation extends AbstractDb
      *
      * @param string[] $requestStatuses
      * @return string[]
+     * @throws LocalizedException
      */
     public function getDispatchableBatchIds(array $requestStatuses, int $maxAttempts, int $limit): array
     {
