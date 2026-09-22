@@ -29,6 +29,11 @@ credit-memo PDF layouts, and a set of admin-configurable instruction texts.
   vertical watermark text, extra details box, and a configurable footer
   (none / full-width / three-column). EU-tax handling and a Japanese font
   (`view/cid0jp.ttf`) for the `jp` store.
+- **Packing slip PDF font** — overrides `Magento\Sales\Model\Order\Pdf\Shipment` so the
+  shipment/packing-slip PDF renders with `view/cid0jp.ttf` instead of core's
+  `lib/internal/GnuFreeFont/FreeSerif*.ttf`, which has no CJK glyphs and turned every
+  Japanese string into `.notdef` boxes. Covers the admin "Print Shipments" action and
+  the IXPF Syncer bulk-PDF endpoints, which both render through that class.
 - **Receipt e-mail** — swaps the invoice e-mail template to a "receipt" template on
   receipt/capture actions (guest + registered).
 - **Grand-total tax control** — toggle showing "Grand Total incl/excl tax" + "Tax"
@@ -61,6 +66,7 @@ country restrictions, `instructions*`, `email_template_receipt*`, `pdf_footer_*`
 | `Observer/AfterInvoicePaid.php` | Post-payment handling |
 | `Overwrite/Plugin/Invoice.php` | Invoice PDF renderer (extends base `Plugin/Invoice.php`) |
 | `Overwrite/Plugin/DefaultInvoice.php` | Invoice line-item PDF renderer |
+| `Overwrite/Plugin/Shipment.php` | Packing slip PDF renderer (Japanese font only) |
 | `Overwrite/Tax/Model/Sales/Pdf/Grandtotal.php` | Grand-total PDF total |
 | `Plugin/PluginCheckEmail.php` | Stores customer e-mail in checkout session |
 | `Plugin/Helper/Data.php` | Sets order status after auto-invoice |
@@ -68,7 +74,7 @@ country restrictions, `instructions*`, `email_template_receipt*`, `pdf_footer_*`
 | `Plugin/Block/Adminhtml/Order/View.php` | Adds reprint-receipt button |
 | `Block/Info/Instructions.php` | Payment info block (context-aware instructions) |
 | `view/frontend/...` | Checkout renderer JS, template, layout, receipt e-mail |
-| `view/cid0jp.ttf` | Japanese PDF font (used for `jp` store) |
+| `view/cid0jp.ttf` | Japanese PDF font (invoice + packing slip) |
 
 ## Dependencies
 

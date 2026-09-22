@@ -116,5 +116,5 @@ Common errors:
 |---|---|
 | `IXPF\Syncer\Controller\V1\Shipment\BulkAction` | Endpoint — auth, validate, delegate, log |
 | `IXPF\Syncer\Services\Shipment\BulkPrint` | Loads shipments, renders packing-slip / label PDF |
-| `Magento\Sales\Model\Order\Pdf\Shipment` | Packing-slip PDF rendering |
+| `Magento\Sales\Model\Order\Pdf\Shipment` | Packing-slip PDF rendering — preferenced to `Evalent\InvoicePaymentMods\Overwrite\Plugin\Shipment` for the Japanese font |
 | `Magento\Shipping\Model\Shipping\LabelGenerator` | Combines carrier labels into one PDF |

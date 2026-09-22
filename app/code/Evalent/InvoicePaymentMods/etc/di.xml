@@ -20,6 +20,9 @@
     <!-- Invoice PDF renderer (merged Method base Plugin\Invoice -> Mods Overwrite child) -->
     <preference for="Magento\Sales\Model\Order\Pdf\Invoice" type="Evalent\InvoicePaymentMods\Overwrite\Plugin\Invoice" />
 
+    <!-- Packing slip PDF renderer: core FreeSerif has no CJK glyphs -->
+    <preference for="Magento\Sales\Model\Order\Pdf\Shipment" type="Evalent\InvoicePaymentMods\Overwrite\Plugin\Shipment" />
+
     <type name="\Magento\Framework\Locale\ResolverInterface">
         <plugin name="mage_localeresolver_reload" type="Magento\Framework\Translate\Locale\Resolver\Plugin" sortOrder="1" disabled="false"/>
     </type>
