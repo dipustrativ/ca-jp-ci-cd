@@ -188,7 +188,6 @@ class IxpfReservation extends AbstractDb
         $select = $connection->select()
             ->from($this->getMainTable(), ['batch_id'])
             ->where(self::ENTITY . ' = ?', $entityId)
-            ->where('direction = ?', ReservationModel::DIRECTION_OUTBOUND)
             ->limit(1);
 
         $batchId = $connection->fetchOne($select);

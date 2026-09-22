@@ -420,6 +420,19 @@ class Sender
         $decoded = json_decode($response, true);
 
         if (!is_array($decoded) || !array_key_exists('success', $decoded)) {
+            // A 2xx carrying something other than the expected JSON is IXPF's
+            // own trouble leaking through — an upstream timeout of theirs comes
+            // back as bare Go error text. fail() keeps the body on the row; this
+            // line puts it in the log too, with the batch and status beside it.
+            $this->logger->writeDaily(
+                sprintf(
+                    'Unparseable IXPF response for batch %s (HTTP %d): %s',
+                    $batchId,
+                    $httpCode,
+                    $response
+                ),
+                'error'
+            );
             $this->fail($batchId, 'Unparseable IXPF response', $response, $payloadJson);
             return;
         }
