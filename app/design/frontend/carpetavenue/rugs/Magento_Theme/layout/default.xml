@@ -132,6 +132,22 @@
         <move element="breadcrumbs" destination="page.top" after="-"/>
         <move element="page.messages" destination="page.top" before="breadcrumbs"/>
 
+        <!-- Magento drops a container whose children render nothing
+             (Layout::_renderContainer trims whitespace-only output, then returns
+             before emitting the htmlTag). The all_pages "Flash Sale" callout
+             widget renders nothing once its countdown date passes, which took
+             div.top-container with it and left .page-header's desktop 20px bottom
+             margin uncancelled: a gap above the banner that appeared and
+             disappeared with the widget's date. Keep the container rendered; the
+             widget div inside it still comes and goes on its own. -->
+        <referenceContainer name="top.container">
+            <block class="Magento\Framework\View\Element\Text" name="top.container.keeper" after="-">
+                <arguments>
+                    <argument name="text" xsi:type="string"><![CDATA[<!-- top.container keeper -->]]></argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
         <!-- ============ FOOTER ============ -->
 
         <referenceContainer name="footer">
