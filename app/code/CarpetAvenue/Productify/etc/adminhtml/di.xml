@@ -24,4 +24,10 @@
         <plugin name="carpetavenue_enhancecategory_category_link_plugin"
                 type="CarpetAvenue\Productify\EnhanceCategory\Rewrite\Magento\Catalog\Model\Category"/>
     </type>
+    <!-- Admin product grids hold base-currency (EUR) values; 2.4.9 labels them
+         with the display currency (JPY). Put the base symbol back. -->
+    <type name="Magento\Catalog\Ui\Component\Listing\Columns\Price">
+        <plugin name="productify_admin_grid_base_currency"
+                type="CarpetAvenue\Productify\Plugin\Currency\AdminGridBaseCurrency"/>
+    </type>
 </config>
