@@ -21,6 +21,7 @@ history record them.
 | [ISSUE-005](ISSUE-005-order-item-null-product-id-deprecation.md) | Admin order view redirects to the grid when an order item has `product_id = NULL`: `null` array offset in `ProductRepository::getById()` | Magento 2.4.9 + PHP 8.5 | 🟡 WORKAROUND — order-item plugin | 2026-09-10 |
 | [ISSUE-006](ISSUE-006-admin-order-item-price-double-converted.md) | Admin order item **Price** column multiplied by the currency rate (¥21,000 → ¥3,570,000): `getItemDisplayPriceExclTax()` converts an order-currency value as if it were base-currency | Magento 2.4.9, base ≠ display currency | 🟡 WORKAROUND — admin tax display set to *Including Tax* | 2026-09-10 |
 | [ISSUE-007](ISSUE-007-order-item-null-product-id-msi-sku-deprecation.md) | MSI order screens (ship / invoice / credit memo / cancel) fatal on an order item with `product_id = NULL`: `null` array offset in `GetSkusByProductIdsCache` — second half of ISSUE-005 | Magento 2.4.9 + PHP 8.5 | 🟡 WORKAROUND — MSI SKU-resolver plugin | 2026-09-10 |
+| [ISSUE-008](ISSUE-008-braintree-admin-system-js-prototype-race.md) | `locations.each is not a function` on every Stores → Configuration page — Braintree's admin JS uses Prototype's `Array#each` without depending on Prototype | `paypal/module-braintree-core` 4.8.0 | 🟡 WORKAROUND — Braintree modules disabled | 2026-09-23 |
 
 ## Resolved
 
