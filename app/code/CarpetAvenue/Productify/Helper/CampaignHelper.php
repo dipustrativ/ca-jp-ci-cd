@@ -314,7 +314,10 @@ class CampaignHelper
             throw new Exception("Failed to fetch sheet. HTTP: $httpCode");
         }
 
-        $rows = array_map('str_getcsv', explode("\n", trim($csv)));
+        $rows = array_map(
+            static fn (string $line): array => str_getcsv($line, ',', '"', '\\'),
+            explode("\n", trim($csv))
+        );
         $headers = array_shift($rows);
 
         $data = [];
