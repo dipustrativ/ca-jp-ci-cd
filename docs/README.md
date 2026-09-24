@@ -18,6 +18,7 @@ once. If something is not in this index, it is not findable — add the row.
 | Run a Magento CLI command in production, upload media | [../docker/INFRA-CI.md](../docker/INFRA-CI.md#part-3--server-ops) |
 | Work locally (containers, CLI, static, tests) | [../CLAUDE.md](../CLAUDE.md) |
 | Understand an error that lives in `vendor/` | [Issues/README.md](Issues/README.md) — check before debugging |
+| Find out why the admin console throws `locations.each is not a function`, or what the Adobe Launch lines on admin pages are | [Issues/ISSUE-008](Issues/ISSUE-008-braintree-admin-system-js-prototype-race.md) — Braintree admin JS; modules disabled 2026-09-23, and what that cost |
 | Know why the site is/isn't fast | [performance/README.md](performance/README.md) |
 | Check what version of anything we run | [architecture/stack.md](architecture/stack.md) |
 

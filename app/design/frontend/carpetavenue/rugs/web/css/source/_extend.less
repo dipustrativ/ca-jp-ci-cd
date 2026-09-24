@@ -1095,9 +1095,34 @@ a:visited, .alink:visited {
 //  _____________________________________________
 @media (min-width: 769px) {
 
-    .page-header{
+    //  The 20px gap below the header is the default on every page. Blank sets its
+    //  own .page-header margin in styles-l.css, which loads after this file, hence
+    //  !important. Ported from the live site
+    //  (Evalent/carpet/Magento_Theme/.../_extend.less):
+    //
+    //  - Home drops it: the hero banner runs edge-to-edge straight under the header.
+    //  - Home WITH a live callout bar puts it back, or Evalent_Callout's
+    //    `.cms-index-index .top-container { margin-top: -20px }` would drag the bar
+    //    up into the header.
+    //
+    //  Do not swap this for a negative margin on .top-container: that container
+    //  disappears with the callout widget (it renders nothing once the countdown
+    //  expires), which is what made the gap come and go with the widget's date.
+    //  `header.` matters: the relocated top panel (default.xml `header.panel.custom`)
+    //  is a second element with class .page-header, and an unqualified selector here
+    //  outranks `.page-header.custom-panel { margin: 0 }` and re-adds a gap under it.
+    header.page-header{
         margin-bottom: 20px !important;
     }
+
+    .cms-index-index header.page-header {
+        margin-bottom: 0 !important;
+    }
+
+    .cms-index-index.callout-widget-active header.page-header {
+        margin-bottom: 20px !important;
+    }
+
     main#maincontent,
     .page-wrapper > .page-bottom,
     .content--full-width,
