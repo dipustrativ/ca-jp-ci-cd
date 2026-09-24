@@ -21,9 +21,9 @@ use Magento\Framework\App\State;
  */
 class PhotoStudioPipeline
 {
-    private const DOWNLOAD_LIMIT = 400;
+    private const DOWNLOAD_LIMIT = 600;
     private const DOWNLOAD_CONCURRENCY = 10;
-    private const QUEUE_LIMIT = 40;
+    private const QUEUE_LIMIT = 50;
 
     public function __construct(
         protected readonly State $state,
