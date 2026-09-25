@@ -22,6 +22,13 @@ date_default_timezone_set("Europe/Stockholm");
 <?php $_isSticky = $block->getIsSticky(); ?>
 
 <?php if($_countdown < $date && !empty($block->getCountdown())) : else: ?>
+<?php /* The full-bleed layout for .top-container hangs off body.callout-widget-active
+         (CarpetAvenue_Widget _module.less:7 — max-width: none, padding: 0, margin-top: -20px).
+         Set it while the HTML is still parsing rather than from the require() block below:
+         waiting on RequireJS + jQuery + countdown left the bar boxed inside the theme's
+         1440px / 0 32px container for the first few hundred ms, so it painted inset with
+         white space to its left, right and above before snapping to full width. */ ?>
+<script>document.body.classList.add('callout-widget-active');</script>
 <div class="callout-widget callout-widget--subscribe" style="background: <?php if($_bgcolor): echo $_bgcolor; endif; ?>;">
 
     <div class="callout-widget__content <?= $_hiddenCountdown ? 'hide-countdown' : '' ?>" style="font-size: <?= $_fontsize ?>; color: <?= $_textcolor ?>;">

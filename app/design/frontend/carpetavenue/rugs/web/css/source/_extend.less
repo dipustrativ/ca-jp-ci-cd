@@ -86,7 +86,10 @@ a:visited, .alink:visited {
     text-decoration: none;
 }
 
-.fieldset>.field, .fieldset>.fields>.field {
+//  `!important` here beats every per-page override, so qty fields are excluded:
+//  the PDP add-to-cart box sits in a flex row and a 20px bottom margin pushes
+//  the input above the button's centre line (carpetavenue.jp has no margin).
+.fieldset>.field:not(.qty), .fieldset>.fields>.field:not(.qty) {
     margin: 0 0 20px !important;
 }
 
