@@ -2,21 +2,17 @@
 /**
  * Size + SKU line under the product title.
  *
- * Round rugs (shape option id from productify/general/round_shape_option_id)
- * render as diameter, "∅ W cm"; everything else as "W x L cm".
+ * ∅ when w == l, else W x L cm — see Data::formatSize
  *
  * @var $block \Magento\Catalog\Block\Product\View
- * @var $sizeFormatter \CarpetAvenue\Productify\ViewModel\SizeFormatter
  */
 $_product = $block->getProduct();
-$sizeFormatter = $block->getData('size_formatter');
 
-$sizeValue = '';
-if ($_product->getData('width') && $_product->getData('length')) {
-    $sizeValue = $sizeFormatter->isRound($_product)
-        ? '∅ ' . $_product->getData('width') . ' cm'
-        : $_product->getData('width') . ' x ' . $_product->getData('length') . ' cm';
-}
+$sizeValue = $this->helper(\CarpetAvenue\Productify\Helper\Data::class)->formatSize(
+    $_product->getData('width'),
+    $_product->getData('length'),
+    $_product->getData('shape')
+);
 ?>
 <div class="size_sku_attribute-wrapper">
     <div class="size-attribute">

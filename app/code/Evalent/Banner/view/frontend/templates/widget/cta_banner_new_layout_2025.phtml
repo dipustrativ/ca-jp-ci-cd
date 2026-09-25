@@ -124,13 +124,12 @@ $elementClass = "cta-banner-".$randomNum;
 
         <?php if($_product !== null): ?>
 
-            <?php if ($_product->getData('width') && $_product->getData('length')) {
-                if ($_product->getData('shape') != 20) {
-                    $sizeValue = $_product->getData('width') . ' x ' . $_product->getData('length') . ' cm';
-                } else {
-                    $sizeValue = "∅ " . $_product->getData('width') . ' cm';
-                }
-            } ?>
+            <?php // ∅ when w == l, else W x L cm — see Data::formatSize
+            $sizeValue = $this->helper(\CarpetAvenue\Productify\Helper\Data::class)->formatSize(
+                $_product->getData('width'),
+                $_product->getData('length'),
+                $_product->getData('shape')
+            ); ?>
 
             <?php if($_sku): ?>
                 <ul class="product-highlighter">

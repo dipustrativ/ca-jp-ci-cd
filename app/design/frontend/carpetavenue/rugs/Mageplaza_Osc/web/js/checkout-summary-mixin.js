@@ -25,8 +25,10 @@ define(
                     var itemWithAttributes = this.productWithAttributes(parent);
 
                     if (itemWithAttributes && itemWithAttributes.hasOwnProperty('product') &&
-                        itemWithAttributes.product.hasOwnProperty('shape')) {
-                        return itemWithAttributes.product.shape == 20;
+                        itemWithAttributes.product.width && itemWithAttributes.product.length) {
+                        // ∅ whenever the sides are equal — same rule as Data::formatSize()
+                        return parseFloat(itemWithAttributes.product.width) ===
+                            parseFloat(itemWithAttributes.product.length);
                     }
                     return false;
                 },

@@ -18,15 +18,12 @@ $configSizeAttrId = $themeHelper->getSizeAttributeId();
     <div class="size">
         <?php
 
-        // Checking size attributes
-        $sizeValue = '';
-        if ($product->getData('width') && $product->getData('length')) {
-            if ($product->getData('shape') != 20) {
-                $sizeValue = $product->getData('width') . ' x ' . $product->getData('length') . ' cm';
-            } else {
-                $sizeValue = "∅ " . $product->getData('width') . ' cm';
-            }
-        }
+        // ∅ when w == l, else W x L cm — see Data::formatSize
+        $sizeValue = $this->helper(\CarpetAvenue\Productify\Helper\Data::class)->formatSize(
+            $product->getData('width'),
+            $product->getData('length'),
+            $product->getData('shape')
+        );
 
         echo $sizeValue;
         ?>

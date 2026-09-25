@@ -197,9 +197,10 @@ class Wishlist extends \Magento\Wishlist\CustomerData\Wishlist
     protected function getSizeData($product)
     {
         $isConfig = $product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE;
-        $isRound = (int) $product->getData('shape') === 20;
         $width = $product->getData('width');
         $length = $product->getData('length');
+        // Diameter for any equal-sided rug, same rule as Productify's Data::formatSize().
+        $isRound = (float) $width > 0 && (float) $width === (float) $length;
 
         $configSize = '';
         if ($width && $length) {

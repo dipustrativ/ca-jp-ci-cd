@@ -46,7 +46,7 @@ $width = $product->getData('width');
 $length = $product->getData('length');
 $shape = $product->getData('shape');
 
-// ∅ for round (shape 20) or square (w == l), else W x L cm — see Data::formatSize
+// ∅ when w == l, else W x L cm — see Data::formatSize
 $sizeValue = $block->escapeHtml($this->helper(Data::class)->formatSize($width, $length, $shape));
 ?>
 

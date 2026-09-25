@@ -8,6 +8,18 @@
                 sortOrder="10"/>
     </type>
 
+    <type name="Magento\Catalog\Block\Product\View\Gallery">
+        <plugin name="carpetavenue_core_strip_store_param_from_gallery_json"
+                type="CarpetAvenue\Core\Plugin\StripStoreParamFromImageUrl"
+                sortOrder="10"/>
+    </type>
+
+    <type name="Magento\Catalog\ViewModel\Product\Gallery">
+        <plugin name="carpetavenue_core_strip_store_param_from_main_image"
+                type="CarpetAvenue\Core\Plugin\StripStoreParamFromImageUrl"
+                sortOrder="10"/>
+    </type>
+
     <type name="Magento\Store\Api\StoreCookieManagerInterface">
         <plugin name="carpetavenue_core_ignore_store_cookie"
                 type="CarpetAvenue\Core\Plugin\IgnoreStoreCookie"
