@@ -16,7 +16,9 @@ declare(strict_types=1);
 
 namespace CarpetAvenue\Productify\Helper;
 
+use CarpetAvenue\Productify\Model\PrimaryShapeResolver;
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
 use Magento\Store\Model\ScopeInterface;
 
 class Data extends AbstractHelper
@@ -32,10 +34,8 @@ class Data extends AbstractHelper
     const IS_GROUP_ATTRIBUTE_CODE = 'is_group';
     const SHAPE_ATTRIBUTE_CODE = 'shape';
     const SHAPE_ATTRIBUTE_KEY_CODE = 'shape_key';
-    const NAME_ATTRIBUTE_ID    = 73;
-    const SIZE_ATTRIBUTE_ID    = 222;
-    const COLOR_ATTRIBUTE_ID   = 223;
-    const DESIGN_ID_ATTRIBUTE_ID   = 264;
+    // No attribute ids here on purpose: they differ per database. Resolve them
+    // from the codes above (Eav Config::getAttribute()->getAttributeId()).
 
     /*
      * CSV Column Names - GROUP Product Features
@@ -62,19 +62,27 @@ class Data extends AbstractHelper
     const QUEUE_BATCH_SIZE = 500;
 
     /**
-     * Fallback primary-shape (rectangular) attribute option id, used when the
-     * admin setting (productify/general/primary_shape_option_id) is empty.
-     */
-    const SHAPE_PRIMARY_OPTION_ID = '19';
-
-    /**
      * Config path for the primary-shape option id.
      */
     const XML_PATH_PRIMARY_SHAPE_OPTION_ID = 'productify/general/primary_shape_option_id';
 
     /**
-     * Primary-shape (rectangular) attribute option id, read from admin config
-     * and falling back to the hardcoded default when the setting is unset/empty.
+     * @param Context $context
+     * @param PrimaryShapeResolver $primaryShapeResolver
+     */
+    public function __construct(
+        Context $context,
+        private readonly PrimaryShapeResolver $primaryShapeResolver
+    ) {
+        parent::__construct($context);
+    }
+
+    /**
+     * Primary-shape (rectangular) attribute option id.
+     *
+     * The admin setting wins when it is a real `shape` option on this install;
+     * otherwise (empty, or an id from another database) it is the shape most
+     * products have. See PrimaryShapeResolver.
      *
      * The primary shape is listed first in the PDP size drawer and gets no
      * heading — it is the default shape of the catalogue.
@@ -90,7 +98,7 @@ class Data extends AbstractHelper
             $storeId
         );
 
-        return ($value === null || $value === '') ? self::SHAPE_PRIMARY_OPTION_ID : (string) $value;
+        return $this->primaryShapeResolver->resolve((string) $value);
     }
 
     /**

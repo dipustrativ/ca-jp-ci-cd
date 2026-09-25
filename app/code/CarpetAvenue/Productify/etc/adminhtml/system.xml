@@ -38,9 +38,10 @@
             </group>
             <group id="group_products" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Group Products</label>
-                <field id="primary_shape_option_id" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Primary Shape Option ID</label>
-                    <comment>Attribute option id of the default ("rectangular") shape. Its sizes are listed first in the PDP size drawer and get no shape heading. Defaults to 19 if empty.</comment>
+                <field id="primary_shape_option_id" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Primary Shape</label>
+                    <comment>The default ("rectangular") shape. Its sizes are listed first in the PDP size drawer and get no shape heading. Automatic uses the shape most products have; a saved value that is not a shape option on this install is ignored the same way.</comment>
+                    <source_model>CarpetAvenue\Productify\Model\Config\Source\ShapeOptions</source_model>
                     <config_path>productify/general/primary_shape_option_id</config_path>
                 </field>
                 <field id="csv_upload" translate="label comment" type="file" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">

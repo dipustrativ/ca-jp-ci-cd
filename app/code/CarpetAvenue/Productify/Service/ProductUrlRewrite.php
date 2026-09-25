@@ -34,19 +34,39 @@ class ProductUrlRewrite
 
     }
 
-    public function init(array $products)
+    /**
+     * Regenerate URL keys for products whose name changed since the last build
+     *
+     * @param array $products Rows as built by CollectionBuilder::buildForStore()
+     * @param callable|null $onProgress Called as ($done, $total): once with 0, then per product
+     */
+    public function init(array $products, ?callable $onProgress = null)
     {
         if (!$this->config->isUpdateProductUrlRewriteEnabled()) {
             return;
         }
 
+        $storedProducts = $this->getStoredProducts($products);
+        $total = count($products);
+        $done = 0;
+        if ($onProgress) {
+            $onProgress($done, $total);
+        }
         foreach ($products as $product) {
+            if ($onProgress) {
+                $onProgress(++$done, $total);
+            }
             try {
                 if (!isset($product['id']) && !isset($product['store_id'])) {
                     continue;
                 }
 
-                $isProductUpdate = $this->checkProductNameUpdated($product['id'], $product['store_id'], $product['name']);
+                $isProductUpdate = $this->checkProductNameUpdated(
+                    $product['id'],
+                    $product['store_id'],
+                    $product['name'],
+                    $storedProducts[$product['id'] . ':' . $product['store_id']] ?? []
+                );
                 if ($isProductUpdate) {
                     $this->setUrlKeyByStore($product['id'], $product['store_id']);
                 }
@@ -56,11 +76,55 @@ class ProductUrlRewrite
         }
     }
 
-    protected function checkProductNameUpdated(int $productId, int $storeId, string $currentProductName)
+    /**
+     * Name and sku from the previous build, per "id:store_id"
+     *
+     * One query per 1000 products instead of one per product. Ordered by entity_id so
+     * a duplicated (id, store_id) resolves to the same row the old per-product
+     * fetchRow() returned.
+     *
+     * @param array $products
+     * @return array<string, array{name: string, sku: string}>
+     */
+    private function getStoredProducts(array $products): array
     {
         $connection = $this->resourceConnection->getConnection();
-        $productifyProductSql = "SELECT `name`, `sku` FROM `carpetavenue_productify_collection` WHERE `store_id` = $storeId AND `id` = $productId";
-        $productifyProduct = $connection->fetchRow($productifyProductSql);
+        $table = $this->resourceConnection->getTableName('carpetavenue_productify_collection');
+        $storeIds = array_values(array_unique(array_column($products, 'store_id')));
+        if (!$storeIds) {
+            return [];
+        }
+
+        $storedProducts = [];
+        foreach (array_chunk(array_column($products, 'id'), 1000) as $ids) {
+            $select = $connection->select()
+                ->from($table, ['id', 'store_id', 'name', 'sku'])
+                ->where('store_id IN (?)', $storeIds)
+                ->where('id IN (?)', $ids)
+                ->order('entity_id ASC');
+            foreach ($connection->fetchAll($select) as $row) {
+                $storedProducts[$row['id'] . ':' . $row['store_id']] ??= [
+                    'name' => $row['name'],
+                    'sku' => $row['sku'],
+                ];
+            }
+        }
+        return $storedProducts;
+    }
+
+    /**
+     * @param int $productId
+     * @param int $storeId
+     * @param string $currentProductName
+     * @param array $productifyProduct Stored name and sku; empty when the product was never built
+     * @return bool
+     */
+    protected function checkProductNameUpdated(
+        int $productId,
+        int $storeId,
+        string $currentProductName,
+        array $productifyProduct
+    ) {
         if (empty($productifyProduct)) {
             return false;
         }

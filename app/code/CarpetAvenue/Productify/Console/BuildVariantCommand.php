@@ -70,10 +70,11 @@ class BuildVariantCommand extends Command
             // VariantBuilder only builds one store at a time; ProductSync is the
             // all-store orchestrator that drives it under store emulation.
             $results = $this->productSync->buildAllStores([], $output);
-            $totalGroups = array_sum($results);
-            $output->writeln("✅ Successfully built variant cache for $totalGroups design groups across all stores.");
+            // The per-store results are product counts, not design counts.
+            $totalProducts = array_sum($results);
+            $output->writeln("✅ Successfully built variant cache for $totalProducts products across all stores.");
             foreach ($results as $storeId => $count) {
-                $output->writeln("  Store $storeId: $count design groups");
+                $output->writeln("  Store $storeId: $count products");
             }
             $executionTime = round(microtime(true) - $startTime, 2);
             $output->writeln("⏱️ Execution time: {$executionTime} seconds");

@@ -35,6 +35,11 @@ use Magento\InventorySalesApi\Api\StockResolverInterface;
 class VariantBuilder
 {
     /**
+     * Design ids per sibling query on a partial (queue) build.
+     */
+    private const DESIGN_QUERY_CHUNK = 500;
+
+    /**
      * @param CollectionFactory $collectionFactory
      * @param GroupProductCacheRepository $repository
      * @param ProductVariantReferenceRepository $referenceRepository
@@ -75,16 +80,22 @@ class VariantBuilder
      * @param int $storeId
      * @param array $products
      * @param callable|null $onProduct Called once per product, for CLI progress reporting
+     * @param array|null $storeProducts Every product of the store, when the caller already
+     *                                  holds them (full build). Null loads the siblings of
+     *                                  $products' designs instead.
      * @return array Built group products
      */
-    public function buildForStore(Store $store, int $storeId, array $products, ?callable $onProduct = null): array
-    {
+    public function buildForStore(
+        Store $store,
+        int $storeId,
+        array $products,
+        ?callable $onProduct = null,
+        ?array $storeProducts = null
+    ): array {
         try {
-            // One collection query per DESIGN, not per product. Every size variant of
-            // a rug carries the same design id, so looping $products directly re-ran
-            // the same group query (and re-saved the same blob) once per sibling —
-            // ~10x the work on this catalog.
-            /** @var array<string, array{design_id: string, products: array}> $productsByDesign */
+            // One entry per DESIGN, not per product: every size variant of a rug
+            // carries the same design id, and each design is saved once.
+            /** @var array<string, array{design_ids: array<string, string>, count: int}> $productsByDesign */
             $productsByDesign = [];
             foreach ($products as $product) {
                 $designId = $product[Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE] ?? null;
@@ -96,23 +107,20 @@ class VariantBuilder
                     continue;
                 }
 
-                // Prefix the key: PHP casts numeric-string array keys to integers,
-                // while the repository contract requires the original string id.
+                // The repository contract requires the original string id, and a
+                // design spelled two collation-equal ways is saved under both.
                 $designId = (string) $designId;
-                $designKey = 'design:' . $designId;
-                $productsByDesign[$designKey]['design_id'] = $designId;
-                $productsByDesign[$designKey]['products'][] = $product;
+                $designKey = $this->designKey($designId);
+                $productsByDesign[$designKey]['design_ids'][$designId] = $designId;
+                $productsByDesign[$designKey]['count'] = ($productsByDesign[$designKey]['count'] ?? 0) + 1;
             }
 
-            $groups = [];
-            foreach ($productsByDesign as $designGroup) {
-                $designId = $designGroup['design_id'];
-                $designProducts = $designGroup['products'];
+            $siblingsByDesign = $this->groupSiblings($store, $productsByDesign, $storeProducts);
 
-                // Build variant data
-                $groupProductCollection = $this->collectionBuilder->buildForStore($store, [], $designId);
+            $groups = [];
+            foreach ($productsByDesign as $designKey => $designGroup) {
                 $variants = [];
-                foreach ($groupProductCollection as $groupProduct) {
+                foreach ($siblingsByDesign[$designKey] ?? [] as $groupProduct) {
                     $groups[] = $groupProduct;
                     $variantData = $this->buildVariantData($groupProduct);
                     if ($variantData) {
@@ -120,24 +128,27 @@ class VariantBuilder
                     }
                 }
                 if ($variants) {
-                    try {
-                        $this->repository->saveByDesignId($designId, ['variants' => $variants], $storeId);
-                    } catch (Exception $exception) {
-                        $this->logger->error(
-                            'Error saving design ID cache ' . $designId
-                            . ' for store ID ' . $storeId . ': ' . $exception->getMessage()
-                        );
+                    foreach ($designGroup['design_ids'] as $designId) {
+                        try {
+                            $this->repository->saveByDesignId($designId, ['variants' => $variants], $storeId);
+                        } catch (Exception $exception) {
+                            $this->logger->error(
+                                'Error saving design ID cache ' . $designId
+                                . ' for store ID ' . $storeId . ': ' . $exception->getMessage()
+                            );
+                        }
                     }
                 }
                 if ($onProduct) {
-                    for ($i = count($designProducts); $i > 0; $i--) {
+                    for ($i = $designGroup['count']; $i > 0; $i--) {
                         $onProduct();
                     }
                 }
             }
 
             $this->logger->info(
-                "Productify : [Group Builder] Saved " . count($groups) . " groups for store ID $storeId."
+                "Productify : [Group Builder] Saved " . count($productsByDesign) . " designs ("
+                . count($groups) . " products) for store ID $storeId."
             );
             return $groups;
         } catch (Exception $exception) {
@@ -150,6 +161,61 @@ class VariantBuilder
             );
             return [];
         }
+    }
+
+    /**
+     * Collect every store product that belongs to one of the given designs
+     *
+     * The old path ran one collection query per design. Each of those filters on an
+     * unindexed EAV value, so it scans the whole catalog: thousands of designs times
+     * the full catalog. A full build already holds every store product, so the groups
+     * are cut from that in memory; a partial build loads just the siblings it needs,
+     * DESIGN_QUERY_CHUNK designs per query.
+     *
+     * @param Store $store
+     * @param array $productsByDesign Design key => ['design_ids' => [...], 'count' => int]
+     * @param array|null $storeProducts
+     * @return array Products per design key, in entity_id order
+     */
+    private function groupSiblings(Store $store, array $productsByDesign, ?array $storeProducts): array
+    {
+        if ($storeProducts === null) {
+            $designIds = array_merge(...array_values(array_column($productsByDesign, 'design_ids')));
+            $storeProducts = [];
+            foreach (array_chunk($designIds, self::DESIGN_QUERY_CHUNK) as $chunk) {
+                $storeProducts += $this->collectionBuilder->buildForStore($store, [], $chunk);
+            }
+        }
+
+        $siblingsByDesign = [];
+        foreach ($storeProducts as $product) {
+            $designId = $product[Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE] ?? null;
+            if (!$designId) {
+                continue;
+            }
+            $designKey = $this->designKey((string) $designId);
+            if (isset($productsByDesign[$designKey])) {
+                $siblingsByDesign[$designKey][] = $product;
+            }
+        }
+        return $siblingsByDesign;
+    }
+
+    /**
+     * Grouping key for a design id, matching how the database compares them
+     *
+     * The per-design query this replaces matched with the column's utf8mb4_general_ci
+     * collation: case-insensitive, trailing spaces ignored. Grouping in PHP has to
+     * treat 'D10', 'd10' and 'D10 ' as one design too, or each spelling would save a
+     * partial variant list over the same cache row. Prefixed so a numeric id never
+     * becomes an integer array key.
+     *
+     * @param string $designId
+     * @return string
+     */
+    private function designKey(string $designId): string
+    {
+        return 'design:' . mb_strtolower(rtrim($designId, ' '));
     }
 
     /**

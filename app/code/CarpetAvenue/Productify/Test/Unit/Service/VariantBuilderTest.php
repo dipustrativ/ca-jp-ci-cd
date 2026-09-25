@@ -31,6 +31,7 @@ use Magento\InventorySalesApi\Api\StockResolverInterface;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class VariantBuilderTest extends TestCase
@@ -44,87 +45,136 @@ class VariantBuilderTest extends TestCase
         }
     }
 
-    public function testBuildsOncePerDesignAndPreservesReturnAndProgressContracts(): void
+    public function testFullBuildGroupsStoreProductsWithoutQuerying(): void
     {
         $store = $this->createStub(Store::class);
         $repository = $this->createMock(GroupProductCacheRepository::class);
         $collectionBuilder = $this->createMock(CollectionBuilder::class);
+        $collectionBuilder->expects(self::never())->method('buildForStore');
 
-        $collectionCalls = [];
-        $groupProducts = [
-            '100' => [
-                ['id' => 1, 'online' => 1, 'status' => 1],
-                ['id' => 2, 'online' => 0, 'status' => 1],
-            ],
-            '200' => [
-                ['id' => 3, 'online' => 1, 'status' => 1],
-            ],
+        $products = [
+            1 => $this->product(1, '100', 1),
+            2 => $this->product(2, '100', 0),
+            3 => $this->product(3, '200', 1),
+            5 => ['id' => 5, 'online' => 1, 'status' => 1],
         ];
-        $collectionBuilder->expects(self::exactly(2))
-            ->method('buildForStore')
-            ->willReturnCallback(
-                static function (
-                    Store $actualStore,
-                    array $ids,
-                    string $designId
-                ) use (
-                    $store,
-                    $groupProducts,
-                    &$collectionCalls
-                ): array {
-                    self::assertSame($store, $actualStore);
-                    self::assertSame([], $ids);
-                    $collectionCalls[] = $designId;
-
-                    return $groupProducts[$designId];
-                }
-            );
-
         $saveCalls = [];
-        $repository->expects(self::exactly(2))
-            ->method('saveByDesignId')
-            ->willReturnCallback(
-                static function (string $designId, array $data, int $storeId) use (&$saveCalls): void {
-                    $saveCalls[] = $designId;
-                    self::assertSame(7, $storeId);
-                    if ($designId === '100') {
-                        self::assertSame(
-                            ['variants' => [['id' => 1, 'online' => 1, 'status' => 1]]],
-                            $data
-                        );
-                    } elseif ($designId === '200') {
-                        self::assertSame(
-                            ['variants' => [['id' => 3, 'online' => 1, 'status' => 1]]],
-                            $data
-                        );
-                    } else {
-                        self::fail('Unexpected design id: ' . $designId);
-                    }
-                }
-            );
+        $this->expectSaves($repository, 2, $saveCalls);
 
         $progress = 0;
-        $products = [
-            ['id' => 1, Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE => '100'],
-            ['id' => 2, Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE => '100'],
-            ['id' => 4, Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE => '100'],
-            ['id' => 3, Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE => '200'],
-            ['id' => 5],
-        ];
-
         $result = $this->builder($repository, $collectionBuilder)->buildForStore(
             $store,
             7,
             $products,
             static function () use (&$progress): void {
                 $progress++;
+            },
+            $products
+        );
+
+        self::assertSame(
+            [
+                '100' => ['variants' => [$products[1]]],
+                '200' => ['variants' => [$products[3]]],
+            ],
+            $saveCalls
+        );
+        self::assertSame(4, $progress, 'Progress callback must run once per input product');
+        self::assertSame([$products[1], $products[2], $products[3]], $result);
+    }
+
+    public function testPartialBuildLoadsAllSiblingDesignsInOneQuery(): void
+    {
+        $store = $this->createStub(Store::class);
+        $repository = $this->createMock(GroupProductCacheRepository::class);
+        $collectionBuilder = $this->createMock(CollectionBuilder::class);
+
+        $siblings = [
+            1 => $this->product(1, '100', 1),
+            2 => $this->product(2, '100', 0),
+            4 => $this->product(4, '100', 1),
+            3 => $this->product(3, '200', 1),
+        ];
+        $collectionBuilder->expects(self::once())
+            ->method('buildForStore')
+            ->with($store, [], ['100', '200'])
+            ->willReturn($siblings);
+        $saveCalls = [];
+        $this->expectSaves($repository, 2, $saveCalls);
+
+        $progress = 0;
+        $changed = [$siblings[1], $siblings[3], ['id' => 5]];
+        $result = $this->builder($repository, $collectionBuilder)->buildForStore(
+            $store,
+            7,
+            $changed,
+            static function () use (&$progress): void {
+                $progress++;
             }
         );
 
-        self::assertSame(['100', '200'], $collectionCalls);
-        self::assertSame(['100', '200'], $saveCalls);
-        self::assertSame(5, $progress, 'Progress callback must still run once per input product');
-        self::assertSame(array_merge($groupProducts['100'], $groupProducts['200']), $result);
+        self::assertSame(
+            [
+                '100' => ['variants' => [$siblings[1], $siblings[4]]],
+                '200' => ['variants' => [$siblings[3]]],
+            ],
+            $saveCalls
+        );
+        self::assertSame(3, $progress, 'Progress callback must run once per input product');
+        self::assertSame([$siblings[1], $siblings[2], $siblings[4], $siblings[3]], $result);
+    }
+
+    public function testCollationEqualDesignIdsShareOneVariantList(): void
+    {
+        $store = $this->createStub(Store::class);
+        $repository = $this->createMock(GroupProductCacheRepository::class);
+        $collectionBuilder = $this->createStub(CollectionBuilder::class);
+
+        // utf8mb4_general_ci compares these equal, so the old per-design query
+        // returned all three rows for each spelling.
+        $products = [
+            1 => $this->product(1, 'D10', 1),
+            2 => $this->product(2, 'd10', 1),
+            3 => $this->product(3, 'D10 ', 1),
+        ];
+        $saveCalls = [];
+        $this->expectSaves($repository, 3, $saveCalls);
+
+        $this->builder($repository, $collectionBuilder)
+            ->buildForStore($store, 7, $products, null, $products);
+
+        $all = ['variants' => array_values($products)];
+        self::assertSame(['D10' => $all, 'd10' => $all, 'D10 ' => $all], $saveCalls);
+    }
+
+    private function product(int $id, string $designId, int $online): array
+    {
+        return [
+            'id' => $id,
+            'online' => $online,
+            'status' => 1,
+            Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE => $designId,
+        ];
+    }
+
+    /**
+     * Expect $expected saves and record them into $saves as design id => data, in save order
+     *
+     * @param GroupProductCacheRepository&MockObject $repository
+     * @param int $expected
+     * @param array $saves
+     */
+    private function expectSaves(
+        GroupProductCacheRepository&MockObject $repository,
+        int $expected,
+        array &$saves
+    ): void {
+        $repository->expects(self::exactly($expected))
+            ->method('saveByDesignId')
+            ->willReturnCallback(static function (string $designId, array $data, int $storeId) use (&$saves): void {
+                self::assertSame(7, $storeId);
+                $saves[$designId] = $data;
+            });
     }
 
     private function builder(

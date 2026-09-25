@@ -9,9 +9,6 @@
             </general>
         </bfcache>
         <productify>
-            <general>
-                <primary_shape_option_id>19</primary_shape_option_id>
-            </general>
             <catalog_price>
                 <hide_zeros>1</hide_zeros>
             </catalog_price>
