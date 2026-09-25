@@ -24,7 +24,7 @@
             <span class="collapse-arrow"></span>
         </div>
 
-        <div data-role="content" style="padding: 10px 10px">
+        <div data-role="content">
         <table class="data table additional-attributes" id="product-attribute-specs-table">
             <caption class="table-caption"><?= $block->escapeHtml(__('More Information')) ?></caption>
             <tbody>
@@ -158,6 +158,9 @@
         .additional-attributes-wrapper .attributes-collapse-trigger h3 {
             margin: 0;
             font-size: 1.1em;
+            /* carpetavenue.jp renders this heading at 600; without it the bare
+               `h3 { font-weight: 300 }` from the theme's type scale wins. */
+            font-weight: 600;
         }
         .additional-attributes-wrapper .attributes-collapse-trigger .collapse-arrow {
             display: inline-block;
@@ -181,6 +184,23 @@
             border: 1px solid #ddd;
             border-top: none;
             border-radius: 0 0 4px 4px;
+        }
+
+        /* Spec rows carry a 1px rule and 11px/10px cells on carpetavenue.jp.
+           Blank resets this table via `.additional-attributes-wrapper
+           .additional-attributes { width: auto }` plus `> tbody > tr > th
+           { padding: 5.5px 30px 10px 0 }` and no cell borders, so the table
+           shrink-wrapped to 246px with the rows running together. Luma — which
+           the live theme inherits from — leaves the generic `.data.table`
+           treatment in place instead. The id selector outranks blank's reset.
+           The mobile block below already does its own version of this. */
+        table#product-attribute-specs-table {
+            width: 100%;
+        }
+        table#product-attribute-specs-table > tbody > tr > th,
+        table#product-attribute-specs-table > tbody > tr > td {
+            border-top: 1px solid #ccc;
+            padding: 11px 10px;
         }
 
         @media (min-width: 769px), print {
