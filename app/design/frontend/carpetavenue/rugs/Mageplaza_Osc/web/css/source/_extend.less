@@ -90,12 +90,25 @@
         }
     }
 
+    //  `!important` because the theme's global `input[type="text"] { padding:
+    //  0 9px; height: 48px }` lands at the same specificity and is emitted
+    //  later; without it the OSC fields go back to 48px tall.
     input {
       padding: 5px 10px !important;
       height: unset !important;
 
         &:focus{
             border: 1px solid #c2c2c2 !important;
+        }
+
+        //  ...except the order-summary qty box, which Mageplaza sizes as a
+        //  26px-wide, zero-padding cell. Ten forced pixels of side padding on a
+        //  border-box that narrow leaves 4px of content, so the digit was
+        //  clipped down to a sliver. Restate Mageplaza's own metrics one class
+        //  deeper, which outranks the blanket rule above.
+        &.item_qty {
+            padding: 0 !important;
+            height: 24px !important;
         }
     }
       select{
