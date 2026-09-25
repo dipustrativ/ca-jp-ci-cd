@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace CarpetAvenue\Productify\Test\Unit\Helper;
 
 use CarpetAvenue\Productify\Helper\Data;
+use CarpetAvenue\Productify\Model\PrimaryShapeResolver;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\Context;
 use PHPUnit\Framework\TestCase;
@@ -24,7 +25,7 @@ class DataTest extends TestCase
     /**
      * @param array<string, string> $config
      */
-    private function helper(array $config = []): Data
+    private function helper(array $config = [], ?PrimaryShapeResolver $resolver = null): Data
     {
         $scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $scopeConfig->method('getValue')->willReturnCallback(
@@ -34,17 +35,22 @@ class DataTest extends TestCase
         $context = $this->createMock(Context::class);
         $context->method('getScopeConfig')->willReturn($scopeConfig);
 
-        return new Data($context);
+        return new Data($context, $resolver ?? $this->createStub(PrimaryShapeResolver::class));
     }
 
-    public function testPrimaryShapeOptionIdFallsBackToDefaultWhenUnset(): void
+    public function testPrimaryShapeOptionIdAsksResolverForAutomaticWhenUnset(): void
     {
-        $this->assertSame('19', $this->helper()->getPrimaryShapeOptionId());
+        $resolver = $this->createMock(PrimaryShapeResolver::class);
+        $resolver->expects(self::once())->method('resolve')->with('')->willReturn('14');
+
+        $this->assertSame('14', $this->helper([], $resolver)->getPrimaryShapeOptionId());
     }
 
-    public function testPrimaryShapeOptionIdComesFromConfigWhenSet(): void
+    public function testPrimaryShapeOptionIdPassesConfiguredValueToResolver(): void
     {
-        $helper = $this->helper([Data::XML_PATH_PRIMARY_SHAPE_OPTION_ID => '76']);
+        $resolver = $this->createMock(PrimaryShapeResolver::class);
+        $resolver->expects(self::once())->method('resolve')->with('76')->willReturn('76');
+        $helper = $this->helper([Data::XML_PATH_PRIMARY_SHAPE_OPTION_ID => '76'], $resolver);
 
         $this->assertSame('76', $helper->getPrimaryShapeOptionId());
     }

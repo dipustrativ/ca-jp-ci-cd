@@ -34,8 +34,8 @@ class ProductifyQueueRun extends Command
             // Area code was already set, ignore
         }
 
-        $this->queue->execute();
-        $output->writeln('<info>Queue process executed successfully.</info>');
+        // run(), not execute(): it prints each outcome and draws the build progress.
+        $this->queue->run($output);
         return Cli::RETURN_SUCCESS;
     }
 }

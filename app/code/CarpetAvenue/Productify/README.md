@@ -50,6 +50,26 @@ Every setting lives under the `productify/` config path. Groups:
 | **Layered Navigation** | `productify/layerednav/` | merged |
 | **Infinite Scroll** | `productify/ajaxscroll/` | merged |
 
+#### No attribute or option ids in code
+
+Attribute ids and option ids are assigned per database: the same attribute has a
+different id on local, staging and production. So Productify refers to attributes only
+by code (the `*_ATTRIBUTE_CODE` constants in `Helper\Data`) and resolves ids at runtime:
+
+- **Group Products CSV upload** (`Controller\Adminhtml\GroupProducts\Upload`) looks up
+  `design_id`, `design_id_group`, `configurable_size`, `config_color` and `is_group` by
+  code, and writes each one to its own value table. If any is missing, the upload stops
+  before writing anything. It used to hardcode 264 / 222 / 223. On the local database
+  those are `attr_299_persian`, `signature` and `main_name`, so uploads wrote design,
+  size and colour data into the wrong attributes. New size and colour options added by
+  an upload are now assigned in that same upload; they used to need a second one.
+- **Primary shape** (Group Products → *Primary Shape*, `productify/general/primary_shape_option_id`)
+  is a dropdown of this install's `shape` options, each shown with its product count.
+  `Model\PrimaryShapeResolver` uses the saved value only when it is a real `shape` option.
+  Otherwise, including when it's empty, it picks the shape most products have (cached,
+  cleared with the EAV cache). The old free-text default `19` is a `google_feed_category`
+  option on the local database, so no size group was ever treated as primary there.
+
 ---
 
 ### Category Enhancements
@@ -351,6 +371,91 @@ the endpoint went ~50 ms → ~25 ms and returns byte-identical HTML.
 To re-enable caching: put the customer group id (and whatever tax/VAT scope this
 store varies prices by) into the key, then restore the `load()` branch —
 `isCacheStillValid()` is the stock guard it used.
+
+### Full rebuild (`productify:group-variant:build`, `productify:product:sync`)
+
+Both commands, the admin **Build Variant** button and the queue (cron and
+`productify:queue:run`) all run `Service\ProductSync::buildAllStores()`. For every store
+view it runs these phases:
+
+| Phase | What it does |
+|---|---|
+| Loading products | `CollectionBuilder` walks the store's catalog in keyset pages of 1000 (`entity_id > last seen`), building one row per product: URL, two image URLs, four formatted prices |
+| Building variants | `VariantBuilder` groups those rows by `design_id_group` and saves one variant list per design to `carpetavenue_productify_group_product_cache` |
+| URL rewrites | Only when *URL Rewrite → Update URL* is enabled: regenerates URL keys of renamed products. Previous names are read 1000 per query |
+| Saving | `ProductifyCollection::saveMany()` upserts the rows into `carpetavenue_productify_collection`, 500 per statement |
+
+A full build passes the loaded products straight to `VariantBuilder`. A partial
+(queue) build loads only the changed products' siblings, 500 designs per query.
+The old code ran one collection query **per design**. That query filters on an
+unindexed EAV value, so each one scanned the whole catalog. It also saved with a
+SELECT plus an UPDATE per product.
+
+Keyset pages cost the same however deep they are, and a product added or deleted
+mid-run cannot shift a page and make the build skip a row, as OFFSET paging could.
+
+Design ids that differ only in case or trailing spaces (`D10`, `d10`, `D10 `) form
+one design, because the database compares them that way (`utf8mb4_general_ci`).
+
+Formatted prices apply *Catalog Pricing → Hide Zeros* in `CollectionBuilder` itself.
+The `HideZeroDecimals` plugin is frontend-only, so queue and cron builds (crontab
+area) used to store `¥168,000.00` where CLI builds stored `¥168,000`. Both now store
+`¥168,000`.
+
+Measured on the local stack: 1105 products, 160 designs (test data), one store view.
+Both tables came out byte-identical to the old code's output, on both the full and
+the partial path. A queue build now matches the CLI build exactly (9/9 designs,
+12/12 rows); before the price-format fix it matched none of them.
+
+| | Old | New |
+|---|---|---|
+| Full build, cold (`Execution time`) | 9.47 s | 2.11 s |
+| Partial build, 10 products | 0.37 s | 0.26 s |
+| Variant phase | ~2 s (160 queries) | 0.6 s (no queries) |
+| Save phase | ~3 s (2210 queries) | < 0.1 s (3 chunks, ≤ 3 statements each) |
+
+At 50 000 rows (synthetic, inside a rolled-back transaction), `saveMany()` took
+2.23 s (25 000 updates + 25 000 inserts, no duplicates), against 5.3 ms per row, or
+~267 s, for the old per-row `updateOrCreate()` in the same transaction. Grouping
+50 000 products into 7 143 designs took 0.05 s.
+
+**Where progress shows.** On the CLI, each phase gets its own progress bar on
+**stderr**, so `2>/dev/null` leaves only the result lines. On a terminal the bars
+redraw in place; piped, they print one line per 10 % or every 10 s.
+`productify:queue:run` also prints whether the cron flag is off, the queue is empty,
+or a batch of N products ran. Everywhere else (cron, admin), look in
+`var/log/carpetavenue/productify/productify_sync_<UTC date>.log`. Each phase logs a
+line when it starts (with its total), at least every 10 s while it runs, and when
+it finishes, with the real count against the announced total:
+
+```
+[…] Productify : [Queue] Starting build for all stores (all products).
+[…] Productify : [Queue] store ID 1 (jp): Loading products 0/1105 started.
+[…] Productify : [Queue] store ID 1 (jp): Loading products 1105/1105 done in 2.3s.
+[…] Productify : [Group Builder] Saved 160 designs (1105 products) for store ID 1.
+[…] Productify : [Queue] store ID 1 (jp) done in 3.0s, peak memory 132MB.
+```
+
+**A run that logs `Starting build` and then nothing** has lost its database
+connection, usually because MySQL itself died (for example an OOM kill of the
+shared MySQL container). PHP then waits on the dead socket for
+`mysqlnd.net_read_timeout`, which defaults to 86400 s (24 h), with no error. Run
+long builds with a bound so a dead database fails the command instead:
+
+```bash
+php -d mysqlnd.net_read_timeout=600 bin/magento productify:group-variant:build
+```
+
+With the setting at 3 s, a stalled `SELECT SLEEP(8)` failed after 3 s with
+`2006 MySQL server has gone away`. No single query in the build should come close
+to 600 s now that it pages.
+
+**URL rewrite template.** Nothing defines `catalog/seo/product_url_generation/template`
+any more (no admin field, no value). With URL rewrite updating enabled,
+`Helper\Config::getUrlRewriteTemplate()` returned null from a `string` method. The
+resulting TypeError got past every `catch (Exception)` and ended the whole build at the
+first renamed product. An unset template now reads as `''`, which leaves the URL key
+unchanged.
 
 ---
 
