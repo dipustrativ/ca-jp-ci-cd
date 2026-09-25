@@ -55,6 +55,7 @@ class Importer
         private readonly OrderCollectionFactory $orderCollectionFactory,
         private readonly StoreManagerInterface $storeManager,
         private readonly ProductRepositoryInterface $productRepository,
+        private readonly StateGuard $stateGuard,
         private readonly Logger $logger,
     ) {
     }
@@ -178,7 +179,9 @@ class Importer
 
         $relinked = $this->relinkItemProducts($order, $itemRows);
 
-        $this->orderRepository->save($order);
+        // Save with Magento's state auto-adjustment off, so the CSV's state/status
+        // is what lands — see StateGuard.
+        $this->stateGuard->run(fn () => $this->orderRepository->save($order));
 
         return $relinked;
     }
@@ -354,7 +357,10 @@ class Importer
         $this->applyAdditionalInformation($payment, $head['payment_additional_information'] ?? '');
         $order->setPayment($payment);
 
-        $this->orderRepository->save($order);
+        // Save with Magento's state auto-adjustment off: with no total_paid in the
+        // CSV it would turn a fully shipped `complete` order into `closed` — see
+        // StateGuard.
+        $this->stateGuard->run(fn () => $this->orderRepository->save($order));
     }
 
     /**

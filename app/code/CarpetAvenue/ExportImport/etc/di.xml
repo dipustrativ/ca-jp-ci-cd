@@ -15,6 +15,17 @@
         </arguments>
     </virtualType>
 
+    <!--
+        Imported orders keep the CSV's state/status: Magento's Handler\State would
+        otherwise turn a `complete` order with no total_paid into `closed` on save.
+        Only active inside StateGuard::run(); see StateGuard.
+    -->
+    <type name="CarpetAvenue\ExportImport\Model\Order\StateGuard" shared="true"/>
+    <type name="Magento\Sales\Model\ResourceModel\Order\Handler\State">
+        <plugin name="carpetavenue_exportimport_preserve_imported_order_state"
+                type="CarpetAvenue\ExportImport\Plugin\PreserveImportedOrderState"/>
+    </type>
+
     <type name="CarpetAvenue\ExportImport\Model\Order\Exporter">
         <arguments>
             <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>

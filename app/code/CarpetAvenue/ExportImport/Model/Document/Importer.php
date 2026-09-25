@@ -16,6 +16,7 @@ namespace CarpetAvenue\ExportImport\Model\Document;
 
 use CarpetAvenue\Core\Logger\Logger;
 use CarpetAvenue\ExportImport\Model\Config;
+use CarpetAvenue\ExportImport\Model\Order\StateGuard;
 use CarpetAvenue\ExportImport\Model\Order\ValidationResult;
 use CarpetAvenue\ExportImport\Model\ResourceModel\DocumentExtraData;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -74,6 +75,7 @@ class Importer
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly StoreManagerInterface $storeManager,
         private readonly ProductRepositoryInterface $productRepository,
+        private readonly StateGuard $stateGuard,
         private readonly Logger $logger,
     ) {
     }
@@ -355,7 +357,10 @@ class Importer
             try {
                 $order = $this->loadOrder($orderIncrementId);
                 $this->orderSynchronizer->apply($order);
-                $this->orderRepository->save($order);
+                // Totals only: the order keeps its state/status. Without the guard
+                // Magento re-derives the state on save and can close the order
+                // (e.g. shipments imported but no paid invoice) — see StateGuard.
+                $this->stateGuard->run(fn () => $this->orderRepository->save($order));
                 $synced[] = $orderIncrementId;
             } catch (\Throwable $e) {
                 $this->logger->error(sprintf(
