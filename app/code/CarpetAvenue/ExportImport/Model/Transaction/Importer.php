@@ -71,14 +71,21 @@ class Importer
      *     created: string[],
      *     updated: string[],
      *     parents_linked: int,
-     *     failed: array<string, string>
+     *     failed: array<string, string>,
+     *     skipped: array<string, string[]>
      * }
      */
-    public function import(array $parsed): array
+    public function import(array $parsed, bool $skipInvalid = false): array
     {
         $validation = $this->validator->validate($parsed);
 
-        if (!$validation->isValid()) {
+        // Skip mode: drop every row with a validation error and import the rest.
+        // A file-level error (missing header column, no data rows) is reported on
+        // line 1 and still aborts — then no row can be trusted.
+        $skipped = [];
+        if ($skipInvalid && !$validation->isValid() && !$this->hasFileLevelError($validation)) {
+            [$parsed, $skipped] = $this->withoutInvalidRows($parsed, $validation);
+        } elseif (!$validation->isValid()) {
             $this->logger->warning(sprintf(
                 'Import aborted — transaction validation failed with %d error(s).',
                 $validation->getSummary()['errors']
@@ -90,6 +97,7 @@ class Importer
                 'updated' => [],
                 'parents_linked' => 0,
                 'failed' => [],
+                'skipped' => [],
             ];
         }
 
@@ -157,10 +165,12 @@ class Importer
         $parentsLinked = $this->fixSavedRows($saved, $txnIdsByOrder);
 
         $this->logger->info(sprintf(
-            'Import finished (transactions): %d created, %d updated, %d failed, %d parent link(s) resolved.',
+            'Import finished (transactions): %d created, %d updated, %d failed, %d skipped, '
+            . '%d parent link(s) resolved.',
             count($created),
             count($updated),
             count($failed),
+            count($skipped),
             $parentsLinked
         ));
 
@@ -171,7 +181,64 @@ class Importer
             'updated' => $updated,
             'parents_linked' => $parentsLinked,
             'failed' => $failed,
+            'skipped' => $skipped,
         ];
+    }
+
+    /**
+     * Whether validation failed on the file as a whole rather than on a row.
+     * The validator reports those on line 1 (the header line), which no data row
+     * can have.
+     */
+    private function hasFileLevelError(ValidationResult $validation): bool
+    {
+        foreach ($validation->getErrors() as $error) {
+            if ((int)$error['line'] <= 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Remove every row that has a validation error. A transaction is one row, so
+     * nothing else goes with it.
+     *
+     * @param array{header: string[], rows: array<int, array{line: int, data: array<string, string>}>} $parsed
+     * @return array{0: array, 1: array<string, string[]>} the filtered file, and
+     *     skipped "order | txn_id" (or "line N") => its error messages
+     */
+    private function withoutInvalidRows(array $parsed, ValidationResult $validation): array
+    {
+        $errorsByLine = [];
+        foreach ($validation->getErrors() as $error) {
+            $errorsByLine[(int)$error['line']][] = sprintf(
+                'line %d, %s: %s',
+                (int)$error['line'],
+                $error['column'],
+                $error['message']
+            );
+        }
+
+        $skipped = [];
+        $kept = [];
+        foreach ($parsed['rows'] as $row) {
+            if (!isset($errorsByLine[$row['line']])) {
+                $kept[] = $row;
+                continue;
+            }
+            $key = $this->schema->rowKey($row['data']);
+            $key = $key !== '|' ? $key : 'line ' . $row['line'];
+            $skipped[$key] = array_merge($skipped[$key] ?? [], $errorsByLine[$row['line']]);
+        }
+        $parsed['rows'] = $kept;
+
+        $this->logger->warning(sprintf(
+            'transaction import: skipping %d row(s) with validation errors.',
+            count($skipped)
+        ));
+
+        return [$parsed, $skipped];
     }
 
     /**
