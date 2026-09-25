@@ -36,9 +36,26 @@ use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Builds the store-scoped product data persisted by Productify.
+ */
 class CollectionBuilder
 {
-    protected mixed $output;
+    /**
+     * @param CollectionFactory $collectionFactory
+     * @param GroupProductCacheRepository $repository
+     * @param ProductVariantReferenceRepository $referenceRepository
+     * @param StoreManagerInterface $storeManager
+     * @param Image $imageHelper
+     * @param CacheInterface $cache
+     * @param Emulation $emulation
+     * @param PriceCurrencyInterface $priceCurrency
+     * @param LocaleCurrency $localeCurrency
+     * @param Config $configHelper
+     * @param LoggerInterface $logger
+     * @param ManagerInterface $eventManager
+     * @param StockResolverInterface $stockResolver
+     */
     public function __construct(
         protected CollectionFactory                 $collectionFactory,
         protected GroupProductCacheRepository       $repository,
@@ -59,12 +76,12 @@ class CollectionBuilder
     /**
      * Build Products Specific Store
      *
-     * @param $store Store
+     * @param Store $store
      * @param array $productIds
-     * @param null $designId
+     * @param string|null $designId
      * @return array
      */
-    public function buildForStore(Store $store, array $productIds = [], $designId = null): array
+    public function buildForStore(Store $store, array $productIds = [], ?string $designId = null): array
     {
         $productsData = [];
 
@@ -95,7 +112,7 @@ class CollectionBuilder
 
                 /**
                  * -----------------------------------
-                 * IMPORTANT:: If added any new row must be add this row into the carpetavenue_productify_collection table
+                 * IMPORTANT: Add every new row to the carpetavenue_productify_collection table.
                  * -----------------------------------
                  */
                 $productsData[$product->getId()] = [
@@ -109,9 +126,10 @@ class CollectionBuilder
                     'online'       => $productOnline,
                     'status'       => $productStatus,
 
-                    // Images
+                    // Images. Both ids are declared in the theme's view.xml — see
+                    // getProductImageUrl() for why they must never be resized here.
                     'image'        => $this->getProductImageUrl($product, 'product_page_image_small'),
-                    'swatch_image' => $this->getProductImageUrl($product, 'swatch_image', 165, 165, ['type' => 'swatch_image']),
+                    'swatch_image' => $this->getProductImageUrl($product, 'productify_variant_swatch'),
 
                     // Currency context for the numbers below
                     'currency'        => $currencyCode,
@@ -127,8 +145,12 @@ class CollectionBuilder
                     // Ready-to-render strings
                     'price_formatted'         => $this->format($dispPrice, $store, $currencyCode),
                     'final_price_formatted'   => $this->format($dispFinalPrice, $store, $currencyCode),
-                    'special_price_formatted' => $minimalPrice ? $this->format($dispMinPrice, $store, $currencyCode) : '',
-                    'minimum_price_formated'  => $baseSpecial ? $this->format($dispSpecial, $store, $currencyCode) : '',
+                    'special_price_formatted' => $minimalPrice
+                        ? $this->format($dispMinPrice, $store, $currencyCode)
+                        : '',
+                    'minimum_price_formated'  => $baseSpecial
+                        ? $this->format($dispSpecial, $store, $currencyCode)
+                        : '',
 
                     // Attribute labels
                     Data::NAME_ATTRIBUTE_CODE => $product->getData(Data::NAME_ATTRIBUTE_CODE),
@@ -149,17 +171,20 @@ class CollectionBuilder
         return $productsData;
     }
 
-
     /**
      * Create Product Collection for Store
+     *
      * @param int $storeId Store Id
      * @param array $productIds Product IDs to filter, empty for all
-     * @param null $designId Design ID
+     * @param string|null $designId Design ID
      *
      * @throws NoSuchEntityException
      */
-    public function createProductCollection(int $storeId, array $productIds = [], $designId = null): Collection
-    {
+    public function createProductCollection(
+        int $storeId,
+        array $productIds = [],
+        ?string $designId = null
+    ): Collection {
         $collection = $this->collectionFactory->create();
         $collection
             ->setStoreId($storeId)
@@ -190,11 +215,16 @@ class CollectionBuilder
         }
 
         if ($designId) {
-            $collection->addAttributeToFilter(Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE, $designId);
+            $collection->addAttributeToFilter(
+                Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE,
+                ['eq' => $designId]
+            );
         }
 
         // Add stock data - this adds is_in_stock, qty, etc.
-        $websiteId = $this->storeManager->getStore($storeId)->getWebsite()->getCode();
+        $websiteId = $this->storeManager->getWebsite(
+            $this->storeManager->getStore($storeId)->getWebsiteId()
+        )->getCode();
         $stockId = $this->stockResolver->execute(
             SalesChannelInterface::TYPE_WEBSITE,
             $websiteId
@@ -209,7 +239,6 @@ class CollectionBuilder
 
         return $collection;
     }
-
 
     /**
      * Get currency symbol or fallback to currency code
@@ -228,11 +257,11 @@ class CollectionBuilder
      * Convert amount to store currency
      *
      * @param float $amount
-     * @param $store
+     * @param Store $store
      * @param string $currencyCode
      * @return float
      */
-    private function convert(float $amount, $store, string $currencyCode): float
+    private function convert(float $amount, Store $store, string $currencyCode): float
     {
         return $this->priceCurrency->convert($amount, $store, $currencyCode);
     }
@@ -241,11 +270,11 @@ class CollectionBuilder
      * Format amount as currency string
      *
      * @param float $amount
-     * @param $store
+     * @param Store $store
      * @param string $currencyCode
      * @return string
      */
-    private function format(float $amount, $store, string $currencyCode): string
+    private function format(float $amount, Store $store, string $currencyCode): string
     {
         return $this->priceCurrency->format(
             $amount,
@@ -257,31 +286,30 @@ class CollectionBuilder
     }
 
     /**
-     * Get product image URL with resizing
+     * Get the product image URL for a view.xml-declared image id.
+     *
+     * Deliberately no ->resize()/->constrainOnly()/->keepAspectRatio() chain: those
+     * override view.xml at runtime, and Magento can only regenerate a derivative
+     * whose params come from a view.xml <image> entry
+     * (MediaStorage\Service\ImageResize::getViewImages). An overridden size yields a
+     * cache hash neither `catalog:images:resize` nor pub/get.php can ever reproduce,
+     * so the moment the file is removed the URL serves the placeholder forever —
+     * and the URL outlives the file, because it is persisted in
+     * carpetavenue_productify_group_product_cache / carpetavenue_productify_collection.
+     *
+     * Add a new <image id> to the theme's view.xml instead of resizing here.
      *
      * @param Product|null $product
-     * @param string $imageId
-     * @param int $width
-     * @param int $height
-     * @param array $attribute
+     * @param string $imageId A view.xml-declared image id.
      * @return false|string
      */
     public function getProductImageUrl(
         ?Product $product = null,
-        string  $imageId = 'thumbnail',
-        int     $width = 200,
-        int     $height = 200,
-        array   $attribute = ['type' => 'thumbnail']
-    ): false|string
-    {
+        string $imageId = 'product_page_image_small'
+    ): false|string {
         if (!$product) {
             return false;
         }
-        return $this->imageHelper->init($product, $imageId, $attribute)
-            ->constrainOnly(true)
-            ->keepAspectRatio(true)
-            ->keepTransparency(true)
-            ->resize($width, $height)
-            ->getUrl();
+        return $this->imageHelper->init($product, $imageId)->getUrl();
     }
 }

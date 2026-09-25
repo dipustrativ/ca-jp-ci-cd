@@ -176,6 +176,52 @@ Active handles: `catalog_category_view`, `catalog_category_view_type_default`,
 
 ---
 
+## Image ids: never resize at runtime
+
+**Every image id Productify renders must be declared as an `<image id>` in
+`app/design/frontend/carpetavenue/rugs/etc/view.xml`. Never call `->resize($w, $h)` on
+`Magento\Catalog\Helper\Image`, and never use an id that no `view.xml` declares.**
+
+Magento names a resized file by an md5 of its image params
+(`Magento\Catalog\Model\View\Asset\Image::getImageInfo()`), and it can only *regenerate*
+a derivative whose params come from a `view.xml` entry — both `catalog:images:resize`
+and the `pub/get.php` fallback iterate exactly that set
+(`Magento\MediaStorage\Service\ImageResize::getViewImages()`). Override the size at
+runtime and you mint a hash nothing in the platform can ever reproduce.
+
+That is fatal here specifically because Productify **persists the rendered URL**:
+`Service/Core/CollectionBuilder.php` writes it into
+`carpetavenue_productify_group_product_cache.json_data` and
+`carpetavenue_productify_collection.swatch_image`, and the templates
+(`tile/variants.phtml`, `variants.phtml`) just echo the stored string. The URL outlives
+the file. When the file goes, `get.php` serves the placeholder on *every* request,
+forever, and writes nothing — a permanent blank image plus a permanent PHP-FPM hit.
+
+This happened on the sibling Carpient store. Colour chips were built with
+`init($product, 'swatch_image', …)->resize(165, 165)`, producing hash
+`3a98496dd7cb0c8b28c4c254a98f915a` — a bucket no `view.xml` described. The chips went
+blank across the storefront and no resize command could bring them back. Fixed by
+declaring `productify_variant_swatch` (165×165, `type="swatch_image"`) in the theme and
+dropping the runtime chain; the declared defaults reproduce the identical hash, so the
+stored URLs stayed valid and merely became regenerable.
+
+`Test/Unit/VariantSwatchImageHashTest.php` pins that hash, while
+`Test/Unit/Service/CollectionBuilderImageTest.php` asserts that Productify calls only
+`init(...)->getUrl()` and never applies a runtime resize/constraint override. If either
+test fails, a declared or emitted image URL is at risk of being orphaned.
+
+| Rendered as | Image id | Declared in |
+|---|---|---|
+| PDP variant image + size/colour thumbnails | `product_page_image_small` (320×280) | theme `view.xml` |
+| Colour chips (PLP + PDP) | `productify_variant_swatch` (165×165) | theme `view.xml` |
+| Related carousel | `related_products_carousel_list` (175×175) | theme `view.xml` |
+| Search suggest | `category_page_grid` | theme `view.xml` |
+
+Changing a declared size changes the hash, which orphans every URL already stored in the
+two tables above — rerun `productify:group-variant:build` in the same deploy.
+
+---
+
 ## Merged Modules
 
 Four modules were absorbed into `CarpetAvenue_Productify`. Code moved with `git mv`, so history

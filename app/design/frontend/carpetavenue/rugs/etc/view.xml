@@ -66,6 +66,24 @@
                 <width>400</width>
                 <height>600</height>
             </image>
+            <!--
+                Colour chips on the PLP tile and the PDP variant selector.
+                Declared here — and NOT resized at runtime — because Magento can
+                only regenerate a cached derivative whose params come from a
+                view.xml entry (ImageResize::getViewImages). A helper call that
+                ends in ->resize(w,h) produces a hash nothing can ever recreate:
+                once the file is deleted, get.php serves the placeholder forever.
+
+                Stock swatch_image (Magento_Swatches, 30x20) is the wrong aspect
+                and far too small for a round chip. These are the dimensions the
+                chips have always been built at, so the hash — and therefore every
+                URL already stored in carpetavenue_productify_group_product_cache —
+                is unchanged; it just becomes regenerable.
+            -->
+            <image id="productify_variant_swatch" type="swatch_image">
+                <width>165</width>
+                <height>165</height>
+            </image>
         </images>
     </media>
 </view>

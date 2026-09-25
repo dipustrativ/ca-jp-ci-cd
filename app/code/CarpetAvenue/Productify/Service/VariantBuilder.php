@@ -34,17 +34,6 @@ use Magento\InventorySalesApi\Api\StockResolverInterface;
 
 class VariantBuilder
 {
-    private array $watchedAttributes = [
-        'final_price',
-        'status',
-        'online',
-        'qty',
-        'is_saleable',
-        Data::COLOR_ATTRIBUTE_CODE,
-        Data::SIZE_ATTRIBUTE_CODE,
-        Data::SHAPE_ATTRIBUTE_CODE
-    ];
-
     /**
      * @param CollectionFactory $collectionFactory
      * @param GroupProductCacheRepository $repository
@@ -79,24 +68,46 @@ class VariantBuilder
     ) {
     }
 
-
     /**
      * Build variant cache for a specific store
      *
-     * @param $store Store
+     * @param Store $store
      * @param int $storeId
      * @param array $products
-     * @return array Design ID => Variants data
+     * @param callable|null $onProduct Called once per product, for CLI progress reporting
+     * @return array Built group products
      */
-    public function buildForStore(Store $store, int $storeId, array $products): array
+    public function buildForStore(Store $store, int $storeId, array $products, ?callable $onProduct = null): array
     {
         try {
-            $groups = [];
+            // One collection query per DESIGN, not per product. Every size variant of
+            // a rug carries the same design id, so looping $products directly re-ran
+            // the same group query (and re-saved the same blob) once per sibling —
+            // ~10x the work on this catalog.
+            /** @var array<string, array{design_id: string, products: array}> $productsByDesign */
+            $productsByDesign = [];
             foreach ($products as $product) {
                 $designId = $product[Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE] ?? null;
                 if (!$designId) {
+                    // Still has to tick: the progress bar total counts every product.
+                    if ($onProduct) {
+                        $onProduct();
+                    }
                     continue;
                 }
+
+                // Prefix the key: PHP casts numeric-string array keys to integers,
+                // while the repository contract requires the original string id.
+                $designId = (string) $designId;
+                $designKey = 'design:' . $designId;
+                $productsByDesign[$designKey]['design_id'] = $designId;
+                $productsByDesign[$designKey]['products'][] = $product;
+            }
+
+            $groups = [];
+            foreach ($productsByDesign as $designGroup) {
+                $designId = $designGroup['design_id'];
+                $designProducts = $designGroup['products'];
 
                 // Build variant data
                 $groupProductCollection = $this->collectionBuilder->buildForStore($store, [], $designId);
@@ -112,16 +123,31 @@ class VariantBuilder
                     try {
                         $this->repository->saveByDesignId($designId, ['variants' => $variants], $storeId);
                     } catch (Exception $exception) {
-                        $this->logger->error('Error saving design ID cache'.' '.$designId.' for store ID '.$storeId.': '.$exception->getMessage());
+                        $this->logger->error(
+                            'Error saving design ID cache ' . $designId
+                            . ' for store ID ' . $storeId . ': ' . $exception->getMessage()
+                        );
+                    }
+                }
+                if ($onProduct) {
+                    for ($i = count($designProducts); $i > 0; $i--) {
+                        $onProduct();
                     }
                 }
             }
 
-            $this->logger->info("Productify : [Group Builder] Saved " . count($groups) . " groups for store ID $storeId.");
+            $this->logger->info(
+                "Productify : [Group Builder] Saved " . count($groups) . " groups for store ID $storeId."
+            );
             return $groups;
         } catch (Exception $exception) {
-            $this->logger->error('Productify : [Queue] [Group Builder] Error - '.$exception->getMessage());
-            $this->logger->error('Productify : [Queue] [Group Builder] Error File - ".'.$exception->getFile().":".$exception->getLine());
+            $this->logger->error(
+                'Productify : [Queue] [Group Builder] Error - ' . $exception->getMessage()
+            );
+            $this->logger->error(
+                'Productify : [Queue] [Group Builder] Error File - '
+                . $exception->getFile() . ':' . $exception->getLine()
+            );
             return [];
         }
     }
