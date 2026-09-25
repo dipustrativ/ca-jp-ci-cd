@@ -62,44 +62,15 @@ class Data extends AbstractHelper
     const QUEUE_BATCH_SIZE = 500;
 
     /**
-     * Fallback round-shape attribute option id, used when the admin setting
-     * (productify/general/round_shape_option_id) is empty.
-     */
-    const SHAPE_ROUND_OPTION_ID = '20';
-
-    /**
      * Fallback primary-shape (rectangular) attribute option id, used when the
      * admin setting (productify/general/primary_shape_option_id) is empty.
      */
     const SHAPE_PRIMARY_OPTION_ID = '19';
 
     /**
-     * Config path for the round-shape option id.
-     */
-    const XML_PATH_ROUND_SHAPE_OPTION_ID = 'productify/general/round_shape_option_id';
-
-    /**
      * Config path for the primary-shape option id.
      */
     const XML_PATH_PRIMARY_SHAPE_OPTION_ID = 'productify/general/primary_shape_option_id';
-
-    /**
-     * Round-shape attribute option id, read from admin config and falling back
-     * to the hardcoded default when the setting is unset/empty.
-     *
-     * @param int|null $storeId
-     * @return string
-     */
-    public function getRoundShapeOptionId($storeId = null): string
-    {
-        $value = $this->scopeConfig->getValue(
-            self::XML_PATH_ROUND_SHAPE_OPTION_ID,
-            ScopeInterface::SCOPE_STORE,
-            $storeId
-        );
-
-        return ($value === null || $value === '') ? self::SHAPE_ROUND_OPTION_ID : (string) $value;
-    }
 
     /**
      * Primary-shape (rectangular) attribute option id, read from admin config
@@ -126,11 +97,11 @@ class Data extends AbstractHelper
      * Same rule as formatSize(), but for an already-built size label
      * ("160x230", "160 x 230 cm") such as the variant cache stores.
      *
-     * Round + square labels become "∅ W cm"; anything else keeps its original
+     * Square labels become "∅ W cm"; anything else keeps its original
      * spelling and only gains the "cm" unit when missing.
      *
      * @param string $label
-     * @param int|string|null $shape
+     * @param int|string|null $shape Unused — kept for call-site compatibility
      * @return string
      */
     public function formatSizeLabel(string $label, $shape = null): string
@@ -160,13 +131,15 @@ class Data extends AbstractHelper
      * Human-readable rug size string, rendered identically everywhere
      * (listings, widgets, cart, tiles).
      *
-     * Diameter notation (∅ W cm) only when the rug is round (shape option id
-     * from config) AND width == length; otherwise "W x L cm". Returns '' when
-     * width or length is missing. Caller is responsible for escaping.
+     * Diameter notation (∅ W cm) whenever width == length, matching
+     * carpient.com; otherwise "W x L cm". Shape is deliberately not consulted —
+     * only Round and Square rugs ever have equal sides, and both read as ∅ on
+     * the live site. Returns '' when width or length is missing. Caller is
+     * responsible for escaping.
      *
      * @param int|float|string|null $width
      * @param int|float|string|null $length
-     * @param int|string|null $shape
+     * @param int|string|null $shape Unused — kept for call-site compatibility
      * @return string
      */
     public function formatSize($width, $length, $shape = null): string
@@ -175,7 +148,7 @@ class Data extends AbstractHelper
             return '';
         }
 
-        if ((string) $shape === $this->getRoundShapeOptionId() && (float) $width === (float) $length) {
+        if ((float) $width === (float) $length) {
             return '∅ ' . $width . ' cm';
         }
 

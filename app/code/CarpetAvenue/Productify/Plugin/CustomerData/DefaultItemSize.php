@@ -48,7 +48,8 @@ class DefaultItemSize
         }
 
         return array_merge($data, [
-            'is_round' => $product->getData('shape') == 20,
+            // ∅ whenever the sides are equal — same rule as Data::formatSize()
+            'is_round' => (float) $size[0] > 0 && (float) $size[0] === (float) $size[1],
             'width' => $size[0],
             'length' => $size[1],
         ]);
