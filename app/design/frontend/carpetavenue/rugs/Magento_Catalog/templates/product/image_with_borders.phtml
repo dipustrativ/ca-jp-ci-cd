@@ -1,0 +1,48 @@
+<?php
+/**
+ * Copy of Magento_Catalog's image_with_borders.phtml with the lazyload hook the
+ * rest of this theme already assumes: the real URL moves to data-original and
+ * src carries the placeholder thumb, so Magento_Theme/js/lazyload swaps it in on
+ * scroll. Hover swap (product/list.phtml), infinite scroll (Productify
+ * ajaxscroll/init.phtml) and plp-snapshot.js all read data-original.
+ * Keep the rest in sync with core on upgrade.
+ */
+/** @var $block \Magento\Catalog\Block\Product\Image */
+/** @var $escaper \Magento\Framework\Escaper */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+$width = (int)$block->getWidth();
+$height = (int)$block->getHeight();
+$paddingBottom = $block->getRatio() * 100;
+?>
+<span class="product-image-container product-image-container-<?= /* @noEscape */ $block->getProductId() ?>">
+    <span class="product-image-wrapper">
+        <img class="<?= $escaper->escapeHtmlAttr($block->getClass()) ?> lazy-load"
+            <?php foreach ($block->getCustomAttributes() as $name => $value): ?>
+                <?= $escaper->escapeHtmlAttr($name) ?>="<?= $escaper->escapeHtml($value) ?>"
+            <?php endforeach; ?>
+            data-original="<?= $escaper->escapeUrl($block->getImageUrl()) ?>"
+            src="<?= $escaper->escapeUrl($block->getViewFileUrl('Magento_Theme::images/lazyload_thumb.webp')) ?>"
+            loading="lazy"
+            width="<?= $escaper->escapeHtmlAttr($block->getWidth()) ?>"
+            height="<?= $escaper->escapeHtmlAttr($block->getHeight()) ?>"
+            alt="<?= $escaper->escapeHtmlAttr($block->getLabel()) ?>"/></span>
+</span>
+<?php
+$styles = <<<STYLE
+.product-image-container-{$block->getProductId()} {
+    width: {$width}px;
+    height: auto;
+    aspect-ratio: {$width} / {$height};
+}
+.product-image-container-{$block->getProductId()} span.product-image-wrapper {
+    height: 100%;
+    width: 100%;
+}
+@supports not (aspect-ratio: auto) {
+    .product-image-container-{$block->getProductId()} span.product-image-wrapper {
+        padding-bottom: {$paddingBottom}%;
+    }
+}
+STYLE;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('style', [], $styles, false) ?>
