@@ -1110,10 +1110,9 @@
             color: #333;
         }
 
-        //  The recently-viewed widget prints a bare <strong>, so it fell
-        //  through to the blank theme's 1.8rem/300 block title while the
-        //  section right above it (similar products) renders at 37px/bold.
-        //  Match the neighbour — same selector weight as the similar block's.
+        //  Both widgets print a bare <strong>, which otherwise falls through to
+        //  the blank theme's 1.8rem/300 block title. 37px is the promo-widget
+        //  heading size on carpetavenue.jp; recently-viewed overrides it below.
         strong {
             font-size: 37px;
             font-weight: @font-weight__bold;
@@ -1160,6 +1159,14 @@
                 }
             }
         }
+    }
+
+    //  carpetavenue.jp prints this one at 25px — the size of the similar-
+    //  products heading above it, not the 37px its promo widgets use. Named
+    //  `.block.widget` for the two extra classes, so the size doesn't depend on
+    //  this rule staying below the shared one.
+    .block.widget.block-viewed-products-grid .block-title strong {
+        font-size: 25px;
     }
 
     .block-products-list.grid,
@@ -1691,7 +1698,14 @@
 //  and the cards stayed one-up on mobile. `.block-products-list.grid` carries
 //  an extra class and so never had this problem. Name `.block.widget` here for
 //  the two classes that break the tie.
-.block.widget.block-viewed-products-grid .products-grid .product-items .product-item {
+//
+//  `:nth-child(n)` adds one more, because blank restates the same margin on
+//  `.page-layout-1column .block.widget .products-grid .product-item:nth-child(
+//  3n + 1)` (768px up) and `:nth-child(4n + 1)` (1024px up) — six classes, the
+//  same as this rule without the pseudo-class, and again loaded later. Cards 4,
+//  5 and 7 kept their 2%, and since the flex items already measure 20% apiece
+//  that pushed the fifth card onto row two and left a gap at the end of row one.
+.block.widget.block-viewed-products-grid .products-grid .product-items .product-item:nth-child(n) {
     margin-left: 0;
 }
 
@@ -1715,6 +1729,19 @@
 
     .price-box {
         order: 3;
+    }
+
+    //  This widget prints the old price through the tax renderer, so the amount
+    //  sits in an extra `.price-wrapper.price-including-tax` that blank styles
+    //  `display: block; font-size: 1.8rem; line-height: 1` — the PLP card has no
+    //  such wrapper. The strike-through is painted by `.old-price` (14px/15.4),
+    //  so routing the 12px amount through an 18px block moved the line off the
+    //  glyphs and down onto the baseline. Render it inline at the card's own
+    //  metrics, the way carpetavenue.jp does.
+    .old-price .price-wrapper {
+        display: inline;
+        font-size: inherit;
+        line-height: inherit;
     }
 
     .product-item-actions {
