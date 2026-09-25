@@ -949,13 +949,15 @@
     //  Minicart dropdown (ported from base Evalent/carpet)
     //  _____________________________________________
 
+    //  Live's content.html renders two `.actions`: the "Proceed to Checkout"
+    //  button first, the "View and Edit Cart" link second, and hides the first
+    //  one here (this store sends people to the cart page, not straight to
+    //  checkout). Our content.html already merges them into a single `.actions`
+    //  holding the cart link, so `display: none` was hiding the dropdown's only
+    //  button — the panel ended at the item list with no call to action.
+    //  `cart_empty_message` is never populated by core, so the empty-cart branch
+    //  of the template emits no `.actions` either; one is all we ever render.
     .block-minicart .block-content > .actions {
-        display: none;
-
-        & ~ .actions {
-            display: block;
-        }
-
         a {
             background: #eee;
             padding: 14px;
@@ -980,23 +982,73 @@
                 padding: 10px 0 50px;
             }
 
+            //  Ported from the live theme, Evalent/carpet Magento_Checkout
+            //  _extend.less:331 ("Reordering and styling of content in minicart
+            //  2020-03-27"). Blank floats `.items-total`, our `.subtotal` below
+            //  floats too, and blank gives `.minicart-items-wrapper`
+            //  `overflow-x: auto` — which makes it a block formatting context,
+            //  so instead of stacking under the floats it shrank to 156px of the
+            //  378px content box and sat beside them, clipping every item row.
+            //  Floats are inert on flex items, so the column lays them out and
+            //  `order` fixes the sequence.
+            //
+            //  Live also sets `position: relative` here. Left `static` on
+            //  purpose: that would re-parent blank's absolutely-positioned
+            //  `.action.close` from the dropdown onto this box and shift the X
+            //  in by the dropdown's own 25px/20px padding. Live compensates with
+            //  negative offsets it needs for Luma's close chrome; ours is
+            //  already where it belongs.
             .block-content {
                 position: static;
+                .lib-vendor-prefix-display(flex);
+                .lib-vendor-prefix-flex-direction(column);
+
+                .items-total {
+                    .lib-vendor-prefix-order(0);
+                    display: flex;
+                    text-align: left;
+
+                    .count {
+                        padding-right: 5px;
+                    }
+                }
+
+                .subtotal {
+                    .lib-vendor-prefix-order(0);
+                }
+
+                .minicart-items-wrapper {
+                    .lib-vendor-prefix-order(4);
+                }
 
                 & > .actions {
                     margin: 0 -25px;
 
+                    //  No bottom margin: carpetavenue.jp zeroes it on the
+                    //  wrapper that actually holds its cart button, via
+                    //  `.block-minicart.block .block-content > .actions >
+                    //  .secondary { margin: 0 }` (Evalent/carpet
+                    //  Magento_Checkout/_extend.less:850) — a block this theme
+                    //  never ported. Live's button sits in `.secondary`, ours in
+                    //  `.primary`, so ours kept the 15px and the gap under the
+                    //  button came out 50px against live's 35px (20px padding
+                    //  here + the 15px top margin on the empty
+                    //  `.minicart-widgets` that follows).
                     & > .primary,
                     & > .secondary {
-                        margin: 0 0 15px;
+                        margin: 0;
                         padding: 20px;
 
                         .action.primary {
                             font-size: 1.5rem;
                         }
 
+                        //  No top margin: the 20px padding on `.primary` above
+                        //  is the whole gap on carpetavenue.jp, whose
+                        //  `.secondary .viewcart` carries no margin at all. The
+                        //  25px here came in with the theme import and pushed
+                        //  the button 45px clear of the subtotal.
                         .action.primary.viewcart {
-                            margin-top: 25px;
                             background-color: #2c8e3b !important;
                             color: #fff;
                         }
