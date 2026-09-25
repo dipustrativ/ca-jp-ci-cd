@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace CarpetAvenue\ExportImport\Model\Transaction;
 
 use CarpetAvenue\Core\Logger\Logger;
+use CarpetAvenue\ExportImport\Model\ErrorMessage;
 use CarpetAvenue\ExportImport\Model\Order\ValidationResult;
 use CarpetAvenue\ExportImport\Model\ResourceModel\DocumentExtraData;
 use CarpetAvenue\ExportImport\Model\ResourceModel\TransactionExtraData;
@@ -152,12 +153,12 @@ class Importer
                     'created' => $mode !== 'update',
                 ];
             } catch (\Throwable $e) {
-                $failed[$key] = $e->getMessage();
+                $failed[$key] = ErrorMessage::describe($e);
                 $this->logger->error(sprintf(
                     'Import failed for transaction %s (%s): %s',
                     $key,
                     $mode,
-                    $e->getMessage()
+                    ErrorMessage::describe($e)
                 ));
             }
         }

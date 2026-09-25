@@ -499,6 +499,18 @@ Comments (`sales_invoice_comment` / `sales_creditmemo_comment` /
 oldest first, carrying `comment`, `is_customer_notified`, `is_visible_on_front`,
 `created_at`, `user_id` and `user_type`.
 
+### Adjustment-only credit memos have no item rows
+
+A refund can be an adjustment alone (`adjustment_positive` /
+`adjustment_negative`) with no product line. Export writes such a credit memo as
+one row with every `item_*` column empty. Validation accepts that row for credit
+memos only (`TypeInterface::allowsItemlessDocument()`), and the importer skips it
+when building items, so the credit memo is created with its amounts and no items.
+A warning flags one that has no items, no adjustment and a zero total. For an
+invoice or a shipment an empty item row is still an error (`item_sku is
+required`): with no items they record nothing. A row with an `item_sku` but no
+`item_qty` is an error for every type.
+
 ### What is different about a shipment
 
 Three things, all declared on `Type/Shipment` so the shared engine needs no
@@ -584,6 +596,33 @@ Comments — and a shipment's tracks — are added **after** the first save and 
 document is saved again. Every model stamps the child's `parent_id` from the
 document id at add time, and that column is `NOT NULL`, so attaching them to an
 unsaved document would insert a null parent.
+
+**MSI stock deduction is switched off for imported documents.** "Touches no
+stock" was not true on its own: MSI observes `sales_order_shipment_save_after`
+(`SourceDeductionProcessor`) and `sales_order_invoice_save_after`
+(`VirtualSourceDeductionProcessor`) and deducts source stock for every new
+document, whoever saves it. For a shipment that also crashed. The processor
+takes the source from the shipment's `source_code` extension attribute and falls
+back to the default source only in single-source mode. An imported shipment has
+no source code and this install has several sources, so `$sourceCode` was never
+assigned (`SourceDeductionProcessor.php:112`), the warning became an exception, and
+`ShipmentRepository::save()` reported only **"The shipment couldn't be saved."**
+The importer now saves inside `Model/Document/StockDeductionGuard::run()`, and
+`Plugin/SkipImportedDocumentStockDeduction` skips both observers while the guard
+is active. Outside an import both run exactly as in core.
+
+**Other observers still fire on imported documents.** IXPF's
+`InvoiceSaveWebhook` / `ShipmentSaveWebhook` / `CreditmemoSaveWebhook` send the ERP
+a webhook for every document saved (create *and* update) when
+`ixpfng/product/enable_webhook` is on, and `IXPF\Syncer\Observer\ReservationRefund`
+records a refunded reservation for every new credit memo. Turn the webhook off
+on the target instance for a bulk migration unless the ERP should be told.
+
+**Failure reasons name the real cause.** Magento's sales repositories wrap any
+error in a generic `CouldNotSaveException`. `Model/ErrorMessage::describe()` walks
+the exception chain, so the Not imported list reads for example "The shipment
+couldn't be saved. — caused by: Warning: Undefined variable $sourceCode in …"
+rather than the wrapper alone. The order and transaction importers use it too.
 
 ### Update path
 

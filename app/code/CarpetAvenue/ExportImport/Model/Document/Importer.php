@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace CarpetAvenue\ExportImport\Model\Document;
 
 use CarpetAvenue\Core\Logger\Logger;
+use CarpetAvenue\ExportImport\Model\ErrorMessage;
 use CarpetAvenue\ExportImport\Model\Config;
 use CarpetAvenue\ExportImport\Model\Order\StateGuard;
 use CarpetAvenue\ExportImport\Model\Order\ValidationResult;
@@ -76,6 +77,7 @@ class Importer
         private readonly StoreManagerInterface $storeManager,
         private readonly ProductRepositoryInterface $productRepository,
         private readonly StateGuard $stateGuard,
+        private readonly StockDeductionGuard $stockDeductionGuard,
         private readonly Logger $logger,
     ) {
     }
@@ -139,25 +141,28 @@ class Importer
         foreach ($grouped as $incrementId => $itemRows) {
             $mode = $plan[(string)$incrementId]['mode'] ?? 'create';
             try {
+                // No MSI stock deduction for an imported document — see StockDeductionGuard.
                 if ($mode === 'update') {
-                    $count = $this->updateDocument((string)$incrementId, $itemRows);
+                    $count = $this->stockDeductionGuard->run(
+                        fn () => $this->updateDocument((string)$incrementId, $itemRows)
+                    );
                     $updated[] = (string)$incrementId;
                     if ($count > 0) {
                         $relinked[(string)$incrementId] = $count;
                     }
                 } else {
-                    $this->createDocument((string)$incrementId, $itemRows);
+                    $this->stockDeductionGuard->run(fn () => $this->createDocument((string)$incrementId, $itemRows));
                     $created[] = (string)$incrementId;
                 }
                 $touchedOrders[(string)($itemRows[0]['order_increment_id'] ?? '')] = true;
             } catch (\Throwable $e) {
-                $failed[(string)$incrementId] = $e->getMessage();
+                $failed[(string)$incrementId] = ErrorMessage::describe($e);
                 $this->logger->error(sprintf(
                     'Import failed for %s %s (%s): %s',
                     $this->type->getCode(),
                     $incrementId,
                     $mode,
-                    $e->getMessage()
+                    ErrorMessage::describe($e)
                 ));
             }
         }
@@ -441,7 +446,7 @@ class Importer
                     'Could not resync totals for order %s after importing %ss: %s',
                     $orderIncrementId,
                     $this->type->getCode(),
-                    $e->getMessage()
+                    ErrorMessage::describe($e)
                 ));
             }
         }

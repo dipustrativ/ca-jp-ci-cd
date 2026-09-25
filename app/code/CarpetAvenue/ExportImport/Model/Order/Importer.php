@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace CarpetAvenue\ExportImport\Model\Order;
 
 use CarpetAvenue\Core\Logger\Logger;
+use CarpetAvenue\ExportImport\Model\ErrorMessage;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterfaceFactory;
@@ -115,12 +116,12 @@ class Importer
                     $created[] = (string)$incrementId;
                 }
             } catch (\Throwable $e) {
-                $failed[(string)$incrementId] = $e->getMessage();
+                $failed[(string)$incrementId] = ErrorMessage::describe($e);
                 $this->logger->error(sprintf(
                     'Import failed for order %s (%s): %s',
                     $incrementId,
                     $mode,
-                    $e->getMessage()
+                    ErrorMessage::describe($e)
                 ));
             }
         }

@@ -101,6 +101,17 @@ interface TypeInterface
     public function hasCurrencyColumns(): bool;
 
     /**
+     * Whether a document of this type may have no items at all.
+     *
+     * True for credit memos only: a refund can be an adjustment alone
+     * (`adjustment_positive` / `adjustment_negative`) with no product line.
+     * Such a document exports as one row whose item columns are all empty, and
+     * that row must validate. An invoice or shipment with no items records
+     * nothing, so an empty item row stays an error there.
+     */
+    public function allowsItemlessDocument(): bool;
+
+    /**
      * A collection of every document of this type, ready for the exporter to filter.
      *
      * @return InvoiceCollection|CreditmemoCollection|ShipmentCollection

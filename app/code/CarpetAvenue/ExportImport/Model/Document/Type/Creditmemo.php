@@ -291,4 +291,14 @@ class Creditmemo extends AbstractType
         }
         return $this->invoiceIncrementIds[$invoiceId];
     }
+
+    /**
+     * An adjustment-only refund has no item lines.
+     *
+     * @inheritDoc
+     */
+    public function allowsItemlessDocument(): bool
+    {
+        return true;
+    }
 }

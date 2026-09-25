@@ -131,7 +131,27 @@ class Validator
             }
 
             $sku = $data['item_sku'] ?? '';
-            if ($sku === '') {
+            // A type that allows item-less documents (an adjustment-only credit
+            // memo) exports them as one row with every item column empty. That row
+            // is valid; the importer skips it when building items.
+            $itemlessRow = $sku === '' && ($data['item_qty'] ?? '') === ''
+                && $this->type->allowsItemlessDocument();
+            if ($itemlessRow) {
+                if ($this->isZeroOrEmpty($data['adjustment_positive'] ?? '')
+                    && $this->isZeroOrEmpty($data['adjustment_negative'] ?? '')
+                    && $this->isZeroOrEmpty($data['grand_total'] ?? '')
+                ) {
+                    $result->addWarning(
+                        $line,
+                        'item_sku',
+                        (string)__(
+                            'The %1 has no items and no adjustment or total — it will be imported but '
+                            . 'records no amount.',
+                            $label
+                        )
+                    );
+                }
+            } elseif ($sku === '') {
                 $result->addError($line, 'item_sku', (string)__('item_sku is required.'));
             } elseif ($orderIncrementId !== '' && isset($orderIds[$orderIncrementId])) {
                 $skusOfOrder = $orderItemSkus[$orderIds[$orderIncrementId]] ?? [];
@@ -154,7 +174,7 @@ class Validator
             // Emptiness only — `item_qty` is a `:num` column, so the loop below
             // already reports a non-numeric value, and checking it twice here
             // would put the same row in the error table twice.
-            if (($data['item_qty'] ?? '') === '') {
+            if (!$itemlessRow && ($data['item_qty'] ?? '') === '') {
                 $result->addError($line, 'item_qty', (string)__('item_qty is required.'));
             }
 
@@ -193,6 +213,11 @@ class Validator
         ));
 
         return $result;
+    }
+
+    private function isZeroOrEmpty(string $value): bool
+    {
+        return $value === '' || (is_numeric($value) && abs((float)$value) < 0.0001);
     }
 
     /**

@@ -227,6 +227,16 @@ abstract class AbstractType implements TypeInterface
         return true;
     }
 
+    /**
+     * Invoices and shipments need items; {@see Creditmemo} overrides this.
+     *
+     * @inheritDoc
+     */
+    public function allowsItemlessDocument(): bool
+    {
+        return false;
+    }
+
     /** @inheritDoc */
     public function exportExtraColumns(AbstractModel $document): array
     {

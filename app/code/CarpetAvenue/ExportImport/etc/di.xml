@@ -26,6 +26,21 @@
                 type="CarpetAvenue\ExportImport\Plugin\PreserveImportedOrderState"/>
     </type>
 
+    <!--
+        Imported documents are history: MSI must not deduct stock for them again.
+        SourceDeductionProcessor also crashed on them (no source_code on an imported
+        shipment, several sources here). Only active inside StockDeductionGuard::run().
+    -->
+    <type name="CarpetAvenue\ExportImport\Model\Document\StockDeductionGuard" shared="true"/>
+    <type name="Magento\InventoryShipping\Observer\SourceDeductionProcessor">
+        <plugin name="carpetavenue_exportimport_skip_imported_document_stock_deduction"
+                type="CarpetAvenue\ExportImport\Plugin\SkipImportedDocumentStockDeduction"/>
+    </type>
+    <type name="Magento\InventoryShipping\Observer\VirtualSourceDeductionProcessor">
+        <plugin name="carpetavenue_exportimport_skip_imported_document_stock_deduction"
+                type="CarpetAvenue\ExportImport\Plugin\SkipImportedDocumentStockDeduction"/>
+    </type>
+
     <type name="CarpetAvenue\ExportImport\Model\Order\Exporter">
         <arguments>
             <argument name="logger" xsi:type="object">CarpetAvenue\ExportImport\Logger\ExportImportLogger</argument>
