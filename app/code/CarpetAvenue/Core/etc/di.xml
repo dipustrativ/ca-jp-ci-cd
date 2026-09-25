@@ -3,4 +3,12 @@
     <preference for="Magento\CatalogImportExport\Model\Import\Uploader" type="CarpetAvenue\Core\Model\Import\Uploader"/>
     <!-- OSC InitializeColumns performs DDL; run it outside the patch transaction (MySQL 8 fix) -->
     <preference for="Mageplaza\Osc\Setup\Patch\Data\InitializeColumns" type="CarpetAvenue\Core\Override\Mageplaza\Osc\InitializeColumns"/>
+
+    <!-- Global, not frontend: pub/get.php runs in Area::AREA_GLOBAL, so a plugin
+         declared in etc/frontend/di.xml would never fire for a media request. -->
+    <type name="Magento\MediaStorage\Model\File\Storage\Response">
+        <plugin name="carpetavenue_core_no_store_on_media_placeholder"
+                type="CarpetAvenue\Core\Plugin\NoStoreOnMediaPlaceholder"
+                sortOrder="10"/>
+    </type>
 </config>
