@@ -397,6 +397,33 @@ never a base amount or a rate — so an update cannot introduce a missing rate.
 Erroring there blocked the whole file: one legacy order with a NULL rate stopped
 every other order in the CSV from being updated, re-links included.
 
+## Imported orders keep the CSV's state and status
+
+Every `orderRepository->save()` runs Magento's
+`Magento\Sales\Model\ResourceModel\Order\Handler\State::check()` from the order
+resource model's `_beforeSave()`, and that handler re-derives the state from the
+order's aggregates. For an imported order those aggregates are incomplete by
+design: the order CSV carries no `total_paid` (see the scope notes in
+`Model/Order/Schema.php`). With `total_paid` NULL, `canCreditmemo()` is false, and
+once every item's `qty_shipped` is filled in, `checkForClosedState()` rewrote a
+`complete` order to **`closed/closed`** on the same save that created it. Updates
+and the document-import totals resync did the same.
+
+The importer now saves inside `Model/Order/StateGuard::run()`, and
+`Plugin/PreserveImportedOrderState` (around `Handler\State::check()`) skips the
+handler while the guard is active. The CSV's `order_state` / `order_status` land
+unchanged in `sales_order`, `sales_order_grid` and the status-change log. Outside
+an import the handler runs exactly as in core.
+
+**Caveat:** the order's aggregates stay as imported. An order with no
+`total_paid` still gets closed by core the next time anything else saves it (an
+admin comment, a Syncer update). To prevent that, import its paid invoices, which
+[fill in `total_paid`](#order-totals-are-recomputed-from-the-documents).
+
+Verified 2026-09-25 (local): a `complete` order with full `qty_shipped` and no
+`total_paid` imports as `complete/complete` on create and on re-import. The same
+order saved outside the import becomes `closed/closed`.
+
 ## Invoices, credit memos and shipments
 
 `Model/Document/` handles all three. The tables are the same shape — a document
@@ -613,7 +640,10 @@ Four properties worth knowing:
 - **The order's `state` and `status` are never changed.** A migrated order's
   status came from its own CSV; importing an invoice does not move it to
   `processing`, nor a shipment to `complete`, the way doing either in the admin
-  would.
+  would. The resync save runs inside `StateGuard`. Without it, Magento's state
+  handler closed the order, for example when shipments were imported with no
+  paid invoice. See
+  [Imported orders keep the CSV's state and status](#imported-orders-keep-the-csvs-state-and-status).
 
 The **online / offline refund split is a heuristic.** No column records which
 bucket a refund went into — Magento decides it at refund time from whether the
@@ -1009,6 +1039,8 @@ address **update** does not exist: a matched address is left exactly as it is,
 - `Model/Order/CsvReader.php` — CSV → header + associative rows (with line numbers).
 - `Model/Order/Validator.php` → `ValidationResult` — the manual-check gate.
 - `Model/Order/Importer.php` — upsert engine (create/update by `increment_id`).
+- `Model/Order/StateGuard.php` + `Plugin/PreserveImportedOrderState.php` — keep
+  Magento's `Handler\State` from rewriting an imported order's state/status on save.
 - `Controller/Adminhtml/Export/{Index,Download}.php`, `Import/{Index,Validate,Submit}.php`.
 - `Console/Command/{ExportOrdersCommand,ImportOrdersCommand}.php`.
 
