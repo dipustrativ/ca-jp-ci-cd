@@ -43,11 +43,6 @@
                     <comment>Attribute option id of the default ("rectangular") shape. Its sizes are listed first in the PDP size drawer and get no shape heading. Defaults to 19 if empty.</comment>
                     <config_path>productify/general/primary_shape_option_id</config_path>
                 </field>
-                <field id="round_shape_option_id" translate="label comment" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Round Shape Option ID</label>
-                    <comment>Attribute option id of the "round" shape. Sizes render as "∅ W cm" when a product's shape matches this id and width == length. Defaults to 20 if empty.</comment>
-                    <config_path>productify/general/round_shape_option_id</config_path>
-                </field>
                 <field id="csv_upload" translate="label comment" type="file" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Upload CSV File</label>
                     <comment><![CDATA[Select a CSV file to upload for group products processing. <a href="https://drive.google.com/file/d/1jMmOV4LsZ5U99aW5hDEHfQ2cqpAVz16X/view?usp=sharing" target="_blank">Sample file</a>]]></comment>

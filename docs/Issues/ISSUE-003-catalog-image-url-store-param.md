@@ -3,13 +3,13 @@
 | | |
 |---|---|
 | **Affects** | Magento 2.4.9 (core), any install with `web/url/use_store = 1` |
-| **Status** | 🟢 WORKAROUND — after-plugin strips the param |
+| **Status** | 🟢 WORKAROUND — after-plugins strip the param at all three core call sites |
 | **First seen** | 2026-08-21 |
-| **Last re-checked** | 2026-08-21 |
+| **Last re-checked** | 2026-09-22 |
 
 ## What breaks
 
-Every product image rendered through `$block->getImage($product, $displayArea)` comes out as:
+Every product image URL core builds comes out as:
 
 ```
 /media/catalog/product/cache/<hash>/2/0/file.jpg?___store=en
@@ -29,6 +29,19 @@ Measured on `/en/all-carpets` before the fix: 40 of 157 media URLs carried the
 param — exactly one per product, the main grid thumbnail.
 
 ## Verified root cause
+
+Core appends the param at **three** independent call sites, each gated on the
+same `Store::XML_PATH_STORE_IN_URL` flag. The original workaround only covered
+the first; the PDP gallery kept shipping `…/file.jpg?___store=se` until
+2026-09-22.
+
+| Call site | Renders |
+|---|---|
+| `Block/Product/ImageFactory.php:176-183` | listing / grid / related thumbnails (`$block->getImage()`) |
+| `Block/Product/View/Gallery.php:132-136` | the PDP gallery JSON — `thumb`, `img`, `full` and every configured extra key. `Evalent_MagicGallery` reuses this block, so its template inherits the bug |
+| `ViewModel/Product/Gallery.php:54-56` | `getMainProductImage()`, the PDP preload `<link rel=preload>` / main image |
+
+### The first call site
 
 `vendor/magento/module-catalog/Block/Product/ImageFactory.php:176-183`
 
@@ -61,10 +74,19 @@ There is no config to suppress it.
 
 ## Workaround in force
 
-After-plugin on the block factory, stripping only the `___store` param:
+One plugin class, registered on all three types, stripping only the `___store`
+param:
 
 - `app/code/CarpetAvenue/Core/Plugin/StripStoreParamFromImageUrl.php`
+  — `afterCreate()`, `afterGetGalleryImagesJson()`, `afterGetMainProductImage()`
 - `app/code/CarpetAvenue/Core/etc/frontend/di.xml`
+- `app/code/CarpetAvenue/Core/Test/Unit/Plugin/StripStoreParamFromImageUrlTest.php`
+
+`afterGetGalleryImagesJson()` returns early when the JSON carries no `___store`.
+That is not just an optimisation: a gallery with no images never resolves a
+product, so calling `$subject->getProduct()->getStore()` unconditionally would
+fatal there. Core only reaches `getProduct()` when it appended the param, so the
+guard keeps the plugin exactly as safe as the code it patches.
 
 ## Alternatives rejected
 
@@ -81,19 +103,40 @@ After-plugin on the block factory, stripping only the `___store` param:
 After any Magento upgrade:
 
 ```bash
-# 1. Is the core line still there?
-grep -n "PARAM_NAME . '=' . \$product->getStore()->getCode()" \
-  vendor/magento/module-catalog/Block/Product/ImageFactory.php
+# 1. How many core call sites append the param now? Expect the 3 in the table
+#    above — a 4th means a new one appeared and needs its own plugin method.
+grep -rn "XML_PATH_STORE_IN_URL" vendor/magento/module-catalog \
+  | grep -v "/Test/"
 
-# 2. Does a listing still render the param when the plugin is disabled?
-#    (temporarily comment the plugin out of etc/frontend/di.xml, then:)
-curl -s https://carpient.carpetavenue.net/en/all-carpets \
-  | grep -o '/media/[^"]*___store[^"]*' | wc -l     # >0 means still broken upstream
-
-# 3. With the plugin active, expect 0:
-curl -s https://carpient.carpetavenue.net/en/all-carpets \
-  | grep -o '/media/[^"]*___store[^"]*' | wc -l     # expect 0
+# 2. With the plugins active, every page type must report 0.
+#    (`-L` matters: the store-code paths 301 before they render.)
+for u in /en/collections \
+         /de/collections \
+         /en/modern-carpets-lunja-berber-183x240-aw1063 \
+         /de/moderne-teppiche-lunja-berber-183x240-aw1063; do
+  echo -n "$u  "
+  curl -skL "https://carpient.devs$u" \
+    | grep -oE '/media/[^"'"'"' \]*___store[^"'"'"' \]*' | wc -l
+done
 ```
+
+Both the listing **and** a PDP must be in the sweep — they take different code
+paths, and the PDP one was missed for a month because only listings were checked.
 
 If step 1 finds nothing, upstream has fixed it — drop the plugin and move this
 file to **Resolved**.
+
+## Gotcha when re-testing locally
+
+`generated/code/**/Interceptor.php` is not regenerated when you add a plugin to
+an already-intercepted class, so the new plugin silently does nothing. Delete the
+specific interceptors (never all of `generated/code`, see ISSUE-001), then flush
+and restart php-fpm:
+
+```bash
+docker exec carpient-phpfpm-1 sh -c "cd /var/www/html && \
+  rm -f generated/code/Magento/Catalog/Block/Product/View/Gallery/Interceptor.php \
+        generated/code/Magento/Catalog/ViewModel/Product/Gallery/Interceptor.php && \
+  php bin/magento cache:flush"
+docker restart carpient-phpfpm-1 carpient-phpfpm-xdebug-1
+```

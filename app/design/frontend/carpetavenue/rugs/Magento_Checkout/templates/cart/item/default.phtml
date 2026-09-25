@@ -22,20 +22,12 @@ $isUnique = $prodTypeHelper->isProductUnique($product);
 
 $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinimalPriceLessMsrp($product);
 
-// Checking size attributes
-$isRound = false;
-$sizeValue = '';
-
-if ($product->getData('shape') == 20) {
-    $isRound = true;
-}
-if ($product->getData('width') && $product->getData('length')) {
-    if (!$isRound) {
-        $sizeValue = $product->getData('width') . ' x ' . $product->getData('length') . ' cm';
-    } else {
-        $sizeValue = '∅ ' . $product->getData('width') . ' cm';
-    }
-}
+// ∅ when w == l, else W x L cm — see Data::formatSize
+$sizeValue = $this->helper(\CarpetAvenue\Productify\Helper\Data::class)->formatSize(
+    $product->getData('width'),
+    $product->getData('length'),
+    $product->getData('shape')
+);
 
 
 ?>

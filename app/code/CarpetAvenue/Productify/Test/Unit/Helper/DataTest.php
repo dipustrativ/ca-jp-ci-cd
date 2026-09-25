@@ -37,42 +37,48 @@ class DataTest extends TestCase
         return new Data($context);
     }
 
-    public function testShapeOptionIdsFallBackToDefaultsWhenUnset(): void
+    public function testPrimaryShapeOptionIdFallsBackToDefaultWhenUnset(): void
     {
-        $helper = $this->helper();
-
-        $this->assertSame('20', $helper->getRoundShapeOptionId());
-        $this->assertSame('19', $helper->getPrimaryShapeOptionId());
+        $this->assertSame('19', $this->helper()->getPrimaryShapeOptionId());
     }
 
-    public function testShapeOptionIdsComeFromConfigWhenSet(): void
+    public function testPrimaryShapeOptionIdComesFromConfigWhenSet(): void
     {
-        $helper = $this->helper([
-            Data::XML_PATH_ROUND_SHAPE_OPTION_ID   => '77',
-            Data::XML_PATH_PRIMARY_SHAPE_OPTION_ID => '76',
-        ]);
+        $helper = $this->helper([Data::XML_PATH_PRIMARY_SHAPE_OPTION_ID => '76']);
 
-        $this->assertSame('77', $helper->getRoundShapeOptionId());
         $this->assertSame('76', $helper->getPrimaryShapeOptionId());
     }
 
-    public function testFormatSizeLabelUsesDiameterOnlyForConfiguredRoundShape(): void
+    public function testFormatSizeUsesDiameterForSquareDimensions(): void
     {
-        $helper = $this->helper([Data::XML_PATH_ROUND_SHAPE_OPTION_ID => '77']);
+        $helper = $this->helper();
 
-        // Round shape id from config, square label -> diameter.
-        $this->assertSame('∅ 150 cm', $helper->formatSizeLabel('150x150', '77'));
-        $this->assertSame('∅ 150 cm', $helper->formatSizeLabel('150 x 150 cm', 77));
+        // Equal sides -> diameter, whatever the shape option id is.
+        $this->assertSame('∅ 240 cm', $helper->formatSize(240, 240, '29'));
+        $this->assertSame('∅ 145 cm', $helper->formatSize('145', '145', '67'));
+        $this->assertSame('∅ 150 cm', $helper->formatSize(150, 150, null));
 
-        // Old hardcoded id is no longer special.
-        $this->assertSame('150x150 cm', $helper->formatSizeLabel('150x150', '20'));
+        // Unequal sides keep W x L.
+        $this->assertSame('160 x 230 cm', $helper->formatSize(160, 230, '29'));
 
-        // Round but not square, and non-round shapes, keep the stored label.
-        $this->assertSame('160x230 cm', $helper->formatSizeLabel('160x230', '77'));
-        $this->assertSame('160x230 cm', $helper->formatSizeLabel('160x230 cm', '19'));
-        $this->assertSame('80x250 cm', $helper->formatSizeLabel(' 80x250 ', null));
+        // Missing dimensions render nothing.
+        $this->assertSame('', $helper->formatSize(null, 230, '29'));
+        $this->assertSame('', $helper->formatSize(160, '', '29'));
+    }
+
+    public function testFormatSizeLabelUsesDiameterForSquareLabels(): void
+    {
+        $helper = $this->helper();
+
+        $this->assertSame('∅ 150 cm', $helper->formatSizeLabel('150x150'));
+        $this->assertSame('∅ 150 cm', $helper->formatSizeLabel('150 x 150 cm'));
+
+        // Unequal sides keep the stored spelling and only gain the unit.
+        $this->assertSame('160x230 cm', $helper->formatSizeLabel('160x230'));
+        $this->assertSame('160x230 cm', $helper->formatSizeLabel('160x230 cm'));
+        $this->assertSame('80x250 cm', $helper->formatSizeLabel(' 80x250 '));
 
         // Labels that are not W x L are left alone apart from the unit.
-        $this->assertSame('One size cm', $helper->formatSizeLabel('One size', '19'));
+        $this->assertSame('One size cm', $helper->formatSizeLabel('One size'));
     }
 }

@@ -15,8 +15,6 @@
 <?php
     $_helper = $this->helper(Magento\Catalog\Helper\Output::class);
     $_product = $block->getProduct();
-    /** @var \CarpetAvenue\Productify\ViewModel\SizeFormatter $sizeFormatter */
-    $sizeFormatter = $block->getData('size_formatter');
 ?>
 <?php if ($_additional = $block->getAdditionalData()) :?>
     <div class="additional-attributes-wrapper table-wrapper" id="product-attributes-collapsible">
@@ -42,9 +40,6 @@
             //-- Motifs (Display both Anatomy and Patterns if either exists)
             $motifs = [];
 
-            // Round rugs (shape option id from productify/general/round_shape_option_id)
-            // show a single "Diameter" row instead of "Size".
-            $isRound = $sizeFormatter->isRound($_product);
             $shapeKey = '';
 
             foreach ($_additional as $key => $_data) {
@@ -64,11 +59,15 @@
                 }
             }
 
-            $sizeValue = $widthValue . ' x ' . $lengthValue . ' cm';
+            // ∅ when w == l, else W x L cm — see Data::formatSize
+            $sizeValue = $this->helper(\CarpetAvenue\Productify\Helper\Data::class)->formatSize(
+                $widthValue,
+                $lengthValue,
+                $_product->getData('shape')
+            );
 
-            if ($isRound) {
+            if (str_starts_with($sizeValue, '∅')) {
                 $sizeLabel = 'Diameter';
-                $sizeValue = '∅ ' . $widthValue . ' cm';
             }
 
             unset($_additional[$widthKey]);

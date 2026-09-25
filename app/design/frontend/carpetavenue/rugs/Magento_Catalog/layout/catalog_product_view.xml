@@ -31,11 +31,7 @@
             <container name="container.size.attribute" htmlTag="div" htmlClass="size-product__attribute">
                 <block name="size.attribute"
                        class="Magento\Catalog\Block\Product\View"
-                       template="Magento_Catalog::product/view/size-attr.phtml">
-                    <arguments>
-                        <argument name="size_formatter" xsi:type="object">CarpetAvenue\Productify\ViewModel\SizeFormatter</argument>
-                    </arguments>
-                </block>
+                       template="Magento_Catalog::product/view/size-attr.phtml"/>
             </container>
             <container name="ups-list" htmlTag="div" htmlClass="product-ups-list">
                 <block class="Magento\Cms\Block\Block" name="product.ups.info">
@@ -162,7 +158,6 @@
                 <arguments>
                     <argument translate="true" name="title" xsi:type="string">Specifications</argument>
                     <argument name="sort_order" xsi:type="number">10</argument>
-                    <argument name="size_formatter" xsi:type="object">CarpetAvenue\Productify\ViewModel\SizeFormatter</argument>
                 </arguments>
             </referenceBlock>
             <referenceBlock name="product.info.description">

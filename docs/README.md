@@ -19,6 +19,7 @@ once. If something is not in this index, it is not findable — add the row.
 | Work locally (containers, CLI, static, tests) | [../CLAUDE.md](../CLAUDE.md) |
 | Understand an error that lives in `vendor/` | [Issues/README.md](Issues/README.md) — check before debugging |
 | Find out why the admin console throws `locations.each is not a function`, or what the Adobe Launch lines on admin pages are | [Issues/ISSUE-008](Issues/ISSUE-008-braintree-admin-system-js-prototype-race.md) — Braintree admin JS; modules disabled 2026-09-23, and what that cost |
+| Find out why a product image shows the grey placeholder even though the file exists | [Issues/ISSUE-009](Issues/ISSUE-009-media-placeholder-cached-as-real-image.md) — CDN cached a `get.php` placeholder; `no-store` plugin |
 | Know why the site is/isn't fast | [performance/README.md](performance/README.md) |
 | Check what version of anything we run | [architecture/stack.md](architecture/stack.md) |
 
