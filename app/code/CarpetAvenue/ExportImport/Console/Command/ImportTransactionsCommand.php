@@ -33,6 +33,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  *   bin/magento exportimport:transactions:import --file=var/import/transactions.csv
  *   bin/magento exportimport:transactions:import --file=var/import/txns.csv --validate-only
  *
+ * A row with a validation error is skipped and the rest are imported; every
+ * skipped and failed row is listed once the run is done. --strict restores
+ * all-or-nothing: any validation error and nothing is written.
+ *
  * The orders the transactions belong to must already exist, with their payment
  * records — import orders first.
  */
@@ -40,6 +44,7 @@ class ImportTransactionsCommand extends Command
 {
     private const OPT_FILE = 'file';
     private const OPT_VALIDATE_ONLY = 'validate-only';
+    private const OPT_STRICT = 'strict';
 
     public function __construct(
         private readonly State $state,
@@ -63,6 +68,12 @@ class ImportTransactionsCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'Only validate; do not write any data.'
+            )
+            ->addOption(
+                self::OPT_STRICT,
+                null,
+                InputOption::VALUE_NONE,
+                'Import nothing if any row fails validation (default: skip the invalid rows).'
             );
     }
 
@@ -104,24 +115,36 @@ class ImportTransactionsCommand extends Command
             $summary['warnings']
         ));
 
-        $this->renderRows($output, 'Errors', $validation->getErrors());
         $this->renderRows($output, 'Warnings', $validation->getWarnings());
 
-        if (!$validation->isValid()) {
-            $output->writeln('<error>Validation failed — nothing imported. Fix the CSV and retry.</error>');
-            return Cli::RETURN_FAILURE;
-        }
-
-        if ($input->getOption(self::OPT_VALIDATE_ONLY)) {
+        // A file-level error (missing header column, no data rows) is reported on
+        // line 1; there is no valid row to import around it.
+        $fileLevelError = array_filter($validation->getErrors(), static fn ($e) => (int)$e['line'] <= 1) !== [];
+        $strict = (bool)$input->getOption(self::OPT_STRICT) || $fileLevelError;
+        if ($input->getOption(self::OPT_VALIDATE_ONLY) || ($strict && !$validation->isValid())) {
+            $this->renderRows($output, 'Errors', $validation->getErrors());
+            if (!$validation->isValid()) {
+                $output->writeln('<error>Validation failed — nothing imported. Fix the CSV and retry.</error>');
+                return Cli::RETURN_FAILURE;
+            }
             $output->writeln('<comment>--validate-only set: no data written.</comment>');
             return Cli::RETURN_SUCCESS;
         }
 
-        $result = $this->importer->import($parsed);
+        if (!$validation->isValid()) {
+            $output->writeln(sprintf(
+                '<comment>%d validation error(s): those rows are skipped, the rest are imported. '
+                . 'Full list below once the import is done.</comment>',
+                count($validation->getErrors())
+            ));
+        }
+
+        $result = $this->importer->import($parsed, true);
         $output->writeln(sprintf(
-            '<info>Import: %d created, %d updated, %d failed.</info>',
+            '<info>Import: %d created, %d updated, %d skipped (validation), %d failed.</info>',
             count($result['created']),
             count($result['updated']),
+            count($result['skipped']),
             count($result['failed'])
         ));
 
@@ -132,11 +155,16 @@ class ImportTransactionsCommand extends Command
             ));
         }
 
-        if (!empty($result['failed'])) {
+        // Error list last, after everything that was imported.
+        if (!empty($result['skipped']) || !empty($result['failed'])) {
+            $output->writeln('<comment>Not imported:</comment>');
             $table = new Table($output);
-            $table->setHeaders(['order | txn_id', 'reason']);
+            $table->setHeaders(['order | txn_id', 'stage', 'reason']);
+            foreach ($result['skipped'] as $key => $reasons) {
+                $table->addRow([$key, 'validation', implode("\n", $reasons)]);
+            }
             foreach ($result['failed'] as $key => $reason) {
-                $table->addRow([$key, $reason]);
+                $table->addRow([$key, 'import', $reason]);
             }
             $table->render();
             return Cli::RETURN_FAILURE;

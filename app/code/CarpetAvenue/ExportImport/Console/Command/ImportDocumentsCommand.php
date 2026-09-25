@@ -34,6 +34,17 @@ use Symfony\Component\Console\Output\OutputInterface;
  *   bin/magento exportimport:documents:import --type=creditmemo --file=var/import/cms.csv --validate-only
  *   bin/magento exportimport:documents:import --type=shipment --file=var/import/shipments.csv
  *
+ * One command per type is registered too (virtualTypes in etc/di.xml passing
+ * $fixedType), so --type can be left off:
+ *
+ *   bin/magento exportimport:invoices:import --file=var/import/invoices.csv
+ *   bin/magento exportimport:creditmemos:import --file=var/import/cms.csv
+ *   bin/magento exportimport:shipments:import --file=var/import/shipments.csv
+ *
+ * A document with a validation error is skipped and the rest are imported; every
+ * skipped and failed document is listed once the run is done. --strict restores
+ * all-or-nothing: any validation error and nothing is written.
+ *
  * The orders the documents belong to must already exist — import orders first.
  */
 class ImportDocumentsCommand extends Command
@@ -41,34 +52,60 @@ class ImportDocumentsCommand extends Command
     private const OPT_TYPE = 'type';
     private const OPT_FILE = 'file';
     private const OPT_VALIDATE_ONLY = 'validate-only';
+    private const OPT_STRICT = 'strict';
 
+    /**
+     * @param string|null $fixedType document type this command is bound to; null = take it from --type
+     * @param string|null $commandName name for a type-bound command
+     */
     public function __construct(
         private readonly State $state,
         private readonly Config $config,
         private readonly CsvReader $csvReader,
         private readonly Pool $pool,
+        private readonly ?string $fixedType = null,
+        private readonly ?string $commandName = null,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this->setName('exportimport:documents:import')
-            ->setDescription(
-                'Validate and import an invoice, credit-memo or shipment CSV (create/update by increment_id).'
-            )
-            ->addOption(
-                self::OPT_TYPE,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Document type: invoice, creditmemo or shipment.'
-            )
-            ->addOption(self::OPT_FILE, null, InputOption::VALUE_REQUIRED, 'Path to the CSV file.')
+        if ($this->fixedType !== null) {
+            $this->setName($this->commandName ?? 'exportimport:' . $this->fixedType . 's:import')
+                ->setDescription(sprintf(
+                    'Validate and import %s CSV (create/update by increment_id).',
+                    match ($this->fixedType) {
+                        'invoice' => 'an invoice',
+                        'creditmemo' => 'a credit-memo',
+                        default => 'a ' . $this->fixedType,
+                    }
+                ));
+        } else {
+            $this->setName('exportimport:documents:import')
+                ->setDescription(
+                    'Validate and import an invoice, credit-memo or shipment CSV (create/update by increment_id).'
+                )
+                ->addOption(
+                    self::OPT_TYPE,
+                    null,
+                    InputOption::VALUE_REQUIRED,
+                    'Document type: invoice, creditmemo or shipment.'
+                );
+        }
+
+        $this->addOption(self::OPT_FILE, null, InputOption::VALUE_REQUIRED, 'Path to the CSV file.')
             ->addOption(
                 self::OPT_VALIDATE_ONLY,
                 null,
                 InputOption::VALUE_NONE,
                 'Only validate; do not write any data.'
+            )
+            ->addOption(
+                self::OPT_STRICT,
+                null,
+                InputOption::VALUE_NONE,
+                'Import nothing if any row fails validation (default: skip the invalid documents).'
             );
     }
 
@@ -85,7 +122,7 @@ class ImportDocumentsCommand extends Command
             return Cli::RETURN_FAILURE;
         }
 
-        $type = (string)$input->getOption(self::OPT_TYPE);
+        $type = $this->fixedType ?? (string)$input->getOption(self::OPT_TYPE);
         if (!$this->pool->has($type)) {
             $output->writeln(sprintf(
                 '<error>--type is required and must be one of: %s.</error>',
@@ -120,24 +157,38 @@ class ImportDocumentsCommand extends Command
             $summary['warnings']
         ));
 
-        $this->renderRows($output, 'Errors', $validation->getErrors());
         $this->renderRows($output, 'Warnings', $validation->getWarnings());
 
-        if (!$validation->isValid()) {
-            $output->writeln('<error>Validation failed — nothing imported. Fix the CSV and retry.</error>');
-            return Cli::RETURN_FAILURE;
-        }
-
-        if ($input->getOption(self::OPT_VALIDATE_ONLY)) {
+        // A file-level error (missing header column, no data rows) is reported on
+        // line 1; there is no valid document to import around it.
+        $fileLevelError = array_filter($validation->getErrors(), static fn ($e) => (int)$e['line'] <= 1) !== [];
+        $strict = (bool)$input->getOption(self::OPT_STRICT) || $fileLevelError;
+        if ($input->getOption(self::OPT_VALIDATE_ONLY) || ($strict && !$validation->isValid())) {
+            $this->renderRows($output, 'Errors', $validation->getErrors());
+            if (!$validation->isValid()) {
+                $output->writeln('<error>Validation failed — nothing imported. Fix the CSV and retry.</error>');
+                return Cli::RETURN_FAILURE;
+            }
             $output->writeln('<comment>--validate-only set: no data written.</comment>');
             return Cli::RETURN_SUCCESS;
         }
 
-        $result = $this->pool->getImporter($type)->import($parsed);
+        if (!$validation->isValid()) {
+            $output->writeln(sprintf(
+                '<comment>%d validation error(s): the %s(s) they belong to are skipped, the rest are imported. '
+                . 'Full list below once the import is done.</comment>',
+                count($validation->getErrors()),
+                $type
+            ));
+        }
+
+        $result = $this->pool->getImporter($type)->import($parsed, true);
+
         $output->writeln(sprintf(
-            '<info>Import: %d created, %d updated, %d failed.</info>',
+            '<info>Import: %d created, %d updated, %d skipped (validation), %d failed.</info>',
             count($result['created']),
             count($result['updated']),
+            count($result['skipped']),
             count($result['failed'])
         ));
 
@@ -162,11 +213,16 @@ class ImportDocumentsCommand extends Command
             $table->render();
         }
 
-        if (!empty($result['failed'])) {
+        // Error list last, after everything that was imported.
+        if (!empty($result['skipped']) || !empty($result['failed'])) {
+            $output->writeln('<comment>Not imported:</comment>');
             $table = new Table($output);
-            $table->setHeaders([$type, 'reason']);
+            $table->setHeaders([$type, 'stage', 'reason']);
+            foreach ($result['skipped'] as $inc => $reasons) {
+                $table->addRow([$inc, 'validation', implode("\n", $reasons)]);
+            }
             foreach ($result['failed'] as $inc => $reason) {
-                $table->addRow([$inc, $reason]);
+                $table->addRow([$inc, 'import', $reason]);
             }
             $table->render();
             return Cli::RETURN_FAILURE;

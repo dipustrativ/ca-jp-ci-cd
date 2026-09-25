@@ -81,6 +81,11 @@ bin/magento exportimport:documents:import --type=invoice --file=var/import/invoi
 bin/magento exportimport:documents:import --type=creditmemo --file=var/import/creditmemos.csv
 bin/magento exportimport:documents:import --type=shipment --file=var/import/shipments.csv
 
+# ...or the one-per-type import commands (same thing, no --type)
+bin/magento exportimport:invoices:import --file=var/import/invoices.csv
+bin/magento exportimport:creditmemos:import --file=var/import/creditmemos.csv
+bin/magento exportimport:shipments:import --file=var/import/shipments.csv --strict
+
 # Payment transactions — their own command pair, no --type
 bin/magento exportimport:transactions:export
 bin/magento exportimport:transactions:export --store=jp --type=capture,refund --from=2026-01-01
@@ -97,6 +102,17 @@ bin/magento exportimport:customer-addresses:export --website=base
 bin/magento exportimport:customer-addresses:import --file=var/import/addresses.csv --validate-only
 bin/magento exportimport:customer-addresses:import --file=var/import/addresses.csv
 ```
+
+**Document and transaction import from the CLI skips invalid records.** Any document with a
+row that fails validation is left out whole (all of its rows, so an invoice is
+never written with an item missing), the rest are imported, and a **Not
+imported** table lists every skipped (`validation`) and failed (`import`)
+document at the end, with line numbers. The exit code is non-zero if anything
+was left out. `--strict` restores all-or-nothing. A file-level error (a missing
+header column, no data rows) always aborts: no row can be trusted then.
+`exportimport:transactions:import` works the same way, per row, since a
+transaction is one row. The admin import screens are unchanged and still
+all-or-nothing, and so are the order and customer imports.
 
 `--state` is the numeric column, not a label: invoice `1` pending / `2` paid /
 `3` canceled, credit memo `1` open / `2` refunded / `3` canceled. It is **ignored

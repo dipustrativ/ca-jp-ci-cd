@@ -89,15 +89,22 @@ class Importer
      *     updated: string[],
      *     relinked: array<string, int>,
      *     orders_synced: string[],
-     *     failed: array<string, string>
+     *     failed: array<string, string>,
+     *     skipped: array<string, string[]>
      * }
      */
-    public function import(array $parsed): array
+    public function import(array $parsed, bool $skipInvalid = false): array
     {
         $this->productIdCache = [];
         $validation = $this->validator->validate($parsed);
 
-        if (!$validation->isValid()) {
+        // Skip mode: drop every document that has a row-level error and import
+        // the rest. A file-level error (missing header column, no data rows) is
+        // reported on line 1 and still aborts — then no row can be trusted.
+        $skipped = [];
+        if ($skipInvalid && !$validation->isValid() && !$this->hasFileLevelError($validation)) {
+            [$parsed, $skipped] = $this->withoutInvalidDocuments($parsed, $validation);
+        } elseif (!$validation->isValid()) {
             $this->logger->warning(sprintf(
                 'Import aborted — %s validation failed with %d error(s).',
                 $this->type->getCode(),
@@ -111,6 +118,7 @@ class Importer
                 'relinked' => [],
                 'orders_synced' => [],
                 'failed' => [],
+                'skipped' => [],
             ];
         }
 
@@ -157,11 +165,13 @@ class Importer
         $synced = $this->syncOrders(array_keys($touchedOrders));
 
         $this->logger->info(sprintf(
-            'Import finished (%s): %d created, %d updated, %d failed, %d item(s) re-linked, %d order(s) resynced.',
+            'Import finished (%s): %d created, %d updated, %d failed, %d skipped, %d item(s) re-linked, '
+            . '%d order(s) resynced.',
             $this->type->getCode(),
             count($created),
             count($updated),
             count($failed),
+            count($skipped),
             array_sum($relinked),
             count($synced)
         ));
@@ -174,7 +184,71 @@ class Importer
             'relinked' => $relinked,
             'orders_synced' => $synced,
             'failed' => $failed,
+            'skipped' => $skipped,
         ];
+    }
+
+    /**
+     * Whether validation failed on the file as a whole rather than on a row.
+     * The validator reports those on line 1 (the header line), which no data row
+     * can have.
+     */
+    private function hasFileLevelError(ValidationResult $validation): bool
+    {
+        foreach ($validation->getErrors() as $error) {
+            if ((int)$error['line'] <= 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Remove every document that has at least one row with a validation error.
+     *
+     * A document is all-or-nothing: importing an invoice with one of its item
+     * rows missing would write wrong totals, so one bad row skips every row of
+     * its increment_id. A bad row with no increment_id is listed under its line.
+     *
+     * @param array{header: string[], rows: array<int, array{line: int, data: array<string, string>}>} $parsed
+     * @return array{0: array, 1: array<string, string[]>} the filtered file, and
+     *     skipped increment_id (or "line N") => its error messages
+     */
+    private function withoutInvalidDocuments(array $parsed, ValidationResult $validation): array
+    {
+        $errorsByLine = [];
+        foreach ($validation->getErrors() as $error) {
+            $errorsByLine[(int)$error['line']][] = sprintf(
+                'line %d, %s: %s',
+                (int)$error['line'],
+                $error['column'],
+                $error['message']
+            );
+        }
+
+        $skipped = [];
+        foreach ($parsed['rows'] as $row) {
+            if (!isset($errorsByLine[$row['line']])) {
+                continue;
+            }
+            $key = (string)($row['data']['increment_id'] ?? '');
+            $key = $key !== '' ? $key : 'line ' . $row['line'];
+            $skipped[$key] = array_merge($skipped[$key] ?? [], $errorsByLine[$row['line']]);
+        }
+
+        $parsed['rows'] = array_values(array_filter(
+            $parsed['rows'],
+            static fn ($row) => !isset($skipped[(string)($row['data']['increment_id'] ?? '')])
+                && !isset($errorsByLine[$row['line']])
+        ));
+
+        $this->logger->warning(sprintf(
+            '%s import: skipping %d document(s) with validation errors.',
+            $this->type->getCode(),
+            count($skipped)
+        ));
+
+        return [$parsed, $skipped];
     }
 
     /**

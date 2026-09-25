@@ -271,6 +271,32 @@
         </arguments>
     </type>
 
+    <!--
+        One import command per document type: the documents:import command with
+        its type fixed, so the type option can be left off.
+    -->
+    <virtualType name="CarpetAvenue\ExportImport\Console\Command\ImportInvoicesCommand"
+                 type="CarpetAvenue\ExportImport\Console\Command\ImportDocumentsCommand">
+        <arguments>
+            <argument name="fixedType" xsi:type="string">invoice</argument>
+            <argument name="commandName" xsi:type="string">exportimport:invoices:import</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="CarpetAvenue\ExportImport\Console\Command\ImportCreditmemosCommand"
+                 type="CarpetAvenue\ExportImport\Console\Command\ImportDocumentsCommand">
+        <arguments>
+            <argument name="fixedType" xsi:type="string">creditmemo</argument>
+            <argument name="commandName" xsi:type="string">exportimport:creditmemos:import</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="CarpetAvenue\ExportImport\Console\Command\ImportShipmentsCommand"
+                 type="CarpetAvenue\ExportImport\Console\Command\ImportDocumentsCommand">
+        <arguments>
+            <argument name="fixedType" xsi:type="string">shipment</argument>
+            <argument name="commandName" xsi:type="string">exportimport:shipments:import</argument>
+        </arguments>
+    </virtualType>
+
     <!-- CLI commands -->
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
@@ -279,6 +305,9 @@
                 <item name="carpetavenue_exportimport_orders_import" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ImportOrdersCommand</item>
                 <item name="carpetavenue_exportimport_documents_export" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ExportDocumentsCommand</item>
                 <item name="carpetavenue_exportimport_documents_import" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ImportDocumentsCommand</item>
+                <item name="carpetavenue_exportimport_invoices_import" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ImportInvoicesCommand</item>
+                <item name="carpetavenue_exportimport_creditmemos_import" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ImportCreditmemosCommand</item>
+                <item name="carpetavenue_exportimport_shipments_import" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ImportShipmentsCommand</item>
                 <item name="carpetavenue_exportimport_transactions_export" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ExportTransactionsCommand</item>
                 <item name="carpetavenue_exportimport_transactions_import" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ImportTransactionsCommand</item>
                 <item name="carpetavenue_exportimport_customers_export" xsi:type="object">CarpetAvenue\ExportImport\Console\Command\ExportCustomersCommand</item>
