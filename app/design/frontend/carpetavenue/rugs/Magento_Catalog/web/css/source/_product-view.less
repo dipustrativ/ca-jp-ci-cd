@@ -391,14 +391,32 @@
     padding-top: 0 !important;
   }
 
+  //  Blank scopes its box-tocart block as `.product-info-main .box-tocart ...`
+  //  (0,4,0), which outranks the bare `.box-tocart` rules above (0,3,0) — the
+  //  qty input fell back to blank's 52x52 and picked up a 15px right gutter.
+  //  Repeat the overrides at blank's specificity so they win on source order.
+  .product-info-main .box-tocart .field.qty,
+  .product-options-bottom .box-tocart .field.qty {
+    padding-right: 0;
+  }
+
+  .product-info-main .box-tocart .input-text.qty,
+  .product-options-bottom .box-tocart .input-text.qty {
+    width: 58px;
+    height: 58px;
+  }
+
   .product-info-main .product-addto-links,
   .product-options-bottom .product-addto-links {
     margin: 0;
   }
 
+  //  Cancels blank's `margin: @indent__base 0` (also 0,2,0), but it was zeroing
+  //  the 5px right margin declared on `.box-tocart` above too — carpetavenue.jp
+  //  keeps that gap between the cart button and the wishlist heart.
   .product-info-main .box-tocart,
   .product-options-bottom .box-tocart {
-    margin: 0;
+    margin: 0 5px 0 0;
   }
 
   .product-social-links {
@@ -631,7 +649,7 @@
             flex-wrap: wrap;
 
             .field.qty {
-              margin: 0 0 10px;
+              margin: 0;
               label {
                 display: none;
               }
