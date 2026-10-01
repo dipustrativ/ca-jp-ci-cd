@@ -11,7 +11,6 @@ use CarpetAvenue\Productify\Model\Search\SuggestConfig;
 use CarpetAvenue\Productify\Model\Search\SuggestProvider;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
-use Magento\Cms\Model\Page;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\CacheInterface;
@@ -87,7 +86,7 @@ class Suggest implements HttpGetActionInterface
             $this->cache->save(
                 $html,
                 $cacheKey,
-                [Product::CACHE_TAG, Category::CACHE_TAG, Page::CACHE_TAG],
+                [Product::CACHE_TAG, Category::CACHE_TAG],
                 $ttl
             );
         }
@@ -108,8 +107,7 @@ class Suggest implements HttpGetActionInterface
             ->setData('total', $products['total'])
             ->setData('categories', $categories['items'])
             ->setData('categories_total', $categories['total'])
-            ->setData('suggestions', $this->provider->getSuggestions($query, SuggestConfig::SIDE_LIMIT))
-            ->setData('pages', $this->provider->getPages($query, SuggestConfig::SIDE_LIMIT));
+            ->setData('suggestions', $this->provider->getSuggestions($query, SuggestConfig::SIDE_LIMIT));
 
         return $block->toHtml();
     }

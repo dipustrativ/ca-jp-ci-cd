@@ -6,10 +6,9 @@
  * CarpetAvenue\Productify\Controller\Search\Suggest and injected into the
  * dropdown host by CarpetAvenue_Productify/js/search-suggest.
  *
- * Sections stack full width in carpetavenue.jp's order: the exact article-number
- * hit first, then categories, then terms other shoppers searched for. In
- * practice only one of them has rows — the article number matches a SKU or the
- * term is a browsing word, never both.
+ * Two columns, as carpetavenue.jp's SearchSuiteAutocomplete lays them out:
+ * categories and similar searches on the left, the single-product hit (SKU, or
+ * a name only one rug has) on the right. Phones stack them in that order.
  *
  * @var \CarpetAvenue\Productify\Block\Search\Suggest $block
  * @var \Magento\Framework\Escaper $escaper
@@ -17,125 +16,110 @@
 $query = (string) $block->getQuery();
 $categories = $block->getCategories();
 $suggestions = $block->getSuggestions();
-$pages = $block->getPages();
 $products = $block->getProducts();
 $total = (int) $block->getTotal();
 ?>
-<?php if (!$block->hasResults()) : ?>
-    <div class="productify-suggest__empty">
-        <?= /* @noEscape */ __(
-            'Sorry, nothing found for "%1".',
-            '<b>' . $escaper->escapeHtml($query) . '</b>'
-        ) ?>
-    </div>
-<?php else : ?>
+<?php // Nothing to show: an empty fragment, and search-suggest.js closes the panel — as live does. ?>
+<?php if ($block->hasResults()) : ?>
     <div class="productify-suggest__inner">
-        <?php if ($block->getProductCount() > 0) : ?>
-            <div class="productify-suggest__section productify-suggest__section--products">
-                <p class="productify-suggest__heading">
-                    <?= $escaper->escapeHtml(__('Products')) ?>
-                    <?php if ($block->canShowAll()) : ?>
-                        <a class="productify-suggest__all" data-suggest-item
-                           href="<?= $escaper->escapeUrl($block->getResultsUrl()) ?>">
-                            <?= $escaper->escapeHtml(__('See All')) ?>
-                            <span><?= /* @noEscape */ $total ?></span>
-                        </a>
-                    <?php endif; ?>
-                </p>
-                <ul class="productify-suggest__grid">
-                    <?php foreach ($products as $product) : ?>
-                        <?php $oldPrice = $block->getOldPrice($product); ?>
-                        <?php $priceClass = $oldPrice ? ' is-special' : ''; ?>
-                        <li class="productify-suggest__cell">
-                            <a class="productify-suggest__product" data-suggest-item
-                               href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>">
-                                <span class="productify-suggest__thumb">
-                                    <img src="<?= $escaper->escapeUrl($block->getImageUrl($product)) ?>"
-                                         alt="<?= $escaper->escapeHtmlAttr($product->getName()) ?>"
-                                         width="135" height="135" loading="lazy"/>
-                                </span>
-                                <span class="productify-suggest__info">
-                                    <span class="productify-suggest__name">
-                                        <?= $escaper->escapeHtml($product->getName()) ?>
-                                    </span>
-                                    <span class="productify-suggest__sku">
-                                        <?= $escaper->escapeHtml(__('Article Number')) ?>:
-                                        <span><?= $escaper->escapeHtml($product->getSku()) ?></span>
-                                    </span>
-                                    <span class="productify-suggest__price">
-                                        <?php if ($oldPrice) : ?>
-                                            <span class="productify-suggest__price-old">
-                                                <?= $escaper->escapeHtml($oldPrice) ?>
+        <?php if ($categories || $suggestions) : ?>
+            <div class="productify-suggest__column">
+                <?php if ($categories) : ?>
+                    <div class="productify-suggest__section productify-suggest__section--categories">
+                        <p class="productify-suggest__heading productify-suggest__heading--primary">
+                            <?= $escaper->escapeHtml(__('Categories')) ?>
+                            <a class="productify-suggest__all" data-suggest-item
+                               href="<?= $escaper->escapeUrl($block->getResultsUrl()) ?>">
+                                <?= $escaper->escapeHtml(__('See All')) ?>
+                                <span><?= /* @noEscape */ (int) $block->getCategoriesTotal() ?></span>
+                            </a>
+                        </p>
+                        <ul class="productify-suggest__list productify-suggest__list--categories">
+                            <?php foreach ($categories as $item) : ?>
+                                <li>
+                                    <a class="productify-suggest__link" data-suggest-item
+                                       href="<?= $escaper->escapeUrl($item['url']) ?>">
+                                        <?= $escaper->escapeHtml($item['label']) ?>
+                                        <?php if ($item['count']) : ?>
+                                            <span class="productify-suggest__count">
+                                                (<?= /* @noEscape */ (int) $item['count'] ?>)
                                             </span>
                                         <?php endif; ?>
-                                        <span class="productify-suggest__price-value<?= /* @noEscape */ $priceClass ?>">
-                                            <?= $escaper->escapeHtml($block->getFinalPrice($product)) ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($suggestions) : ?>
+                    <div class="productify-suggest__section">
+                        <p class="productify-suggest__heading"><?= $escaper->escapeHtml(__('Suggested')) ?></p>
+                        <ul class="productify-suggest__list">
+                            <?php foreach ($suggestions as $item) : ?>
+                                <li>
+                                    <a class="productify-suggest__link" data-suggest-item
+                                       href="<?= $escaper->escapeUrl($item['url']) ?>">
+                                        <?= $escaper->escapeHtml($item['label']) ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($block->getProductCount() > 0) : ?>
+            <div class="productify-suggest__column">
+                <div class="productify-suggest__section productify-suggest__section--products">
+                    <p class="productify-suggest__heading">
+                        <?= $escaper->escapeHtml(__('Products')) ?>
+                        <?php if ($block->canShowAll()) : ?>
+                            <a class="productify-suggest__all" data-suggest-item
+                               href="<?= $escaper->escapeUrl($block->getResultsUrl()) ?>">
+                                <?= $escaper->escapeHtml(__('See All')) ?>
+                                <span><?= /* @noEscape */ $total ?></span>
+                            </a>
+                        <?php endif; ?>
+                    </p>
+                    <ul class="productify-suggest__grid">
+                        <?php foreach ($products as $product) : ?>
+                            <?php $oldPrice = $block->getOldPrice($product); ?>
+                            <?php $priceClass = $oldPrice ? ' is-special' : ''; ?>
+                            <li class="productify-suggest__cell">
+                                <a class="productify-suggest__product" data-suggest-item
+                                   href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>">
+                                    <span class="productify-suggest__thumb">
+                                        <img src="<?= $escaper->escapeUrl($block->getImageUrl($product)) ?>"
+                                             alt="<?= $escaper->escapeHtmlAttr($product->getName()) ?>"
+                                             width="135" height="135" loading="lazy"/>
+                                    </span>
+                                    <span class="productify-suggest__info">
+                                        <span class="productify-suggest__name">
+                                            <?= $escaper->escapeHtml($product->getName()) ?>
+                                        </span>
+                                        <span class="productify-suggest__sku">
+                                            <?= $escaper->escapeHtml(__('Article Number')) ?>:
+                                            <span><?= $escaper->escapeHtml($product->getSku()) ?></span>
+                                        </span>
+                                        <span class="productify-suggest__price">
+                                            <?php if ($oldPrice) : ?>
+                                                <span class="productify-suggest__price-old">
+                                                    <?= $escaper->escapeHtml($oldPrice) ?>
+                                                </span>
+                                            <?php endif; ?>
+                                            <span class="productify-suggest__price-value<?= /* @noEscape */ $priceClass ?>">
+                                                <?= $escaper->escapeHtml($block->getFinalPrice($product)) ?>
+                                            </span>
                                         </span>
                                     </span>
-                                </span>
-                            </a>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
             </div>
         <?php endif; ?>
-
-        <?php if ($categories) : ?>
-            <div class="productify-suggest__section productify-suggest__section--categories">
-                <p class="productify-suggest__heading productify-suggest__heading--primary">
-                    <?= $escaper->escapeHtml(__('Categories')) ?>
-                    <a class="productify-suggest__all" data-suggest-item
-                       href="<?= $escaper->escapeUrl($block->getResultsUrl()) ?>">
-                        <?= $escaper->escapeHtml(__('See All')) ?>
-                        <span><?= /* @noEscape */ (int) $block->getCategoriesTotal() ?></span>
-                    </a>
-                </p>
-                <ul class="productify-suggest__list productify-suggest__list--categories">
-                    <?php foreach ($categories as $item) : ?>
-                        <li>
-                            <a class="productify-suggest__link" data-suggest-item
-                               href="<?= $escaper->escapeUrl($item['url']) ?>">
-                                <?= $escaper->escapeHtml($item['label']) ?>
-                                <?php if ($item['count']) : ?>
-                                    <span class="productify-suggest__count">
-                                        (<?= /* @noEscape */ (int) $item['count'] ?>)
-                                    </span>
-                                <?php endif; ?>
-                            </a>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
-
-        <?php
-        $termGroups = [
-            ['label' => __('Suggested'), 'items' => $suggestions],
-            ['label' => __('Pages'), 'items' => $pages],
-        ];
-        ?>
-        <?php foreach ($termGroups as $group) : ?>
-            <?php if (!$group['items']) : ?>
-                <?php continue; ?>
-            <?php endif; ?>
-            <div class="productify-suggest__section">
-                <p class="productify-suggest__heading"><?= $escaper->escapeHtml($group['label']) ?></p>
-                <ul class="productify-suggest__list">
-                    <?php foreach ($group['items'] as $item) : ?>
-                        <?php [$match, $rest] = $block->splitMatch($item['label']); ?>
-                        <li>
-                            <a class="productify-suggest__link" data-suggest-item
-                               href="<?= $escaper->escapeUrl($item['url']) ?>">
-                                <?= $escaper->escapeHtml($block->matchPrefix($item['label'])) ?><?php
-                                if ($match) :
-                                    ?><b><?= $escaper->escapeHtml($match) ?></b><?php
-                                endif;
-                                ?><?= $escaper->escapeHtml($rest) ?>
-                            </a>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endforeach; ?>
     </div>
 <?php endif; ?>
