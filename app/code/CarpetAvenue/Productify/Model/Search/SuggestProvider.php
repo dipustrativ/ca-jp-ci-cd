@@ -23,6 +23,13 @@ use Psr\Log\LoggerInterface;
  */
 class SuggestProvider
 {
+    /**
+     * Live's spam gate (Evalent QueryCollectionPlugin, also our
+     * Plugin\Search\FilterSpamQueries). Every dropdown lookup is recorded,
+     * so a one-off or half-typed term has to be looked up a few times first.
+     */
+    public const MIN_POPULARITY = 5;
+
     public function __construct(
         private readonly ProductCollectionFactory $productCollectionFactory,
         private readonly CategoryCollectionFactory $categoryCollectionFactory,
@@ -131,12 +138,10 @@ class SuggestProvider
     /**
      * Terms other shoppers have searched for — the "Suggested searches" rows.
      *
-     * Queried directly rather than through Search\ResourceModel\Query\Collection
-     * because Plugin\Search\FilterSpamQueries gates that collection at
-     * `popularity > 5` for the popular-terms page, which would leave this list
-     * empty on any store that isn't already busy. Only `num_results` matters
-     * here: never suggest a search that lands on an empty results page.
-     * Prefix match (`q%`), as live's stock Query\\Collection::setQueryFilter(),
+     * Same gate as live: `num_results > 0` (never suggest a search that lands
+     * on an empty results page) and `popularity > MIN_POPULARITY`, which keeps
+     * out the half-typed terms Controller\Search\Suggest records.
+     * Prefix match (`q%`), as live's stock Query\Collection::setQueryFilter(),
      * with the typed term itself first when it has been searched before.
      *
      * @return array<int, array{label: string, url: string}>
@@ -155,6 +160,7 @@ class SuggestProvider
                 ->from(['sq' => $this->resource->getTableName('search_query')], ['query_text'])
                 ->where('sq.store_id = ?', (int) $this->storeManager->getStore()->getId())
                 ->where('sq.num_results > 0')
+                ->where('sq.popularity > ?', self::MIN_POPULARITY)
                 ->where('sq.query_text LIKE ?', $query . '%')
                 ->where('NOT EXISTS (?)', $skuMatch)
                 // The typed term itself leads, as in stock Autocomplete\DataProvider::getItems().
