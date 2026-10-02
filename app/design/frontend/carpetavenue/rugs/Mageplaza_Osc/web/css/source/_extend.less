@@ -839,3 +839,12 @@ form.form.form-login .fieldset{
 .back-to-cart__link:before{
     color: #333333;
 }
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__xs) {
+    .onestepcheckout-index-index .table-totals .totals.grand {
+        .mark strong,
+        .amount strong {
+            font-size: 1.4rem;
+        }
+    }
+}
