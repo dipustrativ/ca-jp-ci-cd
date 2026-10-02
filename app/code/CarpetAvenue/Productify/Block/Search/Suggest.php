@@ -21,7 +21,6 @@ use Magento\Search\Helper\Data as SearchHelper;
  * @method array getCategories()
  * @method int getCategoriesTotal()
  * @method array getSuggestions()
- * @method array getPages()
  */
 class Suggest extends Template
 {
@@ -66,8 +65,7 @@ class Suggest extends Template
     {
         return $this->getProductCount() > 0
             || $this->getCategories()
-            || $this->getSuggestions()
-            || $this->getPages();
+            || $this->getSuggestions();
     }
 
     /**
@@ -110,37 +108,6 @@ class Suggest extends Template
         $regular = (float) $product->getData('price');
 
         return $regular > (float) $product->getData('final_price') ? $this->format($regular) : '';
-    }
-
-    /**
-     * The matched part of a label, so the template can bold it.
-     * Returns [matched, rest].
-     *
-     * @return array{0: string, 1: string}
-     */
-    public function splitMatch(string $label): array
-    {
-        $query = (string) $this->getQuery();
-        $position = mb_stripos($label, $query);
-
-        if ($position === false) {
-            return ['', $label];
-        }
-
-        return [
-            mb_substr($label, $position, mb_strlen($query)),
-            mb_substr($label, $position + mb_strlen($query)),
-        ];
-    }
-
-    /**
-     * Prefix before the highlighted match (empty for the common prefix case).
-     */
-    public function matchPrefix(string $label): string
-    {
-        $position = mb_stripos($label, (string) $this->getQuery());
-
-        return $position ? mb_substr($label, 0, $position) : '';
     }
 
     public function getResultsUrl(): string

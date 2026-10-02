@@ -22,6 +22,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Eav\Model\Config;
+use Magento\Eav\Model\Entity\Attribute\AbstractAttribute;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\App\ResponseInterface;
@@ -39,11 +40,22 @@ use CarpetAvenue\Productify\Helper\Data;
 
 class Upload extends Action
 {
+    /**
+     * Product attributes this upload writes. Attribute ids differ between
+     * databases, so each is resolved from its code on the running install.
+     */
+    private const WRITTEN_ATTRIBUTES = [
+        Data::DESIGN_ID_ATTRIBUTE_CODE,
+        Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE,
+        Data::SIZE_ATTRIBUTE_CODE,
+        Data::COLOR_ATTRIBUTE_CODE,
+        Data::IS_GROUP_ATTRIBUTE_CODE,
+    ];
+
     protected bool $overwriteDesignId = false;
     protected bool $overwriteDesignIdGroup = false;
     protected bool $overwriteSize = false;
     protected bool $overwriteColor = false;
-    protected int $designIdGroupAttributeId;
 
     public function __construct(
         Context                   $context,
@@ -207,22 +219,17 @@ class Upload extends Action
                 $productSizes  = array_unique($productSizes);
                 $productColors = array_unique($productColors);
 
+                // A missing attribute must stop the upload before anything is written.
+                foreach (self::WRITTEN_ATTRIBUTES as $attributeCode) {
+                    $this->getProductAttribute($attributeCode);
+                }
+
                 // Process attribute options (same as before)
                 $message .= $this->processAttributeOptions($productSizes, $productColors);
 
                 // Get updated attribute options
                 $sizeGroups = $this->getAttributeOptions(Data::SIZE_ATTRIBUTE_CODE);
                 $colorGroups = $this->getAttributeOptions(Data::COLOR_ATTRIBUTE_CODE);
-
-                $this->designIdGroupAttributeId = $this->getDesignIdGroupAttributeId();
-
-                $isGroupAttributeCode = $this->getIsGroupAttributeId();
-                if (!$isGroupAttributeCode) {
-                    return [
-                        'success' => false,
-                        'message' => "No Attribute found for is_group"
-                    ];
-                }
 
                 $productCollection = $this->getProductCollectionBySku($allSkus);
                 $productData = $this->extractProductData($productCollection);
@@ -274,8 +281,7 @@ class Upload extends Action
                                 $product,
                                 $csvProduct,
                                 $sizeGroups,
-                                $colorGroups,
-                                $isGroupAttributeCode
+                                $colorGroups
                             );
                         } catch (Exception $exception) {
                             $message .= "<p style='color: #ee6d39'>SKU - <b>$sku</b> : " . $exception->getMessage()."</p>";
@@ -340,7 +346,7 @@ class Upload extends Action
         return $productData;
     }
 
-    private function updateProductAttributes(array $product, array $csvProduct, array $sizeGroups, array $colorGroups, int $isGroupAttributeCode): void
+    private function updateProductAttributes(array $product, array $csvProduct, array $sizeGroups, array $colorGroups): void
     {
         $entityId = $product['entity_id'];
 
@@ -351,10 +357,8 @@ class Upload extends Action
             $finalDesignId = $csvDesignId;
             $this->updateOrInsertAttributeValue(
                 $entityId,
-                Data::DESIGN_ID_ATTRIBUTE_ID,
-                $csvDesignId,
-                0,
-                'catalog_product_entity_varchar'
+                Data::DESIGN_ID_ATTRIBUTE_CODE,
+                $csvDesignId
             );
         }
 
@@ -367,18 +371,14 @@ class Upload extends Action
         if (!empty($product[Data::CSV_DESIGN_ID_GROUP]) && $product[Data::CSV_DESIGN_ID_GROUP] !== $finalDesignIdGroup) {
             $this->updateOrInsertAttributeValue(
                 $entityId,
-                $this->designIdGroupAttributeId,
-                $finalDesignIdGroup,
-                0,
-                'catalog_product_entity_varchar'
+                Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE,
+                $finalDesignIdGroup
             );
         } else if(empty($product[Data::CSV_DESIGN_ID_GROUP])) {
             $this->updateOrInsertAttributeValue(
                 $entityId,
-                $this->designIdGroupAttributeId,
-                $finalDesignIdGroup,
-                0,
-                'catalog_product_entity_varchar'
+                Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE,
+                $finalDesignIdGroup
             );
         }
 
@@ -388,7 +388,7 @@ class Upload extends Action
         if ($this->overwriteSize && $product['size_id'] !== $newSizeId && $newSizeId !== null) {
             $this->updateOrInsertAttributeValue(
                 $entityId,
-                Data::SIZE_ATTRIBUTE_ID,
+                Data::SIZE_ATTRIBUTE_CODE,
                 $newSizeId
             );
         }
@@ -399,7 +399,7 @@ class Upload extends Action
         if ($this->overwriteColor && $product['color_id'] !== $newColorId && $newColorId !== null) {
             $this->updateOrInsertAttributeValue(
                 $entityId,
-                Data::COLOR_ATTRIBUTE_ID,
+                Data::COLOR_ATTRIBUTE_CODE,
                 $newColorId
             );
         }
@@ -408,7 +408,7 @@ class Upload extends Action
         if ($product['is_group'] !== '1') {
             $this->updateOrInsertAttributeValue(
                 $entityId,
-                $isGroupAttributeCode,
+                Data::IS_GROUP_ATTRIBUTE_CODE,
                 1
             );
         }
@@ -445,7 +445,7 @@ class Upload extends Action
             $message .= count($newSize) . " New size options added : ".implode(', ', $newSize)."<br><br>";
             $eavSetup = $this->eavSetupFactory->create(['setup' => $this->setup]);
             $eavSetup->addAttributeOption([
-                'attribute_id' => Data::SIZE_ATTRIBUTE_ID,
+                'attribute_id' => $sizeAttribute->getAttributeId(),
                 'value'        => $sizeNewOptionsData
             ]);
         }
@@ -474,9 +474,17 @@ class Upload extends Action
             $message .= count($newColor) . " New color options added : ".implode(', ', $newColor)."<br><br>";
             $eavSetup = $this->eavSetupFactory->create(['setup' => $this->setup]);
             $eavSetup->addAttributeOption([
-                'attribute_id' => Data::COLOR_ATTRIBUTE_ID,
+                'attribute_id' => $colorAttribute->getAttributeId(),
                 'value'        => $colorNewOptionsData
             ]);
+        }
+
+        if ($sizeNewOptionsData || $colorNewOptionsData) {
+            // The attributes' option lists were read above and are cached for the rest
+            // of the request, so getAttributeOptions() would miss the options just
+            // added and those rows would get no size/colour. clear() drops that cache
+            // and cleans the EAV cache tags, as an attribute save does.
+            $this->eavConfig->clear();
         }
 
         return $message;
@@ -502,26 +510,37 @@ class Upload extends Action
         return $this->_authorization->isAllowed('CarpetAvenue_Productify::productify_groupproducts');
     }
 
-    private function getIsGroupAttributeId(): int
+    /**
+     * Product attribute by code, as defined on this install
+     *
+     * @param string $attributeCode
+     * @return AbstractAttribute
+     * @throws LocalizedException When the attribute does not exist
+     */
+    private function getProductAttribute(string $attributeCode): AbstractAttribute
     {
-        $connection = $this->resourceConnection->getConnection();
-
-        $select = $connection->select()
-            ->from(['ea' => 'eav_attribute'], ['attribute_id'])
-            ->join(
-                ['eet' => 'eav_entity_type'],
-                'ea.entity_type_id = eet.entity_type_id',
-                []
-            )
-            ->where('ea.attribute_code = ?', Data::IS_GROUP_ATTRIBUTE_CODE)
-            ->where('eet.entity_type_code = ?', 'catalog_product');
-
-        return (int) $connection->fetchOne($select);
+        $attribute = $this->eavConfig->getAttribute(Product::ENTITY, $attributeCode);
+        if (!$attribute->getAttributeId()) {
+            throw new LocalizedException(__('Product attribute "%1" does not exist.', $attributeCode));
+        }
+        return $attribute;
     }
 
-    private function updateOrInsertAttributeValue($entityId, $attributeId, $value, $storeId = 0, $table = 'catalog_product_entity_int'): void
+    /**
+     * Write one attribute value, into the value table that attribute uses
+     *
+     * @param int|string $entityId
+     * @param string $attributeCode
+     * @param mixed $value
+     * @param int $storeId
+     * @throws LocalizedException
+     */
+    private function updateOrInsertAttributeValue($entityId, string $attributeCode, $value, int $storeId = 0): void
     {
         $connection = $this->resourceConnection->getConnection();
+        $attribute = $this->getProductAttribute($attributeCode);
+        $attributeId = $attribute->getAttributeId();
+        $table = $attribute->getBackendTable();
 
         $select = $connection->select()
             ->from($table, ['value_id'])
@@ -549,22 +568,5 @@ class Upload extends Action
                 'value' => $value
             ]);
         }
-    }
-
-    private function getDesignIdGroupAttributeId(): int
-    {
-        $connection = $this->resourceConnection->getConnection();
-
-        $select = $connection->select()
-            ->from(['ea' => 'eav_attribute'], ['attribute_id'])
-            ->join(
-                ['eet' => 'eav_entity_type'],
-                'ea.entity_type_id = eet.entity_type_id',
-                []
-            )
-            ->where('ea.attribute_code = ?', Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE)
-            ->where('eet.entity_type_code = ?', 'catalog_product');
-
-        return (int) $connection->fetchOne($select);
     }
 }

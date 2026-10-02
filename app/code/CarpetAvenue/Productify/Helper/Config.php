@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace CarpetAvenue\Productify\Helper;
 
+use CarpetAvenue\Productify\Plugin\Currency\HideZeroDecimals;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Store\Model\ScopeInterface;
@@ -30,6 +31,21 @@ class Config extends AbstractHelper
     public function __construct(Context $context)
     {
         parent::__construct($context);
+    }
+
+    /**
+     * Whether prices are shown without decimals (Catalog Pricing → Hide Zeros)
+     *
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isHideZeroDecimals($storeId = null): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            HideZeroDecimals::XML_PATH_HIDE_ZEROS,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
     }
 
     public function isAutoSyncEnabled(): bool
@@ -68,9 +84,14 @@ class Config extends AbstractHelper
 
     public function getUrlRewriteTemplate($storeId = null): string
     {
-        return $this->scopeConfig->getValue(
+        // No admin field defines this path any more, so it is usually unset. Unset
+        // returned null from a string method: a TypeError that no catch (Exception)
+        // stopped, killing the whole build on the first renamed product. '' parses
+        // to an empty URL key, which ProductUrlRewrite already treats as "no change".
+        return (string) $this->scopeConfig->getValue(
             self::XML_PATH_URL_REWRITE_TEMPLATE,
-            ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
     }
 

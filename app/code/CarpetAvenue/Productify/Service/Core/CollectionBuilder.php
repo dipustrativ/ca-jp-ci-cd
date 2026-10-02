@@ -25,6 +25,7 @@ use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Currency\Exception\CurrencyException;
+use Magento\Framework\DB\Select;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\Currency as LocaleCurrency;
@@ -41,6 +42,12 @@ use Psr\Log\LoggerInterface;
  */
 class CollectionBuilder
 {
+    /**
+     * Products loaded per query. A full build walks the whole catalog; paging keeps
+     * one page of product models in memory instead of every product at once.
+     */
+    private const PAGE_SIZE = 1000;
+
     /**
      * @param CollectionFactory $collectionFactory
      * @param GroupProductCacheRepository $repository
@@ -78,90 +85,67 @@ class CollectionBuilder
      *
      * @param Store $store
      * @param array $productIds
-     * @param string|null $designId
+     * @param string|string[]|null $designId One design id, or several (matched with IN)
+     * @param callable|null $onProgress Called as ($done, $total): once with 0 before the
+     *                                  first page, then after every product
      * @return array
      */
-    public function buildForStore(Store $store, array $productIds = [], ?string $designId = null): array
-    {
+    public function buildForStore(
+        Store $store,
+        array $productIds = [],
+        string|array|null $designId = null,
+        ?callable $onProgress = null
+    ): array {
         $productsData = [];
+        if ($designId === []) {
+            return $productsData;
+        }
 
         try {
             $storeId = (int)$store->getStoreId();
-            $collection = $this->createProductCollection($storeId, $productIds, $designId);
+            $total = (int)$this->createProductCollection($storeId, $productIds, $designId)->getSize();
             $currencyCode = $store->getCurrentCurrencyCode();
             $currencySymbol = $this->getCurrencySymbol($currencyCode);
+            // Applied here, not left to the HideZeroDecimals plugin: that plugin is
+            // frontend-only, so builds run by the queue cron (crontab area) stored
+            // "¥168,000.00" while CLI builds stored "¥168,000". Same result in both now.
+            $precision = $this->configHelper->isHideZeroDecimals($storeId)
+                ? 0
+                : PriceCurrencyInterface::DEFAULT_PRECISION;
 
-            foreach ($collection as $product) {
-
-                $productOnline  = (int)$product->getData('online');
-                $productStatus  = (int)$product->getData('status');
-                $basePrice      = (float) $product->getPrice();
-                $baseFinalPrice = (float) $product->getFinalPrice();
-                $baseSpecial    = (float) $product->getSpecialPrice();
-                $minimalPrice   = (float) $product->getData('minimal_price');
-                $maximumPrice   = (float) $product->getData('maximal_price');
-
-                if ($minimalPrice > 0 && $minimalPrice < $baseFinalPrice) {
-                    $baseFinalPrice = $minimalPrice;
-                }
-
-                $dispPrice      = $this->convert($basePrice, $store, $currencyCode);
-                $dispMinPrice   = $this->convert($minimalPrice, $store, $currencyCode);
-                $dispFinalPrice = $this->convert($baseFinalPrice, $store, $currencyCode);
-                $dispSpecial    = $baseSpecial ? $this->convert($baseSpecial, $store, $currencyCode) : 0.0;
-
-                /**
-                 * -----------------------------------
-                 * IMPORTANT: Add every new row to the carpetavenue_productify_collection table.
-                 * -----------------------------------
-                 */
-                $productsData[$product->getId()] = [
-                    // Basic info
-                    'id'           => $product->getId(),
-                    'store_id'     => $storeId,
-                    'sku'          => $product->getSku(),
-                    'url'          => $product->getProductUrl(),
-                    'final_status' => true,
-                    'is_salable'   => (int)$product->getData('is_salable'),
-                    'online'       => $productOnline,
-                    'status'       => $productStatus,
-
-                    // Images. Both ids are declared in the theme's view.xml — see
-                    // getProductImageUrl() for why they must never be resized here.
-                    'image'        => $this->getProductImageUrl($product, 'product_page_image_small'),
-                    'swatch_image' => $this->getProductImageUrl($product, 'productify_variant_swatch'),
-
-                    // Currency context for the numbers below
-                    'currency'        => $currencyCode,
-                    'currency_symbol' => $currencySymbol,
-
-                    // RAW numbers in display currency (good for frontend math)
-                    'price'         => round($dispPrice, 2),
-                    'final_price'   => round($dispFinalPrice, 2),
-                    'special_price' => $baseSpecial ? round($dispSpecial, 2) : 0.0,
-                    'minimum_price' => $minimalPrice ? round($dispMinPrice, 2) : 0.0,
-                    'maximum_price' => $maximumPrice ? round($maximumPrice, 2) : 0.0,
-
-                    // Ready-to-render strings
-                    'price_formatted'         => $this->format($dispPrice, $store, $currencyCode),
-                    'final_price_formatted'   => $this->format($dispFinalPrice, $store, $currencyCode),
-                    'special_price_formatted' => $minimalPrice
-                        ? $this->format($dispMinPrice, $store, $currencyCode)
-                        : '',
-                    'minimum_price_formated'  => $baseSpecial
-                        ? $this->format($dispSpecial, $store, $currencyCode)
-                        : '',
-
-                    // Attribute labels
-                    Data::NAME_ATTRIBUTE_CODE => $product->getData(Data::NAME_ATTRIBUTE_CODE),
-                    Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE => $product->getData(Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE),
-                    Data::COLOR_ATTRIBUTE_CODE           => $product->getAttributeText(Data::COLOR_ATTRIBUTE_CODE),
-                    Data::SIZE_ATTRIBUTE_CODE            => $product->getAttributeText(Data::SIZE_ATTRIBUTE_CODE),
-                    Data::SHAPE_ATTRIBUTE_CODE           => $product->getAttributeText(Data::SHAPE_ATTRIBUTE_CODE),
-                    Data::SHAPE_ATTRIBUTE_KEY_CODE       => $product->getData(Data::SHAPE_ATTRIBUTE_CODE),
-                ];
-
+            $done = 0;
+            if ($onProgress) {
+                $onProgress($done, $total);
             }
+            // Keyset pages (entity_id > last seen), not OFFSET: every page costs the
+            // same however deep it is, and a product added or deleted mid-run cannot
+            // shift the pages and make the build skip a row.
+            $lastId = 0;
+            do {
+                $collection = $this->createProductCollection($storeId, $productIds, $designId);
+                $collection->addFieldToFilter('entity_id', ['gt' => $lastId]);
+                $collection->getSelect()
+                    ->order('e.entity_id ' . Select::SQL_ASC)
+                    ->limit(self::PAGE_SIZE);
+                $pageCount = 0;
+                foreach ($collection as $product) {
+                    $pageCount++;
+                    $lastId = (int)$product->getId();
+                    $productsData[$product->getId()] = $this->buildProductData(
+                        $product,
+                        $store,
+                        $storeId,
+                        $currencyCode,
+                        $currencySymbol,
+                        $precision
+                    );
+                    if ($onProgress) {
+                        $onProgress(++$done, $total);
+                    }
+                }
+                // Release this page's product models before the next page loads.
+                $collection->clear();
+            } while ($pageCount === self::PAGE_SIZE);
 
         } catch (Exception $exception) {
             $this->logger->error('Error Building Products', ['exception' => $exception]);
@@ -172,18 +156,106 @@ class CollectionBuilder
     }
 
     /**
+     * Build the persisted row for one product
+     *
+     * @param Product $product
+     * @param Store $store
+     * @param int $storeId
+     * @param string $currencyCode
+     * @param string $currencySymbol
+     * @param int $precision Decimals in the formatted price strings
+     * @return array
+     */
+    private function buildProductData(
+        Product $product,
+        Store $store,
+        int $storeId,
+        string $currencyCode,
+        string $currencySymbol,
+        int $precision
+    ): array {
+        $productOnline  = (int)$product->getData('online');
+        $productStatus  = (int)$product->getData('status');
+        $basePrice      = (float) $product->getPrice();
+        $baseFinalPrice = (float) $product->getFinalPrice();
+        $baseSpecial    = (float) $product->getSpecialPrice();
+        $minimalPrice   = (float) $product->getData('minimal_price');
+        $maximumPrice   = (float) $product->getData('maximal_price');
+
+        if ($minimalPrice > 0 && $minimalPrice < $baseFinalPrice) {
+            $baseFinalPrice = $minimalPrice;
+        }
+
+        $dispPrice      = $this->convert($basePrice, $store, $currencyCode);
+        $dispMinPrice   = $this->convert($minimalPrice, $store, $currencyCode);
+        $dispFinalPrice = $this->convert($baseFinalPrice, $store, $currencyCode);
+        $dispSpecial    = $baseSpecial ? $this->convert($baseSpecial, $store, $currencyCode) : 0.0;
+
+        /**
+         * -----------------------------------
+         * IMPORTANT: Add every new row to the carpetavenue_productify_collection table.
+         * -----------------------------------
+         */
+        return [
+            // Basic info
+            'id'           => $product->getId(),
+            'store_id'     => $storeId,
+            'sku'          => $product->getSku(),
+            'url'          => $product->getProductUrl(),
+            'final_status' => true,
+            'is_salable'   => (int)$product->getData('is_salable'),
+            'online'       => $productOnline,
+            'status'       => $productStatus,
+
+            // Images. Both ids are declared in the theme's view.xml — see
+            // getProductImageUrl() for why they must never be resized here.
+            'image'        => $this->getProductImageUrl($product, 'product_page_image_small'),
+            'swatch_image' => $this->getProductImageUrl($product, 'productify_variant_swatch'),
+
+            // Currency context for the numbers below
+            'currency'        => $currencyCode,
+            'currency_symbol' => $currencySymbol,
+
+            // RAW numbers in display currency (good for frontend math)
+            'price'         => round($dispPrice, 2),
+            'final_price'   => round($dispFinalPrice, 2),
+            'special_price' => $baseSpecial ? round($dispSpecial, 2) : 0.0,
+            'minimum_price' => $minimalPrice ? round($dispMinPrice, 2) : 0.0,
+            'maximum_price' => $maximumPrice ? round($maximumPrice, 2) : 0.0,
+
+            // Ready-to-render strings
+            'price_formatted'         => $this->format($dispPrice, $store, $currencyCode, $precision),
+            'final_price_formatted'   => $this->format($dispFinalPrice, $store, $currencyCode, $precision),
+            'special_price_formatted' => $minimalPrice
+                ? $this->format($dispMinPrice, $store, $currencyCode, $precision)
+                : '',
+            'minimum_price_formated'  => $baseSpecial
+                ? $this->format($dispSpecial, $store, $currencyCode, $precision)
+                : '',
+
+            // Attribute labels
+            Data::NAME_ATTRIBUTE_CODE => $product->getData(Data::NAME_ATTRIBUTE_CODE),
+            Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE => $product->getData(Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE),
+            Data::COLOR_ATTRIBUTE_CODE           => $product->getAttributeText(Data::COLOR_ATTRIBUTE_CODE),
+            Data::SIZE_ATTRIBUTE_CODE            => $product->getAttributeText(Data::SIZE_ATTRIBUTE_CODE),
+            Data::SHAPE_ATTRIBUTE_CODE           => $product->getAttributeText(Data::SHAPE_ATTRIBUTE_CODE),
+            Data::SHAPE_ATTRIBUTE_KEY_CODE       => $product->getData(Data::SHAPE_ATTRIBUTE_CODE),
+        ];
+    }
+
+    /**
      * Create Product Collection for Store
      *
      * @param int $storeId Store Id
      * @param array $productIds Product IDs to filter, empty for all
-     * @param string|null $designId Design ID
+     * @param string|string[]|null $designId Design ID, or several design IDs
      *
      * @throws NoSuchEntityException
      */
     public function createProductCollection(
         int $storeId,
         array $productIds = [],
-        ?string $designId = null
+        string|array|null $designId = null
     ): Collection {
         $collection = $this->collectionFactory->create();
         $collection
@@ -217,7 +289,7 @@ class CollectionBuilder
         if ($designId) {
             $collection->addAttributeToFilter(
                 Data::DESIGN_ID_GROUP_ATTRIBUTE_CODE,
-                ['eq' => $designId]
+                is_array($designId) ? ['in' => $designId] : ['eq' => $designId]
             );
         }
 
@@ -272,14 +344,15 @@ class CollectionBuilder
      * @param float $amount
      * @param Store $store
      * @param string $currencyCode
+     * @param int $precision
      * @return string
      */
-    private function format(float $amount, Store $store, string $currencyCode): string
+    private function format(float $amount, Store $store, string $currencyCode, int $precision): string
     {
         return $this->priceCurrency->format(
             $amount,
             false,
-            PriceCurrencyInterface::DEFAULT_PRECISION,
+            $precision,
             $store,
             $currencyCode
         );

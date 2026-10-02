@@ -11,23 +11,28 @@ use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
-use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFactory;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Sql\Expression;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
  * Data behind the search suggestion dropdown: matching categories
- * ("collections"), previously-searched terms, CMS pages, and an exact
- * article-number lookup.
+ * ("collections"), previously-searched terms, and a single-product lookup.
  */
 class SuggestProvider
 {
+    /**
+     * Live's spam gate (Evalent QueryCollectionPlugin, also our
+     * Plugin\Search\FilterSpamQueries). Every dropdown lookup is recorded,
+     * so a one-off or half-typed term has to be looked up a few times first.
+     */
+    public const MIN_POPULARITY = 5;
+
     public function __construct(
         private readonly ProductCollectionFactory $productCollectionFactory,
         private readonly CategoryCollectionFactory $categoryCollectionFactory,
-        private readonly PageCollectionFactory $pageCollectionFactory,
         private readonly ResourceConnection $resource,
         private readonly StoreManagerInterface $storeManager,
         private readonly UrlInterface $url,
@@ -36,11 +41,12 @@ class SuggestProvider
     }
 
     /**
-     * The "Products" column is an article-number lookup, not a catalogue search:
-     * carpetavenue.jp lists a rug here only when the term *is* its SKU, and
-     * routes every browsing term through the category and suggested-search rows
-     * instead. Verified against live — `OSG16359` returns the rug, while
-     * `OSG163`, `ギャッベ` and `タブリーズ` return no products at all.
+     * The "Products" column only lists a rug when the term pins down exactly one:
+     * its SKU, or a name fragment no other rug shares. Any broader term (a design
+     * name such as `タブリーズ50ラジ`, shared by hundreds of rugs) lists nothing
+     * here and is served by the category and suggested-search rows instead.
+     * Same rule as live's Evalent\SearchSuiteAutocomplete\Model\Search\Product,
+     * which matches `name LIKE %q% OR sku = q` and drops the list when size > 1.
      *
      * @return array{products: ProductCollection|null, total: int}
      */
@@ -50,7 +56,7 @@ class SuggestProvider
             $collection = $this->loadProducts($query, $limit);
             $total = $collection->getSize();
 
-            return ['products' => $total ? $collection : null, 'total' => $total];
+            return ['products' => $total === 1 ? $collection : null, 'total' => $total];
         } catch (\Exception $e) {
             $this->logger->warning('Productify suggest product lookup failed: ' . $e->getMessage());
 
@@ -69,7 +75,10 @@ class SuggestProvider
             ->addPriceData()
             ->addUrlRewrite()
             ->addStoreFilter()
-            ->addAttributeToFilter('sku', $query)
+            ->addAttributeToFilter([
+                ['attribute' => 'name', 'like' => '%' . $query . '%'],
+                ['attribute' => 'sku', 'eq' => $query],
+            ])
             ->addAttributeToFilter('status', Status::STATUS_ENABLED)
             ->addAttributeToFilter(
                 'visibility',
@@ -96,7 +105,14 @@ class SuggestProvider
             $collection->setStore($this->storeManager->getStore())
                 ->addAttributeToSelect(['name', 'url_key', 'url_path'])
                 ->addAttributeToFilter('is_active', 1)
-                ->addAttributeToFilter('name', ['like' => '%' . $query . '%'])
+                // Merchandisers tag categories with extra search words in
+                // meta_keywords, as live's Evalent SearchSuiteAutocomplete reads them.
+                // Left join: the default inner join drops every category that
+                // has no meta_keywords row at all.
+                ->addAttributeToFilter([
+                    ['attribute' => 'name', 'like' => '%' . $query . '%'],
+                    ['attribute' => 'meta_keywords', 'like' => '%' . $query . '%'],
+                ], null, 'left')
                 ->addAttributeToFilter('level', ['gt' => 1])
                 ->setLoadProductCount(true)
                 ->setOrder('level', 'ASC')
@@ -122,11 +138,11 @@ class SuggestProvider
     /**
      * Terms other shoppers have searched for — the "Suggested searches" rows.
      *
-     * Queried directly rather than through Search\ResourceModel\Query\Collection
-     * because Plugin\Search\FilterSpamQueries gates that collection at
-     * `popularity > 5` for the popular-terms page, which would leave this list
-     * empty on any store that isn't already busy. Only `num_results` matters
-     * here: never suggest a search that lands on an empty results page.
+     * Same gate as live: `num_results > 0` (never suggest a search that lands
+     * on an empty results page) and `popularity > MIN_POPULARITY`, which keeps
+     * out the half-typed terms Controller\Search\Suggest records.
+     * Prefix match (`q%`), as live's stock Query\Collection::setQueryFilter(),
+     * with the typed term itself first when it has been searched before.
      *
      * @return array<int, array{label: string, url: string}>
      */
@@ -134,13 +150,22 @@ class SuggestProvider
     {
         try {
             $connection = $this->resource->getConnection();
+            // An article number is answered by the Products row, never re-offered
+            // as a "similar search" — live never lists one (its popularity > 5
+            // gate keeps one-off SKU lookups out).
+            $skuMatch = $connection->select()
+                ->from(['p' => $this->resource->getTableName('catalog_product_entity')], [new Expression('1')])
+                ->where('p.sku = sq.query_text');
             $select = $connection->select()
-                ->from($this->resource->getTableName('search_query'), ['query_text'])
-                ->where('store_id = ?', (int) $this->storeManager->getStore()->getId())
-                ->where('num_results > 0')
-                ->where('query_text LIKE ?', '%' . $query . '%')
-                ->where('query_text != ?', $query)
-                ->order('popularity DESC')
+                ->from(['sq' => $this->resource->getTableName('search_query')], ['query_text'])
+                ->where('sq.store_id = ?', (int) $this->storeManager->getStore()->getId())
+                ->where('sq.num_results > 0')
+                ->where('sq.popularity > ?', self::MIN_POPULARITY)
+                ->where('sq.query_text LIKE ?', $query . '%')
+                ->where('NOT EXISTS (?)', $skuMatch)
+                // The typed term itself leads, as in stock Autocomplete\DataProvider::getItems().
+                ->order(new Expression($connection->quoteInto('sq.query_text = ? DESC', $query)))
+                ->order('sq.popularity DESC')
                 ->limit($limit);
 
             $items = [];
@@ -154,36 +179,6 @@ class SuggestProvider
             return $items;
         } catch (\Exception $e) {
             $this->logger->warning('Productify suggest term lookup failed: ' . $e->getMessage());
-
-            return [];
-        }
-    }
-
-    /**
-     * CMS pages matching the term.
-     *
-     * @return array<int, array{label: string, url: string}>
-     */
-    public function getPages(string $query, int $limit): array
-    {
-        try {
-            $collection = $this->pageCollectionFactory->create();
-            $collection->addFieldToFilter('is_active', 1)
-                ->addFieldToFilter('title', ['like' => '%' . $query . '%'])
-                ->addStoreFilter($this->storeManager->getStore()->getId())
-                ->setPageSize($limit);
-
-            $items = [];
-            foreach ($collection as $page) {
-                $items[] = [
-                    'label' => (string) $page->getTitle(),
-                    'url' => $this->url->getUrl(null, ['_direct' => $page->getIdentifier()]),
-                ];
-            }
-
-            return $items;
-        } catch (\Exception $e) {
-            $this->logger->warning('Productify suggest CMS lookup failed: ' . $e->getMessage());
 
             return [];
         }

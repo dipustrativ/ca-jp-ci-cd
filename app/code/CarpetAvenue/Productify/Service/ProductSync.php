@@ -18,6 +18,7 @@ use CarpetAvenue\Productify\Helper\Config;
 use CarpetAvenue\Productify\Helper\Logger;
 use CarpetAvenue\Productify\Model\GroupProductCacheRepository;
 use CarpetAvenue\Productify\Model\ProductVariantReferenceRepository;
+use CarpetAvenue\Productify\Service\Core\BuildProgress;
 use CarpetAvenue\Productify\Service\Core\CollectionBuilder;
 use Exception;
 use Magento\Catalog\Model\Product;
@@ -30,11 +31,13 @@ use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Event\ManagerInterface;
 use CarpetAvenue\Productify\Model\ResourceModel\ProductifyCollectionFactory as ProductifyCollectionResourceFactory;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ProductSync
 {
     protected array $productIds = [];
-    protected mixed $output;
+    protected ?OutputInterface $output = null;
 
     public function __construct(
         protected CollectionFactory                 $collectionFactory,
@@ -59,34 +62,77 @@ class ProductSync
     /**
      * Sync all Store Products
      *
-     * @param array $productIds
-     * @param null $output
+     * @param array $productIds Only rebuild these products; empty rebuilds every product
+     * @param OutputInterface|null $output CLI output for progress bars
      * @return array
      */
-    public function buildAllStores(array $productIds = [], $output = null): array
+    public function buildAllStores(array $productIds = [], ?OutputInterface $output = null): array
     {
         $this->productIds = $productIds;
-        $this->output = ($output) ?: null;
+        // Progress (store headers, bars and their line breaks) all goes to stderr, where
+        // ProgressBar draws anyway: one stream keeps it in order when stdout and stderr
+        // are merged, and leaves stdout to the command's result lines.
+        $this->output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
         $results = [];
         $startTime = microtime(true);
-        $this->logger->info("Productify : [Queue] Starting build for all stores with " . count($productIds) . " products.");
+        $scope = $productIds ? count($productIds) . ' products' : 'all products';
+        $this->logger->info("Productify : [Queue] Starting build for all stores ($scope).");
         foreach ($this->storeManager->getStores() as $store) {
             $storeId = (int)$store->getId(); // Do not remove this line
+            $storeLabel = "store ID {$storeId} ({$store->getCode()})";
+            $storeStart = microtime(true);
             $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
             try {
-                $products = $this->collectionBuilder->buildForStore($store, $productIds);
+                $this->output?->writeln("<info>Store {$storeId} ({$store->getCode()})</info>");
+                $loadProgress = $this->progress('Loading products', $storeLabel);
+                $products = $this->collectionBuilder->buildForStore($store, $productIds, null, $loadProgress);
+                $loadProgress->finish(count($products));
+
                 // Varient Builder Data
                 $this->logger->info("Productify : [Queue] Building variants for store ID {$storeId} with " . count($products) . " products.");
-                $this->variantBuilder->buildForStore($store, $storeId, $products);
+                $variantProgress = $this->progress('Building variants', $storeLabel);
+                $variantTotal = count($products);
+                $variantDone = 0;
+                $variantProgress($variantDone, $variantTotal);
+                // A full build already holds every product of the store, so the
+                // variant groups are cut from it instead of queried per design.
+                $this->variantBuilder->buildForStore(
+                    $store,
+                    $storeId,
+                    $products,
+                    static function () use ($variantProgress, &$variantDone, $variantTotal): void {
+                        $variantProgress(++$variantDone, $variantTotal);
+                    },
+                    $productIds ? null : $products
+                );
+                $variantProgress->finish($variantDone);
 
-                //-- URL rewrites check
-                $this->productUrlRewrite->init($products);
+                //-- URL rewrites check (a phase only when the feature is enabled)
+                if ($this->configHelper->isUpdateProductUrlRewriteEnabled()) {
+                    $urlProgress = $this->progress('URL rewrites', $storeLabel);
+                    $this->productUrlRewrite->init($products, $urlProgress);
+                    $urlProgress->finish(count($products));
+                }
 
                 //-- Store productify collection data into db
-                $productifyCollectionFactory = $this->productifyCollectionResourceFactory->create();
-                foreach ($products as $product) {
-                    $productifyCollectionFactory->updateOrCreate($product);
+                $saveProgress = $this->progress('Saving', $storeLabel);
+                $saveProgress(0, count($products));
+                $failed = $this->productifyCollectionResourceFactory->create()
+                    ->saveMany($products, $saveProgress);
+                $saveProgress->finish(count($products));
+                if ($failed) {
+                    $this->logger->warning(
+                        "Productify : [Queue] {$storeLabel}: {$failed} of " . count($products)
+                        . " products could not be saved to carpetavenue_productify_collection."
+                    );
                 }
+
+                $this->logger->info(sprintf(
+                    'Productify : [Queue] %s done in %.1fs, peak memory %dMB.',
+                    $storeLabel,
+                    microtime(true) - $storeStart,
+                    memory_get_peak_usage(true) / 1048576
+                ));
 
                 // Callers (productify:product:sync, productify:group-variant:build)
                 // array_sum() this, so it has to carry the per-store counts.
@@ -101,6 +147,18 @@ class ProductSync
         $executionTime = round(microtime(true) - $startTime, 2);
         $this->logger->info("Productify : [Queue] Completed build for all stores | Execution took {$executionTime}s");
         return $results;
+    }
+
+    /**
+     * Progress reporter for one phase of one store
+     *
+     * @param string $phase
+     * @param string $storeLabel
+     * @return BuildProgress
+     */
+    private function progress(string $phase, string $storeLabel): BuildProgress
+    {
+        return new BuildProgress($this->logger, $this->output, $phase, $storeLabel);
     }
 
     /**

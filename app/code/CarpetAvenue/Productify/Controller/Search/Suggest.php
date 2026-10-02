@@ -11,14 +11,16 @@ use CarpetAvenue\Productify\Model\Search\SuggestConfig;
 use CarpetAvenue\Productify\Model\Search\SuggestProvider;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
-use Magento\Cms\Model\Page;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Controller\Result\Raw;
 use Magento\Framework\Controller\Result\RawFactory;
 use Magento\Framework\View\LayoutFactory;
+use Magento\Search\Model\Query;
+use Magento\Search\Model\QueryFactory;
 use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Search suggestion dropdown: /productify/search/suggest?q=...
@@ -26,6 +28,11 @@ use Magento\Store\Model\StoreManagerInterface;
  * Returns a rendered HTML fragment (not JSON) so escaping, translation and the
  * store's price formatting all come from the template layer — the JS side is a
  * single innerHTML assignment. Same posture as Controller\SimilarTo\Ajax.
+ *
+ * Every lookup is also recorded in `search_query`, as live's
+ * SearchSuiteAutocomplete does (saveNumResults + saveIncrementalPopularity on
+ * each request) — that history is what the "similar searches" rows read, and
+ * SuggestProvider::MIN_POPULARITY keeps the half-typed terms it collects out.
  */
 class Suggest implements HttpGetActionInterface
 {
@@ -39,7 +46,9 @@ class Suggest implements HttpGetActionInterface
         private readonly SuggestConfig $config,
         private readonly CacheInterface $cache,
         private readonly CustomerSession $customerSession,
-        private readonly StoreManagerInterface $storeManager
+        private readonly StoreManagerInterface $storeManager,
+        private readonly QueryFactory $queryFactory,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -66,6 +75,8 @@ class Suggest implements HttpGetActionInterface
         // Cap the term so a pasted essay can't reach OpenSearch.
         $query = mb_substr($query, 0, 150);
 
+        $searchQuery = $this->recordLookup($storeId);
+
         $cacheKey = self::CACHE_PREFIX . implode('_', [
             $storeId,
             (int) $this->customerSession->getCustomerGroupId(),
@@ -81,13 +92,16 @@ class Suggest implements HttpGetActionInterface
             }
         }
 
-        $html = $this->render($query, $storeId);
+        $html = $this->render($query, $storeId, $searchQuery);
 
-        if ($ttl > 0) {
+        // An empty panel isn't cached: the lookup that just ran may be the one
+        // that lifts the term over MIN_POPULARITY, and the next keystroke
+        // should show it rather than a 5-minute-old nothing.
+        if ($ttl > 0 && trim($html) !== '') {
             $this->cache->save(
                 $html,
                 $cacheKey,
-                [Product::CACHE_TAG, Category::CACHE_TAG, Page::CACHE_TAG],
+                [Product::CACHE_TAG, Category::CACHE_TAG],
                 $ttl
             );
         }
@@ -95,10 +109,49 @@ class Suggest implements HttpGetActionInterface
         return $result->setContents($html)->setHeader('X-Productify-Suggest', 'MISS', true);
     }
 
-    private function render(string $query, int $storeId): string
+    /**
+     * Popularity counts every lookup, cache hits included — the Redis entry
+     * must not hide demand. Same normalised term as the results page, so both
+     * write the same row. Terms the results page would reject aren't recorded.
+     */
+    private function recordLookup(int $storeId): ?Query
+    {
+        try {
+            $searchQuery = $this->queryFactory->get();
+            if ($searchQuery->isQueryTextShort() || $searchQuery->isQueryTextExceeded()) {
+                return null;
+            }
+            // setStoreId() returns void — not chainable.
+            $searchQuery->setStoreId($storeId);
+            // Twice, as live: its product and category sources each count the
+            // lookup, so a term clears MIN_POPULARITY after 3 lookups there —
+            // and history migrated from live stays on the same scale.
+            $searchQuery->saveIncrementalPopularity();
+            $searchQuery->saveIncrementalPopularity();
+
+            return $searchQuery;
+        } catch (\Exception $e) {
+            $this->logger->warning('Productify suggest could not record the term: ' . $e->getMessage());
+
+            return null;
+        }
+    }
+
+    private function render(string $query, int $storeId, ?Query $searchQuery): string
     {
         $products = $this->provider->getProducts($query, $this->config->getProductLimit($storeId));
         $categories = $this->provider->getCategories($query, SuggestConfig::SIDE_LIMIT);
+
+        // Only ever raise the count: the results page saves its own, fuller
+        // fulltext count, and a lower (or 0) one here would shrink or hide it.
+        $numResults = $products['total'] + $categories['total'];
+        if ($searchQuery && $numResults > (int) $searchQuery->getNumResults()) {
+            try {
+                $searchQuery->saveNumResults($numResults);
+            } catch (\Exception $e) {
+                $this->logger->warning('Productify suggest could not record the count: ' . $e->getMessage());
+            }
+        }
 
         /** @var SuggestBlock $block */
         $block = $this->layoutFactory->create()->createBlock(SuggestBlock::class);
@@ -108,8 +161,7 @@ class Suggest implements HttpGetActionInterface
             ->setData('total', $products['total'])
             ->setData('categories', $categories['items'])
             ->setData('categories_total', $categories['total'])
-            ->setData('suggestions', $this->provider->getSuggestions($query, SuggestConfig::SIDE_LIMIT))
-            ->setData('pages', $this->provider->getPages($query, SuggestConfig::SIDE_LIMIT));
+            ->setData('suggestions', $this->provider->getSuggestions($query, SuggestConfig::SIDE_LIMIT));
 
         return $block->toHtml();
     }
