@@ -3,6 +3,7 @@
 namespace Evalent\ProductCertificate\Block;
 
 use Magento\Catalog\Model\Product;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Exception\ValidatorException;
 use Magento\Framework\View\Element\Template;
 
@@ -54,6 +55,24 @@ class Details extends Template
     public function getStoreId()
     {
         return $this->_storeId;
+    }
+
+    /**
+     * Absolute path of the product's base image in pub/media, or null when the product has
+     * no image or the file is missing. mPDF reads local paths directly, so the certificate
+     * never depends on the storefront being reachable over HTTP.
+     */
+    public function getProductImagePath(): ?string
+    {
+        $image = (string)$this->getProduct()->getImage();
+        if ($image === '' || $image === 'no_selection') {
+            return null;
+        }
+
+        $media = $this->_filesystem->getDirectoryRead(DirectoryList::MEDIA);
+        $relativePath = 'catalog/product/' . ltrim($image, '/');
+
+        return $media->isFile($relativePath) ? $media->getAbsolutePath($relativePath) : null;
     }
 
     public function getSignatureHtml(){

@@ -35,7 +35,6 @@ $svg = '<svg width="1681" height="250" viewBox="0 0 1681 250" fill="none" xmlns=
 </svg>';
 
 $html = '<img src="data:image/svg+xml;base64,'.base64_encode($svg).'"  width="225" height="auto" />';
-$mediaUrl = 'https://www.carpetavenue.com/pub/media/catalog/product';
 $imgHeight = 200;
 
 $_product = $block->getProduct();
@@ -43,6 +42,9 @@ $_product = $block->getProduct();
 if(!function_exists('scaledProductImage')){
   function scaledProductImage($imageUrl){
     $size = getimagesize($imageUrl);
+    if (!$size || !$size[0]) {
+      return '';
+    }
     $width = $size[0];
     $heigth = $size[1];
     $ratio = $heigth / $width;
@@ -73,9 +75,11 @@ if(!function_exists('scaledProductImage')){
 	  <?php echo $html ?>
   </div>
   <p class="text-center text-sm"><?= sprintf(__('We hereby guarantee that the carpet supplied is %s and genuine.'), strtolower($_product->getResource()->getAttribute('production_type')->getFrontend()->getValue($_product))) ?></p>
+  <?php if ($imagePath = $block->getProductImagePath()): ?>
   <div class="product-image">
-    <?php echo scaledProductImage($mediaUrl . $_product->getImage()) ?>
+    <?php echo scaledProductImage($imagePath) ?>
   </div>
+  <?php endif; ?>
   <table class="table">
     <tr>
       <td><?= __('Carpet Type') ?></td>

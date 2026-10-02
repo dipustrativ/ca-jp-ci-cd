@@ -4,6 +4,7 @@ namespace CarpetAvenue\Proforma\Block;
 
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\ValidatorException;
+use Magento\Framework\Module\Dir;
 use Magento\Framework\View\Element\Template;
 
 class Proforma extends Template
@@ -12,6 +13,7 @@ class Proforma extends Template
     public function __construct(
         Template\Context $context,
         protected \Magento\Directory\Model\CountryFactory $countryFactory,
+        protected Dir $moduleDir,
         array $data = []
     ){
         parent::__construct($context,$data);
@@ -27,6 +29,16 @@ class Proforma extends Template
     public function getCountryName($code){
         $country = $this->countryFactory->create()->loadByCode($code);
         return $country->getName();
+    }
+    /**
+     * Carpet Avenue logo as an inline data URI, so mPDF needs no file or HTTP lookup.
+     */
+    public function getLogoDataUri(): string
+    {
+        $path = $this->moduleDir->getDir('CarpetAvenue_Proforma', Dir::MODULE_VIEW_DIR)
+            . '/base/web/images/carpetavenue-logo.svg';
+
+        return 'data:image/svg+xml;base64,' . base64_encode((string)file_get_contents($path));
     }
     public function getFormatedStreet(){
         return str_replace(PHP_EOL,'<br>', $this->proforma->getCustomerStreet()??'');

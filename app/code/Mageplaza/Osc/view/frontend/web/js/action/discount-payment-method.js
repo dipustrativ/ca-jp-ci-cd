@@ -47,6 +47,28 @@ define(
                 }
             }
 
+            // PaymentInterface::additional_data is string[] on the server. Adyen card's getData()
+            // sends stateData: {} until its card component mounts, which makes the REST
+            // TypeProcessor raise "Array to string conversion". Send scalars only: drop empty
+            // objects, JSON-encode the rest (what Adyen itself does at place order).
+            if (paymentData && paymentData.additional_data && typeof paymentData.additional_data === 'object') {
+                var additionalData = {};
+
+                Object.keys(paymentData.additional_data).forEach(function (key) {
+                    var value = paymentData.additional_data[key];
+
+                    if (value !== null && typeof value === 'object') {
+                        if (Object.keys(value).length === 0) {
+                            return;
+                        }
+                        value = JSON.stringify(value);
+                    }
+                    additionalData[key] = value;
+                });
+
+                paymentData = Object.assign({}, paymentData, {additional_data: additionalData});
+            }
+
             payload = {
                 cartId: quote.getQuoteId(),
                 paymentMethod: paymentData,
