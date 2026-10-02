@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Money columns in the order currency (JPY) instead of the EUR base currency.
+    Amounts are read from sales_creditmemo at render time; no grid/DB changes.
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <columns name="sales_order_creditmemo_columns">
+        <column name="base_grand_total" class="CarpetAvenue\Orderify\Ui\Component\Listing\Column\OrderCurrencyPrice">
+            <argument name="data" xsi:type="array">
+                <item name="sourceTable" xsi:type="string">sales_creditmemo</item>
+                <item name="sourceField" xsi:type="string">grand_total</item>
+            </argument>
+        </column>
+        <column name="order_base_grand_total" class="CarpetAvenue\Orderify\Ui\Component\Listing\Column\OrderCurrencyPrice">
+            <argument name="data" xsi:type="array">
+                <item name="sourceTable" xsi:type="string">sales_creditmemo</item>
+                <item name="sourceField" xsi:type="string">order_grand_total</item>
+            </argument>
+        </column>
+        <column name="subtotal" class="CarpetAvenue\Orderify\Ui\Component\Listing\Column\OrderCurrencyPrice">
+            <argument name="data" xsi:type="array">
+                <item name="sourceTable" xsi:type="string">sales_creditmemo</item>
+            </argument>
+        </column>
+        <column name="shipping_and_handling" class="CarpetAvenue\Orderify\Ui\Component\Listing\Column\OrderCurrencyPrice">
+            <argument name="data" xsi:type="array">
+                <item name="sourceTable" xsi:type="string">sales_creditmemo</item>
+                <item name="sourceField" xsi:type="string">shipping_amount</item>
+            </argument>
+        </column>
+        <column name="adjustment_positive" class="CarpetAvenue\Orderify\Ui\Component\Listing\Column\OrderCurrencyPrice">
+            <argument name="data" xsi:type="array">
+                <item name="sourceTable" xsi:type="string">sales_creditmemo</item>
+            </argument>
+        </column>
+        <column name="adjustment_negative" class="CarpetAvenue\Orderify\Ui\Component\Listing\Column\OrderCurrencyPrice">
+            <argument name="data" xsi:type="array">
+                <item name="sourceTable" xsi:type="string">sales_creditmemo</item>
+            </argument>
+        </column>
+    </columns>
+</listing>

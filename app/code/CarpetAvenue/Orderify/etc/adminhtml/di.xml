@@ -13,6 +13,12 @@
                 sortOrder="20"/>
     </type>
 
+    <!-- Sales views: order currency (JPY) only, no "[€ base]" alongside -->
+    <type name="Magento\Sales\Helper\Admin">
+        <plugin name="carpetavenue_orderify_order_currency_only_prices"
+                type="CarpetAvenue\Orderify\Plugins\Adminhtml\Sales\OrderCurrencyOnlyPricesPlugin"/>
+    </type>
+
     <!-- Creditmemo PDF renderer overrides (merged from Evalent_CreditmemoMods) -->
     <preference for="Magento\Sales\Model\Order\Pdf\Creditmemo" type="CarpetAvenue\Orderify\Model\Order\Pdf\Creditmemo" />
     <preference for="Magento\Sales\Model\Order\Pdf\Items\Creditmemo\DefaultCreditmemo" type="CarpetAvenue\Orderify\Model\Order\Pdf\Items\Creditmemo\DefaultCreditmemo" />

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Money columns in the order currency (JPY) instead of the EUR base currency.
+    Amounts are read from sales_invoice at render time; no grid/DB changes.
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <columns name="sales_order_invoice_columns">
+        <!-- "Grand Total (Base)" is the EUR figure; "Grand Total (Purchased)" already shows JPY -->
+        <column name="base_grand_total">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="componentDisabled" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+        </column>
+        <column name="subtotal" class="CarpetAvenue\Orderify\Ui\Component\Listing\Column\OrderCurrencyPrice">
+            <argument name="data" xsi:type="array">
+                <item name="sourceTable" xsi:type="string">sales_invoice</item>
+            </argument>
+        </column>
+        <column name="shipping_and_handling" class="CarpetAvenue\Orderify\Ui\Component\Listing\Column\OrderCurrencyPrice">
+            <argument name="data" xsi:type="array">
+                <item name="sourceTable" xsi:type="string">sales_invoice</item>
+                <item name="sourceField" xsi:type="string">shipping_amount</item>
+            </argument>
+        </column>
+    </columns>
+</listing>
