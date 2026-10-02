@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+		<section id="sales" sortOrder="10" showInWebsite="1" showInStore="1" showInDefault="1" translate="label">
+			<tab>sales</tab>
+			<group id="change_payment" sortOrder="10" showInWebsite="1" showInStore="1" showInDefault="1" translate="label">
+				<label>Change Payment</label>
+				<field id="enabled" type="select" sortOrder="10" showInWebsite="1" showInStore="1" showInDefault="1" translate="label">
+					<label>Enabled</label>
+					<comment>Enabled the customer to change payment method</comment>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+				<field id="allow_reorder_for_order_status" translate="label comment" type="multiselect" sortOrder="10" showInDefault="1">
+					<label>Allow reorder for order status</label>
+					<source_model>Evalent\OrderMods\Model\Config\Source\Order\Status</source_model>
+				</field>
+				<field id="revert_original_payment_after" type="text" sortOrder="20" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+					<label>Revert Original Payment Method After</label>
+					<comment>Time in minutes to revert the original payment method after the change</comment>
+					<validate>validate-greater-than-zero</validate>
+				</field>
+			</group>
+		</section>
+	</system>
+</config>

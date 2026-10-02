@@ -1,0 +1,51 @@
+<?php
+
+use CarpetAvenue\ChangePayment\ViewModel\Confirmation;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Sales\Model\Order;
+
+/**
+ * @var Template $block
+ * @var Escaper $escaper
+ * @var Confirmation $viewModel
+ */
+
+$viewModel = $block->getData('viewModel');
+/** @var Order $order */
+$order = $viewModel->getOrder();
+?>
+
+<div class="checkout-success">
+    <?php if ($order->getStatus() == \CarpetAvenue\ChangePayment\Helper\Order::STATUS_PAUSED) :?>
+        <p><?= $escaper->escapeHtml(__('Verify your new payment method.')) ?></p>
+        <p><?= $escaper->escapeHtml(__('If you want to proceed with bank transfer. Please find our bank detailes in your order confirmation.')) ?></p>
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action primary close" onclick="window.location = '<?= $escaper->escapeUrl($viewModel->getCartUrl()) ?>'"><span><?= $escaper->escapeHtml(__('Proceed')) ?></span></button>
+            </div>
+            <div class="primary">
+                <button class="action secondary close" onclick="window.location = '<?= $escaper->escapeUrl($block->getBaseUrl()) ?>'"><span><?= $escaper->escapeHtml(__('Return to start page.')) ?></span></button>
+            </div>
+        </div>
+    <?php elseif (!$viewModel->canHoldAndReorder()) :?>
+        <p><?= $escaper->escapeHtml(__('This order is no longer valid for payment change. Please contact us for further assistance.')) ?></p>
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action secondary close" onclick="window.location = '<?= $escaper->escapeUrl($block->getBaseUrl()) ?>'"><span><?= $escaper->escapeHtml(__('Return to start page.')) ?></span></button>
+            </div>
+        </div>
+    <?php else :?>
+        <p><?= $escaper->escapeHtml(__('You are about to change payment method of this order.')) ?></p>
+        <p><?= $escaper->escapeHtml(__('You will get an order confirmation with a new order number when checkout is done.')) ?></p>
+        <p><?= $escaper->escapeHtml(__('Would you like to proceed?')) ?></p>
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action primary continue" onclick="window.location = '<?= $escaper->escapeUrl($viewModel->getChangePaymentUrl()) ?>'"><span><?= $escaper->escapeHtml(__('Yes, I would like to change payment method')) ?></span></button>
+            </div>
+            <div class="primary">
+                <button class="action secondary close" onclick="window.location = '<?= $escaper->escapeUrl($block->getBaseUrl()) ?>'"><span><?= $escaper->escapeHtml(__('No thanks, I prefer to keep my order and pay by bank transfer')) ?></span></button>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>

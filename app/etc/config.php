@@ -363,6 +363,7 @@ return [
         'Adyen_Payment' => 1,
         'BelVG_GuestWishlist' => 1,
         'Mageplaza_Core' => 1,
+        'CarpetAvenue_ChangePayment' => 1,
         'Mageplaza_Osc' => 1,
         'CarpetAvenue_Core' => 1,
         'CarpetAvenue_Developify' => 1,

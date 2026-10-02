@@ -1,0 +1,22 @@
+{
+    "name": "carpetavenue/module-changepayment",
+    "description": "Module which lets the customer change payment method of an order.",
+    "type": "magento2-module",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Tobias Nilsson",
+            "email": "tobias.nilsson@lufinity.se"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "CarpetAvenue\\ChangePayment\\": ""
+        }
+    }
+}
