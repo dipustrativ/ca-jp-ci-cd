@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="carpetavenue_feedexport" translate="label" type="text" sortOrder="300"
+                 showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>Feed Export</label>
+            <tab>carpetavenue</tab>
+            <resource>CarpetAvenue_FeedExport::config</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1">
+                <label>General</label>
+                <field id="cron_enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1">
+                    <label>Run Scheduled Exports</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Master switch for all profile cron schedules. Manual and CLI exports keep working.</comment>
+                </field>
+                <field id="batch_size" translate="label comment" type="text" sortOrder="20" showInDefault="1">
+                    <label>Collection Batch Size</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment>Products loaded per page while building a feed.</comment>
+                </field>
+                <field id="log_lifetime" translate="label comment" type="text" sortOrder="30" showInDefault="1">
+                    <label>Keep Execution Log (days)</label>
+                    <validate>validate-digits</validate>
+                    <comment>0 = keep forever.</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

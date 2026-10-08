@@ -1,0 +1,384 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">carpetavenue_feedexport_profile_form.carpetavenue_feedexport_profile_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Product Export Profile</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="back" class="CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\BackButton"/>
+            <button name="delete" class="CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\DeleteButton"/>
+            <button name="run" class="CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\RunButton"/>
+            <button name="save_and_continue" class="CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\SaveAndContinueButton"/>
+            <button name="save" class="CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\SaveButton"/>
+        </buttons>
+        <namespace>carpetavenue_feedexport_profile_form</namespace>
+        <layout>
+            <navContainerName>left</navContainerName>
+            <type>tabs</type>
+        </layout>
+        <deps>
+            <dep>carpetavenue_feedexport_profile_form.carpetavenue_feedexport_profile_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="carpetavenue_feedexport_profile_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="carpetavenue_feedexport/profile/save"/>
+        </settings>
+        <dataProvider class="CarpetAvenue\FeedExport\Ui\DataProvider\ProfileFormDataProvider"
+                      name="carpetavenue_feedexport_profile_form_data_source">
+            <settings>
+                <requestFieldName>profile_id</requestFieldName>
+                <primaryFieldName>profile_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <fieldset name="general" sortOrder="10">
+        <settings>
+            <label translate="true">General Configuration</label>
+            <dataScope>data</dataScope>
+        </settings>
+        <field name="profile_id" formElement="hidden">
+            <settings>
+                <dataType>text</dataType>
+            </settings>
+        </field>
+        <field name="name" formElement="input" sortOrder="10">
+            <settings>
+                <label translate="true">Name</label>
+                <dataType>text</dataType>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="enabled" formElement="checkbox" sortOrder="20">
+            <settings>
+                <label translate="true">Enabled</label>
+                <dataType>boolean</dataType>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+    </fieldset>
+
+    <fieldset name="destination" sortOrder="20">
+        <settings>
+            <label translate="true">Export Destinations</label>
+            <dataScope>data</dataScope>
+        </settings>
+        <field name="destination_path" formElement="input" sortOrder="10">
+            <settings>
+                <label translate="true">Destination Directory</label>
+                <dataType>text</dataType>
+                <notice translate="true">Relative to Magento root. pub/media/feeds/ is publicly reachable at /media/feeds/.</notice>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="output" sortOrder="30">
+        <settings>
+            <label translate="true">Output Format</label>
+            <dataScope>data</dataScope>
+        </settings>
+        <htmlContent name="xsl_editor" sortOrder="5">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <!-- Default content template uses the KO html binding, which skips data-mage-init. -->
+                    <item name="template" xsi:type="string">CarpetAvenue_FeedExport/form/components/html</item>
+                </item>
+            </argument>
+            <block class="CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\XslEditor" name="carpetavenue_feedexport_xsl_editor"/>
+        </htmlContent>
+        <field name="xsl_template" formElement="textarea" sortOrder="10">
+            <settings>
+                <label translate="true">XSL Template</label>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Format: &lt;files&gt;&lt;file filename="feed.xml"&gt;&lt;xsl:stylesheet&gt;...&lt;/xsl:stylesheet&gt;&lt;/file&gt;&lt;/files&gt;. Iterate objects/object. Filename variables: %Y% %m% %d% %h% %i% %s% %timestamp% %collectioncount% %exportid% %uuid%.</notice>
+            </settings>
+            <formElements>
+                <textarea>
+                    <settings>
+                        <rows>30</rows>
+                    </settings>
+                </textarea>
+            </formElements>
+        </field>
+        <field name="replace_newlines" formElement="select" sortOrder="20">
+            <settings>
+                <label translate="true">Line Breaks in Values</label>
+                <dataType>int</dataType>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="CarpetAvenue\FeedExport\Model\Source\NewlineMode"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="strip_tags" formElement="checkbox" sortOrder="30">
+            <settings>
+                <label translate="true">Strip HTML Tags</label>
+                <dataType>boolean</dataType>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="url_remove_store" formElement="checkbox" sortOrder="40">
+            <settings>
+                <label translate="true">Remove ___store From URLs</label>
+                <dataType>boolean</dataType>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="remove_pub_from_urls" formElement="checkbox" sortOrder="50">
+            <settings>
+                <label translate="true">Remove /pub/ From Media URLs</label>
+                <dataType>boolean</dataType>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+    </fieldset>
+
+    <fieldset name="filters" sortOrder="40">
+        <settings>
+            <label translate="true">Stores &amp; Filters</label>
+            <dataScope>data</dataScope>
+        </settings>
+        <field name="store_id" formElement="select" sortOrder="10">
+            <settings>
+                <label translate="true">Store View</label>
+                <dataType>int</dataType>
+                <notice translate="true">Prices, currency, labels and URLs are taken from this store view.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="CarpetAvenue\FeedExport\Model\Source\Store"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="customer_group_id" formElement="select" sortOrder="20">
+            <settings>
+                <label translate="true">Customer Group (price index)</label>
+                <dataType>int</dataType>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="CarpetAvenue\FeedExport\Model\Source\CustomerGroup"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="product_status" formElement="select" sortOrder="30">
+            <settings>
+                <label translate="true">Product Status</label>
+                <dataType>text</dataType>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="CarpetAvenue\FeedExport\Model\Source\ProductStatusFilter"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="product_visibility" formElement="multiselect" sortOrder="40">
+            <settings>
+                <label translate="true">Visibility</label>
+                <dataType>text</dataType>
+                <notice translate="true">Nothing selected = any visibility.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Magento\Catalog\Model\Product\Visibility"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="excluded_product_types" formElement="multiselect" sortOrder="50">
+            <settings>
+                <label translate="true">Exclude Product Types</label>
+                <dataType>text</dataType>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="CarpetAvenue\FeedExport\Model\Source\ProductType"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="instock_only" formElement="checkbox" sortOrder="60">
+            <settings>
+                <label translate="true">In Stock Only</label>
+                <dataType>boolean</dataType>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="sku_filter" formElement="textarea" sortOrder="70">
+            <settings>
+                <label translate="true">Only These SKUs</label>
+                <dataType>text</dataType>
+                <notice translate="true">Comma or newline separated. Empty = all products.</notice>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="category_mapping_tab" sortOrder="50">
+        <settings>
+            <label translate="true">Category Mapping</label>
+            <dataScope>data</dataScope>
+        </settings>
+        <htmlContent name="category_mapping_editor" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <!-- Default content template uses the KO html binding, which skips data-mage-init. -->
+                    <item name="template" xsi:type="string">CarpetAvenue_FeedExport/form/components/html</item>
+                </item>
+            </argument>
+            <block class="CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\CategoryMapping" name="carpetavenue_feedexport_category_mapping"/>
+        </htmlContent>
+    </fieldset>
+
+    <fieldset name="manual_export" sortOrder="60">
+        <settings>
+            <label translate="true">Manual Export</label>
+            <dataScope>data</dataScope>
+        </settings>
+        <htmlContent name="manual_export_content" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <!-- Default content template uses the KO html binding, which skips data-mage-init. -->
+                    <item name="template" xsi:type="string">CarpetAvenue_FeedExport/form/components/html</item>
+                </item>
+            </argument>
+            <block class="CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\ManualExport" name="carpetavenue_feedexport_manual_export"/>
+        </htmlContent>
+    </fieldset>
+
+    <fieldset name="automatic_export" sortOrder="70">
+        <settings>
+            <label translate="true">Automatic Export</label>
+            <dataScope>data</dataScope>
+        </settings>
+        <field name="cron_enabled" formElement="checkbox" sortOrder="10">
+            <settings>
+                <label translate="true">Run by Cron</label>
+                <dataType>boolean</dataType>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="cron_expression" formElement="input" sortOrder="20">
+            <settings>
+                <label translate="true">Cron Expression</label>
+                <dataType>text</dataType>
+                <notice translate="true">Store timezone. Several schedules separated by ";", e.g. 0 0,12 * * *; 30 6 * * 1</notice>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="execution_log" sortOrder="80">
+        <settings>
+            <label translate="true">Profile Execution Log</label>
+            <dataScope>data</dataScope>
+        </settings>
+        <htmlContent name="execution_log_content" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <!-- Default content template uses the KO html binding, which skips data-mage-init. -->
+                    <item name="template" xsi:type="string">CarpetAvenue_FeedExport/form/components/html</item>
+                </item>
+            </argument>
+            <block class="CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\ExecutionLog" name="carpetavenue_feedexport_execution_log"/>
+        </htmlContent>
+    </fieldset>
+</form>

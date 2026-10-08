@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carpetavenue_feedexport>
+            <general>
+                <cron_enabled>1</cron_enabled>
+                <batch_size>500</batch_size>
+                <log_lifetime>30</log_lifetime>
+            </general>
+        </carpetavenue_feedexport>
+    </default>
+</config>

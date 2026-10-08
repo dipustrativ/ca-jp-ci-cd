@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="CarpetAvenue_Core::carpetavenue">
+                    <resource id="CarpetAvenue_FeedExport::feedexport" title="Feed Export"
+                              translate="title" sortOrder="30">
+                        <resource id="CarpetAvenue_FeedExport::profile" title="Manage Profiles"
+                                  translate="title" sortOrder="10"/>
+                        <resource id="CarpetAvenue_FeedExport::run" title="Run Export"
+                                  translate="title" sortOrder="20"/>
+                        <resource id="CarpetAvenue_FeedExport::log" title="Execution Log"
+                                  translate="title" sortOrder="30"/>
+                    </resource>
+                </resource>
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="CarpetAvenue_FeedExport::config" title="Feed Export"
+                                      translate="title" sortOrder="900"/>
+                        </resource>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

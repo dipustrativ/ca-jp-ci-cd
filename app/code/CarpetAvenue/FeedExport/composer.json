@@ -1,0 +1,22 @@
+{
+    "name": "carpetavenue/module-feedexport",
+    "description": "Profile based product feed export (XSL templates, cron, local destinations). Replacement for Xtento_ProductExport.",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "require": {
+        "php": "~8.1.0||~8.2.0||~8.3.0||~8.4.0",
+        "ext-xsl": "*",
+        "ext-dom": "*",
+        "ext-xmlwriter": "*",
+        "magento/framework": ">=103.0.0 <104.0.0"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "CarpetAvenue\\FeedExport\\": ""
+        }
+    }
+}

@@ -1,0 +1,44 @@
+<?php
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/** @var \CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Fields $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+$object = $block->getObject();
+?>
+<?php if ($object === null): ?>
+    <div class="message message-error">
+        <?= $escaper->escapeHtml($block->getError() ?? __('No data found for this product.')) ?>
+    </div>
+<?php else: ?>
+    <div class="feedexport-fields">
+        <p>
+            <em><?= $escaper->escapeHtml(__('Data is based on product #%1.', $block->getTestId())) ?></em>
+            [<a href="#" data-role="expand-all"><?= $escaper->escapeHtml(__('Expand all fields')) ?></a>]
+            [<a href="<?= $escaper->escapeUrl($block->getRawXmlUrl()) ?>" target="_blank"><?= $escaper->escapeHtml(__('Show raw XML')) ?></a>]
+        </p>
+        <p><?= $escaper->escapeHtml(__('Hover a field to see the path to use inside <xsl:for-each select="objects/object">.')) ?></p>
+        <div class="feedexport-fields-tree">
+            <details open="open">
+                <summary>objects/object</summary>
+                <?= /* @noEscape */ $block->renderElement($object) ?>
+            </details>
+        </div>
+    </div>
+    <?php $script = <<<'JS'
+        require(['jquery'], function ($) {
+            $('.feedexport-fields [data-role=expand-all]').on('click', function (event) {
+                event.preventDefault();
+                $('.feedexport-fields-tree details').attr('open', 'open');
+            });
+        });
+    JS; ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $script, false) ?>
+<?php endif; ?>

@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="CarpetAvenue\FeedExport\Api\Data\ProfileInterface"
+                type="CarpetAvenue\FeedExport\Model\Profile"/>
+    <preference for="CarpetAvenue\FeedExport\Api\Data\ProfileSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
+    <preference for="CarpetAvenue\FeedExport\Api\ProfileRepositoryInterface"
+                type="CarpetAvenue\FeedExport\Model\ProfileRepository"/>
+    <preference for="CarpetAvenue\FeedExport\Api\FeedExporterInterface"
+                type="CarpetAvenue\FeedExport\Model\FeedExporter"/>
+
+    <!-- Data providers that build each <object> node. Add more here to extend the feed data. -->
+    <type name="CarpetAvenue\FeedExport\Model\Export\ProductDataBuilder">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="general" xsi:type="object">CarpetAvenue\FeedExport\Model\Export\DataProvider\General</item>
+                <item name="parent" xsi:type="object">CarpetAvenue\FeedExport\Model\Export\DataProvider\ParentProduct</item>
+                <item name="categories" xsi:type="object">CarpetAvenue\FeedExport\Model\Export\DataProvider\Categories</item>
+                <item name="stock" xsi:type="object">CarpetAvenue\FeedExport\Model\Export\DataProvider\Stock</item>
+                <item name="salable" xsi:type="object">CarpetAvenue\FeedExport\Model\Export\DataProvider\Salable</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Admin grids -->
+    <virtualType name="CarpetAvenue\FeedExport\Model\ResourceModel\Profile\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">carpetavenue_feedexport_profile</argument>
+            <argument name="resourceModel" xsi:type="string">CarpetAvenue\FeedExport\Model\ResourceModel\Profile</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="CarpetAvenue\FeedExport\Model\ResourceModel\Log\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">carpetavenue_feedexport_log</argument>
+            <argument name="resourceModel" xsi:type="string">CarpetAvenue\FeedExport\Model\ResourceModel\Log</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="carpetavenue_feedexport_profile_listing_data_source" xsi:type="string">CarpetAvenue\FeedExport\Model\ResourceModel\Profile\Grid\Collection</item>
+                <item name="carpetavenue_feedexport_log_listing_data_source" xsi:type="string">CarpetAvenue\FeedExport\Model\ResourceModel\Log\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- CLI -->
+    <type name="CarpetAvenue\FeedExport\Console\Command\RunCommand">
+        <arguments>
+            <argument name="feedExporter" xsi:type="object">CarpetAvenue\FeedExport\Api\FeedExporterInterface\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="CarpetAvenue\FeedExport\Console\Command\ImportXtentoCommand">
+        <arguments>
+            <argument name="importer" xsi:type="object">CarpetAvenue\FeedExport\Model\Migration\XtentoProfileImporter\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="carpetavenue_feedexport_run" xsi:type="object">CarpetAvenue\FeedExport\Console\Command\RunCommand</item>
+                <item name="carpetavenue_feedexport_list" xsi:type="object">CarpetAvenue\FeedExport\Console\Command\ListCommand</item>
+                <item name="carpetavenue_feedexport_import_xtento" xsi:type="object">CarpetAvenue\FeedExport\Console\Command\ImportXtentoCommand</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

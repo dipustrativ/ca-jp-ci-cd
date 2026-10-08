@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="carpetavenue_feedexport_profile" resource="default" engine="innodb"
+           comment="CarpetAvenue Feed Export Profile">
+        <column xsi:type="int" name="profile_id" unsigned="true" nullable="false" identity="true"
+                comment="Profile ID"/>
+        <column xsi:type="varchar" name="name" length="255" nullable="false" comment="Profile Name"/>
+        <column xsi:type="smallint" name="enabled" unsigned="true" nullable="false" default="1"
+                comment="Is Enabled"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" default="0"
+                comment="Store View ID"/>
+        <column xsi:type="int" name="customer_group_id" unsigned="true" nullable="false" default="0"
+                comment="Customer Group ID used for price index"/>
+        <column xsi:type="varchar" name="excluded_product_types" length="255" nullable="true"
+                comment="Comma separated product types to exclude"/>
+        <column xsi:type="varchar" name="product_status" length="32" nullable="true"
+                comment="Comma separated product status filter"/>
+        <column xsi:type="varchar" name="product_visibility" length="32" nullable="true"
+                comment="Comma separated product visibility filter"/>
+        <column xsi:type="smallint" name="instock_only" unsigned="true" nullable="false" default="0"
+                comment="Export in-stock products only"/>
+        <column xsi:type="text" name="sku_filter" nullable="true" comment="Restrict export to these SKUs"/>
+        <column xsi:type="smallint" name="replace_newlines" unsigned="true" nullable="false" default="0"
+                comment="0 keep, 1 br tag, 2 space, 3 remove"/>
+        <column xsi:type="smallint" name="strip_tags" unsigned="true" nullable="false" default="0"
+                comment="Strip HTML tags from values"/>
+        <column xsi:type="smallint" name="url_remove_store" unsigned="true" nullable="false" default="1"
+                comment="Remove ___store parameter from product URLs"/>
+        <column xsi:type="smallint" name="remove_pub_from_urls" unsigned="true" nullable="false" default="1"
+                comment="Remove /pub/ from media URLs"/>
+        <column xsi:type="mediumtext" name="xsl_template" nullable="true" comment="XSL Template"/>
+        <column xsi:type="mediumtext" name="category_mapping" nullable="true"
+                comment="JSON category ID to taxonomy mapping"/>
+        <column xsi:type="varchar" name="taxonomy_source" length="64" nullable="true" default="google_ja_JP"
+                comment="Taxonomy used for category mapping autocomplete"/>
+        <column xsi:type="varchar" name="destination_path" length="255" nullable="false"
+                default="pub/media/feeds/" comment="Destination directory relative to Magento root"/>
+        <column xsi:type="smallint" name="cron_enabled" unsigned="true" nullable="false" default="0"
+                comment="Cron Enabled"/>
+        <column xsi:type="varchar" name="cron_expression" length="255" nullable="true"
+                comment="Cron expression(s), semicolon separated"/>
+        <column xsi:type="int" name="xtento_profile_id" unsigned="true" nullable="true"
+                comment="Source Xtento profile ID when imported"/>
+        <column xsi:type="timestamp" name="last_execution" nullable="true" comment="Last Execution"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="false" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="profile_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="CARPETAVENUE_FEEDEXPORT_PROFILE_XTENTO_PROFILE_ID">
+            <column name="xtento_profile_id"/>
+        </constraint>
+    </table>
+
+    <table name="carpetavenue_feedexport_log" resource="default" engine="innodb"
+           comment="CarpetAvenue Feed Export Execution Log">
+        <column xsi:type="int" name="log_id" unsigned="true" nullable="false" identity="true" comment="Log ID"/>
+        <column xsi:type="int" name="profile_id" unsigned="true" nullable="false" comment="Profile ID"/>
+        <column xsi:type="varchar" name="trigger_type" length="16" nullable="false" comment="manual/cron/cli"/>
+        <column xsi:type="smallint" name="status" unsigned="true" nullable="false" default="0"
+                comment="0 running, 1 success, 2 failed"/>
+        <column xsi:type="int" name="records_exported" unsigned="true" nullable="false" default="0"
+                comment="Records Exported"/>
+        <column xsi:type="text" name="files" nullable="true" comment="Generated files"/>
+        <column xsi:type="text" name="message" nullable="true" comment="Result message"/>
+        <column xsi:type="decimal" name="duration" scale="2" precision="10" unsigned="true" nullable="false"
+                default="0" comment="Duration in seconds"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="false" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="log_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="CARPETAVENUE_FEEDEXPORT_LOG_PROFILE_ID_PROFILE_PROFILE_ID"
+                    table="carpetavenue_feedexport_log" column="profile_id"
+                    referenceTable="carpetavenue_feedexport_profile" referenceColumn="profile_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="CARPETAVENUE_FEEDEXPORT_LOG_PROFILE_ID" indexType="btree">
+            <column name="profile_id"/>
+        </index>
+        <index referenceId="CARPETAVENUE_FEEDEXPORT_LOG_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
+    </table>
+</schema>

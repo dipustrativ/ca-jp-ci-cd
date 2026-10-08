@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">carpetavenue_feedexport_profile_listing.carpetavenue_feedexport_profile_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="add">
+                <url path="*/*/new"/>
+                <class>primary</class>
+                <label translate="true">Add New Profile</label>
+            </button>
+        </buttons>
+        <deps>
+            <dep>carpetavenue_feedexport_profile_listing.carpetavenue_feedexport_profile_listing_data_source</dep>
+        </deps>
+        <spinner>carpetavenue_feedexport_profile_columns</spinner>
+    </settings>
+    <dataSource name="carpetavenue_feedexport_profile_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">profile_id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>CarpetAvenue_FeedExport::profile</aclResource>
+        <dataProvider name="carpetavenue_feedexport_profile_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>profile_id</requestFieldName>
+                <primaryFieldName>profile_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="carpetavenue_feedexport_profile_columns">
+        <column name="profile_id">
+            <settings>
+                <label translate="true">ID</label>
+                <filter>textRange</filter>
+                <sorting>asc</sorting>
+            </settings>
+        </column>
+        <column name="name">
+            <settings>
+                <label translate="true">Name</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="enabled" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <label translate="true">Enabled</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+            </settings>
+        </column>
+        <column name="store_id" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <options class="CarpetAvenue\FeedExport\Model\Source\Store"/>
+                <label translate="true">Store View</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+            </settings>
+        </column>
+        <column name="cron_enabled" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <label translate="true">Cron</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+            </settings>
+        </column>
+        <column name="cron_expression">
+            <settings>
+                <label translate="true">Schedule</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="destination_path">
+            <settings>
+                <label translate="true">Destination</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="last_execution" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <label translate="true">Last Run</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+            </settings>
+        </column>
+        <column name="xtento_profile_id">
+            <settings>
+                <label translate="true">Xtento ID</label>
+                <filter>text</filter>
+                <visible>false</visible>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="CarpetAvenue\FeedExport\Ui\Component\Listing\Column\ProfileActions">
+            <settings>
+                <label translate="true">Actions</label>
+                <indexField>profile_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

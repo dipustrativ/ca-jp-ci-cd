@@ -1,0 +1,55 @@
+{
+    "carpetavenue_feedexport_profile": {
+        "column": {
+            "profile_id": true,
+            "name": true,
+            "enabled": true,
+            "store_id": true,
+            "customer_group_id": true,
+            "excluded_product_types": true,
+            "product_status": true,
+            "product_visibility": true,
+            "instock_only": true,
+            "sku_filter": true,
+            "replace_newlines": true,
+            "strip_tags": true,
+            "url_remove_store": true,
+            "remove_pub_from_urls": true,
+            "xsl_template": true,
+            "category_mapping": true,
+            "taxonomy_source": true,
+            "destination_path": true,
+            "cron_enabled": true,
+            "cron_expression": true,
+            "xtento_profile_id": true,
+            "last_execution": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "CARPETAVENUE_FEEDEXPORT_PROFILE_XTENTO_PROFILE_ID": true
+        }
+    },
+    "carpetavenue_feedexport_log": {
+        "column": {
+            "log_id": true,
+            "profile_id": true,
+            "trigger_type": true,
+            "status": true,
+            "records_exported": true,
+            "files": true,
+            "message": true,
+            "duration": true,
+            "created_at": true
+        },
+        "index": {
+            "CARPETAVENUE_FEEDEXPORT_LOG_PROFILE_ID": true,
+            "CARPETAVENUE_FEEDEXPORT_LOG_CREATED_AT": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_01DDB0B570DE232F2A466FF92F9A58AC": true
+        }
+    }
+}

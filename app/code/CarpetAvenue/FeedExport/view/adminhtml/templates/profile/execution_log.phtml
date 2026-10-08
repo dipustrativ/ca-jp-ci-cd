@@ -1,0 +1,52 @@
+<?php
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/** @var \CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\ExecutionLog $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$entries = $block->getEntries();
+?>
+<div class="feedexport-execution-log">
+    <?php if (!$entries): ?>
+        <div class="message message-notice">
+            <?= $escaper->escapeHtml(__('This profile has not been executed yet.')) ?>
+        </div>
+    <?php else: ?>
+        <p>
+            <?= $escaper->escapeHtml(__('Latest %1 runs.', $block->getLimit())) ?>
+            <a href="<?= $escaper->escapeUrl($block->getLogGridUrl()) ?>"><?= $escaper->escapeHtml(__('Open full Execution Log')) ?></a>
+        </p>
+        <table class="data-grid">
+            <thead>
+            <tr>
+                <th class="data-grid-th"><?= $escaper->escapeHtml(__('Executed')) ?></th>
+                <th class="data-grid-th"><?= $escaper->escapeHtml(__('Trigger')) ?></th>
+                <th class="data-grid-th"><?= $escaper->escapeHtml(__('Status')) ?></th>
+                <th class="data-grid-th"><?= $escaper->escapeHtml(__('Products')) ?></th>
+                <th class="data-grid-th"><?= $escaper->escapeHtml(__('Duration (s)')) ?></th>
+                <th class="data-grid-th"><?= $escaper->escapeHtml(__('Files / Message')) ?></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($entries as $entry): ?>
+                <tr>
+                    <td><?= $escaper->escapeHtml($block->formatExecutedAt((string)$entry->getData('created_at'))) ?></td>
+                    <td><?= $escaper->escapeHtml($block->getTriggerLabel((string)$entry->getData('trigger_type'))) ?></td>
+                    <td><?= $escaper->escapeHtml($block->getStatusLabel((int)$entry->getData('status'))) ?></td>
+                    <td><?= /* @noEscape */ (int)$entry->getData('records_exported') ?></td>
+                    <td><?= $escaper->escapeHtml((string)$entry->getData('duration')) ?></td>
+                    <td class="feedexport-log-message"><?= /* @noEscape */ nl2br($escaper->escapeHtml(trim(
+                        $entry->getData('files') . "\n" . $entry->getData('message')
+                    ))) ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+</div>

@@ -1,0 +1,55 @@
+<?php
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/** @var \CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\CategoryMapping $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$widgetConfig = ['CarpetAvenue_FeedExport/js/category-mapping' => $block->getWidgetConfig()];
+
+$renderNodes = function (array $nodes) use (&$renderNodes, $escaper): string {
+    $html = '<ul>';
+    foreach ($nodes as $node) {
+        $hasChildren = !empty($node['children']);
+        $html .= '<li class="feedexport-category-node' . ($hasChildren ? ' is-open' : '') . '">'
+            . '<div class="feedexport-category-row">'
+            . ($hasChildren
+                ? '<a href="#" class="feedexport-category-toggle" data-role="toggle">&#x25bc;</a>'
+                : '<span class="feedexport-category-toggle"></span>')
+            . '<span class="feedexport-category-name">' . $escaper->escapeHtml($node['name']) . '</span>'
+            . '<div class="feedexport-category-input"><div class="mage-suggest"><div class="mage-suggest-inner">'
+            . '<input type="text" class="feedexport-category-value" data-category-id="' . (int)$node['id'] . '"/>'
+            . '</div></div></div>'
+            . '</div>'
+            . ($hasChildren ? $renderNodes($node['children']) : '')
+            . '</li>';
+    }
+    return $html . '</ul>';
+};
+?>
+<div class="feedexport-category-mapping" data-mage-init='<?= $escaper->escapeHtmlAttr(json_encode($widgetConfig)) ?>'>
+    <div class="message message-notice">
+        <?= $escaper->escapeHtml(__('Map your categories to another taxonomy such as the Google taxonomy (google_product_category). Products output the mapped category of their deepest mapped category; use <xsl:value-of select="xtento_mapped_category"/> in the XSL Template.')) ?>
+    </div>
+    <div class="admin__field">
+        <label class="admin__field-label" for="feedexport_taxonomy_source">
+            <span><?= $escaper->escapeHtml(__('Taxonomy')) ?></span>
+        </label>
+        <div class="admin__field-control">
+            <select id="feedexport_taxonomy_source" class="admin__control-select" data-role="taxonomy-source">
+                <?php foreach ($block->getTaxonomies() as $code => $label): ?>
+                    <option value="<?= $escaper->escapeHtmlAttr($code) ?>"><?= $escaper->escapeHtml($label) ?></option>
+                <?php endforeach; ?>
+                <option value=""><?= $escaper->escapeHtml(__('No taxonomy')) ?></option>
+            </select>
+        </div>
+    </div>
+    <div class="feedexport-category-tree" data-role="tree">
+        <?= /* @noEscape */ $renderNodes($block->getCategoryTree()) ?>
+    </div>
+</div>

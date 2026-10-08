@@ -1,0 +1,39 @@
+<?php
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/** @var \CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\ManualExport $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<div class="feedexport-manual-export">
+    <?php if (!$block->getProfileId()): ?>
+        <div class="message message-notice">
+            <?= $escaper->escapeHtml(__('Save the profile first, then it can be exported manually.')) ?>
+        </div>
+    <?php elseif (!$block->canRun()): ?>
+        <div class="message message-warning">
+            <?= $escaper->escapeHtml(__('You are not allowed to run exports.')) ?>
+        </div>
+    <?php else: ?>
+        <p><?= $escaper->escapeHtml(__('Generate the feed file(s) now with the last saved settings. Unsaved changes are ignored.')) ?></p>
+        <p>
+            <?= $escaper->escapeHtml(__('Last execution:')) ?>
+            <strong><?= $escaper->escapeHtml($block->getLastExecution() ?? __('Never')) ?></strong>
+        </p>
+        <button type="button" class="action-primary"
+                data-mage-init='<?= $escaper->escapeHtmlAttr(json_encode([
+                    'CarpetAvenue_FeedExport/js/confirm-redirect' => [
+                        'url' => $block->getRunUrl(),
+                        'message' => __('Generate the feed now with the last saved settings? Unsaved changes are ignored.')->render(),
+                    ],
+                ])) ?>'>
+            <span><?= $escaper->escapeHtml(__('Export Now')) ?></span>
+        </button>
+    <?php endif; ?>
+</div>

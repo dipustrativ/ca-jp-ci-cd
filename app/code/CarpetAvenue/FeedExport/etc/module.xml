@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="CarpetAvenue_FeedExport" setup_version="1.0.0">
+        <sequence>
+            <module name="Magento_Store"/>
+            <module name="Magento_Catalog"/>
+            <module name="Magento_CatalogInventory"/>
+            <module name="Magento_ConfigurableProduct"/>
+            <module name="Magento_GroupedProduct"/>
+            <module name="Magento_InventorySalesAdminUi"/>
+            <module name="Magento_Cron"/>
+            <module name="CarpetAvenue_Core"/>
+            <module name="CarpetAvenue_Productify"/>
+        </sequence>
+    </module>
+</config>

@@ -1,0 +1,46 @@
+<?php
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+
+/** @var \CarpetAvenue\FeedExport\Block\Adminhtml\Profile\Edit\XslEditor $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$widgetConfig = ['CarpetAvenue_FeedExport/js/xsl-editor' => $block->getWidgetConfig()];
+?>
+<div class="feedexport-xsl" data-mage-init='<?= $escaper->escapeHtmlAttr(json_encode($widgetConfig)) ?>'>
+    <a href="#" class="feedexport-xsl-help" data-role="show-fields">
+        <?= $escaper->escapeHtml(__('Looking for certain fields or field names? Please use the "Show fields available for export" function.')) ?>
+    </a>
+    <div class="feedexport-xsl-buttons">
+        <button type="button" data-role="test-template">
+            <span><?= $escaper->escapeHtml(__('Test XSL Template')) ?></span>
+        </button>
+        <button type="button" data-role="show-fields">
+            <span><?= $escaper->escapeHtml(__('Show fields available for export')) ?></span>
+        </button>
+        <div class="feedexport-xsl-test-options">
+            <label for="feedexport_test_id"><?= $escaper->escapeHtml(__('Product ID to test with/show fields for:')) ?></label>
+            <input type="text" id="feedexport_test_id" class="admin__control-text" data-role="test-id"
+                   value="<?= $escaper->escapeHtmlAttr((string)$block->getDefaultTestId()) ?>"/><br/>
+            <input type="checkbox" id="feedexport_serve_to_browser" data-role="serve-to-browser"/>
+            <label for="feedexport_serve_to_browser"><?= $escaper->escapeHtml(__('Serve file to browser after running "Test XSL Template"')) ?></label>
+        </div>
+    </div>
+    <div class="feedexport-xsl-editor" data-role="editor-wrapper">
+        <div class="feedexport-xsl-editor-ace" data-role="editor"></div>
+    </div>
+    <div class="feedexport-xsl-buttons">
+        <button type="button" data-role="test-template">
+            <span><?= $escaper->escapeHtml(__('Test XSL Template')) ?></span>
+        </button>
+    </div>
+    <div class="feedexport-xsl-results" data-role="results" style="display: none;">
+        <div class="feedexport-xsl-results-title"><?= $escaper->escapeHtml(__('Test / Validation Results')) ?></div>
+        <textarea data-role="results-content" wrap="off" readonly="readonly"></textarea>
+    </div>
+</div>

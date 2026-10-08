@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Carpet Avenue GmbH. All rights reserved.
+ *
+ * @category  Carpet Avenue
+ * @package   CarpetAvenue_FeedExport
+ * @copyright Copyright (c) carpetavenue.com (https://carpetavenue.com)
+ * @author    Strativ Magento Team
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="carpetavenue_feedexport">
+        <!-- Ticks every minute; each profile's own cron expression decides if it runs. -->
+        <job name="carpetavenue_feedexport_scheduler" instance="CarpetAvenue\FeedExport\Cron\RunScheduledProfiles"
+             method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job name="carpetavenue_feedexport_log_cleanup" instance="CarpetAvenue\FeedExport\Cron\CleanLog"
+             method="execute">
+            <schedule>30 3 * * *</schedule>
+        </job>
+    </group>
+</config>
