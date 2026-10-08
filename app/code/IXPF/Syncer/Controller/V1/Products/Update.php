@@ -7,6 +7,9 @@ use IXPF\Syncer\Helper\Logger\ProductUpdateLogger;
 use IXPF\Syncer\Helper\PhotoStudio;
 use IXPF\Syncer\Helper\TokenValidator;
 use IXPF\Syncer\Helper\Helpers as ProductHelper;
+use IXPF\Syncer\Services\Products\PriceAttributeGuard;
+use Magento\Catalog\Model\Indexer\Product\Price\Processor as PriceIndexProcessor;
+use Magento\Catalog\Model\ResourceModel\Product\Action as ProductAction;
 use Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
@@ -49,7 +52,10 @@ class Update extends AbstractController implements HttpPostActionInterface, Csrf
         protected ProductUpdateLogger $productUpdateLogger,
         protected ProductAttributeMediaGalleryManagementInterface $productAttributeMediaGalleryManagement,
         protected AttributeFilter $attributeFilter,
-        protected ResourceConnection $resourceConnection
+        protected ResourceConnection $resourceConnection,
+        protected PriceAttributeGuard $priceAttributeGuard,
+        protected ProductAction $productAction,
+        protected PriceIndexProcessor $priceIndexProcessor
     )
     {
         parent::__construct($context, $tokenValidator, $resultFactory);
@@ -108,8 +114,8 @@ class Update extends AbstractController implements HttpPostActionInterface, Csrf
             $rawContent = $this->getRequest()->getContent();
             $payload = json_decode($rawContent, true);
             //-- log payload
-            $this->productUpdateLogger->writeDaily("Received update request for product ID: {$id}, Store ID: {$store}, Attribute Set ID: {$set}");
-            $this->productUpdateLogger->writeDaily(json_encode($payload));
+            $this->productUpdateLogger->writeDaily("[product_update] Received update request for product ID: {$id}, Store ID: {$store}, Attribute Set ID: {$set}");
+            $this->productUpdateLogger->writeDaily('[product_update] payload: ' . json_encode($payload));
 
             if (empty($payload)) {
                 throw new \Exception('Empty product information');
@@ -131,19 +137,39 @@ class Update extends AbstractController implements HttpPostActionInterface, Csrf
                 }
             }
 
-            // special_price = 0 → treat as "remove special price" by setting null.
-            if (array_key_exists('special_price', $productPayloads) && $productPayloads['special_price'] == 0) {
-                $productPayloads['special_price'] = null;
+            // null / "" keep their existing meaning ("use default" on store view) and skip the guard.
+            // special_price 0 → clear (store-level NULL written after save). price 0 → ignored.
+            // Any other non-positive / non-numeric price value → reject, nothing saved.
+            $guard = $this->priceAttributeGuard->apply(array_filter(
+                array_intersect_key($productPayloads, ['price' => true, 'special_price' => true]),
+                fn($v) => $v !== null && $v !== ''
+            ));
+            if (count($guard['invalid']) > 0) {
                 $this->productUpdateLogger->writeDaily(
-                    "[INFO] Product ID {$id}: 'special_price' was 0 — set to null to clear the special price."
+                    "[product_update] [INVALID] Product ID {$id}: " . implode('; ', $guard['invalid']),
+                    'error'
+                );
+                return $this->jsonResponse([
+                    'error' => 'Invalid price data: ' . implode('; ', $guard['invalid'])
+                ], 422);
+            }
+            foreach ($guard['attributes'] as $attributeCode => $value) {
+                $productPayloads[$attributeCode] = $value;
+            }
+
+            $clearSpecialPrice = in_array('special_price', $guard['cleared'], true);
+            if ($clearSpecialPrice) {
+                // Keep it out of the save/use-default flow; NULL is written explicitly after save.
+                unset($productPayloads['special_price']);
+                $this->productUpdateLogger->writeDaily(
+                    "[product_update] [INFO] Product ID {$id}: 'special_price' was 0 — special price will be cleared."
                 );
             }
 
-            // price = 0 → almost certainly a bad feed value; unset so the existing price is preserved.
-            if (array_key_exists('price', $productPayloads) && $productPayloads['price'] == 0) {
+            if (in_array('price', $guard['skipped'], true)) {
                 unset($productPayloads['price']);
                 $this->productUpdateLogger->writeDaily(
-                    "[SKIPPED] Product ID {$id}: 'price' was 0 in the request payload — "
+                    "[product_update] [SKIPPED] Product ID {$id}: 'price' was 0 in the request payload — "
                     . "value ignored to prevent accidental zero-price update."
                 );
             }
@@ -192,8 +218,7 @@ class Update extends AbstractController implements HttpPostActionInterface, Csrf
             }
 
             //-- payload data into log
-            $this->productUpdateLogger->writeDaily('Prepared product payload for update:');
-            $this->productUpdateLogger->writeDaily(json_encode($productPayloads));
+            $this->productUpdateLogger->writeDaily('[product_update] Prepared product payload for update: ' . json_encode($productPayloads));
 
             foreach ($productPayloads as $attributeCode => $value) {
                 if ($value == "") {
@@ -205,12 +230,25 @@ class Update extends AbstractController implements HttpPostActionInterface, Csrf
             }
             //-- merge with existing product data to avoid overwriting unchanged attributes with null (since the initialization helper will reset any attributes not included in the payload)
             $productPayloads = array_merge($productData->getData(), $productPayloads);
+            if ($clearSpecialPrice) {
+                unset($useDefaults['special_price']);
+            }
             if (count($useDefaults) > 0 && $store != 0) {
-                $this->productUpdateLogger->writeDaily('Use default for attributes: ' . json_encode($useDefaults));
+                $this->productUpdateLogger->writeDaily('[product_update] Use default for attributes: ' . json_encode($useDefaults));
                 $productPayloads = $this->attributeFilter->prepareProductAttributes($productData, $productPayloads, $useDefaults);
             }
             $product = $this->initializationHelper->initializeFromData($productData, $productPayloads);
             $product->save();
+
+            //-- special_price 0 → store-level NULL row (overrides any default-store special price)
+            if ($clearSpecialPrice) {
+                $productId = (int)$product->getId();
+                $this->productAction->updateAttributes([$productId], ['special_price' => null], (int)$store);
+                $this->priceIndexProcessor->reindexRow($productId);
+                $this->productUpdateLogger->writeDaily(
+                    "[product_update] [INFO] Product ID {$productId}: special_price cleared (NULL) on store {$store}."
+                );
+            }
 
             // Category position: Magento sets position=0 on save; update to 1000 for zero-position rows
             if (isset($payload['product']['category_ids']) && is_array($payload['product']['category_ids']) && !empty($payload['product']['category_ids'])) {
@@ -229,12 +267,18 @@ class Update extends AbstractController implements HttpPostActionInterface, Csrf
                 );
             }
 
+            $this->productUpdateLogger->writeDaily("[product_update] Product ID {$id} updated successfully. Store ID: {$store}");
+
             return $this->jsonResponse([
                 'success' => true,
                 'message' => __('Product updated successfully.'),
             ]);
 
         } catch (\Exception $exception) {
+            $this->productUpdateLogger->writeDaily(
+                '[product_update] Failed to update product ID: ' . ($id ?? '') . '. Error: ' . $exception->getMessage(),
+                'error'
+            );
             return $this->jsonResponse(['error' => $exception->getMessage()], 500);
         }
     }

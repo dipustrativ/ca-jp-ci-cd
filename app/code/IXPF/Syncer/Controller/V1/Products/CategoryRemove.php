@@ -49,12 +49,20 @@ class CategoryRemove extends AbstractController  implements HttpPostActionInterf
                 throw new Exception("Empty product ids");
             }
 
-            //-- Log Payload
-            $this->logger->writeDaily(json_encode($payload));
+            $productIds = $this->normalizeIds($payload['product_ids']);
+            $categoryIds = $this->normalizeIds($payload['category_ids']);
+            if ($productIds === null || $categoryIds === null) {
+                $this->logger->writeDaily('[category_remove] Invalid ids in payload: ' . json_encode($payload), 'error');
+                return $this->jsonResponse([
+                    'error' => 'product_ids and category_ids must be arrays of positive integers'
+                ], 422);
+            }
 
-            $products = $this->getProductSkuFromId($payload['product_ids']);
-            $productExistingCategories = $this->getExistingCategoriesFromProductIds($payload['product_ids']);
-            $categoryIds = $payload['category_ids'];
+            //-- Log Payload
+            $this->logger->writeDaily('[category_remove] payload: ' . json_encode($payload));
+
+            $products = $this->getProductSkuFromId($productIds);
+            $productExistingCategories = $this->getExistingCategoriesFromProductIds($productIds);
             $removeResponse = [];
             $success = 0;
             $failed = 0;
@@ -62,9 +70,9 @@ class CategoryRemove extends AbstractController  implements HttpPostActionInterf
             foreach ($products as $product) {
                 try {
                     if (isset($productExistingCategories[$product['entity_id']]) && !empty($productExistingCategories[$product['entity_id']]['category_ids'])) {
-                        $existingCategoryIds = explode(",", $productExistingCategories[$product['entity_id']]['category_ids']);
+                        $existingCategoryIds = $productExistingCategories[$product['entity_id']]['category_ids'];
                         $deleteCategoryIds = array_values(array_intersect($existingCategoryIds, $categoryIds));
-                        $this->logger->writeDaily("Removing categories from product SKU: ".$product['sku'].", Product ID: ".$product['entity_id'].", Existing Categories: ". $productExistingCategories[$product['entity_id']]['category_ids'] .", Removing Categories: ".implode("|", $categoryIds).", New Categories: N/A");
+                        $this->logger->writeDaily("[category_remove] Removing categories from product SKU: ".$product['sku'].", Product ID: ".$product['entity_id'].", Existing Categories: ". implode(",", $existingCategoryIds) .", Removing Categories: ".implode("|", $categoryIds).", New Categories: N/A");
                         if (!empty($deleteCategoryIds)) {
                             $this->deleteCategoriesFromProduct($deleteCategoryIds, (int)$product['entity_id']);
                         }
@@ -81,10 +89,15 @@ class CategoryRemove extends AbstractController  implements HttpPostActionInterf
                             'product_id' => $product['entity_id'],
                             'error' => 'No existing categories found'
                         ];
-                        $this->logger->writeDaily("Removing categories from product SKU: ".$product['sku'].", Product ID: ".$product['entity_id'].", Existing Categories: None, Removing Categories: ".implode("|", $categoryIds).", New Categories: None");
+                        $this->logger->writeDaily("[category_remove] Removing categories from product SKU: ".$product['sku'].", Product ID: ".$product['entity_id'].", Existing Categories: None, Removing Categories: ".implode("|", $categoryIds).", New Categories: None");
                     }
                 } catch (Exception $exception) {
                     $failed += 1;
+                    $this->logger->writeDaily(
+                        "[category_remove] Failed product ID: {$product['entity_id']} SKU: {$product['sku']} Error: "
+                        . $exception->getMessage(),
+                        'error'
+                    );
                     $removeResponse[] = [
                         'success' => false,
                         'product_id' => $product['entity_id'],
@@ -93,8 +106,13 @@ class CategoryRemove extends AbstractController  implements HttpPostActionInterf
                 }
             }
 
+            $this->logger->writeDaily(
+                "[category_remove] Completed: {$success} success, {$notFound} not found, {$failed} failed. Details: "
+                . json_encode($removeResponse)
+            );
+
             //-- failed message
-            if (count($payload['product_ids']) == $failed) {
+            if (count($productIds) == $failed) {
                 return $this->jsonResponse([
                     'success' => false,
                     'total_success' =>  $success,
@@ -113,8 +131,8 @@ class CategoryRemove extends AbstractController  implements HttpPostActionInterf
             ], 200);
 
         } catch (Exception $exception) {
-            $this->logger->writeExceptionDaily($exception, "Bulk Category remove");
-            $this->logger->writeDaily($exception->getMessage());
+            $this->logger->writeExceptionDaily($exception, "[category_remove] Bulk Category remove");
+            $this->logger->writeDaily('[category_remove] Failed bulk category remove. Error: ' . $exception->getMessage(), 'error');
 
             return $this->jsonResponse(['error' => $exception->getMessage()], 500);
         }
@@ -128,8 +146,16 @@ class CategoryRemove extends AbstractController  implements HttpPostActionInterf
     private function getExistingCategoriesFromProductIds(array $productIds): array
     {
         $connection = $this->resourceConnection->getConnection();
-        $sql = "SELECT product_id, GROUP_CONCAT(category_id ORDER BY category_id) AS category_ids FROM catalog_category_product WHERE product_id IN (".implode(",", $productIds).") GROUP BY product_id";
-        return $connection->fetchAssoc($sql);
+        $select = $connection->select()
+            ->from($this->resourceConnection->getTableName('catalog_category_product'), ['product_id', 'category_id'])
+            ->where('product_id IN (?)', $productIds)
+            ->order(['product_id', 'category_id']);
+
+        $result = [];
+        foreach ($connection->fetchAll($select) as $row) {
+            $result[(int)$row['product_id']]['category_ids'][] = (int)$row['category_id'];
+        }
+        return $result;
     }
 
     /**
@@ -158,10 +184,33 @@ class CategoryRemove extends AbstractController  implements HttpPostActionInterf
     private function getProductSkuFromId(array $productIds): array
     {
         $connection = $this->resourceConnection->getConnection();
-        $sql = "SELECT `entity_id`,`sku` FROM `catalog_product_entity` WHERE `entity_id` IN (". implode(",", $productIds). ")";
-        return $connection->fetchAll($sql);
+        $select = $connection->select()
+            ->from($this->resourceConnection->getTableName('catalog_product_entity'), ['entity_id', 'sku'])
+            ->where('entity_id IN (?)', $productIds);
+        return $connection->fetchAll($select);
     }
 
+
+    /**
+     * Payload id list → unique positive ints. Null when any entry is not a positive integer.
+     *
+     * @param mixed $ids
+     * @return int[]|null
+     */
+    private function normalizeIds(mixed $ids): ?array
+    {
+        if (!is_array($ids) || $ids === []) {
+            return null;
+        }
+        $clean = [];
+        foreach ($ids as $id) {
+            if (!(is_int($id) || (is_string($id) && ctype_digit($id))) || (int)$id <= 0) {
+                return null;
+            }
+            $clean[] = (int)$id;
+        }
+        return array_values(array_unique($clean));
+    }
 
     public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException
     {

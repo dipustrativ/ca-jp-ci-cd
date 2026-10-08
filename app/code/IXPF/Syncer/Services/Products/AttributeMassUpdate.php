@@ -23,7 +23,8 @@ class AttributeMassUpdate
         protected ProductHelper        $productHelper,
         protected ProductAction        $productAction,
         protected ResourceConnection   $resourceConnection,
-        protected ProductUpdateLogger  $logger
+        protected ProductUpdateLogger  $logger,
+        protected PriceAttributeGuard  $priceAttributeGuard
     ) {
     }
 
@@ -48,6 +49,7 @@ class AttributeMassUpdate
         $results       = [];
         $updatedCount  = 0;
         $errorCount    = 0;
+        $recalcPriceIds = [];
 
         foreach ($products as $index => $product) {
             $productId  = isset($product['product_id']) ? (int)$product['product_id'] : 0;
@@ -81,7 +83,13 @@ class AttributeMassUpdate
                 }
             }
 
-            $valid = $this->applyPriceGuards($productId, $valid);
+            $guard = $this->applyPriceGuards($productId, $valid);
+            if (count($guard['invalid']) > 0) {
+                $errorCount++;
+                $results[] = $this->rowError($productId, implode('; ', $guard['invalid']), $invalid);
+                continue;
+            }
+            $valid = $guard['attributes'];
 
             if (count($valid) === 0) {
                 $errorCount++;
@@ -95,6 +103,10 @@ class AttributeMassUpdate
             try {
                 $this->productAction->updateAttributes([$productId], $valid, $storeId);
 
+                if (!empty(array_intersect(['price', 'special_price'], array_keys($valid)))) {
+                    $recalcPriceIds[] = $productId;
+                }
+
                 $updatedCount++;
                 $results[] = [
                     'product_id'         => $productId,
@@ -107,7 +119,7 @@ class AttributeMassUpdate
                 ];
             } catch (\Exception $e) {
                 $errorCount++;
-                $this->logger->writeDaily("[ERROR] Mass update product {$productId}: " . $e->getMessage());
+                $this->logger->writeDaily("[attribute_mass_updated] [ERROR] Mass update product {$productId}: " . $e->getMessage(), 'error');
                 $results[] = $this->rowError($productId, $e->getMessage(), $invalid);
             }
         }
@@ -129,19 +141,26 @@ class AttributeMassUpdate
     }
 
     /**
-     * price = 0 → drop (bad feed). special_price = 0 → null (clear).
+     * special_price 0/null → null (clear). price 0/null → drop (bad feed).
+     * Any other non-positive / non-numeric price value → invalid, product not written.
      */
     protected function applyPriceGuards(int $productId, array $valid): array
     {
-        if (array_key_exists('special_price', $valid) && $valid['special_price'] == 0) {
-            $valid['special_price'] = null;
-            $this->logger->writeDaily("[INFO] Product {$productId}: special_price 0 -> null (cleared).");
+        $guard = $this->priceAttributeGuard->apply($valid);
+
+        foreach ($guard['invalid'] as $message) {
+            $this->logger->writeDaily("[attribute_mass_updated] [INVALID] Product {$productId}: {$message}", 'error');
         }
-        if (array_key_exists('price', $valid) && $valid['price'] == 0) {
-            unset($valid['price']);
-            $this->logger->writeDaily("[SKIPPED] Product {$productId}: price 0 ignored.");
+        if (count($guard['invalid']) > 0) {
+            return $guard;
         }
-        return $valid;
+        if (in_array('special_price', $guard['cleared'], true)) {
+            $this->logger->writeDaily("[attribute_mass_updated] [INFO] Product {$productId}: special_price 0 -> null (cleared).");
+        }
+        if (in_array('price', $guard['skipped'], true)) {
+            $this->logger->writeDaily("[attribute_mass_updated] [SKIPPED] Product {$productId}: price 0 ignored.");
+        }
+        return $guard;
     }
 
     /**

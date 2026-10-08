@@ -47,16 +47,24 @@ class CategoryAssign extends AbstractController  implements HttpPostActionInterf
                 throw new \Exception("Empty product ids");
             }
 
+            $productIds = $this->normalizeIds($payload['product_ids']);
+            $categoryIds = $this->normalizeIds($payload['category_ids']);
+            if ($productIds === null || $categoryIds === null) {
+                $this->logger->writeDaily('[category_assign] Invalid ids in payload: ' . json_encode($payload), 'error');
+                return $this->jsonResponse([
+                    'error' => 'product_ids and category_ids must be arrays of positive integers'
+                ], 422);
+            }
+
             if (!$this->helpers->getEnableBulkCategoryAssign()) {
                 throw new \Exception("Bulk category assign is disabled currently");
             }
 
             //-- Log Payload
-            $this->logger->writeDaily(json_encode($payload));
+            $this->logger->writeDaily('[category_assign] payload: ' . json_encode($payload));
 
-            $products = $this->getProductSkuFromId($payload['product_ids']);
-            $productExistingCategories = $this->getExistingCategoriesFromProductIds($payload['product_ids']);
-            $categoryIds = $payload['category_ids'];
+            $products = $this->getProductSkuFromId($productIds);
+            $productExistingCategories = $this->getExistingCategoriesFromProductIds($productIds);
             $assignResponse = [];
             $success = 0;
             $failed = 0;
@@ -65,7 +73,7 @@ class CategoryAssign extends AbstractController  implements HttpPostActionInterf
                     //-- check existing categories and merge
                     $insertCategories = $categoryIds;
                     if (isset($productExistingCategories[$product['entity_id']]) && !empty($productExistingCategories[$product['entity_id']]['category_ids'])) {
-                        $existingCategoryIds = explode(",", $productExistingCategories[$product['entity_id']]['category_ids']);
+                        $existingCategoryIds = $productExistingCategories[$product['entity_id']]['category_ids'];
                         $insertCategories = array_merge($existingCategoryIds, $insertCategories);
                     }
 
@@ -91,6 +99,11 @@ class CategoryAssign extends AbstractController  implements HttpPostActionInterf
                     ];
                 } catch (\Exception $exception) {
                     $failed += 1;
+                    $this->logger->writeDaily(
+                        "[category_assign] Failed product ID: {$product['entity_id']} SKU: {$product['sku']} Error: "
+                        . $exception->getMessage(),
+                        'error'
+                    );
                     $assignResponse[] = [
                         'success' => false,
                         'product_id' => $product['entity_id'],
@@ -99,8 +112,12 @@ class CategoryAssign extends AbstractController  implements HttpPostActionInterf
                 }
             }
 
+            $this->logger->writeDaily(
+                "[category_assign] Completed: {$success} success, {$failed} failed. Details: " . json_encode($assignResponse)
+            );
+
             //-- failed message
-            if (count($payload['product_ids']) == $failed) {
+            if (count($productIds) == $failed) {
                 return $this->jsonResponse([
                     'success' => false,
                     'total_success' =>  $success,
@@ -118,8 +135,8 @@ class CategoryAssign extends AbstractController  implements HttpPostActionInterf
 
         } catch (\Exception $exception) {
             //-- Log
-            $this->logger->writeExceptionDaily($exception, "Bulk Category assign");
-            $this->logger->writeDaily($exception->getMessage());
+            $this->logger->writeExceptionDaily($exception, "[category_assign] Bulk Category assign");
+            $this->logger->writeDaily('[category_assign] Failed bulk category assign. Error: ' . $exception->getMessage(), 'error');
 
             return $this->jsonResponse(['error' => $exception->getMessage()], 500);
         }
@@ -133,8 +150,16 @@ class CategoryAssign extends AbstractController  implements HttpPostActionInterf
     private function getExistingCategoriesFromProductIds(array $productIds): array
     {
         $connection = $this->resourceConnection->getConnection();
-        $sql = "SELECT product_id, GROUP_CONCAT(category_id ORDER BY category_id) AS category_ids FROM catalog_category_product WHERE product_id IN (".implode(",", $productIds).") GROUP BY product_id";
-        return $connection->fetchAssoc($sql);
+        $select = $connection->select()
+            ->from($this->resourceConnection->getTableName('catalog_category_product'), ['product_id', 'category_id'])
+            ->where('product_id IN (?)', $productIds)
+            ->order(['product_id', 'category_id']);
+
+        $result = [];
+        foreach ($connection->fetchAll($select) as $row) {
+            $result[(int)$row['product_id']]['category_ids'][] = (int)$row['category_id'];
+        }
+        return $result;
     }
 
 
@@ -145,8 +170,31 @@ class CategoryAssign extends AbstractController  implements HttpPostActionInterf
     private function getProductSkuFromId(array $productIds): array
     {
         $connection = $this->resourceConnection->getConnection();
-        $sql = "SELECT `entity_id`,`sku` FROM `catalog_product_entity` WHERE `entity_id` IN (". implode(",", $productIds). ")";
-        return $connection->fetchAll($sql);
+        $select = $connection->select()
+            ->from($this->resourceConnection->getTableName('catalog_product_entity'), ['entity_id', 'sku'])
+            ->where('entity_id IN (?)', $productIds);
+        return $connection->fetchAll($select);
+    }
+
+    /**
+     * Payload id list → unique positive ints. Null when any entry is not a positive integer.
+     *
+     * @param mixed $ids
+     * @return int[]|null
+     */
+    private function normalizeIds(mixed $ids): ?array
+    {
+        if (!is_array($ids) || $ids === []) {
+            return null;
+        }
+        $clean = [];
+        foreach ($ids as $id) {
+            if (!(is_int($id) || (is_string($id) && ctype_digit($id))) || (int)$id <= 0) {
+                return null;
+            }
+            $clean[] = (int)$id;
+        }
+        return array_values(array_unique($clean));
     }
 
     public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException

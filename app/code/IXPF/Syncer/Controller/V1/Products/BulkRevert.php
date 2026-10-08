@@ -56,7 +56,8 @@ class BulkRevert extends AbstractController implements HttpPostActionInterface, 
             }
 
             //-- log payload
-            $this->productUpdateLogger->writeDaily("Starting revert bulk update products. Store ID: " . $store);
+            $this->productUpdateLogger->writeDaily("[bulk_revert] Starting revert bulk update products. Store ID: " . $store);
+            $this->productUpdateLogger->writeDaily('[bulk_revert] payload: ' . $rawContent);
 
             $connection = $this->resourceConnection->getConnection();
             $tableName = $this->resourceConnection->getTableName('ixpf_product_bulk_update_queue');
@@ -69,12 +70,18 @@ class BulkRevert extends AbstractController implements HttpPostActionInterface, 
                 'updated_at' => (new \DateTime())->format('Y-m-d H:i:s'),
             ]);
 
+            $this->productUpdateLogger->writeDaily(
+                "[bulk_revert] Queued. Queue ID: " . $connection->lastInsertId($tableName)
+                . ", ixpf_batch_id: " . $payload['ixpf_batch_id']
+            );
+
             return $this->jsonResponse([
                 'success' => true,
                 'message' => 'Revert bulk update products request has been queued successfully.'
             ], 201);
 
         } catch (Exception $e) {
+            $this->productUpdateLogger->writeDaily('[bulk_revert] Failed to queue revert bulk update. Error: ' . $e->getMessage(), 'error');
             return $this->jsonResponse(['error' => $e->getMessage()], 500);
         }
     }

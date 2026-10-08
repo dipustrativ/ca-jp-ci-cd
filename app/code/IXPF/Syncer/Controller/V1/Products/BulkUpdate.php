@@ -15,6 +15,7 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
 use Magento\Eav\Model\Config as EavConfig;
 use IXPF\Syncer\Helper\Logger\ProductUpdateLogger;
+use IXPF\Syncer\Services\Products\PriceAttributeGuard;
 
 
 class BulkUpdate extends AbstractController implements HttpPostActionInterface, CsrfAwareActionInterface
@@ -27,7 +28,8 @@ class BulkUpdate extends AbstractController implements HttpPostActionInterface, 
         protected Action $productAction,
         protected ResourceConnection $resourceConnection,
         protected EavConfig $eavConfig,
-        protected ProductUpdateLogger $productUpdateLogger
+        protected ProductUpdateLogger $productUpdateLogger,
+        protected PriceAttributeGuard $priceAttributeGuard
     )
     {
         parent::__construct($context, $tokenValidator, $resultFactory);
@@ -66,8 +68,8 @@ class BulkUpdate extends AbstractController implements HttpPostActionInterface, 
             }
 
             //-- log payload
-            $this->productUpdateLogger->writeDaily("Starting bulk update products. Store ID: " . $store);
-            $this->productUpdateLogger->writeDaily(json_encode($payload));
+            $this->productUpdateLogger->writeDaily("[bulk_update] Starting bulk update products. Store ID: " . $store);
+            $this->productUpdateLogger->writeDaily('[bulk_update] payload: ' . json_encode($payload));
 
             $updatedAttributesWithValue = [];
             $categoryIds = [];
@@ -91,34 +93,45 @@ class BulkUpdate extends AbstractController implements HttpPostActionInterface, 
                 }
             }
 
-            // special_price = 0 → treat as "remove special price" by setting null.
-            if (array_key_exists('special_price', $updatedAttributesWithValue) && $updatedAttributesWithValue['special_price'] == 0) {
-                $updatedAttributesWithValue['special_price'] = null;
+            // special_price 0/null → null (clear). price 0/null → dropped (bad feed).
+            // Any other non-positive / non-numeric price value → reject, nothing written.
+            $guard = $this->priceAttributeGuard->apply($updatedAttributesWithValue);
+            if (count($guard['invalid']) > 0) {
                 $this->productUpdateLogger->writeDaily(
-                    "[INFO] Bulk update: 'special_price' was 0 — set to null to clear the special price."
+                    '[bulk_update] [INVALID] ' . implode('; ', $guard['invalid']),
+                    'error'
+                );
+                return $this->jsonResponse([
+                    'error' => 'Invalid price data: ' . implode('; ', $guard['invalid'])
+                ], 422);
+            }
+            $updatedAttributesWithValue = $guard['attributes'];
+
+            if (in_array('special_price', $guard['cleared'], true)) {
+                $this->productUpdateLogger->writeDaily(
+                    "[bulk_update] [INFO] Bulk update: 'special_price' was 0 — set to null to clear the special price."
                 );
             }
 
-            // price = 0 → almost certainly a bad feed value; unset so existing prices are preserved.
-            if (array_key_exists('price', $updatedAttributesWithValue) && $updatedAttributesWithValue['price'] == 0) {
-                unset($updatedAttributesWithValue['price']);
+            if (in_array('price', $guard['skipped'], true)) {
+                $updatedAllowAttributes = array_values(array_diff($updatedAllowAttributes, ['price']));
                 $this->productUpdateLogger->writeDaily(
-                    "[SKIPPED] Bulk update: 'price' was 0 in the request payload — "
+                    "[bulk_update] [SKIPPED] Bulk update: 'price' was 0 in the request payload — "
                     . "value ignored to prevent accidental zero-price update."
                 );
             }
 
             if (count($notAllowUpdateAttributes) > 0) {
-                $this->productUpdateLogger->writeDaily("Not allowed update attributes");
-                $this->productUpdateLogger->writeDaily(json_encode($notAllowUpdateAttributes));
+                $this->productUpdateLogger->writeDaily("[bulk_update] Not allowed update attributes");
+                $this->productUpdateLogger->writeDaily('[bulk_update] not allowed: ' . json_encode($notAllowUpdateAttributes));
                 throw new \Exception('There are attributes that are not allowed to update: ' . implode(", ", $notAllowUpdateAttributes));
             }
 
             if (count($allowUpdateAttributes)) {
                 //-- log updated products
-                $this->productUpdateLogger->writeDaily("Bulk update products");
-                $this->productUpdateLogger->writeDaily("Bulk update products Store ID: " . $store);
-                $this->productUpdateLogger->writeDaily(json_encode($updatedAttributesWithValue));
+                $this->productUpdateLogger->writeDaily("[bulk_update] Bulk update products");
+                $this->productUpdateLogger->writeDaily("[bulk_update] Bulk update products Store ID: " . $store);
+                $this->productUpdateLogger->writeDaily('[bulk_update] attributes: ' . json_encode($updatedAttributesWithValue));
 
                 // Keep every non-null value. Keep 'special_price' even when null so it is
                 // written through updateAttributes (null clears the special price). A null
@@ -132,11 +145,11 @@ class BulkUpdate extends AbstractController implements HttpPostActionInterface, 
                 if (!empty($toUpdate)) {
                     //-- update attributes (special_price kept even when null)
                     $this->productAction->updateAttributes($payload['product_ids'], $toUpdate, $store);
-                }
 
-                if (!empty($toReset) && (int)$store !== 0) {
-                    //-- delete store-level EAV rows so Magento falls back to store 0 (default) value
-                    $this->resetAttributesToDefault($payload['product_ids'], array_keys($toReset), (int)$store);
+                    //-- Recalculate otto_price if price or special_price was updated
+                    if (!empty(array_intersect(['price', 'special_price'], array_keys($toUpdate)))) {
+                        $this->ottoPriceUpdater->updateForProducts($payload['product_ids']);
+                    }
                 }
             }
 
@@ -182,9 +195,9 @@ class BulkUpdate extends AbstractController implements HttpPostActionInterface, 
             //-- updated category values
             if (is_array($categoryIds) && count($categoryIds)) {
                 //-- log updated products
-                $this->productUpdateLogger->writeDaily("Bulk update products categories");
-                $this->productUpdateLogger->writeDaily("Bulk update products Store ID: " . $store);
-                $this->productUpdateLogger->writeDaily($categoryIds);
+                $this->productUpdateLogger->writeDaily("[bulk_update] Bulk update products categories");
+                $this->productUpdateLogger->writeDaily("[bulk_update] Bulk update products Store ID: " . $store);
+                $this->productUpdateLogger->writeDaily('[bulk_update] category_ids: ' . json_encode($categoryIds));
 
                 $connection  = $this->resourceConnection->getConnection();
                 $tableName   = $connection->getTableName('catalog_category_product');
@@ -242,7 +255,7 @@ class BulkUpdate extends AbstractController implements HttpPostActionInterface, 
             ]);
 
         } catch (\Exception $exception) {
-            $this->productUpdateLogger->writeDaily("Failed to bulk update products. Error: " . $exception->getMessage());
+            $this->productUpdateLogger->writeDaily("[bulk_update] Failed to bulk update products. Error: " . $exception->getMessage(), 'error');
             return $this->jsonResponse(['error' => $exception->getMessage()], 500);
         }
     }
@@ -268,7 +281,7 @@ class BulkUpdate extends AbstractController implements HttpPostActionInterface, 
                 $attribute = $this->eavConfig->getAttribute('catalog_product', $attributeCode);
                 if (!$attribute || !$attribute->getId()) {
                     $this->productUpdateLogger->writeDaily(
-                        "[WARN] resetAttributesToDefault: attribute '{$attributeCode}' not found — skipped."
+                        "[bulk_update] [WARN] resetAttributesToDefault: attribute '{$attributeCode}' not found — skipped."
                     );
                     continue;
                 }
@@ -283,14 +296,15 @@ class BulkUpdate extends AbstractController implements HttpPostActionInterface, 
                 ]);
 
                 $this->productUpdateLogger->writeDaily(
-                    "[RESET] Attribute '{$attributeCode}' store-level override removed for "
+                    "[bulk_update] [RESET] Attribute '{$attributeCode}' store-level override removed for "
                     . count($productIds) . " product(s) on store {$storeId} "
                     . "({$deleted} row(s) deleted) — will fall back to default (store 0)."
                 );
 
             } catch (\Exception $e) {
                 $this->productUpdateLogger->writeDaily(
-                    "[ERROR] resetAttributesToDefault failed for '{$attributeCode}': " . $e->getMessage()
+                    "[bulk_update] [ERROR] resetAttributesToDefault failed for '{$attributeCode}': " . $e->getMessage(),
+                    'error'
                 );
             }
         }

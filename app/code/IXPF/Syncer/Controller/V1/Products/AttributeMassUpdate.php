@@ -46,8 +46,8 @@ class AttributeMassUpdate extends AbstractController implements HttpPostActionIn
             $payload = json_decode($raw, true);
 
             //-- log payload
-            $this->logger->writeDaily("Product Attribute Mass Update. Store ID: {$store}");
-            $this->logger->writeDaily($raw);
+            $this->logger->writeDaily("[attribute_mass_updated] Product Attribute Mass Update. Store ID: {$store}");
+            $this->logger->writeDaily('[attribute_mass_updated] payload: ' . $raw);
 
             //-- validate shape
             if (empty($payload)) {
@@ -60,14 +60,14 @@ class AttributeMassUpdate extends AbstractController implements HttpPostActionIn
             //-- delegate
             $result = $this->service->process($payload['products'], $store);
 
-            $this->logger->writeDaily('Mass update result: ' . json_encode($result['summary']));
+            $this->logger->writeDaily('[attribute_mass_updated] Mass update result: ' . json_encode($result['summary']));
 
             //-- 207-style: some rows may fail; still 200 if any succeeded, 422 if all failed
             $statusCode = ($result['summary']['updated'] === 0) ? 422 : 200;
 
             return $this->jsonResponse($result, $statusCode);
         } catch (\Exception $exception) {
-            $this->logger->writeDaily('Failed mass attribute update. Error: ' . $exception->getMessage());
+            $this->logger->writeDaily('[attribute_mass_updated] Failed mass attribute update. Error: ' . $exception->getMessage(), 'error');
             return $this->jsonResponse(['error' => $exception->getMessage()], 500);
         }
     }
