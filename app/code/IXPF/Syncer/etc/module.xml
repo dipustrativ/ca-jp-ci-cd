@@ -16,6 +16,7 @@
             <module name="Magento_InventoryIndexer"/>
             <module name="Magento_InventorySourceSelectionApi"/>
             <module name="Magento_InventoryCatalogApi"/>
+            <module name="CarpetAvenue_OrderAttachment"/>
         </sequence>
     </module>
 </config>

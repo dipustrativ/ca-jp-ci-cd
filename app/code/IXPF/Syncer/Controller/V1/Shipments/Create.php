@@ -53,18 +53,31 @@ class Create extends AbstractController implements HttpPostActionInterface, Csrf
 
             $result = $this->createShipment->execute((int) $id, $payload);
 
-            $this->orderLogger->writeDaily("[shipment_create] Shipment created for Order ID: $id — Shipment: {$result['shipment_increment_id']}");
-
-            $this->activityLogger->success(
-                'shipment_create',
-                'shipment',
-                $result['shipment_increment_id'],
-                "Shipment created for order #{$result['increment_id']}"
+            $created = array_map(
+                fn(array $shipment) => $shipment['shipment_increment_id']
+                    . ($shipment['source_code'] ? " ({$shipment['source_code']})" : ''),
+                $result['shipments']
+            );
+            $this->orderLogger->writeDaily(
+                "[shipment_create] Shipment(s) created for Order ID: $id — " . implode(', ', $created)
             );
 
+            foreach ($result['shipments'] as $shipment) {
+                $this->activityLogger->success(
+                    'shipment_create',
+                    'shipment',
+                    $shipment['shipment_increment_id'],
+                    "Shipment created for order #{$result['increment_id']}"
+                    . ($shipment['source_code'] ? " from source {$shipment['source_code']}" : '')
+                );
+            }
+
+            $count = count($result['shipments']);
             return $this->jsonResponse([
                 'success' => true,
-                'message' => "Shipment created for order #{$result['increment_id']}",
+                'message' => $count > 1
+                    ? "$count shipments created for order #{$result['increment_id']} (one per source)"
+                    : "Shipment created for order #{$result['increment_id']}",
                 'data'    => $result,
             ]);
         } catch (Exception $exception) {

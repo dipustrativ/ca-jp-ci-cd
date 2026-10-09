@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace IXPF\Syncer\Services\Order;
 
 use Exception;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\CreditmemoManagementInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -131,7 +132,7 @@ class CreateCreditmemo
             foreach ($payload['items'] as $item) {
                 $orderItemId = null;
                 if (!empty($item['order_item_id'])) {
-                    $orderItemId = (int) $item['order_item_id'];
+                    $orderItemId = $this->resolveRefundableItemId($order, (int) $item['order_item_id']);
                 } elseif (!empty($item['sku'])) {
                     $orderItemId = $skuToItemId[$item['sku']] ?? null;
                     if (!$orderItemId) {
@@ -197,7 +198,10 @@ class CreateCreditmemo
                 }
                 $orderItemId = null;
                 if (!empty($item['order_item_id'])) {
-                    $orderItemId = (int) $item['order_item_id'];
+                    $orderItemId = $this->resolveRefundableItemId(
+                        $creditmemo->getOrder(),
+                        (int) $item['order_item_id']
+                    );
                 } elseif (!empty($item['sku'])) {
                     $orderItemId = $skuToItemId[$item['sku']] ?? null;
                 }
@@ -216,17 +220,43 @@ class CreateCreditmemo
                 continue;
             }
             $orderItemId = (int) $cmItem->getOrderItemId();
-            $cmItem->setBackToStock($perItem[$orderItemId] ?? $default);
+            // Configurable child rows inherit the override given for their parent.
+            $parentItemId = (int) $cmItem->getOrderItem()?->getParentItemId();
+            $cmItem->setBackToStock($perItem[$orderItemId] ?? $perItem[$parentItemId] ?? $default);
         }
     }
 
+    /**
+     * SKU => order_item_id of the row Magento refunds by.
+     *
+     * A configurable line is two order items sharing the child SKU: the configurable parent
+     * (carries price/qty) and the simple child (price 0). CreditmemoFactory only reads qtys
+     * keyed by the parent and derives the child qty from it, so the SKU must map to the parent.
+     */
     private function buildSkuMap(Order $order): array
     {
         $map = [];
         foreach ($order->getAllItems() as $item) {
-            $map[$item->getSku()] = (int) $item->getItemId();
+            $itemId = $this->resolveRefundableItemId($order, (int) $item->getItemId());
+            $map[$item->getSku()] ??= $itemId;
         }
         return $map;
+    }
+
+    /**
+     * Configurable child order item => its parent item id; anything else unchanged.
+     * Bundle children are left alone — they can be refunded per child.
+     */
+    private function resolveRefundableItemId(Order $order, int $orderItemId): int
+    {
+        $item = $order->getItemById($orderItemId);
+        $parent = $item?->getParentItem();
+
+        if ($parent && $parent->getProductType() === Configurable::TYPE_CODE) {
+            return (int) $parent->getItemId();
+        }
+
+        return $orderItemId;
     }
 
     /**

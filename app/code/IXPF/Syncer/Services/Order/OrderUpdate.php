@@ -7,6 +7,7 @@ use Exception;
 use IXPF\Syncer\Helper\Logger\OrderActionLogger;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterfaceFactory;
+use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderAddressInterface;
@@ -23,7 +24,8 @@ class OrderUpdate
         protected readonly AddressInterfaceFactory      $customerAddressFactory,
         protected readonly OrderStatusCollectionFactory $orderStatusCollectionFactory,
         protected readonly OrderActionLogger           $orderLogger,
-        protected readonly OrderCommentSender          $orderCommentSender
+        protected readonly OrderCommentSender          $orderCommentSender,
+        protected readonly OrderAttachment             $orderAttachment
     )
     {
     }
@@ -40,6 +42,31 @@ class OrderUpdate
         }
 
         $updated = [];
+        $attachmentPath = null;
+        $previousAttachment = null;
+
+        // Attachment first: the bucket download is the step most likely to fail, and it must
+        // fail before the shipping-address sync below saves the customer address on its own.
+        if (array_key_exists('extra_shipping_instructions', $payload)) {
+            $this->orderAttachment->setExtraInstructions($order, $payload['extra_shipping_instructions']);
+            $updated[] = 'extra_shipping_instructions';
+        }
+
+        if (array_key_exists('attachment', $payload)) {
+            if ($payload['attachment'] === null) {
+                $previousAttachment = $this->orderAttachment->detach($order);
+            } elseif (is_array($payload['attachment']) && is_string($payload['attachment']['bucket_url'] ?? null)) {
+                [
+                    'path' => $attachmentPath,
+                    'previous' => $previousAttachment,
+                ] = $this->orderAttachment->attachFromBucket($order, $payload['attachment']['bucket_url']);
+            } else {
+                throw new InputException(
+                    __("'attachment' must be null or an object with a 'bucket_url' string.")
+                );
+            }
+            $updated[] = 'attachment';
+        }
 
         if (!empty($payload['status'])) {
             $this->updateStatus($order, $payload['status']);
@@ -69,14 +96,34 @@ class OrderUpdate
             }
         }
 
-        $this->orderRepository->save($order);
+        try {
+            $this->orderRepository->save($order);
+        } catch (\Throwable $e) {
+            if ($attachmentPath !== null) {
+                $this->orderAttachment->rollback($attachmentPath, $previousAttachment);
+            }
+            throw $e;
+        }
+
+        // Old file goes only once the order no longer references it.
+        if ($previousAttachment !== null && $previousAttachment !== $attachmentPath) {
+            $this->orderAttachment->deleteFile($previousAttachment);
+        }
 
         $this->orderLogger->writeDaily(
             "[order_update] Order ID: $orderId updated — fields: "
             . (empty($updated) ? 'none' : implode(', ', $updated))
         );
 
-        return ['updated_fields' => $updated, 'order_id' => $orderId];
+        $result = ['updated_fields' => $updated, 'order_id' => $orderId];
+        if (in_array('attachment', $updated, true)) {
+            $result['attachment'] = $attachmentPath;
+        }
+        if (in_array('extra_shipping_instructions', $updated, true)) {
+            $result['extra_shipping_instructions'] = (bool)$order->getData(OrderAttachment::COLUMN_EXTRA);
+        }
+
+        return $result;
     }
 
     /**
@@ -118,7 +165,7 @@ class OrderUpdate
 
         if (!$statusModel || !$statusModel->getStatus()) {
             throw new Exception(
-                "Order status '$statusCode' does not exist in Magento. 
+                "Order status '$statusCode' does not exist in Magento.
             Please create it under Stores > Order Status first."
             );
         }

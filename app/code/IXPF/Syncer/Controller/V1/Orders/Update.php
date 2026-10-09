@@ -16,6 +16,7 @@ use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Exception\InputException;
 
 class Update extends AbstractController implements HttpPostActionInterface, CsrfAwareActionInterface
 {
@@ -62,6 +63,12 @@ class Update extends AbstractController implements HttpPostActionInterface, Csrf
 
             $result = $this->orderUpdate->process((int)$id, $payload);
 
+            $this->_eventManager->dispatch('ixpf_syncer_after_order_update', [
+                'order_id' => (int)$id,
+                'payload'  => $payload,
+                'result'   => $result,
+            ]);
+
             $this->activityLogger->success(
                 'order_update',
                 'order',
@@ -78,7 +85,10 @@ class Update extends AbstractController implements HttpPostActionInterface, Csrf
         } catch (\Exception $exception) {
             $this->orderLogger->writeDaily("Error processing order update request: " . $exception->getMessage(), 'error');
             $this->activityLogger->error('order_update', 'order', $id ?? null, $exception->getMessage());
-            return $this->jsonResponse(['error' => $exception->getMessage()], 500);
+            return $this->jsonResponse(
+                ['error' => $exception->getMessage()],
+                $exception instanceof InputException ? 422 : 500
+            );
         }
     }
 

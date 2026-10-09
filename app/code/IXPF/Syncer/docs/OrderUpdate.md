@@ -3,7 +3,7 @@
 **Version:** 1.0  
 **Module:** IXPF_Syncer  
 **Feature:** Order Update via API  
-**Last Updated:** March 24, 2026
+**Last Updated:** October 8, 2026
 
 ---
 
@@ -26,10 +26,14 @@
    - [Status Update](#status-update)
    - [Billing Address](#billing-address)
    - [Shipping Address](#shipping-address)
+   - [Extra Shipping Instructions](#extra-shipping-instructions)
+   - [Attachment](#attachment)
 6. [Examples](#examples)
    - [Update Order Status](#update-order-status)
    - [Update Billing Address](#update-billing-address)
    - [Update Shipping Address](#update-shipping-address)
+   - [Attach PDF from Bucket](#attach-pdf-from-bucket)
+   - [Remove Attachment](#remove-attachment)
    - [Full Payload Example](#full-payload-example)
    - [Fetch Metadata](#fetch-metadata)
 7. [Error Handling](#error-handling)
@@ -48,6 +52,8 @@ The **Order Update API** allows the IXPF external system to update Magento order
 - **Order status** — including cancellation with automatic stock restoration
 - **Billing address** — overwrites fields on the order's billing address
 - **Shipping address** — overwrites fields on the order's shipping address and optionally syncs the linked customer address
+- **Extra shipping instructions** — the admin "Extra shipping instructions" toggle (`CarpetAvenue_OrderAttachment`)
+- **Attachment** — the admin "Attach new file" PDF, downloaded from the Google bucket
 
 The endpoint is synchronous: the response confirms which fields were updated.
 
@@ -108,7 +114,9 @@ Send a JSON body containing the fields you want to update. Only the keys you inc
 {
   "status": "string",
   "billing_address": { ... },
-  "shipping_address": { ... }
+  "shipping_address": { ... },
+  "extra_shipping_instructions": true,
+  "attachment": { "bucket_url": "string" }
 }
 ```
 
@@ -119,6 +127,8 @@ Send a JSON body containing the fields you want to update. Only the keys you inc
 | `status` | `string` | New order status code (must exist in Magento) |
 | `billing_address` | `object` | Address fields to overwrite on the billing address |
 | `shipping_address` | `object` | Address fields to overwrite on the shipping address (also syncs customer address if linked) |
+| `extra_shipping_instructions` | `bool` | Sets the order's "Extra shipping instructions" flag |
+| `attachment` | `object\|null` | `{ "bucket_url": "..." }` attaches a PDF from the Google bucket; `null` removes the current attachment |
 
 ### Response
 
@@ -136,6 +146,19 @@ Send a JSON body containing the fields you want to update. Only the keys you inc
 ```
 
 The `updated_fields` array will only contain the fields that were actually processed.
+
+When `attachment` / `extra_shipping_instructions` are sent, the inner object also carries their final value:
+
+```json
+"updated_fields": {
+  "updated_fields": ["extra_shipping_instructions", "attachment"],
+  "order_id": 123,
+  "attachment": "persistent/order_attachments/123/shipping-instructions.pdf",
+  "extra_shipping_instructions": true
+}
+```
+
+**Error — HTTP 422** (invalid `extra_shipping_instructions` / `attachment` input, see [Error Handling](#error-handling))
 
 **Error — HTTP 500**
 
@@ -290,6 +313,57 @@ The `shipping_address` object accepts the same fields as `billing_address`.
 
 ---
 
+### Extra Shipping Instructions
+
+```json
+{
+  "extra_shipping_instructions": true
+}
+```
+
+Writes `sales_order.ca_attachment_check_extra` (`1` / `0`) — the same toggle shown in the admin order view under **Attachment**. Accepts `true`/`false`, `1`/`0`, `"true"`/`"false"`, `"yes"`/`"no"`. The `GET /V1/orders/:orderId/attachment` REST endpoint only returns the PDF when this flag is `1`.
+
+---
+
+### Attachment
+
+```json
+{
+  "attachment": {
+    "bucket_url": "orders/100000123/shipping-instructions.pdf"
+  }
+}
+```
+
+The PDF is downloaded from the Google bucket configured under **IXPF Syncer → Product → Google Bucket Config** (same bucket and service account as the product gallery) and stored at:
+
+```
+var/persistent/order_attachments/<order_entity_id>/<filename>.pdf
+```
+
+`sales_order.ca_attachment_file` is set to the path relative to `var/` — identical to the admin "Attach new file" upload, so the admin download link and `GET /V1/orders/:orderId/attachment` work unchanged.
+
+**Accepted `bucket_url` formats:**
+
+| Format | Example |
+|---|---|
+| Object path | `orders/100000123/shipping-instructions.pdf` |
+| gs:// URI | `gs://<bucket>/orders/100000123/shipping-instructions.pdf` |
+| Public URL | `https://storage.googleapis.com/<bucket>/orders/100000123/shipping-instructions.pdf` |
+| Virtual-host URL | `https://<bucket>.storage.googleapis.com/orders/100000123/shipping-instructions.pdf` |
+
+The bucket in a URI/URL must match the configured bucket.
+
+**Rules:**
+- Only `.pdf`; content must start with `%PDF-`
+- Maximum size **10 MB**
+- Filename is sanitised (`[^A-Za-z0-9_.-]` → `_`)
+- Sending a new attachment replaces the old one; the old file is deleted only after the order is saved
+- `"attachment": null` removes the current attachment and deletes its file
+- Attachment is processed before status/address changes — a failed download leaves the order untouched
+
+---
+
 ## Examples
 
 ### Update Order Status
@@ -383,6 +457,48 @@ Content-Type: application/json
 
 ---
 
+### Attach PDF from Bucket
+
+```http
+POST /ixpfsyncer/V1/Orders/Update?id=100000123
+X-Auth-Token: Bearer abc123token
+Content-Type: application/json
+
+{
+  "extra_shipping_instructions": true,
+  "attachment": {
+    "bucket_url": "orders/100000123/shipping-instructions.pdf"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Order #100000123 updated successfully",
+  "updated_fields": {
+    "updated_fields": ["extra_shipping_instructions", "attachment"],
+    "order_id": 100000123,
+    "attachment": "persistent/order_attachments/100000123/shipping-instructions.pdf",
+    "extra_shipping_instructions": true
+  }
+}
+```
+
+---
+
+### Remove Attachment
+
+```json
+{
+  "attachment": null,
+  "extra_shipping_instructions": false
+}
+```
+
+---
+
 ### Full Payload Example
 
 ```http
@@ -470,7 +586,23 @@ X-Auth-Token: Bearer abc123token
 | Order cannot be cancelled | `Order #<increment_id> cannot be cancelled in its current state '<state>'.` |
 | Status code does not exist | `Order status '<code>' does not exist in Magento. Please create it under Stores > Order Status first.` |
 
-All errors return HTTP `500` with the body:
+**Attachment / extra shipping instructions — HTTP 422:**
+
+| Scenario | Error Message |
+|---|---|
+| Non-boolean flag | `'extra_shipping_instructions' must be a boolean.` |
+| Wrong `attachment` shape | `'attachment' must be null or an object with a 'bucket_url' string.` |
+| Empty `bucket_url` | `'attachment.bucket_url' is required.` |
+| Not a `.pdf` filename | `Attachment must be a .pdf file, got '<name>'.` |
+| Non-GCS URL host | `Unsupported attachment URL host '<host>'. Use a Google bucket path.` |
+| Bucket mismatch | `Attachment bucket '<bucket>' does not match the configured bucket.` |
+| `..` in path | `Invalid attachment bucket path '<url>'.` |
+| Object missing / no access / bucket not configured | `Attachment download failed: <detail>` |
+| Empty file / over 10 MB / not a PDF | `Attachment file is empty.` / `Attachment is <n> MB, maximum allowed is 10 MB.` / `Attachment is not a valid PDF file.` |
+
+GCS 5xx / network failures return HTTP `500`.
+
+All other errors return HTTP `500` with the body:
 ```json
 {
   "error": "<error message>"
@@ -490,6 +622,10 @@ All requests and errors are logged by `IXPF\Syncer\Helper\Logger\OrderLogger` us
 - Full decoded payload (JSON)
 - Any exception message on failure
 
+Attachment actions (`[order_attachment]` tag — bucket path, stored path, size, replaced/deleted file) are written by `IXPF\Syncer\Helper\Logger\OrderActionLogger` to `var/log/ixpf/orders/order_action_<date>.log`.
+
+After a successful update the controller dispatches `ixpf_syncer_after_order_update` with `order_id`, `payload` and `result`.
+
 Log files are located at:
 ```
 var/log/ixpf_order_<YYYY-MM-DD>.log
@@ -506,6 +642,8 @@ var/log/ixpf_order_<YYYY-MM-DD>.log
 | `IXPF\Syncer\Controller\V1\Orders\Update` | HTTP controller — validates token, parses request, delegates to service |
 | `IXPF\Syncer\Controller\V1\Orders\Metadata` | HTTP controller — returns available order statuses, states, and customer groups |
 | `IXPF\Syncer\Services\Order\OrderUpdate` | Business logic — status update, address update, customer address sync |
+| `IXPF\Syncer\Services\Order\OrderAttachment` | Extra shipping instructions flag, attachment download / validation / storage / removal |
+| `IXPF\Syncer\Services\PhotoStudio\ProcessGoogleBucketImages` | `downloadObject()` — GCS download with the gallery service account |
 | `IXPF\Syncer\Helper\Config` | Reads `ixpfng_order/order_update/enabled` config flag |
 | `IXPF\Syncer\Helper\TokenValidator` | Validates the Bearer token against Magento OAuth tokens |
 | `IXPF\Syncer\Helper\Logger\OrderLogger` | Daily-rotating log writer for order events |
@@ -543,3 +681,5 @@ Returns:
 | Config | XML Path |
 |---|---|
 | Enable Order Update | `ixpfng_order/order_update/enabled` |
+| Google bucket name (attachment) | `ixpfng_product/google_bucket_config/bucket_name` |
+| Google service-account JSON (attachment) | `ixpfng_product/google_bucket_config/json_file` |
