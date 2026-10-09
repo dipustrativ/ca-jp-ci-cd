@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Raw PDF body (not JSON) — see Model\Attachment\AttachmentGet. -->
+    <route url="/V1/orders/:orderId/attachment" method="GET">
+        <service class="CarpetAvenue\Orderify\Api\AttachmentGetInterface" method="execute"/>
+        <resources>
+            <resource ref="Magento_Sales::sales_operation"/>
+        </resources>
+    </route>
+</routes>

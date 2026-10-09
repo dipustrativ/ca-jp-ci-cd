@@ -14,7 +14,9 @@
     "sales_order": {
         "column": {
             "is_pos_order": true,
-            "store_to_eur_rate": true
+            "store_to_eur_rate": true,
+            "ca_attachment_file": true,
+            "ca_attachment_check_extra": true
         }
     },
     "sales_order_grid": {

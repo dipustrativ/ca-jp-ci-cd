@@ -15,6 +15,7 @@
 - **Customer Blacklist** — Admin UI to blacklist customers by email, shipping address, or IP address. Blacklist status shown inline on order view.
 - **Regional Address Settings** — Configurable state/region field behaviour for checkout and admin order creation. Includes optional-region countries, Italy VAT state warnings, and Japan field sort order.
 - **Order Cancel Inventory Reindex** — Triggers an immediate, targeted MSI inventory index recalculation when an order is canceled, so salable quantities on the storefront reflect reality without waiting for the next scheduled reindex.
+- **Order Attachment** — One PDF per order plus an "Extra shipping instructions" flag, managed from the admin order view and served to IXPF via `GET /V1/orders/:orderId/attachment`. Merged from the former `CarpetAvenue_OrderAttachment` module — see [Order Attachment](#order-attachment).
 - **Payment Icons ("We accept" strip)** — Per-store-view payment-logo strip rendered on the cart checkout button area and reusable in CMS (e.g. the footer). Icons resolve from a media library by payment-method code and can be bulk-synced from a Google Sheet via CLI or an admin button.
 
 ---
@@ -305,6 +306,9 @@ Stores all customer blacklist entries. Queried on every order view page load (vi
 | `orderify/blacklist/add`                 | `Blacklist/Add`                     | POST — add blacklist entry      |
 | `orderify/blacklist/remove`              | `Blacklist/Remove`                  | Remove entry by `id`            |
 | `orderify/order/refundstatistics`        | `Order/RefundStatistics`            | AJAX — return statistics HTML   |
+| `orderify/attachment/save`               | `Attachment/Save`                   | POST — upload PDF / save flag   |
+| `orderify/attachment/download`           | `Attachment/Download`               | GET — download attachment PDF   |
+| `orderify/attachment/remove`             | `Attachment/Remove`                 | POST — detach + delete PDF      |
 
 ### ACL Resources
 
@@ -312,7 +316,8 @@ Stores all customer blacklist entries. Queried on every order view page load (vi
 CarpetAvenue_Core::carpetavenue
 └── CarpetAvenue_Orderify::orderify
     ├── CarpetAvenue_Orderify::add_blacklist     ← required for Blacklist/Add
-    └── CarpetAvenue_Orderify::remove_blacklist  ← required for Blacklist/Remove
+    ├── CarpetAvenue_Orderify::remove_blacklist  ← required for Blacklist/Remove
+    └── CarpetAvenue_Orderify::order_attachment  ← required for the order-view Attachment section + Attachment/*
 ```
 
 ### Dependencies
@@ -517,3 +522,63 @@ independent of the checkout strip's styles. Example host tweak:
 | `Magento_MediaStorage` | SVG/PNG uploader. |
 | `Magento_AdminNotification` | Admin inbox notifications on failed/aborted imports. |
 | `Evalent_CheckoutMods` | Renders the strip in the cart checkout-button area. |
+
+---
+
+## Order Attachment
+
+Merged from the former standalone `CarpetAvenue_OrderAttachment` module (admin route
+`orderattachment/*` → `orderify/attachment/*`). The DB columns, storage directory and REST URL
+are unchanged, so existing attachments and the IXPF client keep working.
+
+### What it does
+
+- **Admin order view → Attachment** section: upload one PDF per order, toggle **Extra shipping
+  instructions**, download or remove the current file. Needs ACL
+  `CarpetAvenue_Orderify::order_attachment` (full-access admins have it; restricted roles must be
+  granted it).
+- **`GET /V1/orders/:orderId/attachment`** (ACL `Magento_Sales::sales_operation`) returns the PDF
+  as a **raw `application/pdf` body** — not JSON — and only when the flag is on.
+- `IXPF_Syncer`'s Order Update API (`app/code/IXPF/Syncer/docs/OrderUpdate.md`) writes the same
+  columns/directory from a Google bucket and reuses `AttachmentManager`'s constants.
+
+### Storage
+
+| Item | Value |
+|------|-------|
+| File | `var/persistent/order_attachments/<order_entity_id>/<name>.pdf` |
+| `sales_order.ca_attachment_file` | varchar(255), path relative to `var/` |
+| `sales_order.ca_attachment_check_extra` | boolean, "Extra shipping instructions" |
+
+### Rules
+
+- PDF only: `.pdf` extension **and** `%PDF-` magic bytes, max 10 MB.
+- Uploading a same-named file stores it as `<name>_1.pdf`; the previous file is deleted only after
+  the new path is saved, so a rejected upload never touches the current attachment.
+- Only the two columns are written (`saveAttribute`), not a full order save — no order observers fire.
+- Remove clears the column and deletes the file. A column pointing at a missing file shows a warning
+  in the admin and returns 404 from REST.
+
+### REST responses
+
+| Case | HTTP | Body |
+|------|------|------|
+| Flag on, file present | 200 | PDF bytes, `Content-Disposition: attachment; filename="<name>.pdf"` |
+| Flag off / null | 400 | `Extra shipping instructions should not be included for this order.` |
+| No file / file missing on disk | 404 | `Order has no attachment file.` |
+| Unknown order | 404 | Magento "entity doesn't exist" |
+| Token lacks `Magento_Sales::sales_operation` | 401 | Magento ACL error |
+
+The webapi layer only serialises JSON/XML, so `Model/Attachment/AttachmentGet` streams the file and
+terminates the request. On 2.4.9 the old module's approach (`FileFactory::create()` + output
+buffering) returned a response object instead of the file — the endpoint was broken before the merge.
+
+### Files
+
+| Path | Role |
+|------|------|
+| `Api/AttachmentGetInterface.php` + `etc/webapi.xml` | REST contract |
+| `Model/Attachment/AttachmentManager.php` | Upload, validate, store, detach, delete — the only writer in this module |
+| `Model/Attachment/AttachmentGet.php` | REST implementation (raw PDF stream) |
+| `Block/Adminhtml/Order/View/Attachment.php` + `view/adminhtml/templates/order/view/attachment.phtml` | Order-view section (added in `sales_order_view.xml`) |
+| `Controller/Adminhtml/Attachment/{Save,Download,Remove}.php` | Admin actions (`AbstractAttachment` holds ACL + order loading) |

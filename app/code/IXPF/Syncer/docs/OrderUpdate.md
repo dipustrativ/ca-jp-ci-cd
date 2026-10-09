@@ -52,7 +52,7 @@ The **Order Update API** allows the IXPF external system to update Magento order
 - **Order status** — including cancellation with automatic stock restoration
 - **Billing address** — overwrites fields on the order's billing address
 - **Shipping address** — overwrites fields on the order's shipping address and optionally syncs the linked customer address
-- **Extra shipping instructions** — the admin "Extra shipping instructions" toggle (`CarpetAvenue_OrderAttachment`)
+- **Extra shipping instructions** — the admin "Extra shipping instructions" toggle (`CarpetAvenue_Orderify`)
 - **Attachment** — the admin "Attach new file" PDF, downloaded from the Google bucket
 
 The endpoint is synchronous: the response confirms which fields were updated.

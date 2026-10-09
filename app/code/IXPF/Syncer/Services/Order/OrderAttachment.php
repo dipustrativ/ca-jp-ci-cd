@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace IXPF\Syncer\Services\Order;
 
+use CarpetAvenue\Orderify\Model\Attachment\AttachmentManager;
 use IXPF\Syncer\Helper\Helpers as ProductHelper;
 use IXPF\Syncer\Helper\Logger\OrderActionLogger;
 use IXPF\Syncer\Services\PhotoStudio\ProcessGoogleBucketImages;
@@ -15,7 +16,7 @@ use RuntimeException;
 use Throwable;
 
 /**
- * Order attachment (CarpetAvenue_OrderAttachment) handling for the Order Update API.
+ * Order attachment (CarpetAvenue_Orderify AttachmentManager) handling for the Order Update API.
  *
  * Files are stored exactly where the admin "Attach new file" form stores them, so the admin
  * download link and GET /V1/orders/:orderId/attachment keep working unchanged:
@@ -30,12 +31,12 @@ use Throwable;
  */
 class OrderAttachment
 {
-    public const COLUMN_FILE  = 'ca_attachment_file';
-    public const COLUMN_EXTRA = 'ca_attachment_check_extra';
+    public const COLUMN_FILE  = AttachmentManager::COLUMN_FILE;
+    public const COLUMN_EXTRA = AttachmentManager::COLUMN_EXTRA;
 
-    public const STORAGE_ROOT = 'persistent/order_attachments';
+    public const STORAGE_ROOT = AttachmentManager::STORAGE_ROOT;
     public const TMP_ROOT     = 'tmp/ixpf_order_attachments';
-    public const MAX_SIZE     = 10 * 1024 * 1024;
+    public const MAX_SIZE     = AttachmentManager::MAX_SIZE;
 
     private ?WriteInterface $varDirectory = null;
 

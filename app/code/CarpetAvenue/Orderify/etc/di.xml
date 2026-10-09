@@ -4,6 +4,7 @@
 
     <!-- <preference for="Magento\Sales\Block\Adminhtml\Order\View" type="CarpetAvenue\Orderify\Block\Adminhtml\Order\View"/>-->
     <preference for="CarpetAvenue\Orderify\Api\BlacklistInterface" type="CarpetAvenue\Orderify\Model\Blocklist"/>
+    <preference for="CarpetAvenue\Orderify\Api\AttachmentGetInterface" type="CarpetAvenue\Orderify\Model\Attachment\AttachmentGet"/>
 
     <type name="Magento\Sales\Block\Adminhtml\Order\View\Info">
         <plugin name="show_state_message_plugin" type="CarpetAvenue\Orderify\Plugins\Adminhtml\View\ShippingStateMessagePlugin"/>
@@ -68,6 +69,12 @@
     </virtualType>
 
     <type name="CarpetAvenue\Orderify\Observer\Order\CancelInventoryReindex">
+        <arguments>
+            <argument name="logger" xsi:type="object">CarpetAvenue\Orderify\Logger\OrderifyLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="CarpetAvenue\Orderify\Model\Attachment\AttachmentManager">
         <arguments>
             <argument name="logger" xsi:type="object">CarpetAvenue\Orderify\Logger\OrderifyLogger</argument>
         </arguments>

@@ -1,0 +1,88 @@
+<?php
+/**
+ * Admin order view — "Attachment" section (PDF + extra shipping instructions flag).
+ *
+ * @var \CarpetAvenue\Orderify\Block\Adminhtml\Order\View\Attachment $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$orderId = $block->getOrderId();
+$fileName = $block->getFileName();
+?>
+<style>
+    .order-attachment input::file-selector-button {
+        padding: 10px;
+        background: #e3e3e3;
+        border: 1px solid #adadad;
+        color: #514943;
+        border-radius: 0;
+    }
+</style>
+<section class="admin__page-section order-attachment">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $escaper->escapeHtml(__('Attachment')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item order-attachment-new">
+            <div class="admin__page-section-item-title">
+                <span class="title"><?= $escaper->escapeHtml(__('Attach new file')) ?></span>
+            </div>
+            <div class="admin__page-section-item-content">
+                <form id="ca_attachment_form" method="post" enctype="multipart/form-data"
+                      action="<?= $escaper->escapeUrl($block->getSaveUrl()) ?>" style="margin-bottom: 5px;">
+                    <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
+                    <input type="hidden" name="order_id" value="<?= (int)$orderId ?>"/>
+                    <input type="file" name="file_attachment" id="file_attachment" accept=".pdf,application/pdf"/>
+                    <p class="note">
+                        <?= $escaper->escapeHtml(__('PDF only, max %1 MB. Replaces the current attachment.', $block->getMaxSizeMb())) ?>
+                    </p>
+
+                    <div class="admin__actions-switch" data-role="switcher" style="padding-right: 5%;">
+                        <span><?= $escaper->escapeHtml(__('Extra shipping instructions')) ?></span>
+                        <input type="hidden" name="extra_shipping_instructions" value="0"/>
+                        <input type="checkbox" class="admin__actions-switch-checkbox" id="attachment_extra_check"
+                               name="extra_shipping_instructions" value="1"
+                               <?= $block->hasExtraInstructions() ? 'checked' : '' ?>/>
+                        <label class="admin__actions-switch-label" for="attachment_extra_check">
+                            <span class="admin__actions-switch-text"
+                                  data-text-on="<?= $escaper->escapeHtmlAttr(__('Yes')) ?>"
+                                  data-text-off="<?= $escaper->escapeHtmlAttr(__('No')) ?>"></span>
+                        </label>
+                    </div>
+
+                    <button type="submit" id="attachment-submit" class="action-default scalable action-save">
+                        <span><?= $escaper->escapeHtml(__('Save')) ?></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="admin__page-section-item order-attachment-view">
+            <?php if ($fileName): ?>
+                <div class="admin__page-section-item-title">
+                    <span class="title"><?= $escaper->escapeHtml(__('Order attachment')) ?></span>
+                    <div class="actions">
+                        <form method="post" action="<?= $escaper->escapeUrl($block->getRemoveUrl()) ?>"
+                              style="display: inline;"
+                              onsubmit="return confirm('<?= $escaper->escapeJs(__('Remove this attachment? The file will be deleted.')) ?>');">
+                            <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
+                            <input type="hidden" name="order_id" value="<?= (int)$orderId ?>"/>
+                            <button type="submit" class="action-link"><?= $escaper->escapeHtml(__('Remove')) ?></button>
+                        </form>
+                    </div>
+                </div>
+                <div class="admin__page-section-item-content" id="order-attachment-file">
+                    <?php if ($block->isFileMissing()): ?>
+                        <div class="message message-warning">
+                            <?= $escaper->escapeHtml(__('File "%1" is referenced by this order but missing on disk.', $fileName)) ?>
+                        </div>
+                    <?php else: ?>
+                        <?= $escaper->escapeHtml(__('Download')) ?>:
+                        <a href="<?= $escaper->escapeUrl($block->getDownloadUrl()) ?>" target="_blank">
+                            <?= $escaper->escapeHtml($fileName) ?>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>

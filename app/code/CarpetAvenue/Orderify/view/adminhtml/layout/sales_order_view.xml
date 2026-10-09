@@ -3,6 +3,7 @@
         <referenceBlock name="order_info" template="CarpetAvenue_Orderify::order/view/info.phtml"/>
         <referenceContainer name="order_additional_info">
             <block ifconfig="orderify/fake_customer_statistic/enable" class="CarpetAvenue\Orderify\Block\Adminhtml\Order\RefundStatisticsSection" name="orderify_refund_statistic_section" template="CarpetAvenue_Orderify::order/view/fake_customer_statistics.phtml"/>
+            <block class="CarpetAvenue\Orderify\Block\Adminhtml\Order\View\Attachment" name="ca_order_attachment" template="CarpetAvenue_Orderify::order/view/attachment.phtml" after="-"/>
         </referenceContainer>
     </body>
 </page>

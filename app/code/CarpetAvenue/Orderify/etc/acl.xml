@@ -9,6 +9,7 @@
                     <resource id="CarpetAvenue_Orderify::add_blacklist" title="Add Black List" sortOrder="20"/>
                     <resource id="CarpetAvenue_Orderify::remove_blacklist" title="Remove Black List" sortOrder="30"/>
                     <resource id="CarpetAvenue_Orderify::payment_icons" title="Payment Icons" sortOrder="40"/>
+                    <resource id="CarpetAvenue_Orderify::order_attachment" title="Order Attachment" sortOrder="50"/>
                 </resource>
             </resource>
         </resources>
