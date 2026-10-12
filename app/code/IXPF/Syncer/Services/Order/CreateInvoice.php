@@ -65,6 +65,8 @@ class CreateInvoice
                     }
                 }
                 if ($orderItemId && isset($item['qty'])) {
+                    // Child items (e.g. configurable simple) take qty from parent — set qty on parent
+                    $orderItemId = $this->resolveParentItemId($order, $orderItemId);
                     $qtys[$orderItemId] = (float) $item['qty'];
                 }
             }
@@ -117,13 +119,31 @@ class CreateInvoice
 
     /**
      * Build SKU → order_item_id map from order items.
+     *
+     * Parent items win over children: a configurable parent and its simple child
+     * share the same SKU, and invoice qty must be set on the parent.
      */
     private function buildSkuMap(Order $order): array
     {
         $map = [];
         foreach ($order->getAllItems() as $item) {
+            if ($item->getParentItemId() && isset($map[$item->getSku()])) {
+                continue;
+            }
             $map[$item->getSku()] = (int) $item->getItemId();
         }
         return $map;
+    }
+
+    /**
+     * Return parent item id for child items, otherwise the id itself.
+     */
+    private function resolveParentItemId(Order $order, int $orderItemId): int
+    {
+        $orderItem = $order->getItemById($orderItemId);
+        if ($orderItem && $orderItem->getParentItemId()) {
+            return (int) $orderItem->getParentItemId();
+        }
+        return $orderItemId;
     }
 }
