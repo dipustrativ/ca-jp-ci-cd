@@ -30,6 +30,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
  *
  * Only changes the order record (customer_firstname, customer_lastname,
  * customer_email) — the customer account itself is untouched.
+ * When email changes, all related order addresses (order address collection — billing/shipping) get the new email too.
  * Adds a status history note listing the changed fields.
  */
 class UpdateCustomer extends AbstractController implements HttpPostActionInterface, CsrfAwareActionInterface
@@ -102,6 +103,10 @@ class UpdateCustomer extends AbstractController implements HttpPostActionInterfa
                 }
                 $changes[] = "email: '{$order->getCustomerEmail()}' → '$email'";
                 $order->setCustomerEmail($email);
+
+                foreach ($order->getAddressesCollection() as $address) {
+                    $address->setEmail($email)->save();
+                }
             }
 
             $order->addCommentToStatusHistory(
