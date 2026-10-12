@@ -13,6 +13,7 @@ class Helpers extends AbstractHelper
 {
     const XML_PATH_IXPFNG_PRODUCT_UPDATE_CONFIG_ENABLE = "ixpfng_product/product_update_config/enable";
     const XML_PATH_IXPFNG_PRODUCT_UPDATE_ALLOW_ATTRIBUTES = "ixpfng_product/product_update_config/allow_attributes";
+    const XML_PATH_IXPFNG_PRODUCT_UPDATE_ALLOW_STOCK_SOURCE = "ixpfng_product/product_update_config/allow_stock_source";
     const XML_PATH_IXPFNG_PRODUCT_BULK_UPDATE_CONFIG_ENABLE = "ixpfng_product/product_bulk_update_config/enable";
     const XML_PATH_IXPFNG_PRODUCT_BULK_UPDATE_ALLOW_ATTRIBUTES = "ixpfng_product/product_bulk_update_config/allow_attributes";
     const XML_PATH_IXPFNG_PRODUCT_GOOGLE_BUCKET_ENABLE = "ixpfng_product/google_bucket_config/enable";
@@ -43,6 +44,11 @@ class Helpers extends AbstractHelper
     public function getEnableProductUpdateConfig(): bool
     {
         return $this->scopeConfig->getValue(self::XML_PATH_IXPFNG_PRODUCT_UPDATE_CONFIG_ENABLE) == 1;
+    }
+
+    public function getProductUpdateAllowStockSource(): bool
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_IXPFNG_PRODUCT_UPDATE_ALLOW_STOCK_SOURCE) == 1;
     }
 
     public function getEnableProductBulkUpdateConfig(): bool

@@ -17,9 +17,12 @@ use Magento\Framework\Controller\Result\JsonFactory;
  * Product Attribute Mass Update.
  *
  * POST /ixpfsyncer/V1/Products/AttributeMassUpdate[?store=<id>]
- * Body: { "products": [ { "product_id": 124, "attributes": { "price": 110 } } ] }
+ * Body: { "products": [ { "product_id": 124, "attributes": { "price": 110 },
+ *         "sources": [ { "source_code": "default", "quantity": 1, "status": 1 } ],
+ *         "stock": { "manage_stock": 1 } } ] }
  *
  * Each attribute validated against ixpfng_product/product_update_config/allow_attributes.
+ * "sources" / "stock" require ixpfng_product/product_update_config/allow_stock_source.
  */
 class AttributeMassUpdate extends AbstractController implements HttpPostActionInterface, CsrfAwareActionInterface
 {

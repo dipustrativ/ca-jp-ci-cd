@@ -13,6 +13,12 @@
                 <root_category_id>1</root_category_id>
             </purchase>
         </ixpfng_purchase>
+        <!-- AttributeMassUpdate writes no stock/source data until this is turned on. -->
+        <ixpfng_product>
+            <product_update_config>
+                <allow_stock_source>0</allow_stock_source>
+            </product_update_config>
+        </ixpfng_product>
         <!-- Both switches default off: nothing is sent to IXPF and no source item is
              written until each side is turned on deliberately. -->
         <ixpfng_reservation>
