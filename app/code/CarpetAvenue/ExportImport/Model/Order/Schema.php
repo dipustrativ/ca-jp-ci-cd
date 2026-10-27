@@ -442,11 +442,15 @@ class Schema
         'item_discount_percent',
     ];
 
-    /** Columns that MUST be present (as header) and non-empty (per row) to import. */
+    /**
+     * Columns that MUST be present (as header) and non-empty (per row) to import.
+     *
+     * Not `order_status` / `order_state`: either may be empty and is then derived
+     * from the other — see Model/Order/StatusResolver.
+     */
     public const REQUIRED_COLUMNS = [
         'increment_id',
         'store_code',
-        'order_status',
         'customer_email',
         'item_sku',
         'item_qty_ordered',

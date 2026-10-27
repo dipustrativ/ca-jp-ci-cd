@@ -42,6 +42,10 @@ use Magento\Store\Model\StoreManagerInterface;
  */
 class Importer
 {
+    /** What a new order gets when the CSV leaves both status and state empty. */
+    public const DEFAULT_STATE = Order::STATE_NEW;
+    public const DEFAULT_STATUS = 'pending';
+
     /** @var array<string, int|null> sku => product id (per-run cache) */
     private array $productIdCache = [];
 
@@ -57,12 +61,17 @@ class Importer
         private readonly StoreManagerInterface $storeManager,
         private readonly ProductRepositoryInterface $productRepository,
         private readonly StateGuard $stateGuard,
+        private readonly StatusResolver $statusResolver,
         private readonly Logger $logger,
     ) {
     }
 
     /**
      * @param array{header: string[], rows: array<int, array{line: int, data: array<string, string>}>} $parsed
+     * @param ValidationResult|null $validation the result of validating this same $parsed, when the
+     *     caller already has it — skips a second full validation pass
+     * @param callable(int $done, int $total, string $incrementId): void|null $onProgress called after
+     *     each order is written (or fails)
      * @return array{
      *     success: bool,
      *     validation: ValidationResult,
@@ -72,10 +81,13 @@ class Importer
      *     failed: array<string, string>
      * }
      */
-    public function import(array $parsed): array
-    {
+    public function import(
+        array $parsed,
+        ?ValidationResult $validation = null,
+        ?callable $onProgress = null
+    ): array {
         $this->productIdCache = [];
-        $validation = $this->validator->validate($parsed);
+        $validation ??= $this->validator->validate($parsed);
 
         if (!$validation->isValid()) {
             $this->logger->warning('Import aborted — validation failed with ' . $validation->getSummary()['errors'] . ' error(s).');
@@ -101,6 +113,8 @@ class Importer
         $updated = [];
         $relinked = [];
         $failed = [];
+        $total = count($grouped);
+        $done = 0;
 
         foreach ($grouped as $incrementId => $itemRows) {
             $mode = $plan[(string)$incrementId]['mode'] ?? 'create';
@@ -123,6 +137,10 @@ class Importer
                     $mode,
                     ErrorMessage::describe($e)
                 ));
+            }
+
+            if ($onProgress !== null) {
+                $onProgress(++$done, $total, (string)$incrementId);
             }
         }
 
@@ -164,13 +182,17 @@ class Importer
             throw new NoSuchEntityException(__('Order %1 disappeared before update.', $incrementId));
         }
 
-        $status = $data['order_status'] ?? '';
-        $state = $data['order_state'] ?? '';
+        // An empty side is derived from the other; with both empty the order
+        // keeps what it has.
+        ['status' => $status, 'state' => $state] = $this->statusResolver->resolve(
+            (string)($data['order_status'] ?? ''),
+            (string)($data['order_state'] ?? '')
+        );
 
-        if ($state !== '') {
+        if ($state !== null) {
             $order->setState($state);
         }
-        if ($status !== '') {
+        if ($status !== null) {
             $order->setStatus($status);
             $order->addCommentToStatusHistory(
                 (string)__('Status set to "%1" via ExportImport CSV import.', $status),
@@ -305,9 +327,16 @@ class Importer
             $order->setCreatedAt($head['created_at']);
         }
 
-        // State / status.
-        $order->setState(($head['order_state'] ?? '') ?: Order::STATE_NEW);
-        $order->setStatus(($head['order_status'] ?? '') ?: 'pending');
+        // State / status. An empty side is derived from the other; with both
+        // empty the order starts as new/pending.
+        ['status' => $status, 'state' => $state] = $this->statusResolver->resolve(
+            (string)($head['order_status'] ?? ''),
+            (string)($head['order_state'] ?? '')
+        );
+        $state ??= self::DEFAULT_STATE;
+        $status ??= self::DEFAULT_STATUS;
+        $order->setState($state);
+        $order->setStatus($status);
 
         // Items. Keep a sku => item map so child lines can be linked to their parent.
         $itemsBySku = [];
@@ -334,8 +363,8 @@ class Importer
         // adds, so replaying the history leaves the order on whichever status the
         // last history row carried. Re-assert the CSV's status/state afterwards —
         // otherwise a closed order imports as state=closed, status=pending.
-        $order->setState(($head['order_state'] ?? '') ?: Order::STATE_NEW);
-        $order->setStatus(($head['order_status'] ?? '') ?: 'pending');
+        $order->setState($state);
+        $order->setStatus($status);
 
         // Addresses.
         $billing = $this->buildAddress($head, 'billing');

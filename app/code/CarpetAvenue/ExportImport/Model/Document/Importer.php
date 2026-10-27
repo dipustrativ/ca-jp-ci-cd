@@ -84,6 +84,10 @@ class Importer
 
     /**
      * @param array{header: string[], rows: array<int, array{line: int, data: array<string, string>}>} $parsed
+     * @param ValidationResult|null $validation the result of validating this same $parsed, when the
+     *     caller already has it — skips a second full validation pass
+     * @param callable(int $done, int $total, string $incrementId): void|null $onProgress called after
+     *     each document is written (or fails)
      * @return array{
      *     success: bool,
      *     validation: ValidationResult,
@@ -95,10 +99,14 @@ class Importer
      *     skipped: array<string, string[]>
      * }
      */
-    public function import(array $parsed, bool $skipInvalid = false): array
-    {
+    public function import(
+        array $parsed,
+        bool $skipInvalid = false,
+        ?ValidationResult $validation = null,
+        ?callable $onProgress = null
+    ): array {
         $this->productIdCache = [];
-        $validation = $this->validator->validate($parsed);
+        $validation ??= $this->validator->validate($parsed);
 
         // Skip mode: drop every document that has a row-level error and import
         // the rest. A file-level error (missing header column, no data rows) is
@@ -137,6 +145,8 @@ class Importer
         $failed = [];
         // Orders whose documents changed, so their aggregates need recomputing.
         $touchedOrders = [];
+        $total = count($grouped);
+        $done = 0;
 
         foreach ($grouped as $incrementId => $itemRows) {
             $mode = $plan[(string)$incrementId]['mode'] ?? 'create';
@@ -164,6 +174,10 @@ class Importer
                     $mode,
                     ErrorMessage::describe($e)
                 ));
+            }
+
+            if ($onProgress !== null) {
+                $onProgress(++$done, $total, (string)$incrementId);
             }
         }
 

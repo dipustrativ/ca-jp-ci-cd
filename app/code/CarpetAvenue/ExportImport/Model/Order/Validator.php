@@ -44,6 +44,7 @@ class Validator
         private readonly ValidationResultFactory $resultFactory,
         private readonly StoreManagerInterface $storeManager,
         private readonly OrderStatus $orderStatus,
+        private readonly StatusResolver $statusResolver,
         private readonly ProductRepositoryInterface $productRepository,
         private readonly OrderCollectionFactory $orderCollectionFactory,
         private readonly ScopeConfigInterface $scopeConfig,
@@ -80,6 +81,7 @@ class Validator
         $validStatuses = $this->orderStatus->getValidStatusCodes();
         $existing = $this->existingIncrementIds($rows);
         $numericColumns = array_intersect($this->schema->getNumericColumns(), $header);
+        $statusChecked = [];
 
         foreach ($rows as $row) {
             $line = $row['line'];
@@ -103,11 +105,18 @@ class Validator
                 $result->addError($line, 'store_code', (string)__('Unknown store code "%1".', $storeCode));
             }
 
+            // Status and state are both optional: an empty one is derived from
+            // the other (see StatusResolver), and a row with neither still
+            // imports. Only a status this instance does not know is an error —
+            // the order would carry a code no admin screen can label.
             $status = $data['order_status'] ?? '';
-            if ($status === '') {
-                $result->addError($line, 'order_status', (string)__('order_status is required.'));
-            } elseif (!isset($validStatuses[$status])) {
+            if ($status !== '' && !isset($validStatuses[$status])) {
                 $result->addError($line, 'order_status', (string)__('Unknown order status "%1".', $status));
+            } elseif (!isset($statusChecked[$incrementId])) {
+                // The importer reads status/state from an order's first row only,
+                // so warn once per order, not once per item row.
+                $statusChecked[$incrementId] = true;
+                $this->warnOnDerivedStatus($result, $line, $status, (string)($data['order_state'] ?? ''), $mode);
             }
 
             // A CSV whose base currency differs from the store's is imported verbatim,
@@ -231,6 +240,61 @@ class Validator
         ));
 
         return $result;
+    }
+
+    /**
+     * Tell the user what an empty order_status / order_state turns into, since
+     * the CSV no longer says it.
+     */
+    private function warnOnDerivedStatus(
+        ValidationResult $result,
+        int $line,
+        string $status,
+        string $state,
+        string $mode
+    ): void {
+        if ($status !== '' && $state !== '') {
+            return;
+        }
+
+        $resolved = $this->statusResolver->resolve($status, $state);
+
+        if ($status === '' && $state === '') {
+            $message = $mode === 'create'
+                ? __(
+                    'order_status and order_state are empty — the order is created as state "%1", status "%2".',
+                    Importer::DEFAULT_STATE,
+                    Importer::DEFAULT_STATUS
+                )
+                : __('order_status and order_state are empty — the order keeps its current status and state.');
+            $result->addWarning($line, 'order_status', (string)$message);
+            return;
+        }
+
+        if ($status === '') {
+            $message = $resolved['status'] !== null
+                ? __('order_status is empty — set to "%1", the default status of state "%2".', $resolved['status'], $state)
+                : __(
+                    'order_status is empty and state "%1" has no default status — %2.',
+                    $state,
+                    $mode === 'create'
+                        ? __('status "%1" is used', Importer::DEFAULT_STATUS)
+                        : __('the current status is kept')
+                );
+            $result->addWarning($line, 'order_status', (string)$message);
+            return;
+        }
+
+        $message = $resolved['state'] !== null
+            ? __('order_state is empty — set to "%1", the state status "%2" belongs to.', $resolved['state'], $status)
+            : __(
+                'order_state is empty and status "%1" is not assigned to any state — %2.',
+                $status,
+                $mode === 'create'
+                    ? __('state "%1" is used', Importer::DEFAULT_STATE)
+                    : __('the current state is kept')
+            );
+        $result->addWarning($line, 'order_state', (string)$message);
     }
 
     /**

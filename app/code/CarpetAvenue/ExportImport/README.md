@@ -44,7 +44,8 @@ row whose parent is missing, so the order is enforced, not just recommended.
 - **Import** — a two-step, manual-check flow mirroring product import:
   1. **Validate** — upload the CSV; it is parsed and checked (header completeness,
      required fields, store-code/status validity, email format, numeric types,
-     product existence). Errors block the import; warnings (e.g. unknown SKU) do not.
+     product existence). `order_status` / `order_state` may be empty — see
+     [Empty status or state](#empty-order_status-or-order_state). Errors block the import; warnings (e.g. unknown SKU) do not.
      Nothing is written.
   2. **Run Import** — only offered when validation passed. Upserts by `increment_id`:
      existing → **update** (status/state + audit comment, plus a
@@ -117,6 +118,13 @@ all-or-nothing, and so are the order and customer imports.
 `--state` is the numeric column, not a label: invoice `1` pending / `2` paid /
 `3` canceled, credit memo `1` open / `2` refunded / `3` canceled. It is **ignored
 for shipments** — `sales_shipment` has no state column.
+
+**Order and document import commands report progress.** Each phase prints a
+timestamped line (reading, validating, importing), and the write phase draws a
+progress bar: done/total, elapsed, estimated, memory, and the increment id last
+written. Piped to a file the bar prints at most one line every 0.5–2 s. The
+command validates once and hands that result to the importer, so a large file
+is no longer validated twice before the first write.
 
 On `exportimport:transactions:export`, `--type` is the transaction type
 (`order`, `authorization`, `capture`, `void`, `refund`, `payment`), not a
@@ -439,6 +447,35 @@ admin comment, a Syncer update). To prevent that, import its paid invoices, whic
 Verified 2026-09-25 (local): a `complete` order with full `qty_shipped` and no
 `total_paid` imports as `complete/complete` on create and on re-import. The same
 order saved outside the import becomes `closed/closed`.
+
+### Empty `order_status` or `order_state`
+
+Neither column is required. An empty one is filled from the other by
+`Model/Order/StatusResolver`, using this instance's status/state assignments
+(`sales_order_status_state`):
+
+| CSV status | CSV state | Written |
+|---|---|---|
+| `processing` | `processing` | as given |
+| empty | `complete` | the state's default status → `complete/complete` |
+| `fraud` | empty | the state the status is assigned to, preferring one it is the default of → `payment_review/fraud` |
+| empty | empty | create: `new/pending`; update: the order keeps its current status and state |
+
+Each derived value is reported as a validation **warning**, once per order, so
+the outcome is visible before anything is written. A status this instance does
+not know is still an **error**.
+
+Before this, an empty `order_status` failed validation and blocked the whole
+file, and a status with an empty state created the order as state `new`
+whatever the status was.
+
+Verified 2026-10-27 (local), all four rows above plus `payment_review/payment_review`
+from state only; re-importing the same orders with both columns emptied left
+every status and state unchanged.
+
+Invoice, credit-memo and shipment `state` / `creditmemo_status` /
+`shipment_status` were already optional: empty imports as NULL on create and
+leaves the value alone on update.
 
 ## Invoices, credit memos and shipments
 
@@ -1097,7 +1134,10 @@ address **update** does not exist: a matched address is left exactly as it is,
 - `Model/Order/StateGuard.php` + `Plugin/PreserveImportedOrderState.php` — keep
   Magento's `Handler\State` from rewriting an imported order's state/status on save.
 - `Controller/Adminhtml/Export/{Index,Download}.php`, `Import/{Index,Validate,Submit}.php`.
+- `Model/Order/StatusResolver.php` — fills an empty `order_status` / `order_state`
+  from the other.
 - `Console/Command/{ExportOrdersCommand,ImportOrdersCommand}.php`.
+- `Console/ImportProgress.php` — step lines and progress bar for the import commands.
 
 Invoices, credit memos and shipments:
 

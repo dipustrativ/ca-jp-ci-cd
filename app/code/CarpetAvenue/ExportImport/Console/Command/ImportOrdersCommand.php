@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace CarpetAvenue\ExportImport\Console\Command;
 
+use CarpetAvenue\ExportImport\Console\ImportProgress;
 use CarpetAvenue\ExportImport\Model\Config;
 use CarpetAvenue\ExportImport\Model\Order\CsvReader;
 use CarpetAvenue\ExportImport\Model\Order\Importer;
@@ -75,6 +76,8 @@ class ImportOrdersCommand extends Command
             return Cli::RETURN_FAILURE;
         }
 
+        $progress = new ImportProgress($output);
+        $progress->step(sprintf('Reading %s ...', $file));
         try {
             $parsed = $this->csvReader->read($file);
         } catch (\Throwable $e) {
@@ -83,6 +86,10 @@ class ImportOrdersCommand extends Command
         }
 
         // Always validate first — the manual check.
+        $progress->step(sprintf(
+            'Validating %d row(s) (store codes, statuses, SKUs against the catalog) ...',
+            count($parsed['rows'])
+        ));
         $validation = $this->validator->validate($parsed);
         $summary = $validation->getSummary();
         $output->writeln(sprintf(
@@ -107,7 +114,11 @@ class ImportOrdersCommand extends Command
             return Cli::RETURN_SUCCESS;
         }
 
-        $result = $this->importer->import($parsed);
+        $progress->step(sprintf('Importing %d order(s) ...', $summary['orders']));
+        // Hand over the validation already done — the importer would otherwise
+        // run the whole check again before writing anything.
+        $result = $this->importer->import($parsed, $validation, $progress->callback('orders'));
+        $progress->finish('Import finished.');
         $output->writeln(sprintf(
             '<info>Import: %d created, %d updated, %d failed.</info>',
             count($result['created']),
