@@ -138,15 +138,6 @@ class PriceStep extends AbstractStep
     }
 
     /**
-     * Gets the rate to convert current chosen currency to base currency
-     * @return float
-     */
-    private function getBaseCurrencyConversionRate(): float
-    {
-        return round(1 / $this->priceCurrency->convert(1), 10);
-    }
-
-    /**
      * gets the level data for the current currency
      * return[0] is middle levels lower bound
      * return[1] is middle levels upper bound
@@ -165,16 +156,12 @@ class PriceStep extends AbstractStep
         return $currency->getCode();
     }
 
+    /**
+     * ?price= carries STORE currency — Productify's Price filter converts it to
+     * base itself, so converting here too divided the bound by the rate twice.
+     */
     private function getFilterUrl(?int $lower, ?int $upper): string
     {
-        if ($lower !== null) {
-            $lower *= $this->getBaseCurrencyConversionRate();
-        }
-
-        if ($upper !== null) {
-            $upper *= $this->getBaseCurrencyConversionRate();
-        }
-
         $filter = ($lower ?? "") . "-" . ($upper ?? "");
 
         if ($this->isInCmsContext()) {

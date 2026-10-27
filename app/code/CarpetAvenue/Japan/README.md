@@ -35,7 +35,7 @@ A home/CMS carpet finder ported from the base store's `Evalent_CarpetFinder`
 that deep-link into the **all-carpets** root category:
 
 - **Price step** — pretty price buckets per currency (JPY `[50000, 130000]`),
-  links `?price=<from>-<to>` (values in base currency).
+  links `?price=<from>-<to>` (values in store currency — the Productify price filter converts to base).
 - **Size step** — common room sizes, links `?width2=<cm>&height2=<cm>` range
   filters. Depends on the `width2` / `height2` decimal attributes being
   populated (ERP-sourced) and read by the Productify layered nav.

@@ -123,7 +123,9 @@ class Price extends \Magento\CatalogSearch\Model\Layer\Filter\Price implements S
 
         $this->getLayer()->getState()->addFilter(
             $this->_createItem(
-                $this->_renderRangeLabel($from === '' ? 0 : $from, $to),
+                // Core's label renderer multiplies by the currency rate itself,
+                // so it takes the base figures, not the store-currency ones.
+                $this->_renderRangeLabel($baseFrom === '' ? 0 : $baseFrom, $baseTo),
                 [$from, $to]
             )
         );
