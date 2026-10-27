@@ -54,6 +54,10 @@ services:
   app:
     image: registry.carpetavenue.net/carpetavenue-jp:${IMAGE_TAG:-local}
     restart: unless-stopped
+    # Same uid as php-fpm workers, so a bare `docker exec` (bin/magento,
+    # catalog:images:resize) runs as www-data and can never leave root-owned
+    # dirs in pub/media or var. Entrypoint skips its root-only steps.
+    user: www-data
     mem_limit: 4g
     depends_on:
       upgrade: { condition: service_completed_successfully }

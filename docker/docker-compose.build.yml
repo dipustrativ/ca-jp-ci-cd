@@ -79,6 +79,10 @@ services:
         - composer_auth
         - env_php_scd
     restart: unless-stopped
+    # Same uid as php-fpm workers, so a bare `docker exec` (bin/magento,
+    # catalog:images:resize) runs as www-data and can never leave root-owned
+    # dirs in pub/media or var. Entrypoint skips its root-only steps.
+    user: www-data
     depends_on:
       upgrade: { condition: service_completed_successfully }
       queue:   { condition: service_healthy }

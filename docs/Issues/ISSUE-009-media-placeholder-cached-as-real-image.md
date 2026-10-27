@@ -95,7 +95,10 @@ therefore indistinguishable, to any cache, from a successful one.
    locally — delete a cache file, request it, and it comes back 63605 B and is
    rewritten to disk.
 3. When that resize fails instead — original missing, fpm `memory_limit` blown
-   on a large PNG, worker timeout — the `catch` hands back the placeholder, 200.
+   on a large PNG, worker timeout, or a `cache/<hash>/a/b/` dir left root-owned
+   by a root `docker exec ... catalog:images:resize` (fixed: `app` now runs as
+   www-data and the root entrypoint re-chowns, see `docker/INFRA-CI.md`) — the
+   `catch` hands back the placeholder, 200.
 4. The CDN stores it. Cloudflare's cache key includes the **hostname**, so the
    entry poisons only the store view that happened to make that request, for the
    full Browser Cache TTL (31 days here). The other hostnames requested the same

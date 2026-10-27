@@ -446,8 +446,23 @@ docker exec <app-container> sh -c "cd /var/www/html && php bin/magento cache:flu
 docker exec -it <app-container> sh     # interactive shell
 ```
 
+`app` runs as `www-data` (compose `user:`), so a bare `docker exec` is already
+www-data — the same uid as php-fpm. Keep it that way. A root exec (`-u root`)
+that runs `bin/magento` leaves root-owned dirs in `pub/media` / `var`; a root
+`catalog:images:resize` makes `pub/media/catalog/product/cache/...` unwritable
+for php-fpm, and on-demand resizes then serve the placeholder. Use `-u root`
+only for OS-level work (`apt`, `chown`), never for `bin/magento`. `cron` still
+starts as root and its entrypoint re-chowns any root-owned entry in
+`pub/media` and `var` to www-data, so a restart of `cron` (or a redeploy)
+repairs a slip:
+
+```bash
+docker restart <cron-container>
+```
+
 `cron` and `static` run the same image if you need to inspect those — same
-`docker ps --filter "name=cron"` pattern.
+`docker ps --filter "name=cron"` pattern. A bare exec into those is **root**:
+run `bin/magento` in `app`, or pass `-u www-data`.
 
 ## Upload files into `magento_media`
 

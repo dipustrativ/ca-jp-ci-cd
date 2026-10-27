@@ -27,8 +27,23 @@ cp /var/www/html/docker/env.php.template /var/www/html/app/etc/env.php
 # defaults (DB_HOST -> "db" -> "getaddrinfo for db failed", empty
 # MAGE_CRYPT_KEY, etc). /etc/cron.d/magento-cron sources this file first.
 # Written on every start so it always matches the current environment.
-export -p > /etc/magento-env.sh
-chown root:www-data /etc/magento-env.sh
-chmod 0640 /etc/magento-env.sh
+#
+# Root-only: the `app` service runs as www-data (compose `user:`), so it skips
+# this. `cron` and `upgrade` still start as root and do it.
+if [ "$(id -u)" = "0" ]; then
+  export -p > /etc/magento-env.sh
+  chown root:www-data /etc/magento-env.sh
+  chmod 0640 /etc/magento-env.sh
+
+  # Self-heal anything a root `docker exec` left root-owned in the shared
+  # volumes. A root `catalog:images:resize` creates
+  # pub/media/catalog/product/cache/<hash>/a/b/ as root:root 0755; php-fpm
+  # (www-data) then can't write the on-demand resize into it and the storefront
+  # serves the placeholder (docs/Issues/ISSUE-009). Only touches wrong-owner
+  # entries, so a clean volume costs one stat walk.
+  for d in /var/www/html/pub/media /var/www/html/var; do
+    [ -d "$d" ] && find "$d" ! -user www-data -exec chown -h www-data:www-data {} +
+  done
+fi
 
 exec "$@"
