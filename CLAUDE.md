@@ -194,9 +194,9 @@ Vendors and their roles:
   (order mgmt, refund fraud detection, customer blacklist), `Proforma` (proforma
   invoices), `Trackify`, `Developify`, `Widget`, `Utilities`, `ThemeContent`,
   `B2B`, `VAT`.
-  Three modules have absorbed others; each documents the merge in its own README:
+  Four modules have absorbed others; each documents the merge in its own README:
   `Productify` (`EnhanceCategory`, `LayeredNavigation`, `ProductStatus`,
-  `Lof_AjaxScroll`), `Utilities` (`MagestyApps_WebImages`) and `Developify`
+  `Lof_AjaxScroll`), `Orderify` (`OrderAttachment`), `Utilities` (`MagestyApps_WebImages`) and `Developify`
   (`EW_ConfigScopeHints` — absorbed by `Utilities` first, then moved).
   **Filesystem/module name is `CarpetAvenue` (capital A)** — some
   older notes/composer names use `carpetavenue`/`carpet-avenue`; match the

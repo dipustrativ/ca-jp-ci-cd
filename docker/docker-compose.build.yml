@@ -4,11 +4,10 @@
 # repo and runs `docker compose build`; `app` builds the image once, the other
 # Magento services reuse it. Traefik still fronts nginx (Domain tab, port 80).
 #
-# ⚠️ Two build secrets are gitignored and are NOT in Dokploy's clone. You must
-#    place them into the build context on the Dokploy host before deploying:
+# ⚠️ The build secret is gitignored and is NOT in Dokploy's clone. You must
+#    place it into the build context on the Dokploy host before deploying:
 #      <clone>/auth.json            (Composer keys)
-#      <clone>/docker/env.php.scd   (env.php used only during static-content deploy)
-#    Add them via Dokploy → Advanced → Files, or scp them onto the host clone.
+#    Add it via Dokploy → Advanced → Files, or scp it onto the host clone.
 #    This friction is exactly why the registry-pull path is the default.
 #
 # Dokploy setup: same Environment + Domains + sysctl as docker-compose.dokploy.yml.
@@ -77,7 +76,6 @@ services:
       dockerfile: docker/Dockerfile
       secrets:
         - composer_auth
-        - env_php_scd
     restart: unless-stopped
     # Same uid as php-fpm workers, so a bare `docker exec` (bin/magento,
     # catalog:images:resize) runs as www-data and can never leave root-owned
@@ -177,8 +175,6 @@ services:
 secrets:
   composer_auth:
     file: ../auth.json
-  env_php_scd:
-    file: ./env.php.scd
 
 volumes:
   magento_media:

@@ -41,10 +41,11 @@ VKPASS=<VALKEY_PASSWORD from Dokploy env>
 | **CI:** `permission denied … docker.sock` | Runner user not in the `docker` group → `sudo usermod -aG docker $USER`, restart the service |
 | **CI:** `unauthorized` on push | `REGISTRY_USER`/`REGISTRY_PASS` wrong → verify with `docker login` on Server A |
 | **CI:** `composer install` auth failure | `COMPOSER_AUTH` truncated → re-paste all of `auth.json` |
-| **CI:** SCD step dies with no DB | `ENV_PHP_SCD` truncated → re-paste all of `docker/env.php.scd` |
+| **SCD step:** `The default website isn't defined` | `docker/scd-scopes.php` missing/stale, or `env.php` still has `db`/`install` during SCD → regenerate per README §8.1 |
 | **CI:** build OOMs, Dokploy panel dies with it | ~4 GB peak on a shared Server A → add RAM or move the runner |
 | **CI:** green workflow, site unchanged | `IMAGE_TAG`/`NGINX_TAG` pinned to an old `v<N>` → set both back to `latest`. If already `latest`, the webhook is not firing — POST it by hand |
-| **CI:** two pushes, only one build ran | `concurrency: cancel-in-progress` — by design. Re-run manually if you needed both |
+| **CI:** pushed to `main`, nothing ran | By design — only a pushed `v*` git tag triggers it: `git tag v<N> && git push origin v<N>` |
+| **CI:** tag pushed, build waits | Earlier tag still building — `concurrency` queues, never cancels. Or no runner (see first row) |
 | **Registry disk full** | GC is never scheduled — Dokploy does not touch registry storage, and every build orphans the previous `latest`/`buildcache` manifests at ~1.2 GB a time → [INFRA-CI Step 4](INFRA-CI.md#step-4--cleanup-jobs) |
 
 ---

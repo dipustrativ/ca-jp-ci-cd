@@ -5,7 +5,6 @@
 #   2. Build & push image:
 #        docker buildx build \
 #          --secret id=composer_auth,src=auth.json \
-#          --secret id=env_php_scd,src=docker/env.php.scd \
 #          -f docker/Dockerfile \
 #          -t registry.carpetavenue.net/carpetavenue-jp:local \
 #          --push .

@@ -45,6 +45,7 @@ Imperative, copy-pasteable, no theory. Each opens with **Use when**.
 | [multistore.md](architecture/multistore.md) | Path-based store views via `web/url/use_store`, the rules that are easy to get wrong, layouts that were tried and rejected, nginx file layout |
 | [multistore-setup.php](architecture/multistore-setup.php) | Idempotent script that applies the whole multistore config. Dry-run by default |
 | [theme-manual.html](architecture/theme-manual.html) | Theme manual for content editors |
+| [redesign-old-vs-new.html](architecture/redesign-old-vs-new.html) | Homepage redesign: why build on this platform (2.4.9 / PHP 8.5) before carpetavenue (2.4.6 / PHP 8.2) — findings, options, per-section effort. `.docx` copy alongside for Google Docs |
 | [../CLAUDE.md](../CLAUDE.md) | Module ecosystem, vendors, DI gotchas, local commands |
 | [../docker/README.md](../docker/README.md) | Deploy guide: one image five roles, which build platform applies to your machine (§1.1), the three deploy paths, rollback, and where the image bytes go (§7) |
 | [../docker/INFRA-CI.md](../docker/INFRA-CI.md) | Shared MySQL/OpenSearch/RabbitMQ · self-hosted runner → registry → Dokploy webhook · server ops · open items |

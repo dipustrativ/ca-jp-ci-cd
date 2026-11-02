@@ -15,7 +15,9 @@
 #
 # Dispatches on its own basename, so the symlink is the whole magerun install.
 # -u www-data: the image has no USER, so a bare exec runs as root and leaves
-# root-owned files in var/ that php-fpm then can't write. The app tree is
+# root-owned files in var/ that php-fpm then can't write. The compose `app`
+# service now sets `user: www-data` too; this stays so the wrapper is correct
+# whichever container CARPETAVENUE_JP_CONTAINER points at. The app tree is
 # www-data:www-data (Dockerfile COPY --chown), so www-data can do everything
 # including setup:upgrade.
 # Container name comes from `container_name:` in docker-compose.dokploy.yml.

@@ -1,32 +1,36 @@
 name: build-deploy
 
-# Push to main -> build the Magento image on our build server (self-hosted runner)
-# -> push to the registry -> tell Dokploy (hosting server) to repull + restart.
-# Tags pushed (same image, both):
-#   latest      what Dokploy pulls by default
-#   v<run>      frozen version, never moves -> rollback target
+# Push a release tag -> build the Magento image on our build server (self-hosted
+# runner) -> push to the registry -> tell Dokploy (hosting server) to repull +
+# restart. Nothing else triggers it: branch pushes, merges and PRs do not run.
+#
+#   git tag v164 && git push origin v164                     (production)
+#   git tag 1.0.1_stage_1 && git push origin 1.0.1_stage_1   (stage)
+#
+# Image tags pushed:
+#   latest      what Dokploy pulls by default — v* tags only, never stage
+#   <tag>       the git tag name, frozen, never moves -> rollback target
 # Setup: docker/INFRA-CI.md, Part 2 (CI/CD).
-
-# ⚠️ NO self-hosted runner is registered for indexon/carpetavenue-jp yet, so the
-# push trigger is OFF — with it on, every push to main would queue a job forever
-# waiting for a `carpetavenue-jp-build` runner that does not exist. Builds are
-# manual for now (docker/README.md §1). To turn CI on: deploy
-# docker/github-runner.compose.yml on Server A, add the repo secrets
-# (docker/INFRA-CI.md), then restore the `push:` block below.
+#
+# ⚠️ A `carpetavenue-jp-build` self-hosted runner must be registered for
+# indexon/carpetavenue-jp first — without one, a pushed tag queues a job that
+# waits forever. Deploy docker/github-runner.compose.yml on Server A and add the
+# repo secrets (docker/INFRA-CI.md) before pushing the first tag.
 on:
-  # push:
-  #   branches: [main]
-  workflow_dispatch:
+  push:
+    tags: ['v*', '*_stage_*']
 
+# A tag is a release: never cancel one half-built in favour of the next.
 concurrency:
   group: build-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: [self-hosted, carpetavenue-jp-build]
     env:
       IMAGE: registry.carpetavenue.net/carpetavenue-jp
+      VERSION: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -37,22 +41,19 @@ jobs:
           password: ${{ secrets.REGISTRY_PASS }}
 
       # Repo root IS src/, so build context = "." and Dockerfile = docker/Dockerfile.
+      # Static-content deploy needs no DB and no secret (docker/scd-scopes.php).
       - name: Build & push
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/Dockerfile
           push: true
+          # Stage tags must not move `latest` — production Dokploy pulls it.
           tags: |
-            ${{ env.IMAGE }}:latest
-            ${{ env.IMAGE }}:v${{ github.run_number }}
+            ${{ env.IMAGE }}:${{ env.VERSION }}
+            ${{ startsWith(env.VERSION, 'v') && format('{0}:latest', env.IMAGE) || '' }}
           secrets: |
             composer_auth=${{ secrets.COMPOSER_AUTH }}
-            env_php_scd=${{ secrets.ENV_PHP_SCD }}
           cache-from: type=registry,ref=${{ env.IMAGE }}:buildcache
           cache-to: type=registry,ref=${{ env.IMAGE }}:buildcache,mode=max
 
-      - name: Trigger Dokploy deploy
-        run: |
-          curl -fsSL -X POST "${{ secrets.DOKPLOY_WEBHOOK }}"
-          echo "Deployed: latest = v${{ github.run_number }}"

@@ -101,8 +101,16 @@ ARG STATIC_LOCALES="en_US ja_JP"
 # without it the admin panel loads with no CSS/JS. Magento/blank still deploys
 # as carpetavenue/rugs' parent; SCD keeps ancestors of deployed packages.
 #
-# SCD needs real DB creds — swap in SCD env.php, deploy static, restore build env.php.
-# Single RUN: BuildKit snapshots final state only — real creds never persist in a layer.
+# SCD runs with NO database and no build secret. Magento's InitialConfigSource
+# reads websites, stores and themes from app/etc/config.php when env.php has
+# neither 'db' nor 'install'. So inside this one RUN:
+#   1. merge docker/scd-scopes.php (scopes + themes) into config.php,
+#   2. swap in env.php.build minus db/resource/install,
+#   3. deploy, then restore the original config.php and env.php.build.
+# The runtime config.php never carries scopes — if it did, app:config:import /
+# setup:upgrade would sync stores from the file into the prod DB. Locales and
+# themes are pinned here, so SCD needs nothing else a DB would supply.
+# Adding a website / store view / theme = regenerate docker/scd-scopes.php.
 # ${STATIC_LOCALES} is intentionally unquoted so it word-splits into separate args.
 #
 # The trailing `test`s: if minify is off here but on at runtime, SCD writes
@@ -112,11 +120,13 @@ ARG STATIC_LOCALES="en_US ja_JP"
 # The four paths also assert the locale × area matrix STATIC_LOCALES asks for:
 # admin and storefront, each in en_US and ja_JP. Drop the matching pair if a
 # locale is ever removed from STATIC_LOCALES.
-RUN --mount=type=secret,id=env_php_scd \
-    cp /run/secrets/env_php_scd app/etc/env.php && \
+RUN cp app/etc/config.php /tmp/config.php.orig && \
+    php -r '$c = include "app/etc/config.php"; $s = include "docker/scd-scopes.php"; file_put_contents("app/etc/config.php", "<?php\nreturn " . var_export(array_replace($c, $s), true) . ";\n");' && \
+    php -r '$e = include "docker/env.php.build"; unset($e["db"], $e["resource"], $e["install"]); file_put_contents("app/etc/env.php", "<?php\nreturn " . var_export($e, true) . ";\n");' && \
     php -d memory_limit=4G bin/magento setup:static-content:deploy -f \
         --theme carpetavenue/rugs --theme Magento/backend \
         ${STATIC_LOCALES} --jobs="$(nproc)" && \
+    cp /tmp/config.php.orig app/etc/config.php && rm /tmp/config.php.orig && \
     cp docker/env.php.build app/etc/env.php && \
     test -f pub/static/adminhtml/Magento/backend/en_US/requirejs/require.min.js && \
     test -f pub/static/adminhtml/Magento/backend/en_US/css/styles.min.css && \

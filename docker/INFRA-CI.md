@@ -101,32 +101,34 @@ docker exec rabbitmq rabbitmqctl list_permissions -p /ca_jp
 
 # PART 2 — CI/CD
 
-> **⚠️ CI IS OFF for this repo.** No runner is registered for
-> `indexon/carpetavenue-jp` (Server A's runner is repo-scoped to
-> `indexon/carpient`), so the `push:` trigger in
-> `.github/workflows/build-deploy.yml` is commented out — with it on, every push
-> would queue forever. **Builds are manual** ([README §1](README.md#1-build-the-images-server-a-or-your-laptop)).
+> **⚠️ CI IS OFF for this repo until a runner exists.** No runner is
+> registered for `indexon/carpetavenue-jp` (Server A's runner is repo-scoped to
+> `indexon/carpient`). The workflow triggers **only on a pushed `v*` git tag** —
+> push one before the runner exists and the job queues forever. **Builds are
+> manual** until then ([README §1](README.md#1-build-the-images-server-a-or-your-laptop)).
 > This part is the procedure for turning it on.
 
-**Merge to `main` → both images build on Server A → push to the registry →
-Dokploy redeploys Server B.** No laptop, no manual step, no billed Actions
-minutes — GitHub only *schedules* the job; self-hosted runners cost zero minutes.
+**Push a `v<N>` git tag → the Magento image builds on Server A → push to the
+registry → Dokploy redeploys Server B.** Branch pushes, merges and PRs never
+trigger it. No laptop, no billed Actions minutes — GitHub only *schedules* the
+job; self-hosted runners cost zero minutes.
 
 ```
-git push main
+git tag v164 && git push origin v164
    ↓  GitHub schedules the job (no GitHub compute used)
 Self-hosted runner on SERVER A
-   ├── docker/Dockerfile        → carpetavenue-jp:latest       + :v<N>
-   └── docker/Dockerfile.nginx  → carpetavenue-jp-nginx:latest + :v<N>
-   ↓  push both to registry.carpetavenue.net  (Server A → its own registry)
+   └── docker/Dockerfile        → carpetavenue-jp:latest + :v164
+   ↓  push to registry.carpetavenue.net  (Server A → its own registry)
    ↓  POST the Dokploy webhook
 SERVER B pulls :latest and restarts the stack
 ```
 
-**Tag scheme.** `v<N>` is `github.run_number` — monotonic, never reused, never
-moved. Both images share the same `N` because both are built every run, so
-`carpetavenue-jp:v41` always pairs with `carpetavenue-jp-nginx:v41`. Re-running
-a workflow produces a **new** `N`; tags stay immutable.
+**Tag scheme.** The image tag **is** the git tag name (`github.ref_name`), so
+`git tag v164` → `carpetavenue-jp:v164`, and the tag points at the exact commit
+built. Manual builds and CI share one sequence: pick the next number above the
+highest in the registry (`curl … /tags/list`). Never re-push or move a git tag —
+image tags must stay immutable (rollback depends on it); cut the next number
+instead. A failed build is retried with GitHub → Actions → *Re-run jobs*.
 
 > This supersedes the "independent `v<N>` sequences" note in
 > [README §1.6](README.md#16-tags-cache-and-size-all-paths) — that applies to
@@ -203,16 +205,15 @@ repository secret**. Add all five:
 | `REGISTRY_USER` | registry username (same as `docker login`) |
 | `REGISTRY_PASS` | registry password |
 | `COMPOSER_AUTH` | the **entire contents** of `auth.json` |
-| `ENV_PHP_SCD` | the **entire contents** of `docker/env.php.scd` |
 | `DOKPLOY_WEBHOOK` | the URL above |
 
-The two file secrets are gitignored, so this is the only way they reach the
-build. Paste them whole — GitHub handles multi-line natively, no quoting, no
-base64. `pbcopy < auth.json`, `pbcopy < docker/env.php.scd`. They become
-BuildKit secrets (`--secret id=composer_auth` / `id=env_php_scd`), consumed at
-`docker/Dockerfile:49` and `:94`, and never land in a layer.
+`auth.json` is gitignored, so this is the only way it reaches the build. Paste
+it whole — GitHub handles multi-line natively, no quoting, no base64.
+`pbcopy < auth.json`. It becomes a BuildKit secret (`--secret id=composer_auth`)
+consumed by `composer install` in `docker/Dockerfile`, and never lands in a
+layer. Static-content deploy needs no secret (README §8.1).
 
-✅ Exactly five secrets listed. Values are write-only — re-paste if unsure.
+✅ Exactly four secrets listed. Values are write-only — re-paste if unsure.
 
 ## Step 3 — First run
 
@@ -221,11 +222,11 @@ BuildKit secrets (`--secret id=composer_auth` / `id=env_php_scd`), consumed at
 pinned tag — your new build never goes live. Pinning is for rollback only
 ([README §5](README.md#5-rollback-fast)).
 
-**Trigger manually first:** GitHub → **Actions → build-deploy → Run workflow**.
-Do not start with a push to `main`.
+**First trigger:** push a tag from a commit you already built manually and
+trust — `git tag v<N> && git push origin v<N>`.
 
 Expect **10–20 minutes**. Step order: checkout → buildx setup → registry login →
-Magento image → nginx image → webhook → summary.
+Magento image → webhook.
 
 ✅ **The push** — the job summary lists both images and both tags:
 
@@ -241,8 +242,9 @@ admin panel renders with CSS too (that is what proves `--theme Magento/backend`
 deployed). Server B's pull does not appear in the GitHub log, so a green
 workflow and a briefly unchanged site is normal.
 
-**Go live:** merge to `main`. From here, merge = deploy. Branch flow stays
-`develop → staging → main`; CI triggers on `main` only. Rollback stays manual.
+**Go live:** from here, tag = deploy. Branch flow stays
+`develop → staging → main`; cut the `v<N>` tag on `main` after the merge.
+Rollback stays manual.
 
 ## Step 4 — Cleanup jobs
 
@@ -291,13 +293,12 @@ tagged, so they are never collected. That is what makes rollback safe.
 
 | Part | Why |
 |---|---|
-| `on: push: branches: [main]` | merge = deploy |
-| `on: workflow_dispatch` | manual "Run workflow" button |
-| `concurrency: cancel-in-progress` | two pushes in a row → only the newer build runs; no registry race |
+| `on: push: tags: ['v*', '*_stage_*']` | tag = deploy (`v164` prod, `1.0.1_stage_1` stage). Nothing else triggers it — no branch push, merge, PR or manual button |
+| `concurrency: cancel-in-progress: false` | two tags in a row → queued one after the other; a release is never cancelled half-built |
 | `runs-on: [self-hosted, carpetavenue-jp-build]` | pins to your runner. Zero GitHub minutes |
-| `VERSION: v${{ github.run_number }}` | the immutable tag, shared by both images |
+| `VERSION: ${{ github.ref_name }}` | the git tag name (`v164`) = the immutable image tag |
 | `context: .` | repo root **is** the Magento root (`src/`), filtered by `.dockerignore` |
-| `secrets:` on the Magento build | `auth.json` + `env.php.scd` as BuildKit secrets, never in a layer |
+| `secrets:` on the Magento build | `auth.json` as a BuildKit secret, never in a layer |
 | `cache-from`/`cache-to … :buildcache` | layer cache in the registry — a code-only change skips the `vendor` rebuild |
 | nginx step has no `secrets:` | `Dockerfile.nginx` needs none |
 | `Trigger Dokploy deploy` | POSTs the webhook; Server B pulls |
@@ -378,7 +379,6 @@ cd /opt/carpetavenue-jp-build && git pull       # clone it there first if absent
 
 docker buildx build --progress=plain \
   --secret id=composer_auth,src=auth.json \
-  --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile \
   -t registry.carpetavenue.net/carpetavenue-jp:latest \
   -t registry.carpetavenue.net/carpetavenue-jp:v<N> \
@@ -390,19 +390,18 @@ docker buildx build -f docker/Dockerfile.nginx \
   --push .
 ```
 
-Pick `<N>` **above** the current `github.run_number` so CI does not later
-collide with it. Check both:
+Pick `<N>` **above** the highest tag in the registry, and push the same git
+tag only if you want CI to build it — CI and manual builds share the sequence. Check both:
 
 ```bash
 curl -su '<user>:<pass>' https://registry.carpetavenue.net/v2/carpetavenue-jp/tags/list
 ```
 
-The two secret files are gitignored, so `scp` them up once:
+`auth.json` is gitignored, so `scp` it up once:
 
 ```bash
-scp auth.json          <server-a>:/opt/carpetavenue-jp-build/auth.json
-scp docker/env.php.scd <server-a>:/opt/carpetavenue-jp-build/docker/env.php.scd
-ssh <server-a> 'chmod 600 /opt/carpetavenue-jp-build/auth.json /opt/carpetavenue-jp-build/docker/env.php.scd'
+scp auth.json <server-a>:/opt/carpetavenue-jp-build/auth.json
+ssh <server-a> 'chmod 600 /opt/carpetavenue-jp-build/auth.json'
 ```
 
 Run under `tmux`/`nohup` — 10–20 minutes, and an SSH drop kills it. The build

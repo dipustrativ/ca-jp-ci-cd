@@ -12,11 +12,12 @@ build; everything needed is here.
 ## 1. Preflight (run once per build, one command)
 
 ```bash
-ls -la auth.json docker/env.php.scd && docker version --format '{{.Server.Version}}'
+ls -la auth.json && docker version --format '{{.Server.Version}}'
 ```
 
-Both secret files must exist. They are gitignored **and** in `.dockerignore`;
-BuildKit reads them from the host path, so they never land in a layer.
+`auth.json` must exist. It is gitignored **and** in `.dockerignore`; BuildKit
+reads it from the host path, so it never lands in a layer. Static-content
+deploy needs no DB and no `env.php.scd` (docker/README.md §8.1).
 Missing → stop and tell the user; they cannot be regenerated from the repo.
 
 ## 2. Pick the tag
@@ -41,7 +42,6 @@ Not logged in → `docker login registry.carpetavenue.net`.
 ```bash
 docker buildx build --platform linux/amd64 \
   --secret id=composer_auth,src=auth.json \
-  --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile \
   -t registry.carpetavenue.net/carpetavenue-jp:latest \
   -t registry.carpetavenue.net/carpetavenue-jp:v<N> \
@@ -94,7 +94,6 @@ their own `v<M>` sequence.
 ```bash
 # --load, not --push: local tag stays on this machine, no registry, no login.
 docker buildx build --secret id=composer_auth,src=auth.json \
-  --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile -t registry.carpetavenue.net/carpetavenue-jp:local --load .
 
 # ⚠️ stop the dev stack first — it holds host :80 and :3306
@@ -112,7 +111,7 @@ Site: `http://carpetavenue-jp.devs` / `http://localhost` (plain HTTP, no TLS loc
 ## 6. Deploy after push
 
 Not part of the build. Dokploy (Path B) pulls `latest` on redeploy; CI does this
-via webhook on merge to `main`. Rollback = set `IMAGE_TAG=v<previous>` in the
+via webhook when a `v<N>` git tag is pushed. Rollback = set `IMAGE_TAG=v<previous>` in the
 Dokploy environment → Redeploy. Only touch the server if the user asks.
 
 ## Gotchas

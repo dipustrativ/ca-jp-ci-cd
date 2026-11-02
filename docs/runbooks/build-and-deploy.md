@@ -17,7 +17,7 @@ Background on the image design: [../../docker/README.md](../../docker/README.md)
 ## 0. Preflight
 
 ```bash
-ls -la auth.json docker/env.php.scd     # both required, gitignored, never in a layer
+ls -la auth.json                        # required, gitignored, never in a layer
 git status --short                      # the WORKING TREE ships, not HEAD
 ```
 
@@ -43,7 +43,6 @@ Application image — 10–20 min, ~4 GB RAM, run it in the background:
 ```bash
 docker buildx build --platform linux/amd64 \
   --secret id=composer_auth,src=auth.json \
-  --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile \
   -t registry.carpetavenue.net/carpetavenue-jp:latest \
   -t registry.carpetavenue.net/carpetavenue-jp:v<N> \
@@ -152,11 +151,11 @@ was running.
   (`vendor/`, `pub/static/`, `dev/`, most of `var/`) before blaming the cache.
 - **A `499`/`504` mid-push** is a Traefik timeout on the laptop→registry hop, not
   a bad image. Retry.
-- **New locale?** `STATIC_LOCALES` is `""` = SCD auto-discovers every locale in
-  the **SCD database** (`docker/env.php.scd`), so what matters is that the new
-  store view exists *there* before the build — not in `docker/Dockerfile`. Only
-  edit `STATIC_LOCALES` if someone pinned an explicit list. Production never
-  builds static on demand: a missing locale is a broken storefront for that store
+- **New locale / store view / website?** SCD has no database: locales come
+  from `STATIC_LOCALES` in `docker/Dockerfile`, stores and themes from
+  `docker/scd-scopes.php` — update both before the build
+  ([docker/README.md §8.1](../../docker/README.md)). Production never builds
+  static on demand: a missing locale is a broken storefront for that store
   view, not a fallback to `en_US`. See [add-store-view.md](add-store-view.md).
 - **No secrets in the image.** `entrypoint.sh` renders `app/etc/env.php` at
   container start, so a config change is an env var plus a restart, never a

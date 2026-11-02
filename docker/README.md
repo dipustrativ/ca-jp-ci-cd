@@ -51,10 +51,12 @@ the command differs, the image does not:
 **No secrets in the image.** `entrypoint.sh` renders `app/etc/env.php` from
 `env.php.template` on every container start, reading all config through
 `getenv()`. Change a value = change the env var + restart, never a rebuild. The
-two build-time secrets (`auth.json`, `env.php.scd`) are passed as BuildKit
-secrets — which read from the *host path*, not the build context — and never
-land in a layer. Both are **also** in `.dockerignore`; that is what stops
-`COPY . .` copying them anyway. Do not remove those two lines.
+one build-time secret (`auth.json`) is passed as a BuildKit secret — which
+reads from the *host path*, not the build context — and never lands in a layer.
+It is **also** in `.dockerignore`; that is what stops `COPY . .` copying it
+anyway. Do not remove that line. (`docker/env.php.scd` stays listed there too,
+so a stray old copy can't leak.) Static-content deploy needs no DB and no
+secret — see `docker/scd-scopes.php` in §8.
 
 **What ships vs. what doesn't.** Code, `vendor` (prod only), compiled DI and
 `pub/static` are baked in. Secrets, DB and all hostnames are injected at
@@ -73,10 +75,9 @@ First-deploy and operator to-dos: [INFRA-CI Parts 3–4](INFRA-CI.md#part-3--ser
 
 ## 1. Build the images (Server A, or your laptop)
 
-Two secret files must be present in the repo root (both gitignored):
+One secret file must be present in the repo root (gitignored):
 
 - `auth.json` — Composer Marketplace keys
-- `docker/env.php.scd` — throwaway env.php used only during static-content deploy
 
 ### 1.1 First: which build applies to you?
 
@@ -107,7 +108,6 @@ docker login registry.carpetavenue.net
 # 1) The Magento image (app/upgrade/static/cron all use this one)
 docker buildx build \
   --secret id=composer_auth,src=auth.json \
-  --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile \
   -t registry.carpetavenue.net/carpetavenue-jp:latest \
   -t registry.carpetavenue.net/carpetavenue-jp:v1 \
@@ -133,7 +133,6 @@ docker login registry.carpetavenue.net
 
 docker buildx build --platform linux/amd64 \
   --secret id=composer_auth,src=auth.json \
-  --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile \
   -t registry.carpetavenue.net/carpetavenue-jp:latest \
   -t registry.carpetavenue.net/carpetavenue-jp:v1 \
@@ -241,7 +240,6 @@ the dev DB with a throwaway one — then stop it too and set `DB_HOST=db`.
 #     No --platform on purpose — native is correct for a laptop-only image (§1.4).
 docker buildx build \
   --secret id=composer_auth,src=auth.json \
-  --secret id=env_php_scd,src=docker/env.php.scd \
   -f docker/Dockerfile -t registry.carpetavenue.net/carpetavenue-jp:local --load .
 # (local uses a plain nginx with mounted config — no nginx image build needed)
 
@@ -328,9 +326,9 @@ HTTPS with working static assets.
 Same UI steps as B, but paste `docker/docker-compose.build.yml` and connect the
 Git source; Dokploy clones and runs `docker compose build`.
 
-⚠️ The two build secrets are gitignored, so they are **not** in the clone.
-Before deploying, place `auth.json` at the clone root and `docker/env.php.scd`
-into the build context on the Dokploy host — **Advanced → Files**, or `scp`.
+⚠️ `auth.json` is gitignored, so it is **not** in the clone. Before
+deploying, place it at the clone root on the Dokploy host — **Advanced →
+Files**, or `scp`.
 (This friction is exactly why Path B is recommended.)
 
 ### Co-hosting with `carpient` on one server
@@ -369,11 +367,11 @@ resolves those names — on that network Magento only resolves `mysql`,
 
 ## 4. Redeploy (new code)
 
-⚠️ **CI is currently OFF** for this repo — no runner is registered, so the
-`push:` trigger is commented out and **every** deploy is the manual path below
+⚠️ **CI is currently OFF** for this repo — no runner is registered, so a
+pushed `v*` tag would queue forever and **every** deploy is the manual path below
 ([INFRA-CI Part 2](INFRA-CI.md#part-2--cicd) turns it on).
 
-- **Paths B/C once CI is on:** merge to `main`. Done.
+- **Paths B/C once CI is on:** `git tag v<N> && git push origin v<N>`. Done.
 - **Path A, or anything today:** rebuild + push (§1) with a new `v<N>`, then
   either Dokploy → Environment → bump `IMAGE_TAG` → Redeploy, or on the host:
 
@@ -626,7 +624,8 @@ docker/
                              env to /etc/magento-env.sh for cron
   env.php.template           runtime config, all via getenv()
   env.php.build              build-time env.php (file cache, no network)
-  env.php.scd                SECRET: env.php for static-content deploy (gitignored)
+  scd-scopes.php             websites/stores/themes for the DB-less static-content
+                             deploy — regenerate on a new website/store view/theme
   docker-compose.local.yml   local dry-run (HTTP :80, optional localdb)
   docker-compose.yml         Path A — plain server (pull, publish :80)
   docker-compose.dokploy.yml Path B — Dokploy pull (recommended), shared infra
@@ -650,3 +649,30 @@ Named volumes: `magento_media`, `magento_var`, `magento_static`, `valkey_data`,
 carpient's same-named volumes are separate objects. `magento_static` is written
 by the `static` service and read-only in nginx; `magento_media` is read-write
 for app/cron, read-only in nginx.
+
+### 8.1 Static-content deploy runs without a database
+
+`setup:static-content:deploy` gets websites, stores and themes from
+`docker/scd-scopes.php`, merged into `app/etc/config.php` only inside the SCD
+`RUN` and restored straight after — the shipped `config.php` never carries
+scopes (otherwise `app:config:import` would sync stores into the prod DB).
+Magento only reads scopes from `config.php` when `env.php` has neither `db` nor
+`install`, so the `RUN` strips both from `env.php.build`. Locales come from
+`STATIC_LOCALES`, themes from `--theme`; there is nothing left a DB would supply.
+
+Adding a website, store view or theme → regenerate the file. `app:config:dump`
+rewrites `config.php`, so run it in a scratch copy, not the live tree:
+
+```bash
+docker exec ca-jp-phpfpm-1 sh -c '
+  rm -rf /tmp/scd && mkdir -p /tmp/scd && cd /tmp/scd &&
+  cp -a /var/www/html/app /var/www/html/bin /var/www/html/composer.json /var/www/html/composer.lock . &&
+  for d in vendor lib setup; do ln -s /var/www/html/$d $d; done &&
+  mkdir -p pub/static var generated &&
+  php bin/magento app:config:dump scopes themes >/dev/null &&
+  php -r "\$c = include \"app/etc/config.php\"; var_export([\"scopes\" => \$c[\"scopes\"], \"themes\" => \$c[\"themes\"]]);" ;
+  rm -rf /tmp/scd'
+```
+
+Paste the output into `docker/scd-scopes.php`. A new locale also needs
+`STATIC_LOCALES` in `docker/Dockerfile`.
