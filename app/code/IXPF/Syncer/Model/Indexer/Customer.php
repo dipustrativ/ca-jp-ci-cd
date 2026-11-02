@@ -34,7 +34,7 @@ class Customer implements ActionInterface, \Magento\Framework\Mview\ActionInterf
      */
     public function executeList(array $ids)
     {
-        $this->execute($ids);
+        $this->queue($ids, false);
     }
 
     /**
@@ -43,15 +43,23 @@ class Customer implements ActionInterface, \Magento\Framework\Mview\ActionInterf
      */
     public function executeRow($id)
     {
-        $this->execute([$id]);
+        $this->queue([$id], false);
     }
 
+    /**
+     * Mview (cron) entry point: a failed upsert throws so the ids are retried.
+     */
     public function execute($ids)
+    {
+        $this->queue($ids, true);
+    }
+
+    private function queue(array $ids, bool $throwOnFailure): void
     {
         $ids = array_unique($ids);
         if (count($ids)) {
             $customerIds = array_values(array_unique(array_map('intval', $ids)));
-            $this->webhookHelper->updateOrCreateJob("customer", $customerIds);
+            $this->webhookHelper->updateOrCreateJob("customer", $customerIds, $throwOnFailure);
         }
     }
 }

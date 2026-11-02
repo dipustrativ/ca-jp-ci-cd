@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace IXPF\Syncer\Plugin;
 
+use IXPF\Syncer\Helper\Logger\WebhookLogger;
+use IXPF\Syncer\Helper\Webhook;
+
 /**
- * Invoice comment save fires the invoice webhook.
+ * Invoice comment-save webhook binding. See {@see CommentWebhook}.
  */
-class InvoiceCommentWebhook extends AbstractCommentWebhook
+class InvoiceCommentWebhook extends CommentWebhook
 {
-    /**
-     * @inheritDoc
-     */
-    protected function getType(): string
+    public function __construct(Webhook $webhook, WebhookLogger $logger)
     {
-        return 'invoice';
+        parent::__construct($webhook, $logger, 'invoice');
     }
 }

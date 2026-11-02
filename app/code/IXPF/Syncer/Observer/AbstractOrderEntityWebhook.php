@@ -12,6 +12,9 @@ use Throwable;
 /**
  * Base observer: fire a webhook instantly on a sales entity save.
  *
+ * Bound to *_save_commit_after events, so the webhook leaves only once the
+ * transaction has committed and released its row locks.
+ *
  * Each entity carries its own type (order / invoice / shipment / creditmemo)
  * and its own id. The send is fire-and-forget, so the save request is never
  * blocked by the endpoint.

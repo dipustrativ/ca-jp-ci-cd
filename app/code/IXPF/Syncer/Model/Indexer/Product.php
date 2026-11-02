@@ -19,18 +19,13 @@ class Product implements ActionInterface, \Magento\Framework\Mview\ActionInterfa
         $this->webhookHelper = $webhook;
     }
 
+    /**
+     * Mview (cron) entry point: a failed upsert throws so the changelog
+     * version is not advanced and the ids are retried next run.
+     */
     public function execute($ids): void
     {
-        if (empty($ids)) {
-            return;
-        }
-
-        $ids = array_values(array_unique(array_filter((array)$ids)));
-
-        // Process in chunks to avoid memory issues with large backlogs
-        foreach (array_chunk($ids, self::CHUNK_SIZE) as $chunk) {
-            $this->webhookHelper->updateOrCreateJob('product', $chunk);
-        }
+        $this->queue((array)$ids, true);
     }
 
     /**
@@ -47,7 +42,7 @@ class Product implements ActionInterface, \Magento\Framework\Mview\ActionInterfa
      */
     public function executeList(array $ids): void
     {
-        $this->execute($ids);
+        $this->queue($ids, false);
     }
 
     /**
@@ -56,7 +51,21 @@ class Product implements ActionInterface, \Magento\Framework\Mview\ActionInterfa
      */
     public function executeRow($id): void
     {
-        $this->execute([$id]);
+        $this->queue([$id], false);
+    }
+
+    private function queue(array $ids, bool $throwOnFailure): void
+    {
+        if (empty($ids)) {
+            return;
+        }
+
+        $ids = array_values(array_unique(array_filter($ids)));
+
+        // Process in chunks to avoid memory issues with large backlogs
+        foreach (array_chunk($ids, self::CHUNK_SIZE) as $chunk) {
+            $this->webhookHelper->updateOrCreateJob('product', $chunk, $throwOnFailure);
+        }
     }
 
 

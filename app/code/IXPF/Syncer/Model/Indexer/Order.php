@@ -34,7 +34,7 @@ class Order implements ActionInterface, \Magento\Framework\Mview\ActionInterface
      */
     public function executeList(array $ids)
     {
-        $this->execute($ids);
+        $this->queue($ids, false);
     }
 
     /**
@@ -43,10 +43,18 @@ class Order implements ActionInterface, \Magento\Framework\Mview\ActionInterface
      */
     public function executeRow($id)
     {
-        $this->execute([$id]);
+        $this->queue([$id], false);
     }
 
+    /**
+     * Mview (cron) entry point: a failed upsert throws so the ids are retried.
+     */
     public function execute($ids)
+    {
+        $this->queue($ids, true);
+    }
+
+    private function queue(array $ids, bool $throwOnFailure): void
     {
         $ids = array_unique($ids);
         if (count($ids)) {
@@ -63,7 +71,7 @@ class Order implements ActionInterface, \Magento\Framework\Mview\ActionInterface
                 ->where('so.entity_id IN (?)', $ids);
             $productIds = $connection->fetchCol($select);
             $productIds = array_unique($productIds);
-            $this->webhookHelper->updateOrCreateJob("product_order", $productIds);
+            $this->webhookHelper->updateOrCreateJob("product_order", $productIds, $throwOnFailure);
 
             //Todo: upcoming realtime order processing will handle here
             //-- code...

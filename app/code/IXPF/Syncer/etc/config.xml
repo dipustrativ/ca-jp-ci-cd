@@ -36,10 +36,21 @@
                 <show_on_frontend>1</show_on_frontend>
                 <per_page>10</per_page>
                 <warn_threshold>2000</warn_threshold>
+                <!-- Without a stored value every entry would count as a bare rating. -->
+                <review_criteria>text,photo,sub_ratings</review_criteria>
+                <count_display>split</count_display>
+                <show_photo_filter>1</show_photo_filter>
+                <show_text_filter>0</show_text_filter>
+                <reply_name>Carpet Avenue Customer Service</reply_name>
             </general>
             <media>
                 <enabled>1</enabled>
             </media>
+            <!-- The invite form stays off until its host is configured. -->
+            <form>
+                <enabled>0</enabled>
+                <base_url/>
+            </form>
         </ixpf_reviews>
     </default>
 </config>

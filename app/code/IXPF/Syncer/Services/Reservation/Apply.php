@@ -137,7 +137,7 @@ class Apply
                 if ($autoAssigned) {
                     $reason = sprintf(
                         "SKU %s is not stocked at source '%s' and IXPF asked to remove %s from it."
-                            . ' The source was NOT assigned and no quantity was changed. %s',
+                        . ' The source was NOT assigned and no quantity was changed. %s',
                         $sku,
                         $source,
                         rtrim(rtrim(number_format(abs($qty), 4, '.', ''), '0'), '.'),
@@ -188,7 +188,7 @@ class Apply
                     if ($item['source_assigned']) {
                         $reason = sprintf(
                             'SKU %s was not stocked at source %s and adding it failed,'
-                                . ' so the source is still not assigned. %s',
+                            . ' so the source is still not assigned. %s',
                             $item['sku'],
                             $item['source'],
                             $reason
@@ -400,8 +400,8 @@ class Apply
     {
         return sprintf(
             'SKU %s was not stocked at source %s (no source item existed).'
-                . ' IXPF sent a stock update for %s, so Magento added %s to that source'
-                . ' and set its quantity to %s. Requested by IXPF, not entered by an admin.',
+            . ' IXPF sent a stock update for %s, so Magento added %s to that source'
+            . ' and set its quantity to %s. Requested by IXPF, not entered by an admin.',
             $sku,
             $source,
             $source,

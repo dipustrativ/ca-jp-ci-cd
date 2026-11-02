@@ -90,7 +90,13 @@ check('source_store_code stored raw (ch_de is not a country code)', $row['source
 check('source stored', $row['source'] === 'customer', (string)$row['source']);
 check('source stored per review, not as a constant',
     $conn->fetchOne("SELECT source FROM $tReview WHERE review_id='zztest18ec8892e02f1d9daf'") === 'staff');
-check('reply_author stored', $row['reply_author'] === 'Carpet Avenue Customer Service');
+$bought = json_decode((string)$row['bought_variant_texts'], true);
+check('bought_variant_texts json, 4 locales', is_array($bought) && count($bought) === 4,
+    (string)$row['bought_variant_texts']);
+check('bought line stored as sent', ($bought['sv_SE'] ?? '') === 'Köpt: Beige, 200 × 250 cm',
+    (string)($bought['sv_SE'] ?? ''));
+check('bought json keeps unicode unescaped', str_contains((string)$row['bought_variant_texts'], '× 250'),
+    (string)$row['bought_variant_texts']);
 check('thumbnail_path stored, local null', $row['thumbnail_path'] !== null && $row['thumbnail_local'] === null);
 check('payload_hash is md5', (bool)preg_match('/^[a-f0-9]{32}$/', (string)$row['payload_hash']));
 $firstEntityIds = $conn->fetchPairs("SELECT review_id, entity_id FROM $tReview WHERE review_group='" . TEST_GROUP . "'");
@@ -128,8 +134,8 @@ check(
     'updated review kept its entity_id too',
     $afterIds['zztest18ec8892e02f1d9daf'] === $firstEntityIds['zztest18ec8892e02f1d9daf']
 );
-check('updated review gained a reply author',
-    $conn->fetchOne("SELECT reply_author FROM $tReview WHERE review_id='zztest18ec8892e02f1d9daf'") === 'Carpet Avenue Customer Service');
+check('updated review gained a reply',
+    $conn->fetchOne("SELECT reply_created_at FROM $tReview WHERE review_id='zztest18ec8892e02f1d9daf'") === '2026-09-02 09:15:00');
 check('group aggregates updated', (int)$conn->fetchOne("SELECT review_count FROM $tGroup WHERE review_group='" . TEST_GROUP . "'") === 2);
 check('distribution updated', (int)$conn->fetchOne("SELECT dist_3 FROM $tGroup WHERE review_group='" . TEST_GROUP . "'") === 0);
 
@@ -256,14 +262,52 @@ check('a stray review title is ignored, not rejected', (function () use ($v1, $s
     return ($service->upsert($stray)['status'] ?? '') === 'stored';
 })());
 
+echo "\n--- payload shape before 2026-09-24 ---\n";
+// Old fields (variant_text, reply.author) are accepted and ignored.
+$legacy = $v1;
+$legacy['review_group'] = 'ZZLEGACYSHAPE';
+$legacy['generated_at'] = '2026-09-01T09:10:00Z';
+unset($legacy['reviews'][0]['bought']['variant_texts']);
+$legacy['reviews'][0]['bought']['variant_text'] = 'Bought a NMA15 200 x 250 cm';
+$legacy['reviews'][0]['reply']['author'] = 'Alexander Hamming elastycloud / Indexon';
+// A malformed map is filtered to null, not rejected.
+$legacy['reviews'][1]['bought']['variant_texts'] = ['sv_SE' => '', 'de_DE' => ['nested'], 0 => 'x'];
+$resLegacy = $service->upsert($legacy);
+check('old variant_text and reply.author are accepted', ($resLegacy['status'] ?? '') === 'stored',
+    json_encode($resLegacy));
+check('old variant_text is not stored as a bought line',
+    $conn->fetchOne("SELECT bought_variant_texts FROM $tReview WHERE review_id='zztest18ec8892e02f1d9cc9'") === null);
+check('an unusable variant_texts map stores null',
+    $conn->fetchOne("SELECT bought_variant_texts FROM $tReview WHERE review_id='zztest18ec8892e02f1d9daf'") === null);
+
 $redacted = (new ReflectionClass(\IXPF\Syncer\Controller\V1\Reviews\Upsert::class))
     ->getConstant('REDACTED_HEADERS');
 check('the integration token header is redacted before logging',
     is_array($redacted) && in_array('x-auth-token', $redacted, true), json_encode($redacted));
 
+// What actually reaches the log, through the controller's own header filter. Ixpf-Partner-Secret
+// was written to every production log in plain text before it was redacted.
+$om->get(\Magento\Framework\App\RequestInterface::class)->getHeaders()
+    ->addHeaderLine('Ixpf-Partner-Secret', 'zz-partner-secret')
+    ->addHeaderLine('X-Auth-Token', 'Bearer zz-token')
+    ->addHeaderLine('X-Future-Secret-Key', 'zz-future')
+    ->addHeaderLine('User-Agent', 'IXPF-NG/e2e');
+$logged = (new ReflectionMethod(\IXPF\Syncer\Controller\V1\Reviews\Upsert::class, 'safeHeaders'))
+    ->invoke($om->create(\IXPF\Syncer\Controller\V1\Reviews\Upsert::class));
+check('the partner secret header is redacted before logging',
+    ($logged['Ixpf-Partner-Secret'] ?? null) === '*** redacted ***', json_encode($logged['Ixpf-Partner-Secret'] ?? null));
+check('the integration token value never reaches the log',
+    ($logged['X-Auth-Token'] ?? null) === '*** redacted ***', json_encode($logged['X-Auth-Token'] ?? null));
+check('an unlisted header named like a secret is redacted too',
+    ($logged['X-Future-Secret-Key'] ?? null) === '*** redacted ***', json_encode($logged['X-Future-Secret-Key'] ?? null));
+check('ordinary headers stay readable in the log',
+    ($logged['User-Agent'] ?? null) === 'IXPF-NG/e2e', json_encode($logged['User-Agent'] ?? null));
+check('no secret value appears anywhere in the logged headers',
+    !str_contains((string)json_encode($logged), 'zz-partner-secret') && !str_contains((string)json_encode($logged), 'zz-token'));
+
 // cleanup
 $conn->delete($tGroup, ['review_group IN (?)' => [
-    TEST_GROUP, TEST_GROUP . '1', 'ZZTEST2', 'ZZNOWTC', 'ZZSTRAYTITLE',
+    TEST_GROUP, TEST_GROUP . '1', 'ZZTEST2', 'ZZNOWTC', 'ZZSTRAYTITLE', 'ZZLEGACYSHAPE',
 ]]);
 echo "\ncleaned up test rows\n";
 

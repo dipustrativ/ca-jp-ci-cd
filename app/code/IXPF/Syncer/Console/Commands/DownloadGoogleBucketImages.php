@@ -58,7 +58,7 @@ class DownloadGoogleBucketImages extends Command
             $output->writeln('<info>╚══════════════════════════════╝</info>');
 
             $this->state->setAreaCode('frontend');
-            $this->processGoogleBucketImages->process($concurrency, $output, $downloadLimit);
+            $succeeded = $this->processGoogleBucketImages->process($concurrency, $output, $downloadLimit);
             $totalTime = $this->processGoogleBucketImages->elapsed($scriptStart);
             $output->writeln('<info>╔══════════════════════════════╗</info>');
             $output->writeln('<info>║         Summary              ║</info>');
@@ -66,7 +66,7 @@ class DownloadGoogleBucketImages extends Command
             $output->writeln("<info>║</info> Total time:   <info>$totalTime</info>");
             $output->writeln('<info>╚══════════════════════════════╝</info>');
 
-            return Command::SUCCESS;
+            return $succeeded ? Command::SUCCESS : Command::FAILURE;
 
         } catch (\Exception $exception) {
             $this->logger->writeDaily('Error in GCS image download: ' . $exception->getMessage());

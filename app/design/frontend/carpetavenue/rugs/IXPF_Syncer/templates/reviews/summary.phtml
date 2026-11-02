@@ -1,0 +1,55 @@
+<?php
+/**
+ * "Summary & Chart Header": overall score, total review count, and the 1-5 distribution chart.
+ *
+ * The distribution always comes from the pool row, never from the filtered set, so the bars do
+ * not move when a filter is applied. That is a property of the read service, not this template.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \IXPF\Syncer\ViewModel\Reviews\Reviews $viewModel
+ */
+$viewModel = $block->getData('view_model');
+
+$summary       = $viewModel->getSummary();
+$count         = $summary->getCount();
+$average       = $summary->getAverage();
+$distribution  = $summary->getDistribution();
+?>
+<div class="ixpf-reviews-summary">
+    <div class="ixpf-reviews-summary__headline">
+        <span class="ixpf-reviews-summary__score"><?= $escaper->escapeHtml($viewModel->formatAverage($average)) ?></span>
+        <span class="ixpf-reviews-summary__outof"><?= $escaper->escapeHtml(__('of 5')) ?></span>
+        <?= /* @noEscape */ $viewModel->getStarsHtml(
+            $average,
+            'large',
+            (string)__('Average rating %1 out of 5', $viewModel->formatAverage($average))
+        ) ?>
+        <?php /* Split or combined per ixpf_reviews/general/count_display - see getSummaryCountLabel(). */ ?>
+        <span class="ixpf-reviews-summary__count">
+            <?= $escaper->escapeHtml($viewModel->getSummaryCountLabel($summary)) ?>
+        </span>
+    </div>
+
+    <ul class="ixpf-reviews-dist">
+        <?php /* 5 stars first, matching the reference, so index 4 down to 0. */ ?>
+        <?php for ($stars = 5; $stars >= 1; $stars--): ?>
+            <?php
+            $bucket  = (int)($distribution[$stars - 1] ?? 0);
+            $percent = $viewModel->getPercentage($bucket, $count);
+            ?>
+            <li class="ixpf-reviews-dist__row">
+                <span class="ixpf-reviews-dist__label">
+                    <?php /* The design distinguishes these: "1 star" vs "5 stars". */ ?>
+                    <?= $escaper->escapeHtml($stars === 1 ? __('%1 star', $stars) : __('%1 stars', $stars)) ?>
+                </span>
+                <span class="ixpf-reviews-dist__track">
+                    <?php /* Width comes from the data-percent rules in _extend.less - no inline style. */ ?>
+                    <span class="ixpf-reviews-dist__fill" data-percent="<?= (int)$percent ?>"></span>
+                </span>
+                <span class="ixpf-reviews-dist__percent"><?= (int)$percent ?>%</span>
+            </li>
+        <?php endfor; ?>
+    </ul>
+
+</div>
