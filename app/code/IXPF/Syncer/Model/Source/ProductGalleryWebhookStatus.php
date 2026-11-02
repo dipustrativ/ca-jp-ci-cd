@@ -21,7 +21,8 @@ class ProductGalleryWebhookStatus implements ArrayInterface
             ['value' => IxpfPhotoStudioQueue::STATUS_FAILED, 'label' => __('Failed')],
             ['value' => IxpfPhotoStudioQueue::STATUS_MAGENTO_FAILED, 'label' => __('Failed by Magento')],
             ['value' => IxpfPhotoStudioQueue::STATUS_READY_FOR_WEBHOOK, 'label' => __('Ready for Webhook')],
-            ['value' => IxpfPhotoStudioQueue::STATUS_WEBHOOK_FAILED, 'label' => __('Webhook Failed')]
+            ['value' => IxpfPhotoStudioQueue::STATUS_WEBHOOK_FAILED, 'label' => __('Webhook Failed')],
+            ['value' => IxpfPhotoStudioQueue::STATUS_SUPERSEDED, 'label' => __('Superseded')]
         ];
     }
 

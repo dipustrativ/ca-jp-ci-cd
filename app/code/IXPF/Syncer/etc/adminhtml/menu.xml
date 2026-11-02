@@ -18,7 +18,7 @@
              resource="IXPF_Syncer::webhook_list"/>
 
         <add id="IXPF_Syncer::product_gallery_webhook_list"
-             title="Product Studio Webhooks"
+             title="Photo Studio Webhooks"
              module="IXPF_Syncer"
              sortOrder="20"
              parent="IXPF_Syncer::ixpf_syncer"

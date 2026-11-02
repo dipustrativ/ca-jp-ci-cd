@@ -29,6 +29,7 @@ class DirectGallerySync
 
     const STATUS_COMPLETED = 'completed';
     const STATUS_READY_FOR_WEBHOOK = 'ready_for_webhook';
+    const STATUS_SUPERSEDED = 'superseded';
 
     const DEFAULT_IMAGE_ROLES = ['image', 'small_image', 'thumbnail'];
 
@@ -87,6 +88,7 @@ class DirectGallerySync
         $this->logInfo(sprintf('DirectGallerySync: Starting — limit=%d', $limit), false);
 
         $this->resetStuckProcessingRows();
+        $this->supersedeOlderPendingJobs();
 
         $batches = $this->getNextBatches($limit);
         if (empty($batches)) {
@@ -221,6 +223,17 @@ class DirectGallerySync
         }
 
         [$newImages, $existingImages, $keepValueIds] = $this->classifyPayloadItems($payload);
+        $failedDownloads = $this->getFailedDownloads($batch['images']);
+
+        // Must run before deleteRemovedImages(): a resent image keeps its value_id instead of
+        // being deleted and re-inserted under a new one.
+        [$newImages, $existingImages, $keepValueIds] = $this->reuseIdenticalImages(
+            $productRow,
+            $newImages,
+            $existingImages,
+            $keepValueIds,
+            $failedDownloads
+        );
 
         $this->logDebug(sprintf(
             'DirectGallerySync: Queue ID=%d | new=%d existing=%d keepIds=%s',
@@ -232,11 +245,7 @@ class DirectGallerySync
         $otherErrors = [];
 
         $otherErrors = array_merge($otherErrors, $this->deleteRemovedImages($productRow, $keepValueIds));
-        [$addErrors, $addUploadErrors] = $this->addNewImages(
-            $productRow,
-            $newImages,
-            $this->getFailedDownloads($batch['images'])
-        );
+        [$addErrors, $addUploadErrors] = $this->addNewImages($productRow, $newImages, $failedDownloads);
         $otherErrors = array_merge($otherErrors, $addErrors);
         $uploadErrors = array_merge($uploadErrors, $addUploadErrors);
         $otherErrors = array_merge($otherErrors, $this->updateExistingImages($productRow, $existingImages));
@@ -272,6 +281,130 @@ class DirectGallerySync
         return $failed;
     }
 
+
+    /**
+     * Match new_image items against the images already in the product's gallery (and against
+     * each other) by file content, so a resent or repeated photo is not added again.
+     *
+     * - Same content as a current gallery image → becomes an update of that value_id (label,
+     *   position, disabled, roles) and the value_id is kept, not deleted and re-inserted.
+     *   If the payload already lists that value_id, the explicit entry wins.
+     * - Same content as an earlier new_image in this payload → dropped.
+     *
+     * Items whose download failed or whose file is missing are left for addNewImages() to report.
+     *
+     * @param array{entity_id: int, row_id: int, sku: string} $productRow
+     * @param array<int, array<string, mixed>> $newImages
+     * @param array<int, array<string, mixed>> $existingImages
+     * @param int[] $keepValueIds
+     * @param array<string, string> $failedDownloads
+     * @return array{0: array, 1: array, 2: int[]}
+     */
+    private function reuseIdenticalImages(
+        array $productRow,
+        array $newImages,
+        array $existingImages,
+        array $keepValueIds,
+        array $failedDownloads
+    ): array {
+        if (empty($newImages)) {
+            return [$newImages, $existingImages, $keepValueIds];
+        }
+
+        $downloadDir = $this->productHelper->getGoogleBucketImageInitDownloadPath();
+        $galleryHashes = $this->getGalleryFileHashes($productRow);
+        $remaining = [];
+        $remainingHashes = [];
+        $resolvedPaths = [];
+
+        foreach ($newImages as $item) {
+            $bucketUrl = (string)($item['bucket_url'] ?? '');
+            $sourcePath = $downloadDir . preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($bucketUrl));
+
+            if (isset($failedDownloads[$bucketUrl]) || !is_file($sourcePath) || filesize($sourcePath) === 0) {
+                $remaining[] = $item;
+                continue;
+            }
+
+            $hash = hash_file('sha256', $sourcePath);
+            $valueId = $hash !== false ? array_search($hash, $galleryHashes, true) : false;
+
+            if ($valueId !== false) {
+                if (!in_array($valueId, $keepValueIds, true)) {
+                    $existingImages[] = array_merge($item, ['id' => $valueId]);
+                    $keepValueIds[] = $valueId;
+                }
+                $resolvedPaths[] = $sourcePath;
+                $this->logInfo(sprintf(
+                    'DirectGallerySync: %s is identical to gallery value_id=%d — kept, not re-added.',
+                    basename($sourcePath),
+                    $valueId
+                ));
+                continue;
+            }
+
+            if ($hash !== false && in_array($hash, $remainingHashes, true)) {
+                $resolvedPaths[] = $sourcePath;
+                $this->logInfo(sprintf(
+                    'DirectGallerySync: %s repeats an image earlier in the payload — skipped.',
+                    basename($sourcePath)
+                ));
+                continue;
+            }
+
+            $remaining[] = $item;
+            $remainingHashes[] = $hash;
+        }
+
+        // Temp files no longer needed — unless a remaining item still uploads the same file.
+        $stillNeeded = [];
+        foreach ($remaining as $item) {
+            $stillNeeded[] = $downloadDir
+                . preg_replace('/[^a-zA-Z0-9._-]/', '_', basename((string)($item['bucket_url'] ?? '')));
+        }
+        foreach (array_diff(array_unique($resolvedPaths), $stillNeeded) as $path) {
+            if (is_file($path)) {
+                unlink($path);
+            }
+        }
+
+        return [$remaining, $existingImages, $keepValueIds];
+    }
+
+    /**
+     * Content hash of every image file currently in the product's gallery.
+     *
+     * @param array{entity_id: int, row_id: int, sku: string} $productRow
+     * @return array<int, string> value_id => sha256 (files missing on disk are left out)
+     */
+    private function getGalleryFileHashes(array $productRow): array
+    {
+        $conn = $this->resourceConnection->getConnection();
+        $galleryT = $this->resourceConnection->getTableName('catalog_product_entity_media_gallery');
+        $valueToET = $this->resourceConnection->getTableName('catalog_product_entity_media_gallery_value_to_entity');
+
+        $files = $conn->fetchPairs(
+            $conn->select()
+                ->from(['g' => $galleryT], ['value_id', 'value'])
+                ->join(['vte' => $valueToET], 'vte.value_id = g.value_id', [])
+                ->where('vte.entity_id = ?', (int)$productRow['entity_id'])
+                ->where('g.media_type = ?', self::MEDIA_IMAGE_TYPE)
+        );
+
+        $mediaBaseDir = $this->getMediaBaseDir();
+        $hashes = [];
+        foreach ($files as $valueId => $file) {
+            $path = $mediaBaseDir . '/' . ltrim((string)$file, '/');
+            if (is_file($path)) {
+                $hash = hash_file('sha256', $path);
+                if ($hash !== false) {
+                    $hashes[(int)$valueId] = $hash;
+                }
+            }
+        }
+
+        return $hashes;
+    }
 
     /**
      * Fetch the minimal product data needed for raw SQL gallery writes.
@@ -962,6 +1095,86 @@ class DirectGallerySync
                 $affected, self::STUCK_PROCESSING_THRESHOLD_MINUTES
             ), true);
         }
+    }
+
+    /**
+     * Keep only the newest pending job per product; older pending jobs become 'superseded'.
+     *
+     * Each payload is the product's full desired gallery. An older job still queued would be
+     * undone by the newer one anyway (its new images are deleted again because the newer
+     * payload doesn't know their value_ids), so running it only churns files and value_ids.
+     * Superseded jobs get no webhook: the webhook is keyed by product and the newer job's
+     * webhook reports the final gallery. Their pending downloads are cancelled and temp files
+     * that no other queued job needs are removed.
+     */
+    private function supersedeOlderPendingJobs(): void
+    {
+        $conn = $this->resourceConnection->getConnection();
+        $queueTable = $this->resourceConnection->getTableName(self::PHOTO_STUDIO_QUEUE_TABLE);
+        $bucketTable = $this->resourceConnection->getTableName(self::PHOTO_STUDIO_BUCKET_IMAGES_TABLE);
+
+        $older = $conn->fetchPairs(
+            $conn->select()
+                ->from(['q' => $queueTable], ['q.entity_id', 'newer_id' => 'MAX(n.entity_id)'])
+                ->join(
+                    ['n' => $queueTable],
+                    'n.object_id = q.object_id AND n.type = q.type AND n.status = q.status'
+                    . ' AND n.entity_id > q.entity_id',
+                    []
+                )
+                ->where('q.status = ?', self::STATUS_PENDING)
+                ->group('q.entity_id')
+        );
+        if (empty($older)) {
+            return;
+        }
+
+        $olderIds = array_map('intval', array_keys($older));
+        $now = (new DateTime())->format('Y-m-d H:i:s');
+        foreach ($older as $queueId => $newerId) {
+            $conn->update(
+                $queueTable,
+                [
+                    'status' => self::STATUS_SUPERSEDED,
+                    'updated_at' => $now,
+                    'response_result' => json_encode(['superseded_by' => (int)$newerId]),
+                ],
+                ['entity_id = ?' => (int)$queueId, 'status = ?' => self::STATUS_PENDING]
+            );
+        }
+
+        $conn->update(
+            $bucketTable,
+            ['status' => self::STATUS_SUPERSEDED, 'updated_at' => $now],
+            ['photo_studio_queue_id IN (?)' => $olderIds, 'status = ?' => self::STATUS_PENDING]
+        );
+
+        // Remove already-downloaded temp files of superseded jobs unless a live job uses the same file.
+        $downloadDir = $this->productHelper->getGoogleBucketImageInitDownloadPath();
+        $sanitize = fn($path) => preg_replace('/[^a-zA-Z0-9._-]/', '_', basename((string)$path));
+        $liveFiles = array_map($sanitize, $conn->fetchCol(
+            $conn->select()
+                ->from(['bi' => $bucketTable], ['bucket_image_path'])
+                ->join(['q' => $queueTable], 'q.entity_id = bi.photo_studio_queue_id', [])
+                ->where('q.status IN (?)', [self::STATUS_PENDING, self::STATUS_PROCESSING])
+        ));
+        $supersededFiles = array_map($sanitize, $conn->fetchCol(
+            $conn->select()
+                ->from($bucketTable, ['bucket_image_path'])
+                ->where('photo_studio_queue_id IN (?)', $olderIds)
+                ->where('status = ?', self::STATUS_DOWNLOADED)
+        ));
+        foreach (array_diff(array_unique($supersededFiles), $liveFiles) as $file) {
+            if (is_file($downloadDir . $file)) {
+                unlink($downloadDir . $file);
+            }
+        }
+
+        $this->logInfo(sprintf(
+            'DirectGallerySync: Superseded %d older pending job(s): %s',
+            count($older),
+            implode(', ', array_map(fn($id, $newer) => "{$id}->{$newer}", array_keys($older), $older))
+        ));
     }
 
     /**

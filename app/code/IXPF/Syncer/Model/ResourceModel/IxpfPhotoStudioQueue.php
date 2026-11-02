@@ -18,6 +18,9 @@ class IxpfPhotoStudioQueue extends AbstractDb
     const STATUS_COMPLETED = 'completed';
     const STATUS_READY_FOR_WEBHOOK = 'ready_for_webhook';
 
+    /** Replaced by a newer pending job for the same product; final, no webhook. */
+    const STATUS_SUPERSEDED = 'superseded';
+
     const STATUS_WEBHOOK_FAILED = 'webhook_failed';
 
     const PRODUCT_GALLERY_TYPE = 'product_gallery';
