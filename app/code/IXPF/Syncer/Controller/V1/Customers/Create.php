@@ -19,6 +19,12 @@ use Magento\Framework\Controller\Result\JsonFactory;
 
 class Create extends AbstractController implements HttpPostActionInterface, CsrfAwareActionInterface
 {
+    /**
+     * Payload keys whose values never reach the log: `password` is accepted in plain text (see
+     * docs/CustomerCreate.md), and the rest are what a password or a confirmation link turns into.
+     */
+    private const REDACTED_KEY_PATTERN = '/password|passwd|secret|token|confirmation|hash/i';
+
     public function __construct(
         Context $context,
         TokenValidator $tokenValidator,
@@ -43,7 +49,7 @@ class Create extends AbstractController implements HttpPostActionInterface, Csrf
             $raw     = $this->getRequest()->getContent();
             $payload = json_decode($raw, true);
 
-            $this->logger->writeDaily("[customer_create] payload: $raw");
+            $this->logger->writeDaily('[customer_create] payload: ' . $this->redactForLog($raw, $payload));
 
             if (empty($payload) || !is_array($payload)) {
                 throw new Exception('Empty payload');
@@ -65,6 +71,38 @@ class Create extends AbstractController implements HttpPostActionInterface, Csrf
 
             return $this->jsonResponse(['success' => false, 'error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * The raw body unless it carries a secret, so an ordinary payload logs byte-for-byte as sent.
+     * Otherwise the decoded payload re-encoded with every matching value, at any depth, masked.
+     */
+    private function redactForLog(string $raw, mixed $payload): string
+    {
+        if (!is_array($payload)) {
+            return $raw;
+        }
+
+        $redacted = false;
+        $clean = $this->redact($payload, $redacted);
+
+        return $redacted
+            ? (string)json_encode($clean, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            : $raw;
+    }
+
+    private function redact(array $data, bool &$redacted): array
+    {
+        foreach ($data as $key => $value) {
+            if (is_string($key) && preg_match(self::REDACTED_KEY_PATTERN, $key) === 1) {
+                $data[$key] = '*** redacted ***';
+                $redacted = true;
+            } elseif (is_array($value)) {
+                $data[$key] = $this->redact($value, $redacted);
+            }
+        }
+
+        return $data;
     }
 
     public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException

@@ -13,6 +13,7 @@ use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use IXPF\Syncer\Helper\Logger\ProductUpdateLogger;
+use IXPF\Syncer\Services\Products\PriceAttributeGuard;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
 use Magento\Framework\App\ResourceConnection;
 
@@ -27,7 +28,8 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
         protected ProductRepositoryInterface $productRepository,
         protected ProductUpdateLogger $productUpdateLogger,
         protected Action $productAction,
-        protected ResourceConnection $resourceConnection
+        protected ResourceConnection $resourceConnection,
+        protected PriceAttributeGuard $priceAttributeGuard
     )
     {
         parent::__construct($context, $tokenValidator, $resultFactory);
@@ -66,17 +68,17 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
             }
 
             //-- log start
-            $this->productUpdateLogger->writeDaily("Bulk update started for " . count($payload['products']) . " products");
-            $this->productUpdateLogger->writeDaily(json_encode($payload));
+            $this->productUpdateLogger->writeDaily("[v2_bulkprice_update] Bulk update started for " . count($payload['products']) . " products");
+            $this->productUpdateLogger->writeDaily('[v2_bulkprice_update] payload: ' . json_encode($payload));
 
             //-- Process all products
             $result = $this->processBulkUpdateOptimized($payload['products'], $store);
 
             //-- log end
             $this->productUpdateLogger->writeDaily(
-                "Bulk update completed: {$result['success_count']} success, {$result['failed_count']} failed"
+                "[v2_bulkprice_update] Bulk update completed: {$result['success_count']} success, {$result['failed_count']} failed"
             );
-            $this->productUpdateLogger->writeDaily(json_encode($result['details']));
+            $this->productUpdateLogger->writeDaily('[v2_bulkprice_update] result: ' . json_encode($result['details']));
 
             return $this->jsonResponse([
                 'success' => $result['success_count'],
@@ -85,7 +87,7 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
             ]);
 
         } catch (\Exception $exception) {
-            $this->productUpdateLogger->writeDaily("Bulk update failed: " . $exception->getMessage());
+            $this->productUpdateLogger->writeDaily('[v2_bulkprice_update] Bulk update failed: ' . $exception->getMessage(), 'error');
             return $this->jsonResponse(['error' => $exception->getMessage()], 500);
         }
     }
@@ -98,7 +100,8 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
         $result = [
             'success_count' => 0,
             'failed_count' => 0,
-            'details' => []
+            'details' => [],
+            'product_ids' => []
         ];
 
         $validProducts = [];
@@ -136,8 +139,29 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
             }
 
             $productId = $productIds[$sku];
-            $hasPrice = !empty($productData['price']) && floatval($productData['price']) > 0;
-            $hasSpecialPrice = !empty($productData['special_price']) && floatval($productData['special_price']) > 0;
+            // special_price 0/null → null (clear). price 0/null → skipped.
+            // Any other non-positive / non-numeric value → product rejected, nothing written.
+            $guard = $this->priceAttributeGuard->apply(
+                array_intersect_key($productData, ['price' => true, 'special_price' => true])
+            );
+
+            if (count($guard['invalid']) > 0) {
+                $this->productUpdateLogger->writeDaily(
+                    "[v2_bulkprice_update] [INVALID] SKU {$sku}: " . implode('; ', $guard['invalid']),
+                    'error'
+                );
+                $result['details'][] = [
+                    'sku' => $sku,
+                    'success' => false,
+                    'message' => implode('; ', $guard['invalid'])
+                ];
+                $result['failed_count']++;
+                continue;
+            }
+
+            $attributes = $guard['attributes'];
+            $hasPrice = array_key_exists('price', $attributes);
+            $hasSpecialPrice = array_key_exists('special_price', $attributes);
 
             if (!$hasPrice && !$hasSpecialPrice) {
                 $result['details'][] = [
@@ -152,18 +176,18 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
             if ($hasPrice && $hasSpecialPrice) {
                 $bothUpdates[$productId] = [
                     'sku' => $sku,
-                    'price' => floatval($productData['price']),
-                    'special_price' => floatval($productData['special_price'])
+                    'price' => $attributes['price'],
+                    'special_price' => $attributes['special_price']
                 ];
             } elseif ($hasPrice) {
                 $priceUpdates[$productId] = [
                     'sku' => $sku,
-                    'price' => floatval($productData['price'])
+                    'price' => $attributes['price']
                 ];
             } else {
                 $specialPriceUpdates[$productId] = [
                     'sku' => $sku,
-                    'special_price' => floatval($productData['special_price'])
+                    'special_price' => $attributes['special_price']
                 ];
             }
         }
@@ -205,6 +229,7 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
                         'success' => true
                     ];
                     $result['success_count']++;
+                    $result['product_ids'][] = $productId;
                 } catch (\Exception $e) {
                     $result['details'][] = [
                         'sku' => $data['sku'],
@@ -246,9 +271,10 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
                         'success' => true
                     ];
                     $result['success_count']++;
+                    $result['product_ids'][] = $productId;
                 } catch (\Exception $exception) {
                     $sku = $productData[$productId]['sku'];
-                    $this->productUpdateLogger->writeDaily("Failed to update product ID: {$sku} Error: " . $exception->getMessage());
+                    $this->productUpdateLogger->writeDaily("[v2_bulkprice_update] Failed to update product SKU: {$sku} Error: " . $exception->getMessage(), 'error');
 
                     $result['details'][] = [
                         'sku' => $sku,
@@ -259,7 +285,7 @@ class BulkPriceUpdate extends AbstractController implements HttpPostActionInterf
                 }
             }
         } catch (\Exception $e) {
-            $this->productUpdateLogger->writeDaily("Batch update error: " . $e->getMessage());
+            $this->productUpdateLogger->writeDaily('[v2_bulkprice_update] Batch update error: ' . $e->getMessage(), 'error');
 
             // If batch fails completely, mark all as failed
             foreach ($productIds as $productId) {

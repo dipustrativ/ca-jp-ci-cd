@@ -58,10 +58,10 @@ class PhotoStudioQueueRun extends Command
 
             if ($this->helpers->isRawDbSaveMethod()) {
                 $output->writeln('<comment>Using RAW DB save method (faster, no ORM events)</comment>');
-                $this->directGallerySync->process($limit, $output);
+                $succeeded = $this->directGallerySync->process($limit, $output);
             } else {
                 $output->writeln('<comment>Using ORM save method (product->save, fires events)</comment>');
-                $this->processImages->process($limit, $output);
+                $succeeded = $this->processImages->process($limit, $output);
             }
 
             $elapsed = $this->formatElapsed(microtime(true) - $scriptStart);
@@ -73,7 +73,7 @@ class PhotoStudioQueueRun extends Command
             $output->writeln("<info>║</info> Total time:   <info>$elapsed</info>");
             $output->writeln('<info>╚══════════════════════════════════════╝</info>');
 
-            return Command::SUCCESS;
+            return $succeeded ? Command::SUCCESS : Command::FAILURE;
 
         } catch (\Exception $e) {
             $this->logger->writeDaily('PhotoStudioQueueRun: Fatal error — ' . $e->getMessage(), 'error');

@@ -43,7 +43,12 @@
       "source_store_code": "dk",
       "bought": {
         "name": "Pakistan Bokhara",
-        "variant_text": "Bought a NMA15 200 x 250 cm",
+        "variant_texts": {
+          "da_DK": "Købt: Beige, 200 × 250 cm",
+          "sv_SE": "Köpt: Beige, 200 × 250 cm",
+          "en_US": "Bought: Beige, 200 × 250 cm",
+          "de_DE": "Gekauft: Beige, 200 × 250 cm"
+        },
         "purchased_at": "2026-01-15T00:00:00Z",
         "thumbnail_path": "caProdMagento/products/aw1645/images/standard/aw1645-00001.jpg"
       },
@@ -92,7 +97,12 @@
       "source_store_code": "se",
       "bought": {
         "name": "Pakistan Bokhara",
-        "variant_text": "Bought a NMA15 200 x 300 cm",
+        "variant_texts": {
+          "da_DK": "Købt: Beige, 200 × 300 cm",
+          "sv_SE": "Köpt: Beige, 200 × 300 cm",
+          "en_US": "Bought: Beige, 200 × 300 cm",
+          "de_DE": "Gekauft: Beige, 200 × 300 cm"
+        },
         "purchased_at": "2026-06-02T00:00:00Z",
         "thumbnail_path": "caProdMagento/products/aw1646/images/standard/aw1646-00001.jpg"
       },
@@ -120,7 +130,10 @@
       "source_store_code": "ch_de",
       "bought": {
         "name": "Pakistan Bokhara",
-        "variant_text": "Bought a NMA15 160 x 230 cm",
+        "variant_texts": {
+          "de_DE": "Gekauft: Beige, 160 × 230 cm",
+          "en_US": "Bought: Beige, 160 × 230 cm"
+        },
         "purchased_at": "2026-05-11T00:00:00Z",
         "thumbnail_path": "caProdMagento/products/aw1650/images/standard/aw1650-00001.jpg"
       },

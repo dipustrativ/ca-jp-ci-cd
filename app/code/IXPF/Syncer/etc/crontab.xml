@@ -47,12 +47,9 @@
             <schedule>*/1 * * * *</schedule>
         </job>
 
-        <!-- PARKED with the reviews read service — IXPF\Syncer\Cron\ReviewMediaCleanup was never
-             committed. See dev/parked/ixpf-syncer-reviews/README.md.
         <job name="ixpf_review_media_cleanup" instance="IXPF\Syncer\Cron\ReviewMediaCleanup" method="execute">
             <schedule>0 3 * * *</schedule>
         </job>
-        -->
 
     </group>
 </config>

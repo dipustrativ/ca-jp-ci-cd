@@ -12,6 +12,9 @@ use IXPF\Syncer\Services\Notification\SlackNotifier;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Adapter\DeadlockException;
+use Magento\Framework\DB\Adapter\LockWaitException;
+use RuntimeException;
 use Throwable;
 use Zend_Db_Expr;
 
@@ -57,8 +60,19 @@ class Webhook extends AbstractHelper
 
     /**
      * Upsert (or reset) webhook jobs for a list of object IDs.
+     *
+     * Ids are sorted so every concurrent upsert locks rows in the same order.
+     * A deadlock / lock wait timeout is retried (the upsert is idempotent), but
+     * only outside a caller transaction: a deadlock rolls back the whole outer
+     * transaction, so retrying inside it is not possible.
+     *
+     * @param bool $throwOnFailure Throw when a chunk still fails after retries.
+     *                             Mview callers set it so the changelog version
+     *                             is not advanced and the ids are retried on the
+     *                             next cron run instead of being lost.
+     * @throws RuntimeException
      */
-    public function updateOrCreateJob(string $type, array $objectIds = []): static
+    public function updateOrCreateJob(string $type, array $objectIds = [], bool $throwOnFailure = false): static
     {
         if (!$objectIds) {
             return $this;
@@ -67,38 +81,77 @@ class Webhook extends AbstractHelper
         $conn     = $this->resourceConnection->getConnection();
         $table    = $conn->getTableName("ixpf_webhook_jobs");
         $objectIds = array_values(array_unique(array_map('intval', $objectIds)));
+        sort($objectIds);
         $chunkSize = self::CHUNK_SIZE;
         foreach (array_chunk($objectIds, $chunkSize) as $chunk) {
-            try {
-                $rows = [];
-                foreach ($chunk as $objectId) {
-                    $rows[] = [
-                        'type'           => $type,
-                        'object_id'      => $objectId,
-                        'payload'        => null,
-                        'trigger_status' => 'pending',
-                        'total_trigger' => 0,
-                        'created_at'     => (new \DateTime())->format('Y-m-d H:i:s'),
-                        'updated_at'     => (new \DateTime())->format('Y-m-d H:i:s'),
-                    ];
-                }
+            $now  = (new DateTime())->format('Y-m-d H:i:s');
+            $rows = [];
+            foreach ($chunk as $objectId) {
+                $rows[] = [
+                    'type'           => $type,
+                    'object_id'      => $objectId,
+                    'payload'        => null,
+                    'trigger_status' => 'pending',
+                    'total_trigger'  => 0,
+                    'created_at'     => $now,
+                    'updated_at'     => $now,
+                ];
+            }
 
-                // Upsert: insert new rows; update these fields if row already exists
-                $conn->insertOnDuplicate(
-                    $table,
-                    $rows,
-                    [
-                        'payload',
-                        'trigger_status',
-                        'updated_at',
-                    ]
-                );
-            } catch (\Throwable $e) {
-                $this->webhookLogger->writeExceptionDaily($e, "Webhook bulk upsert exception");
+            for ($attempt = 1; ; $attempt++) {
+                try {
+                    // Upsert: insert new rows; update these fields if row already exists
+                    $conn->insertOnDuplicate(
+                        $table,
+                        $rows,
+                        [
+                            'payload',
+                            'trigger_status',
+                            'updated_at',
+                        ]
+                    );
+                    break;
+                } catch (DeadlockException|LockWaitException $e) {
+                    if ($attempt < self::MAX_DEADLOCK_RETRIES && $conn->getTransactionLevel() === 0) {
+                        usleep(100_000 * $attempt);
+                        continue;
+                    }
+                    $this->failUpsert($e, $type, $chunk, $attempt, $throwOnFailure);
+                    break;
+                } catch (Throwable $e) {
+                    $this->failUpsert($e, $type, $chunk, $attempt, $throwOnFailure);
+                    break;
+                }
             }
         }
 
         return $this;
+    }
+
+    /**
+     * @param int[] $chunk
+     * @throws RuntimeException
+     */
+    private function failUpsert(Throwable $e, string $type, array $chunk, int $attempts, bool $throw): void
+    {
+        $this->webhookLogger->writeExceptionDaily(
+            $e,
+            sprintf(
+                'Webhook bulk upsert exception (type %s, %d ids, %d attempt(s)): %s',
+                $type,
+                count($chunk),
+                $attempts,
+                implode(',', $chunk)
+            )
+        );
+
+        if ($throw) {
+            throw new RuntimeException(
+                sprintf('IXPF webhook job upsert failed for type "%s"', $type),
+                0,
+                $e
+            );
+        }
     }
 
     /**
@@ -404,14 +457,14 @@ class Webhook extends AbstractHelper
                 'success' => false,
                 'payload' => null,
                 'response' => 'No Response',
-            ]);
+            ], true);
         } catch (Throwable $e) {
             $this->webhookLogger->writeExceptionDaily($e, 'Webhook process job exception');
             $this->updateJob($row, [
                 'success' => false,
                 'payload' => null,
                 'response' => 'Exception: ' . $e->getMessage(),
-            ]);
+            ], true);
         }
     }
 
@@ -492,8 +545,11 @@ class Webhook extends AbstractHelper
     /**
      * @param array<string, mixed> $job
      * @param array<string, mixed> $webhookResponse
+     * @param bool $onlyIfProcessing Skip the write when the row left "processing"
+     *                               meanwhile — an upsert reset it to "pending" for a
+     *                               newer change, which must not be marked done.
      */
-    public function updateJob(array $job, array $webhookResponse): void
+    public function updateJob(array $job, array $webhookResponse, bool $onlyIfProcessing = false): void
     {
         $connection = $this->resourceConnection->getConnection();
         $table = $connection->getTableName('ixpf_webhook_jobs');
@@ -512,7 +568,9 @@ class Webhook extends AbstractHelper
                     'updated_at' => new Zend_Db_Expr('NOW()'),
                     'last_response' => json_encode($webhookResponse),
                 ],
-                ['entity_id = ?' => (int)$job['entity_id']]
+                $onlyIfProcessing
+                    ? ['entity_id = ?' => (int)$job['entity_id'], 'trigger_status = ?' => 'processing']
+                    : ['entity_id = ?' => (int)$job['entity_id']]
             );
         } catch (Throwable $e) {
             $this->webhookLogger->writeExceptionDaily($e, 'Webhook update job exception');

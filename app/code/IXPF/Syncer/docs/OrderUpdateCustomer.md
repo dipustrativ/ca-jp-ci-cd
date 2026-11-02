@@ -9,7 +9,7 @@
 
 ## Overview
 
-Updates the customer name and/or email stored **on the order** (`customer_firstname`, `customer_lastname`, `customer_email`). The customer account itself is not modified. Billing/shipping address names are also untouched — use the [Order Update endpoint](OrderUpdate.md) for address changes.
+Updates the customer name and/or email stored **on the order** (`customer_firstname`, `customer_lastname`, `customer_email`). The customer account itself is not modified. When `email` is sent, every address in the order's address collection (`sales_order_address` — billing/shipping) gets the same email. Billing/shipping address names are untouched — use the [Order Update endpoint](OrderUpdate.md) for address changes.
 
 Every change adds a status history note, e.g.:
 

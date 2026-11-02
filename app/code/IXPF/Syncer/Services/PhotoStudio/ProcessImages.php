@@ -49,6 +49,9 @@ class ProcessImages
     /** Roles automatically assigned to the first image if none are specified. */
     const DEFAULT_IMAGE_ROLES = ['image', 'small_image', 'thumbnail'];
 
+    /** status_code reported to IXPF in response_result. */
+    const RESPONSE_CODE_SUCCESS = 200;
+    const RESPONSE_CODE_FAILED = 500;
     /**
      * Reset queue rows that are permanently stuck in 'processing'.
      *
@@ -88,7 +91,7 @@ class ProcessImages
      * @param int $limit Maximum number of queue batches to process.
      * @param OutputInterface|null $consoleOutput Symfony console output (CLI runs only).
      */
-    public function process(int $limit = 15, ?OutputInterface $consoleOutput = null): void
+    public function process(int $limit = 15, ?OutputInterface $consoleOutput = null): bool
     {
         $this->consoleOutput = $consoleOutput;
 
@@ -103,12 +106,13 @@ class ProcessImages
 
         if (empty($batches)) {
             $this->logInfo('ProcessImages: No pending batches found, exiting.', false);
-            return;
+            return true;
         }
 
         $this->logInfo(sprintf('ProcessImages: Found %d batch(es) to process.', count($batches)), false);
         $this->markBatchesAsProcessing($batches);
 
+        $allSucceeded = true;
         foreach ($batches as $batch) {
             $queueId = (int)$batch['queue']['entity_id'];
             $productId = (int)$batch['queue']['object_id'];
@@ -119,18 +123,24 @@ class ProcessImages
                 $productId
             ), false);
 
-            $this->processBatch($batch);
+            if (!$this->processBatch($batch)) {
+                $allSucceeded = false;
+            }
 
             $this->logInfo("-----------------------------------------------------", false);
         }
 
         $this->logInfo('ProcessImages: Run complete.', false);
+
+        return $allSucceeded;
     }
 
 
     /**
      * Fetch the next $limit pending queue jobs where ALL related bucket images
-     * are in 'downloaded' status — using a single JOIN + HAVING query.
+     * reached a final download state — 'downloaded' or 'failed' — using a single
+     * JOIN + HAVING query. Failed downloads are reported back to IXPF as upload
+     * errors instead of leaving the queue job pending forever.
      *
      * @return array<int, array{queue: array, images: array}>
      */
@@ -145,7 +155,10 @@ class ProcessImages
             ->joinLeft(['bi' => $bucketTable], 'bi.photo_studio_queue_id = q.entity_id', [])
             ->where('q.status = ?', self::STATUS_PENDING)
             ->group('q.entity_id')
-            ->having('COUNT(bi.entity_id) = 0 OR COUNT(bi.entity_id) = SUM(bi.status = ?)', self::STATUS_DOWNLOADED)
+            ->having($connection->quoteInto(
+                'COUNT(bi.entity_id) = 0 OR COUNT(bi.entity_id) = SUM(bi.status IN (?))',
+                [self::STATUS_DOWNLOADED, self::STATUS_FAILED]
+            ))
             ->order('q.created_at ASC')
             ->limit($limit);
 
@@ -187,14 +200,20 @@ class ProcessImages
      * {
      *   "success": true|false,
      *   "status":  "ready_for_webhook"|"failed"|"magento_failed",
+     *   "status_code": 200|500,
      *   "details": {
      *     "gallery_images": [...],
      *     "upload_errors":  [...],
      *     "others_errors":  [...]
      *   }
      * }
+     *
+     * Any error (failed download, missing/corrupt file) gives success=false /
+     * status_code=500; the job still goes to ready_for_webhook so IXPF is notified.
+     *
+     * @return bool True when the batch finished without any error.
      */
-    private function processBatch(array $batch): void
+    private function processBatch(array $batch): bool
     {
         $queue = $batch['queue'];
         $queueId = (int)$queue['entity_id'];
@@ -210,7 +229,7 @@ class ProcessImages
                 $queueId
             ));
             $this->failQueue($queueId, ['Invalid payload JSON (could not decode).']);
-            return;
+            return false;
         }
 
         // Empty array [] means "remove all images from this product"
@@ -223,28 +242,19 @@ class ProcessImages
 
             $product = $this->loadProduct($productId, $queueId);
             if ($product === null) {
-                return;
+                return false;
             }
 
             [$product, $deleteErrors] = $this->deleteRemovedImages($product, $productId, $queueId, []);
             if ($product === null) {
-                return;
+                return false;
             }
 
             if (!$this->saveProduct($product, $queueId, [], $deleteErrors)) {
-                return;
+                return false;
             }
 
-            $this->updateQueueStatus($queueId, self::STATUS_READY_FOR_WEBHOOK, [
-                'success' => true,
-                'status'  => self::STATUS_READY_FOR_WEBHOOK,
-                'details' => [
-                    'gallery_images' => [],
-                    'upload_errors'  => [],
-                    'others_errors'  => $deleteErrors,
-                ],
-            ]);
-            return;
+            return $this->completeQueue($queueId, [], [], $deleteErrors);
         }
 
         // ── Step 2: Classify payload items
@@ -261,7 +271,7 @@ class ProcessImages
         // ── Step 3: Load product
         $product = $this->loadProduct($productId, $queueId);
         if ($product === null) {
-            return;
+            return false;
         }
 
         $uploadErrors = [];
@@ -270,12 +280,16 @@ class ProcessImages
         // ── Step 4: Delete images no longer in payload
         [$product, $deleteErrors] = $this->deleteRemovedImages($product, $productId, $queueId, $keepIds);
         if ($product === null) {
-            return;
+            return false;
         }
         $otherErrors = array_merge($otherErrors, $deleteErrors);
 
         // ── Step 5: Add new images from disk
-        [$addErrors, $addUploadErrors] = $this->addNewImages($product, $newImages);
+        [$addErrors, $addUploadErrors] = $this->addNewImages(
+            $product,
+            $newImages,
+            $this->getFailedDownloads($batch['images'])
+        );
         $otherErrors = array_merge($otherErrors, $addErrors);
         $uploadErrors = array_merge($uploadErrors, $addUploadErrors);
 
@@ -286,27 +300,42 @@ class ProcessImages
 
         // ── Step 7: Save product
         if (!$this->saveProduct($product, $queueId, $uploadErrors, $otherErrors)) {
-            return;
+            return false;
         }
 
         // ── Step 8: Set final status & persist response_result
         $this->logInfo(sprintf(
-            'ProcessImages: Queue ID=%d | Product ID=%d — Completed successfully. upload_errors=%d others_errors=%d',
+            'ProcessImages: Queue ID=%d | Product ID=%d — Done. upload_errors=%d others_errors=%d',
             $queueId,
             $productId,
             count($uploadErrors),
             count($otherErrors)
         ));
 
-        $this->updateQueueStatus($queueId, self::STATUS_READY_FOR_WEBHOOK, [
-            'success' => true,
-            'status' => self::STATUS_READY_FOR_WEBHOOK,
-            'details' => [
-                'gallery_images' => $this->photoStudioHelper->getGalleryImages($productId),
-                'upload_errors' => $uploadErrors,
-                'others_errors' => $otherErrors,
-            ],
-        ]);
+        return $this->completeQueue(
+            $queueId,
+            $this->photoStudioHelper->getGalleryImages($productId),
+            $uploadErrors,
+            $otherErrors
+        );
+    }
+
+    /**
+     * Map bucket_image_path → error_message for the batch's failed downloads.
+     *
+     * @param array<int, array<string, mixed>> $images Rows from ixpf_photo_studio_bucket_images.
+     * @return array<string, string>
+     */
+    private function getFailedDownloads(array $images): array
+    {
+        $failed = [];
+        foreach ($images as $image) {
+            if (($image['status'] ?? '') === self::STATUS_FAILED) {
+                $failed[(string)$image['bucket_image_path']] = (string)($image['error_message'] ?? '') ?: 'Download failed';
+            }
+        }
+
+        return $failed;
     }
 
 
@@ -382,6 +411,7 @@ class ProcessImages
             $this->updateQueueStatus($queueId, self::STATUS_MAGENTO_FAILED, [
                 'success' => false,
                 'status' => self::STATUS_MAGENTO_FAILED,
+                'status_code' => self::RESPONSE_CODE_FAILED,
                 'details' => [
                     'gallery_images' => [],
                     'upload_errors' => $uploadErrors,
@@ -443,6 +473,7 @@ class ProcessImages
             $this->updateQueueStatus($queueId, self::STATUS_MAGENTO_FAILED, [
                 'success' => false,
                 'status' => self::STATUS_MAGENTO_FAILED,
+                'status_code' => self::RESPONSE_CODE_FAILED,
                 'details' => [
                     'gallery_images' => [],
                     'upload_errors' => [],
@@ -530,7 +561,7 @@ class ProcessImages
      *
      * @return array{0: string[], 1: array[]}
      */
-    private function addNewImages(Product &$product, array $newImages): array
+    private function addNewImages(Product &$product, array $newImages, array $failedDownloads = []): array
     {
         if (empty($newImages)) {
             return [[], []];
@@ -542,12 +573,23 @@ class ProcessImages
         $uploadErrors    = [];
 
         foreach ($newImages as $item) {
-            $filename   = basename($item['bucket_url'] ?? '');
+            $bucketUrl  = (string)($item['bucket_url'] ?? '');
+            // Same sanitising as ProcessGoogleBucketImages::sanitizeFilename() so the paths match.
+            $filename   = preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($bucketUrl));
             $sourcePath = $downloadBaseDir . $filename;
+
+            if (isset($failedDownloads[$bucketUrl])) {
+                $msg = sprintf('Download failed, skipped: %s (%s)', $filename, $failedDownloads[$bucketUrl]);
+                $this->logWarning('ProcessImages: ' . $msg);
+                $uploadErrors[] = array_merge($item, ['error' => $msg]);
+                $otherErrors[] = $msg;
+                continue;
+            }
 
             if (!file_exists($sourcePath) || filesize($sourcePath) === 0) {
                 $msg = 'File not found on disk, skipped: ' . $filename;
                 $this->logWarning('ProcessImages: ' . $msg);
+                $uploadErrors[] = array_merge($item, ['error' => $msg]);
                 $otherErrors[] = $msg;
                 continue;
             }
@@ -558,6 +600,7 @@ class ProcessImages
                 if ($testImage === false) {
                     $msg = 'Image corrupted, skipped: ' . $filename;
                     $this->logWarning('ProcessImages: ' . $msg);
+                    $uploadErrors[] = array_merge($item, ['error' => $msg]);
                     $otherErrors[] = $msg;
                     continue;
                 }
@@ -771,21 +814,43 @@ class ProcessImages
     }
 
     /**
-     * Convenience wrapper: mark a queue row as permanently failed.
+     * Persist the final result of a processed batch and hand it to the webhook.
+     *
+     * Any upload or other error flips the result to success=false /
+     * status_code=500; the row still moves to ready_for_webhook so IXPF
+     * receives the failure.
+     *
+     * @param array[] $uploadErrors Payload items that could not be added, each with an 'error' key.
+     * @param string[] $othersErrors
+     * @return bool True when there were no errors.
+     */
+    private function completeQueue(int $queueId, array $galleryImages, array $uploadErrors, array $othersErrors): bool
+    {
+        $success = empty($uploadErrors) && empty($othersErrors);
+
+        $this->updateQueueStatus($queueId, self::STATUS_READY_FOR_WEBHOOK, [
+            'success' => $success,
+            'status' => $success ? self::STATUS_READY_FOR_WEBHOOK : self::STATUS_FAILED,
+            'status_code' => $success ? self::RESPONSE_CODE_SUCCESS : self::RESPONSE_CODE_FAILED,
+            'details' => [
+                'gallery_images' => $galleryImages,
+                'upload_errors' => $uploadErrors,
+                'others_errors' => $othersErrors,
+            ],
+        ]);
+
+        return $success;
+    }
+
+    /**
+     * Convenience wrapper: report a batch that could not be processed at all
+     * (bad payload, missing product) as success=false / status_code=500.
      *
      * @param string[] $othersErrors
      */
     private function failQueue(int $queueId, array $othersErrors): void
     {
-        $this->updateQueueStatus($queueId, self::STATUS_FAILED, [
-            'success' => false,
-            'status' => self::STATUS_FAILED,
-            'details' => [
-                'gallery_images' => [],
-                'upload_errors' => [],
-                'others_errors' => $othersErrors,
-            ],
-        ]);
+        $this->completeQueue($queueId, [], [], $othersErrors);
     }
 
     private function resetStuckProcessingRows(): void

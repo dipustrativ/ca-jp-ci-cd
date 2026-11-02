@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Communication/etc/communication.xsd">
+    <topic name="ixpf.review.media.download" is_synchronous="false"
+           request="IXPF\Syncer\Model\Queue\ReviewMediaMessage">
+        <handler name="ixpf_review_media_download_handler"
+                 type="IXPF\Syncer\Model\Queue\Consumer\ReviewMediaConsumer" method="execute"/>
+    </topic>
+</config>

@@ -1,0 +1,173 @@
+<?php
+/**
+ * One review card.
+ *
+ * The variant context row is the point of the whole feature: one pool is shared by every size,
+ * colour and market of a design, so without naming the exact item bought, a five-star review of
+ * a 300x400 tells you nothing about the 80x250 on screen.
+ *
+ * All text arrives from IXPF unescaped by design - the read service stores it verbatim and says
+ * "escape on output". This is that output.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \IXPF\Syncer\ViewModel\Reviews\Reviews $viewModel
+ * @var \IXPF\Syncer\Model\Reviews\ReviewItem $item
+ */
+$viewModel = $block->getData('view_model');
+$item      = $block->getData('review_item');
+
+$flag         = $viewModel->getFlag($item->sourceLocale);
+$thumbnailUrl = $viewModel->getThumbnailUrl($item->thumbnailPath);
+$hasSubRating = $viewModel->hasSubRatings($item->subRatings);
+?>
+<article class="ixpf-review" data-review-id="<?= $escaper->escapeHtmlAttr($item->reviewId) ?>">
+    <div class="ixpf-review__head">
+        <h3 class="ixpf-review__author">
+            <?= $escaper->escapeHtml($item->reviewer) ?>
+            <?php if ($flag !== ''): ?>
+                <span class="ixpf-review__flag"
+                      title="<?= $escaper->escapeHtmlAttr($viewModel->getLanguageName($item->sourceLocale)) ?>"><?= $escaper->escapeHtml($flag) ?></span>
+            <?php endif; ?>
+        </h3>
+
+        <?php /* purchased_at present means IXPF matched the review to an order. The date beside
+                 BUYER is the purchase date; the review date sits under the name. */ ?>
+        <?php if ($item->purchasedAt !== null): ?>
+            <div class="ixpf-review__meta">
+                <span class="ixpf-review__verified">
+                    <svg class="ixpf-review__verified-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                        <path fill="currentColor" d="M10 1a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm4.2 6.7-5 5a1 1 0 0 1-1.4 0L5.8 10.7a1 1 0 1 1 1.4-1.4L8.5 10.6l4.3-4.3a1 1 0 0 1 1.4 1.4Z"/>
+                    </svg>
+                    <span class="ixpf-review__verified-text"><?= $escaper->escapeHtml(__('BUYER')) ?></span>
+                </span>
+                <time class="ixpf-review__purchase-date" datetime="<?= $escaper->escapeHtmlAttr($item->purchasedAt) ?>">
+                    <?= $escaper->escapeHtml($viewModel->formatDate($item->purchasedAt)) ?>
+                </time>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <time class="ixpf-review__date" datetime="<?= $escaper->escapeHtmlAttr($item->createdAt) ?>">
+        <?= $escaper->escapeHtml($viewModel->formatDate($item->createdAt)) ?>
+    </time>
+
+    <div class="ixpf-review__rating">
+        <?= /* @noEscape */ $viewModel->getStarsHtml(
+            (float)$item->rating,
+            '',
+            (string)__('Rated %1 out of 5', $item->rating)
+        ) ?>
+    </div>
+
+    <?php /* [Thumbnail] | Art. No: AW1655 | Köpt: Vit / Beige, 300 × 384 cm (IXPF's text, as is) */ ?>
+    <?php if ($thumbnailUrl !== null || $item->sku !== '' || $item->boughtVariantText !== null): ?>
+        <div class="ixpf-review__bought">
+            <?php if ($thumbnailUrl !== null): ?>
+                <span class="ixpf-review__bought-thumb">
+                    <img src="<?= $escaper->escapeUrl($thumbnailUrl) ?>"
+                         alt="<?= $escaper->escapeHtmlAttr((string)$item->boughtName) ?>"
+                         loading="lazy" width="40" height="40">
+                </span>
+            <?php endif; ?>
+            <?php if ($item->sku !== ''): ?>
+                <span class="ixpf-review__bought-sku">
+                    <?= $escaper->escapeHtml(__('Art. No: %1', $item->sku)) ?>
+                </span>
+            <?php endif; ?>
+            <?php if ($item->boughtVariantText !== null): ?>
+                <span class="ixpf-review__bought-variant">
+                    <?= $escaper->escapeHtml($item->boughtVariantText) ?>
+                </span>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <div class="ixpf-review__body-row">
+        <?php if ($item->body !== null): ?>
+            <p class="ixpf-review__text" data-ixpf-review-text><?= $escaper->escapeHtml($item->body) ?></p>
+        <?php endif; ?>
+
+        <?php /* Click toggles the row between max 120px and max 450px (Rugvista). One 800px image
+                 for both; width/height only reserve the aspect ratio. */ ?>
+        <?php if ($item->photos !== []): ?>
+            <div class="ixpf-review__photos" data-ixpf-review-photos>
+                <?php foreach ($item->photos as $photo): ?>
+                    <button type="button" class="ixpf-review__photo" data-ixpf-review-photo aria-expanded="false">
+                        <img src="<?= $escaper->escapeUrl($viewModel->getMediaUrl($photo->gridPath)) ?>"
+                             alt="<?= $escaper->escapeHtmlAttr(__('Photo by %1', $item->reviewer)) ?>"
+                             <?php if ($photo->width !== null && $photo->height !== null): ?>
+                                 width="<?= (int)$photo->width ?>" height="<?= (int)$photo->height ?>"
+                             <?php endif; ?>
+                             loading="lazy">
+                    </button>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <?php if ($hasSubRating): ?>
+        <div class="ixpf-review__subratings">
+            <?php foreach ($viewModel->getSubRatingLabels() as $key => $label): ?>
+                <?php $value = $item->subRatings[$key] ?? null; ?>
+                <?php if ($value === null) { continue; } ?>
+                <div class="ixpf-review__subrating">
+                    <?= /* @noEscape */ $viewModel->getStarsHtml(
+                        (float)$value,
+                        'small',
+                        (string)__('%1: %2 out of 5', $label, $value)
+                    ) ?>
+                    <span class="ixpf-review__subrating-label"><?= $escaper->escapeHtml($label) ?></span>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php /* Both texts are already loaded, so the toggle needs no second request. */ ?>
+    <?php if ($item->isTranslated() && $item->sourceBody !== null): ?>
+        <div class="ixpf-review__translated" data-ixpf-review-translated>
+            <span class="ixpf-review__translated-note">
+                <?php /* The source market's domain, not the language - see getSourceDomain(). */ ?>
+                <?= $escaper->escapeHtml(__(
+                    'Automatically translated from %1',
+                    $viewModel->getSourceDomain($item->sourceStoreCode, $item->sourceLocale)
+                )) ?>
+            </span>
+            <button type="button" class="ixpf-review__translated-toggle"
+                    data-ixpf-show-original
+                    data-original="<?= $escaper->escapeHtmlAttr($item->sourceBody) ?>"
+                    data-translated="<?= $escaper->escapeHtmlAttr((string)$item->body) ?>"
+                    data-label-original="<?= $escaper->escapeHtmlAttr(__('show original')) ?>"
+                    data-label-translated="<?= $escaper->escapeHtmlAttr(__('show translation')) ?>">
+                <?= $escaper->escapeHtml(__('show original')) ?>
+            </button>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($item->replyBody !== null): ?>
+        <div class="ixpf-review__reply">
+            <?php
+            /* IXPF sends no author, so the heading is ours. See Reviews::getReplyHeading(). */
+            $replyHeading = $viewModel->getReplyHeading();
+            ?>
+            <div class="ixpf-review__reply-head">
+                <?php /* "Reply from Carpet Avenue Customer Service" does not fit one line in a
+                         390px drawer, and neither will the longer locales. The date keeps its own
+                         column and the heading wraps beneath it - truncating hid the end of the
+                         line, which read as broken. */ ?>
+                <h4 class="ixpf-review__reply-author" title="<?= $escaper->escapeHtmlAttr($replyHeading) ?>">
+                    <svg class="ixpf-review__reply-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                        <path fill="currentColor" d="M7.7 14.7a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 0-1.4l4-4a1 1 0 1 1 1.4 1.4L5.4 9H17a1 1 0 1 1 0 2H5.4l2.3 2.3a1 1 0 0 1 0 1.4Z"/>
+                    </svg>
+                    <span class="ixpf-review__reply-author-text"><?= $escaper->escapeHtml($replyHeading) ?></span>
+                </h4>
+                <?php if ($item->replyCreatedAt !== null): ?>
+                    <time class="ixpf-review__reply-date" datetime="<?= $escaper->escapeHtmlAttr($item->replyCreatedAt) ?>">
+                        <?= $escaper->escapeHtml($viewModel->formatDate($item->replyCreatedAt)) ?>
+                    </time>
+                <?php endif; ?>
+            </div>
+            <p class="ixpf-review__reply-text"><?= $escaper->escapeHtml($item->replyBody) ?></p>
+        </div>
+    <?php endif; ?>
+</article>

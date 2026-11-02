@@ -126,7 +126,12 @@ class ProcessGoogleBucketImages
     }
 
 
-    public function process(int $concurrency = 20, $commandLineOutput = null, $downloadLimit = 250): void
+    /**
+     * Download pending bucket images.
+     *
+     * @return bool False when any download failed or the run aborted with an error.
+     */
+    public function process(int $concurrency = 20, $commandLineOutput = null, $downloadLimit = 250): bool
     {
         try {
             $this->concurrency    = $concurrency;
@@ -146,7 +151,7 @@ class ProcessGoogleBucketImages
 
             if (empty($pendingImages)) {
                 $this->log('No pending images found.', 'info', 'comment');
-                return;
+                return true;
             }
 
             $this->markAsProcessing(array_column($pendingImages, 'entity_id'));
@@ -159,7 +164,7 @@ class ProcessGoogleBucketImages
 
             if (empty($files)) {
                 $this->log('No files to download — all pending images are already on disk.', 'info', 'comment');
-                return;
+                return true;
             }
 
             $this->log('Starting download of ' . count($files) . ' files from Google Bucket.', 'info', 'info');
@@ -170,8 +175,16 @@ class ProcessGoogleBucketImages
 
             $this->persistDownloadResults($success, $failed);
 
+            if (!empty($failed)) {
+                $this->log(count($failed) . ' file(s) failed to download.', 'error', 'error', true);
+                return false;
+            }
+
+            return true;
+
         } catch (Exception $e) {
             $this->log('Error processing Google Bucket images: ' . $e->getMessage(), 'error', 'error', true);
+            return false;
         }
     }
 
@@ -481,7 +494,9 @@ class ProcessGoogleBucketImages
                 CURLOPT_FILE           => $fh,
                 CURLOPT_TIMEOUT        => 60,
                 CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_FAILONERROR    => true,
+                // false: HTTP errors come back as errno 0 + status code, so a 4xx
+                // fails at once instead of burning retries.
+                CURLOPT_FAILONERROR    => false,
                 CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_2_0,
                 CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . $accessToken],
             ]);
@@ -538,7 +553,7 @@ class ProcessGoogleBucketImages
                     'info', 'info', true
                 );
 
-            } elseif ($errno === 0 && $httpCode !== 200) {
+            } elseif ($errno === 0 && $this->isPermanentHttpError($httpCode)) {
                 @unlink($item['file']['save_path']);
                 $this->log(
                     'GCS error HTTP ' . $httpCode . ': ' . $filename . ' (entity_id: ' . $item['file']['entity_id'] . ')',
@@ -574,6 +589,14 @@ class ProcessGoogleBucketImages
         }
 
         return [$success, $failed, $retry];
+    }
+
+    /**
+     * 4xx = bad path / no access, retrying never helps. 408 and 429 are transient.
+     */
+    private function isPermanentHttpError(int $httpCode): bool
+    {
+        return $httpCode >= 400 && $httpCode < 500 && !in_array($httpCode, [408, 429], true);
     }
 
     /**

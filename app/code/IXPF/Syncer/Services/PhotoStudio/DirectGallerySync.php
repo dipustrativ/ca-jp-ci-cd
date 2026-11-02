@@ -32,6 +32,10 @@ class DirectGallerySync
 
     const DEFAULT_IMAGE_ROLES = ['image', 'small_image', 'thumbnail'];
 
+    /** status_code reported to IXPF in response_result. */
+    const RESPONSE_CODE_SUCCESS = 200;
+    const RESPONSE_CODE_FAILED = 500;
+
     /**
      * EAV attribute_id → role name map.
      *
@@ -75,8 +79,9 @@ class DirectGallerySync
      *
      * @param int $limit Maximum number of queue batches to process per run.
      * @param OutputInterface|null $consoleOutput Symfony console output; null when run via cron.
+     * @return bool False when at least one batch finished with errors.
      */
-    public function process(int $limit = 25, ?OutputInterface $consoleOutput = null): void
+    public function process(int $limit = 25, ?OutputInterface $consoleOutput = null): bool
     {
         $this->consoleOutput = $consoleOutput;
         $this->logInfo(sprintf('DirectGallerySync: Starting — limit=%d', $limit), false);
@@ -86,29 +91,35 @@ class DirectGallerySync
         $batches = $this->getNextBatches($limit);
         if (empty($batches)) {
             $this->logInfo('DirectGallerySync: No pending batches found, exiting.', false);
-            return;
+            return true;
         }
 
         $this->logInfo(sprintf('DirectGallerySync: Found %d batch(es) to process.', count($batches)), false);
         $this->markBatchesAsProcessing($batches);
 
+        $allSucceeded = true;
         foreach ($batches as $batch) {
             $queueId = (int)$batch['queue']['entity_id'];
             $productId = (int)$batch['queue']['object_id'];
             $this->logInfo(sprintf(
                 'DirectGallerySync: Processing queue ID=%d | product ID=%d', $queueId, $productId
             ), false);
-            $this->processBatch($batch);
+            if (!$this->processBatch($batch)) {
+                $allSucceeded = false;
+            }
             $this->logInfo('-----------------------------------------------------', false);
         }
 
         $this->logInfo('DirectGallerySync: Run complete.', false);
+
+        return $allSucceeded;
     }
 
     /**
      * Fetch the next $limit pending queue jobs where ALL related bucket images
-     * are in 'downloaded' status (or there are no bucket images at all).
-     * downloaded batches are skipped automatically.
+     * reached a final download state — 'downloaded' or 'failed' — (or there are
+     * no bucket images at all). Failed downloads are reported back to IXPF as
+     * upload errors instead of leaving the queue job pending forever.
      *
      * @param int $limit Maximum number of queue rows to return.
      * @return array<int, array{queue: array<string, mixed>, images: array<int, array<string, mixed>>}>
@@ -124,7 +135,10 @@ class DirectGallerySync
             ->joinLeft(['bi' => $bucketTable], 'bi.photo_studio_queue_id = q.entity_id', [])
             ->where('q.status = ?', self::STATUS_PENDING)
             ->group('q.entity_id')
-            ->having('COUNT(bi.entity_id) = 0 OR COUNT(bi.entity_id) = SUM(bi.status = ?)', self::STATUS_DOWNLOADED)
+            ->having($conn->quoteInto(
+                'COUNT(bi.entity_id) = 0 OR COUNT(bi.entity_id) = SUM(bi.status IN (?))',
+                [self::STATUS_DOWNLOADED, self::STATUS_FAILED]
+            ))
             ->order('q.created_at ASC')
             ->limit($limit);
 
@@ -170,9 +184,14 @@ class DirectGallerySync
      *   7. Update metadata (label, position, disabled, roles) for existing entries.
      *   8. Persist final status and response_result to the queue row.
      *
+     * Any error (failed download, missing/corrupt file, DB error) marks the
+     * result as success=false / status_code=500. The job still goes to
+     * ready_for_webhook so IXPF is notified.
+     *
      * @param array{queue: array<string, mixed>, images: array<int, array<string, mixed>>} $batch
+     * @return bool True when the batch finished without any error.
      */
-    private function processBatch(array $batch): void
+    private function processBatch(array $batch): bool
     {
         $queue = $batch['queue'];
         $queueId = (int)$queue['entity_id'];
@@ -182,14 +201,14 @@ class DirectGallerySync
         if (!is_array($payload)) {
             $this->logError(sprintf('DirectGallerySync: Queue ID=%d — Invalid payload JSON.', $queueId));
             $this->failQueue($queueId, ['Invalid payload JSON (could not decode).']);
-            return;
+            return false;
         }
 
         $productRow = $this->getProductRow($productId);
         if ($productRow === null) {
             $this->logError(sprintf('DirectGallerySync: Queue ID=%d — Product ID=%d not found.', $queueId, $productId));
             $this->failQueue($queueId, ['Product not found: ID=' . $productId]);
-            return;
+            return false;
         }
 
         if (empty($payload)) {
@@ -198,12 +217,7 @@ class DirectGallerySync
                 $queueId, $productId
             ));
             $deleteErrors = $this->deleteAllImages($productRow);
-            $this->updateQueueStatus($queueId, self::STATUS_READY_FOR_WEBHOOK, [
-                'success' => true,
-                'status' => self::STATUS_READY_FOR_WEBHOOK,
-                'details' => ['gallery_images' => [], 'upload_errors' => [], 'others_errors' => $deleteErrors],
-            ]);
-            return;
+            return $this->completeQueue($queueId, [], [], $deleteErrors);
         }
 
         [$newImages, $existingImages, $keepValueIds] = $this->classifyPayloadItems($payload);
@@ -218,7 +232,11 @@ class DirectGallerySync
         $otherErrors = [];
 
         $otherErrors = array_merge($otherErrors, $this->deleteRemovedImages($productRow, $keepValueIds));
-        [$addErrors, $addUploadErrors] = $this->addNewImages($productRow, $newImages);
+        [$addErrors, $addUploadErrors] = $this->addNewImages(
+            $productRow,
+            $newImages,
+            $this->getFailedDownloads($batch['images'])
+        );
         $otherErrors = array_merge($otherErrors, $addErrors);
         $uploadErrors = array_merge($uploadErrors, $addUploadErrors);
         $otherErrors = array_merge($otherErrors, $this->updateExistingImages($productRow, $existingImages));
@@ -228,15 +246,30 @@ class DirectGallerySync
             $queueId, $productId, count($uploadErrors), count($otherErrors)
         ));
 
-        $this->updateQueueStatus($queueId, self::STATUS_READY_FOR_WEBHOOK, [
-            'success' => true,
-            'status' => self::STATUS_READY_FOR_WEBHOOK,
-            'details' => [
-                'gallery_images' => $this->photoStudioHelper->getGalleryImages($productId),
-                'upload_errors' => $uploadErrors,
-                'others_errors' => $otherErrors,
-            ],
-        ]);
+        return $this->completeQueue(
+            $queueId,
+            $this->photoStudioHelper->getGalleryImages($productId),
+            $uploadErrors,
+            $otherErrors
+        );
+    }
+
+    /**
+     * Map bucket_image_path → error_message for the batch's failed downloads.
+     *
+     * @param array<int, array<string, mixed>> $images Rows from ixpf_photo_studio_bucket_images.
+     * @return array<string, string>
+     */
+    private function getFailedDownloads(array $images): array
+    {
+        $failed = [];
+        foreach ($images as $image) {
+            if (($image['status'] ?? '') === self::STATUS_FAILED) {
+                $failed[(string)$image['bucket_image_path']] = (string)($image['error_message'] ?? '') ?: 'Download failed';
+            }
+        }
+
+        return $failed;
     }
 
 
@@ -445,9 +478,10 @@ class DirectGallerySync
      *
      * @param array{entity_id: int, row_id: int, sku: string} $productRow
      * @param array<int, array<string, mixed>> $newImages Items classified as 'new_image'.
+     * @param array<string, string> $failedDownloads bucket_image_path → download error message.
      * @return array{0: string[], 1: array[]}  [$otherErrors, $uploadErrors]
      */
-    private function addNewImages(array $productRow, array $newImages): array
+    private function addNewImages(array $productRow, array $newImages, array $failedDownloads = []): array
     {
         if (empty($newImages)) {
             return [[], []];
@@ -460,12 +494,23 @@ class DirectGallerySync
         $uploadErrors = [];
 
         foreach ($newImages as $item) {
-            $filename = basename($item['bucket_url'] ?? '');
+            $bucketUrl = (string)($item['bucket_url'] ?? '');
+            // Same sanitising as ProcessGoogleBucketImages::sanitizeFilename() so the paths match.
+            $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($bucketUrl));
             $sourcePath = $downloadDir . $filename;
+
+            if (isset($failedDownloads[$bucketUrl])) {
+                $msg = sprintf('Download failed, skipped: %s (%s)', $filename, $failedDownloads[$bucketUrl]);
+                $this->logWarning('DirectGallerySync: ' . $msg);
+                $uploadErrors[] = array_merge($item, ['error' => $msg]);
+                $otherErrors[] = $msg;
+                continue;
+            }
 
             if (!file_exists($sourcePath) || filesize($sourcePath) === 0) {
                 $msg = 'File not found on disk, skipped: ' . $filename;
                 $this->logWarning('DirectGallerySync: ' . $msg);
+                $uploadErrors[] = array_merge($item, ['error' => $msg]);
                 $otherErrors[] = $msg;
                 continue;
             }
@@ -475,6 +520,7 @@ class DirectGallerySync
                 if ($img === false) {
                     $msg = 'Image corrupted, skipped: ' . $filename;
                     $this->logWarning('DirectGallerySync: ' . $msg);
+                    $uploadErrors[] = array_merge($item, ['error' => $msg]);
                     $otherErrors[] = $msg;
                     continue;
                 }
@@ -948,19 +994,46 @@ class DirectGallerySync
     }
 
     /**
-     * Convenience wrapper: mark a queue row as permanently failed and persist
-     * the error details in response_result.
+     * Persist the final result of a processed batch and hand it to the webhook.
+     *
+     * Any upload or other error flips the result to success=false /
+     * status_code=500; the row still moves to ready_for_webhook so IXPF
+     * receives the failure.
+     *
+     * @param int $queueId
+     * @param array $galleryImages Current gallery state.
+     * @param array[] $uploadErrors Payload items that could not be added, each with an 'error' key.
+     * @param string[] $othersErrors Human-readable error messages.
+     * @return bool True when there were no errors.
+     */
+    private function completeQueue(int $queueId, array $galleryImages, array $uploadErrors, array $othersErrors): bool
+    {
+        $success = empty($uploadErrors) && empty($othersErrors);
+
+        $this->updateQueueStatus($queueId, self::STATUS_READY_FOR_WEBHOOK, [
+            'success' => $success,
+            'status' => $success ? self::STATUS_READY_FOR_WEBHOOK : self::STATUS_FAILED,
+            'status_code' => $success ? self::RESPONSE_CODE_SUCCESS : self::RESPONSE_CODE_FAILED,
+            'details' => [
+                'gallery_images' => $galleryImages,
+                'upload_errors' => $uploadErrors,
+                'others_errors' => $othersErrors,
+            ],
+        ]);
+
+        return $success;
+    }
+
+    /**
+     * Convenience wrapper: report a batch that could not be processed at all
+     * (bad payload, missing product) as success=false / status_code=500.
      *
      * @param int $queueId
      * @param string[] $othersErrors Human-readable error messages.
      */
     private function failQueue(int $queueId, array $othersErrors): void
     {
-        $this->updateQueueStatus($queueId, self::STATUS_FAILED, [
-            'success' => false,
-            'status' => self::STATUS_FAILED,
-            'details' => ['gallery_images' => [], 'upload_errors' => [], 'others_errors' => $othersErrors],
-        ]);
+        $this->completeQueue($queueId, [], [], $othersErrors);
     }
 
     /**
@@ -969,7 +1042,8 @@ class DirectGallerySync
      * The response_result shape mirrors PhotoStudio::manageGalleryImages():
      * {
      *   "success": true|false,
-     *   "status":  "ready_for_webhook"|"failed"|"failed_by_magento",
+     *   "status":  "ready_for_webhook"|"failed",
+     *   "status_code": 200|500,
      *   "details": {
      *     "gallery_images": [...],
      *     "upload_errors":  [...],

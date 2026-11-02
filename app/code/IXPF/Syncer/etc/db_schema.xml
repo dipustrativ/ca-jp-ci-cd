@@ -20,6 +20,14 @@
             <column name="type"/>
             <column name="object_id"/>
         </constraint>
+        <!-- Serves claimBatch() / recoverStuckProcessingJobs(). Without it their
+             SELECT ... FOR UPDATE scans and locks the whole table, deadlocking
+             with the indexer upserts. -->
+        <index referenceId="IXPF_WEBHOOK_JOBS_TYPE_TRIGGER_STATUS_UPDATED_AT" indexType="btree">
+            <column name="type"/>
+            <column name="trigger_status"/>
+            <column name="updated_at"/>
+        </index>
     </table>
 
     <!-- Append-only audit trail of every reservation exchanged with IXPF, both directions.
@@ -74,10 +82,10 @@
     </table>
 
     <!-- One row per inbound request that carried an idempotency_key. Separate from
-         ixpf_reservations because the uniqueness is per request and that table holds
-         one row per product line, so the constraint cannot live there. The INSERT is
-         the claim: two concurrent retries of the same key race on this unique index
-         and exactly one wins, which a SELECT-then-INSERT check could not guarantee. -->
+        ixpf_reservations because the uniqueness is per request and that table holds
+        one row per product line, so the constraint cannot live there. The INSERT is
+        the claim: two concurrent retries of the same key race on this unique index
+        and exactly one wins, which a SELECT-then-INSERT check could not guarantee. -->
     <table name="ixpf_reservation_idempotency" engine="innodb" comment="Claimed inbound reservation idempotency keys">
         <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true"/>
         <column xsi:type="varchar" name="idempotency_key" length="128" nullable="false" comment="Caller-supplied key, unique across inbound requests"/>
@@ -260,11 +268,13 @@
         <column xsi:type="varchar" name="source_locale" length="12" nullable="false"/>
         <column xsi:type="varchar" name="source_store_code" length="32" nullable="false"/>
         <column xsi:type="varchar" name="bought_name" length="255" nullable="true"/>
-        <column xsi:type="varchar" name="bought_variant_text" length="255" nullable="true"/>
+        <!-- On the row, not ixpf_review_text: a bought-only text row would hijack body locale
+             resolution. bought_variant_text and reply_author left the payload 2026-09-24; their
+             whitelist entries authorise the DROP. -->
+        <column xsi:type="text" name="bought_variant_texts" nullable="true" comment="JSON, locale keyed, printed as sent"/>
         <column xsi:type="varchar" name="thumbnail_path" length="500" nullable="true" comment="Bucket path as sent"/>
         <column xsi:type="varchar" name="thumbnail_local" length="500" nullable="true" comment="Local media path once fetched"/>
         <column xsi:type="smallint" name="has_photos" nullable="false" default="0" comment="Denormalised, drives the photo filter"/>
-        <column xsi:type="varchar" name="reply_author" length="255" nullable="true"/>
         <column xsi:type="datetime" name="reply_created_at" nullable="true"/>
 
         <constraint xsi:type="primary" referenceId="PRIMARY">
@@ -277,20 +287,25 @@
                     table="ixpf_review" column="review_group"
                     referenceTable="ixpf_review_group" referenceColumn="review_group" onDelete="CASCADE"/>
 
-        <!-- created_at is the trailing column on purpose: the list is always sorted by it, so the
-             index satisfies filter and sort together instead of filtering then filesorting. -->
-        <index referenceId="IXPF_REVIEW_GROUP_CREATED_AT" indexType="btree">
+        <!-- The list sorts by purchase date, then review date, then entity_id (which InnoDB appends
+             to every secondary index), so these columns trail each index: filter and sort are
+             satisfied together and a page stops after its rows instead of filesorting the pool.
+             "Lowest rating" mixes ASC and DESC and still sorts within one pool. -->
+        <index referenceId="IXPF_REVIEW_GROUP_PURCHASED_AT" indexType="btree">
             <column name="review_group"/>
+            <column name="purchased_at"/>
             <column name="created_at"/>
         </index>
-        <index referenceId="IXPF_REVIEW_GROUP_RATING_CREATED_AT" indexType="btree">
+        <index referenceId="IXPF_REVIEW_GROUP_RATING_PURCHASED_AT" indexType="btree">
             <column name="review_group"/>
             <column name="rating"/>
+            <column name="purchased_at"/>
             <column name="created_at"/>
         </index>
-        <index referenceId="IXPF_REVIEW_GROUP_PHOTOS_CREATED_AT" indexType="btree">
+        <index referenceId="IXPF_REVIEW_GROUP_PHOTOS_PURCHASED_AT" indexType="btree">
             <column name="review_group"/>
             <column name="has_photos"/>
+            <column name="purchased_at"/>
             <column name="created_at"/>
         </index>
     </table>

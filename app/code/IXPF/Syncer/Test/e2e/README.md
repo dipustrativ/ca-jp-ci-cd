@@ -1,30 +1,81 @@
 # Review e2e checks
 
-Two scripts that bootstrap Magento and assert against the real database.
+Scripts that bootstrap Magento and assert against the real database.
 
 ```bash
-docker/cli php app/code/IXPF/Syncer/Test/e2e/upsert.php   # 64 checks
-docker/cli php app/code/IXPF/Syncer/Test/e2e/media.php    # 30 checks
-docker/cli php app/code/IXPF/Syncer/Test/e2e/read.php     # 86 checks
-docker/cli php app/code/IXPF/Syncer/Test/e2e/grid.php     # 37 checks
+docker/cli php app/code/IXPF/Syncer/Test/e2e/upsert.php       # 74 checks
+docker/cli php app/code/IXPF/Syncer/Test/e2e/media.php        # 33 checks
+docker/cli php app/code/IXPF/Syncer/Test/e2e/read.php         # 118 checks (113 on a single-market install)
+docker/cli php app/code/IXPF/Syncer/Test/e2e/grid.php         # 38 checks
+docker/cli php app/code/IXPF/Syncer/Test/e2e/form-embed.php   # 26 checks
 ```
 
-Each prints `N passed, M failed` and exits non-zero on failure.
+Each prints `N passed, M failed` and exits non-zero on failure. `read.php`'s source-domain
+checks need the `de`, `ch_de` and `dk` store views; on an install without them (the JP store
+has only `jp`) they print a `skip` line instead of failing.
 
-## Why these exist instead of PHPUnit
+## Drawer, in a real browser
 
-`Test/Unit/` holds the real PHPUnit tests, but **PHPUnit cannot run in this project**:
-`vendor/bin/phpunit --version` itself dies with
-
+```bash
+node app/code/IXPF/Syncer/Test/e2e/drawer.cjs [product_id]   # ~3900 checks, ~30s warm
 ```
-Subscriber "PHPUnit\Event\Test\DataProviderMethodCalledSubscriber" does not exist
+
+Every reachable storefront (16 here; `ot` shares the default domain) at desktop 1440px and phone
+390px. `drawer-fixture.php` points one product at a throwaway pool `ZZDRAWER` and restores the
+product's own `review_group` / `review_count` / `review_average` afterwards, also on failure and
+Ctrl+C. Without an id it picks the first product in every website that already has reviews.
+
+What the pool covers, per store and viewport:
+
+- bought line in the store's locale; `hu_HU` left out of the map (falls back to `en_US`); a map with
+  only `da_DK` (first-sent fallback); no line; no `bought` at all
+- reply heading from the theme CSV plus `reply_name`; a legacy `reply.author` never rendered; a
+  star-only review whose reply resolves through its source locale
+- photos: portrait, landscape and one without width/height; previews capped at 120px on the longest side, under the text; a click
+  grows the whole row to max 450px (never wider than the card), keeps aspect ratios and scrolls the clicked photo into view; the
+  second click collapses and rewinds; Enter and Space; other reviews untouched; "Images only"
+  drops the text-only review and resets the row
+- filter row: "Text only" is switched on for every other store view (`show_text_filter`, restored
+  afterwards), so both states run everywhere: shown or hidden per setting, the two checkboxes side
+  by side, selects on the same line and side by side only when they fit; the run lists which
+  stores use one, two or three lines
+- filters: photos, text, both and none return exactly the right reviews, in the HTML and by
+  clicking; with the setting off the server ignores `with_text`
+- nothing overflows: bought row, reply heading, photo row, filter row, drawer; no drawer JS errors;
+  every review image served
+
+Expected strings are read from the theme `i18n/*.csv`, so a new translation needs no test change.
+A deliberately broken bought-line locale fails 45 checks across 15 stores; a removed
+scroll-into-view fails all 32 pages.
+
+Needs Playwright's Chromium once: `npx playwright install chromium`. The script finds the npx copy
+itself, and falls back to the newest downloaded Chromium when the versions disagree.
+
+| Env | Default | |
+|---|---|---|
+| `E2E_CONCURRENCY` | 6 | Pages in flight. The first run after a static-content clear is slow (~85s) while developer mode builds `pub/static` |
+| `E2E_KEEP=1` | off | Leave the fixture up to look at it; `docker/cli php app/code/IXPF/Syncer/Test/e2e/drawer-fixture.php down` cleans up |
+| `E2E_SHOTS` | failures only | A directory: screenshot every page's drawer there |
+| `MAGENTO_PHP` | `docker/cli php` | How to run the fixture script |
+| `PLAYWRIGHT_MODULE`, `CHROMIUM_PATH` | auto | Point at a specific install |
+| `E2E_THEME` | auto | Theme whose `i18n/*.csv` holds the expected strings: `Evalent/carpet` if present, else `carpetavenue/rugs` |
+
+Every host other than the storefront's own, catalog images and the consent script are blocked: they are not under test,
+and they are most of the page weight.
+
+## Unit tests vs these scripts
+
+`Test/Unit/` holds the PHPUnit tests (PHPUnit 12, so data providers are `#[DataProvider]`
+attributes — docblock `@dataProvider` is ignored). Run them with Magento's unit config, which
+defines `BP`:
+
+```bash
+docker/cli vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist app/code/IXPF/Syncer/Test/Unit
 ```
 
-`vendor/phpunit/phpunit` has two versions overlaid (`composer dump-autoload` reports ambiguous
-class resolution for `PHPUnit\Framework\TestRunner` and `PHPUnit\Runner\PhptTestCase`). This is
-pre-existing and affects every existing test in `app/code`, not just these. Once the vendor
-install is repaired, `Test/Unit/` runs normally and these scripts become redundant for the
-logic they duplicate — they still cover the DB round trip, which unit tests do not.
+The only expected warning is the Allure extension's missing `allure/allure.config.php`.
+The e2e scripts overlap the unit tests on logic but also cover the DB round trip, which unit
+tests do not.
 
 These scripts call the service directly, so they do not cover the HTTP layer, and the media
 script hands the consumer a factory-built message rather than one that has been through the
@@ -36,7 +87,7 @@ shape, because a wrong one looks like an auth failure:
 ```bash
 U=http://com-m246.carpetavenue.devs/ixpfsyncer/V1_Reviews/Upsert
 T=$(docker/mysqlquery -N -e "SELECT t.token FROM oauth_token t
-      JOIN integration i ON i.consumer_id = t.consumer_id WHERE t.type='access' LIMIT 1")
+      JOIN integration i ON i.consumer_id = t.consumer_id WHERE t.type='access' LIMIT 1" | tr -d '| ')
 
 curl -sS -X POST "$U" -H "X-Auth-Token: Bearer $T" -H 'Content-Type: application/json' \
   --data @app/code/IXPF/Syncer/Test/fixture/review_group_8518C.json

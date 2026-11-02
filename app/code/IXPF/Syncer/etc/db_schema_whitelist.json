@@ -14,6 +14,9 @@
         "constraint": {
             "PRIMARY": true,
             "IXPF_WEBHOOK_JOBS_TYPE_OBJECT_ID": true
+        },
+        "index": {
+            "IXPF_WEBHOOK_JOBS_TYPE_TRIGGER_STATUS_UPDATED_AT": true
         }
     },
     "ixpf_reservations": {
@@ -228,6 +231,7 @@
             "source_store_code": true,
             "bought_name": true,
             "bought_variant_text": true,
+            "bought_variant_texts": true,
             "thumbnail_path": true,
             "thumbnail_local": true,
             "has_photos": true,
@@ -237,7 +241,10 @@
         "index": {
             "IXPF_REVIEW_REVIEW_GROUP_CREATED_AT": true,
             "IXPF_REVIEW_REVIEW_GROUP_RATING_CREATED_AT": true,
-            "IXPF_REVIEW_REVIEW_GROUP_HAS_PHOTOS_CREATED_AT": true
+            "IXPF_REVIEW_REVIEW_GROUP_HAS_PHOTOS_CREATED_AT": true,
+            "IXPF_REVIEW_REVIEW_GROUP_PURCHASED_AT_CREATED_AT": true,
+            "IXPF_REVIEW_REVIEW_GROUP_RATING_PURCHASED_AT_CREATED_AT": true,
+            "IXPF_REVIEW_REVIEW_GROUP_HAS_PHOTOS_PURCHASED_AT_CREATED_AT": true
         },
         "constraint": {
             "PRIMARY": true,

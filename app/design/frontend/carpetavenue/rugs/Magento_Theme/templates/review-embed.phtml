@@ -1,0 +1,27 @@
+<?php
+/**
+ * Hosted review form, embedded from its own origin. The submit stays inside the frame because
+ * its target is the frame's own origin.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \IXPF\Syncer\ViewModel\Reviews\FormEmbed $viewModel
+ */
+$viewModel = $block->getData('view_model');
+$formUrl   = $viewModel->getFormUrl();
+
+if ($formUrl === '') {
+    return;
+}
+?>
+<div class="review-embed"
+     data-mage-init='<?= $escaper->escapeHtmlAttr(json_encode([
+         'Magento_Theme/js/review-embed' => ['origin' => $viewModel->getExpectedOrigin()],
+     ])) ?>'>
+    <iframe class="review-embed__frame"
+            src="<?= $escaper->escapeUrl($formUrl) ?>"
+            title="<?= $escaper->escapeHtmlAttr(__('Write a review')) ?>"
+            loading="eager"
+            referrerpolicy="strict-origin"
+            data-review-frame></iframe>
+</div>

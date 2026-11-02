@@ -1,0 +1,482 @@
+diff --git a/html/reviews/review.js b/html/reviews/review.js
+index 21d5bf5e3..5f2b17301 100644
+--- a/html/reviews/review.js
++++ b/html/reviews/review.js
+@@ -1,3 +1,68 @@
++(function () {
++  'use strict';
++
++  /*
++   * Height reporting for the embedded form.
++   *
++   * Its own IIFE, first in the file: the form logic below returns early on every page that has
++   * no upload input, which is exactly the done and gone pages - the short ones the frame has to
++   * shrink for. Sharing a scope with it silently disabled resizing on those pages.
++   *
++   * The storefront frames this page on its own domain and cannot measure a cross-origin frame,
++   * so it sizes the frame from what we send here. With nothing sent the frame keeps whatever
++   * height the storefront guessed, which is a scrollbar inside a scrollbar on a phone.
++   *
++   * data-parent is only populated when the server recognised ?parent= as an origin allowed to
++   * embed us, so an arbitrary value in the link cannot make this page talk to a stranger. That
++   * check is the reason we post to a concrete origin instead of '*': a '*' target would hand
++   * these messages, and anything later added to them, to any page that managed to frame us.
++   */
++  var parentOrigin = document.body.dataset.parent;
++
++  if (parentOrigin && window.parent !== window) {
++    var lastHeight = 0;
++
++    var reportHeight = function () {
++      /*
++       * body's box, not documentElement.scrollHeight: the parent sets the frame's height, so
++       * documentElement is at least that tall and measuring it would report our own frame back
++       * to us - the frame could then only ever grow. The thank-you step is much shorter than
++       * the form, so shrinking has to work.
++       */
++      var height = Math.ceil(document.body.getBoundingClientRect().bottom);
++      if (height > 0 && height !== lastHeight) {
++        lastHeight = height;
++        window.parent.postMessage({ type: 'review-height', height: height }, parentOrigin);
++      }
++    };
++
++    window.addEventListener('load', reportHeight);
++    window.addEventListener('resize', reportHeight);
++
++    // Photo thumbnails, validation messages and step changes all resize the page after load.
++    if (window.ResizeObserver) {
++      new ResizeObserver(reportHeight).observe(document.body);
++    }
++
++    /*
++     * Answer the parent asking.
++     *
++     * The parent's listener is loaded asynchronously, so our load-time message usually arrives
++     * before anything over there is listening. Without this reply the first paint of every
++     * visit sits at the storefront's fallback height.
++     */
++    window.addEventListener('message', function (event) {
++      if (event.origin === parentOrigin && event.data && event.data.type === 'review-height-request') {
++        lastHeight = 0;
++        reportHeight();
++      }
++    });
++
++    reportHeight();
++  }
++
++})();
++
+ (function () {
+   'use strict';
+ 
+diff --git a/internal/config/sysconfig.go b/internal/config/sysconfig.go
+index 4999ab5e6..688a15e29 100644
+--- a/internal/config/sysconfig.go
++++ b/internal/config/sysconfig.go
+@@ -4,6 +4,7 @@ import (
+ 	"encoding/json"
+ 	"os"
+ 	"strconv"
++	"strings"
+ 
+ 	"github.com/indexon/ixpf-ng/pkg/atlas"
+ 	"github.com/indexon/ixpf-ng/pkg/logger"
+@@ -54,6 +55,20 @@ type SystemConfiguration struct {
+ 	// reproduce old behaviour.
+ 	PSIDeleteOnMagentoFailure bool `json:"PSIDeleteOnMagentoFailure"`
+ 
++	// ReviewFrameAncestors lists the storefront origins allowed to embed the review form in an
++	// iframe, as CSP frame-ancestors sources ("https://www.carpetavenue.de", or a wildcard host
++	// like "https://*.carpetavenue.devs"). Empty keeps the form unembeddable by anyone.
++	//
++	// This has to be decided here rather than at Cloudflare or the load balancer: multiple CSP
++	// headers are enforced as their intersection, so no edge can loosen a frame-ancestors the
++	// application already sent. The edge would have to strip and rewrite the header.
++	//
++	// One list for the whole deployment, not per shop: the middleware that writes the header
++	// runs before the token is resolved, so a per-shop value would cost a database read on
++	// every page load. Framing grants nothing on its own - the token is still the only way to
++	// reach a request's contents.
++	ReviewFrameAncestors []string `json:"ReviewFrameAncestors"`
++
+ 	NATS         string       `json:"NATS"`
+ 	Environment  string       `json:"environment"`
+ 	EmailService emailService `json:"EmailService"`
+@@ -80,6 +95,26 @@ func (c *SystemConfiguration) WithServicePrefix(str string) string {
+ 	return c.GetServicePrefix() + "_" + str
+ }
+ 
++// GetReviewFrameAncestors returns the configured storefront origins, falling back to the
++// comma-separated REVIEW_FRAME_ANCESTORS environment variable so a deployment can change who may
++// embed the form without a config file rebuild.
++func (c *SystemConfiguration) GetReviewFrameAncestors() []string {
++	if len(c.ReviewFrameAncestors) > 0 {
++		return c.ReviewFrameAncestors
++	}
++	env := strings.TrimSpace(os.Getenv("REVIEW_FRAME_ANCESTORS"))
++	if env == "" {
++		return nil
++	}
++	var out []string
++	for _, part := range strings.Split(env, ",") {
++		if part = strings.TrimSpace(part); part != "" {
++			out = append(out, part)
++		}
++	}
++	return out
++}
++
+ func init() {
+ 	loadConfig()
+ }
+diff --git a/internal/reviews/public/handlers.go b/internal/reviews/public/handlers.go
+index 0596846af..ffbab9118 100644
+--- a/internal/reviews/public/handlers.go
++++ b/internal/reviews/public/handlers.go
+@@ -4,6 +4,7 @@ import (
+ 	"errors"
+ 	"io"
+ 	"net/http"
++	"net/url"
+ 	"strconv"
+ 	"strings"
+ 	"time"
+@@ -104,6 +105,10 @@ func render(c *gin.Context, status int, tpl string, lang string, t strings_, dat
+ 	data["Lang"] = lang
+ 	data["T"] = t
+ 	data["Nonce"] = nonceFrom(c)
++	// Every step needs this, including the thank-you and the gone page: the embedding storefront
++	// sizes the frame from what we report, and a step that reports nothing leaves the frame at
++	// whatever height the previous one needed. Empty when we are not framed.
++	data["Parent"] = allowedParent(c)
+ 	c.HTML(status, tpl, data)
+ }
+ 
+@@ -395,7 +400,13 @@ func submitHandler(c *gin.Context) {
+ 		render(c, http.StatusOK, formTemplate, lang, t, gin.H{"Step": "thanks", "Title": t["thanks_title"], "Edit": req.EditReviewID != "", "Others": []itemView{}, "Reviewed": reviewedItems(c, req), "Token": c.Param("token"), "CSRF": c.PostForm("_csrf")})
+ 		return
+ 	}
+-	c.Redirect(http.StatusSeeOther, "/r/"+c.Param("token")+"?done=1")
++	// Carry the parent through: it is how the thank-you page knows where to report its height,
++	// and dropping it here would leave the frame stuck at the taller form's size.
++	done := "/r/" + c.Param("token") + "?done=1"
++	if parent := allowedParent(c); parent != "" {
++		done += "&parent=" + url.QueryEscape(parent)
++	}
++	c.Redirect(http.StatusSeeOther, done)
+ }
+ 
+ // uploadURLHandler hands out one signed PUT per call, scoped to this request's prefix.
+diff --git a/internal/reviews/public/routes.go b/internal/reviews/public/routes.go
+index aab4f5335..b60036658 100644
+--- a/internal/reviews/public/routes.go
++++ b/internal/reviews/public/routes.go
+@@ -4,6 +4,7 @@ import (
+ 	"net/http"
+ 
+ 	"github.com/gin-gonic/gin"
++	"github.com/indexon/ixpf-ng/pkg/logger"
+ )
+ 
+ func limitBody(c *gin.Context) {
+@@ -13,6 +14,12 @@ func limitBody(c *gin.Context) {
+ 
+ // AddPublicRoutes registers the customer-facing review form directly on the engine, outside /admin and its session middleware. Only /r/* is reachable on the public review host, so the form's script and icon live under it too.
+ func AddPublicRoutes(r *gin.Engine) {
++	// Who may embed the form is decided here and nowhere downstream - a load balancer cannot
++	// loosen a CSP the application already sent - so the effective list is worth one line at
++	// startup. "'none'" means the form is unembeddable and every storefront iframe will be
++	// blank, which is the correct default but a confusing thing to debug from the browser.
++	logger.GetLogger().Info("review form frame-ancestors: " + frameAncestors())
++
+ 	// Same hardening headers as the pages, but outside the rate limiter: every page load fetches these and they carry no token to key on. The script overrides no-store with no-cache so it revalidates instead of never caching.
+ 	r.GET("/r/review.js", securityHeadersMW, func(c *gin.Context) {
+ 		c.Header("Cache-Control", "no-cache")
+diff --git a/internal/reviews/public/security.go b/internal/reviews/public/security.go
+index d5cbef131..39eafab3a 100644
+--- a/internal/reviews/public/security.go
++++ b/internal/reviews/public/security.go
+@@ -15,6 +15,7 @@ import (
+ 	"time"
+ 
+ 	"github.com/gin-gonic/gin"
++	"github.com/indexon/ixpf-ng/internal/config"
+ 	"github.com/indexon/ixpf-ng/internal/reviews"
+ )
+ 
+@@ -105,11 +106,17 @@ func rateLimitMW(c *gin.Context) {
+ func securityHeadersMW(c *gin.Context) {
+ 	nonce := newNonce()
+ 	c.Set("cspNonce", nonce)
++	ancestors := frameAncestors()
+ 	c.Header("Content-Security-Policy",
+ 		"default-src 'none'; img-src 'self' https://storage.googleapis.com blob: data:; "+
+ 			"style-src 'nonce-"+nonce+"'; script-src 'nonce-"+nonce+"'; "+
+-			"connect-src 'self' https://storage.googleapis.com; form-action 'self'; frame-ancestors 'none'; base-uri 'none'")
+-	c.Header("X-Frame-Options", "DENY")
++			"connect-src 'self' https://storage.googleapis.com; form-action 'self'; frame-ancestors "+ancestors+"; base-uri 'none'")
++	// X-Frame-Options only when nobody may embed. It has no allowlist form - ALLOW-FROM is
++	// unimplemented in every current browser - so sending it alongside a frame-ancestors
++	// allowlist would block the embed that frame-ancestors just permitted.
++	if ancestors == none {
++		c.Header("X-Frame-Options", "DENY")
++	}
+ 	c.Header("X-Content-Type-Options", "nosniff")
+ 	c.Header("Referrer-Policy", "no-referrer")
+ 	c.Header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+@@ -117,6 +124,91 @@ func securityHeadersMW(c *gin.Context) {
+ 	c.Next()
+ }
+ 
++const none = "'none'"
++
++// frameAncestors builds the CSP source list from configuration, dropping anything that is not a
++// plain scheme://host[:port] origin.
++//
++// The values land verbatim in a response header, so a stray space or semicolon would let a bad
++// config value append directives to the policy. Rejecting instead of escaping keeps the failure
++// obvious: a malformed entry means that storefront cannot embed, never a weakened policy.
++func frameAncestors() string {
++	configured := config.SysConfig.GetReviewFrameAncestors()
++	valid := make([]string, 0, len(configured))
++	for _, origin := range configured {
++		if isFrameAncestor(origin) {
++			valid = append(valid, origin)
++		}
++	}
++	if len(valid) == 0 {
++		return none
++	}
++	return strings.Join(valid, " ")
++}
++
++// isFrameAncestor accepts http(s)://host, an optional :port, and a leading "*." wildcard label.
++func isFrameAncestor(origin string) bool {
++	host, ok := strings.CutPrefix(origin, "https://")
++	if !ok {
++		// http is allowed so a local storefront can be tested; production lists https only.
++		if host, ok = strings.CutPrefix(origin, "http://"); !ok {
++			return false
++		}
++	}
++	if host == "" || strings.ContainsAny(host, " \t;,'\"/\\") {
++		return false
++	}
++	if h, port, found := strings.Cut(host, ":"); found {
++		if n, err := strconv.Atoi(port); err != nil || n < 1 || n > 65535 {
++			return false
++		}
++		host = h
++	}
++	host = strings.TrimPrefix(host, "*.")
++	return host != "" && !strings.Contains(host, "*")
++}
++
++// allowedParent echoes back the ?parent= origin when it is one we allow to embed us.
++//
++// The form cannot discover its parent on its own: reading the parent's location is blocked
++// cross-origin, and the Referrer-Policy above deliberately strips the referrer. So the embedder
++// declares it and we check it, rather than trusting it - postMessage must target one origin, and
++// posting to a "*" or to an unverified value would hand the frame's messages to any page that
++// managed to embed it.
++func allowedParent(c *gin.Context) string {
++	parent := strings.TrimRight(strings.TrimSpace(c.Query("parent")), "/")
++	if parent == "" || !isFrameAncestor(parent) {
++		return ""
++	}
++	for _, allowed := range config.SysConfig.GetReviewFrameAncestors() {
++		if strings.EqualFold(allowed, parent) || matchesWildcard(allowed, parent) {
++			return parent
++		}
++	}
++	return ""
++}
++
++// matchesWildcard resolves a "https://*.example.com" entry against a concrete origin. One label
++// only, matching how CSP host wildcards behave: *.example.com covers a.example.com but not
++// a.b.example.com, and the scheme has to match too.
++func matchesWildcard(pattern, origin string) bool {
++	patternScheme, patternHost, ok := strings.Cut(pattern, "://")
++	if !ok || !strings.HasPrefix(patternHost, "*.") {
++		return false
++	}
++	originScheme, originHost, ok := strings.Cut(origin, "://")
++	if !ok || !strings.EqualFold(patternScheme, originScheme) {
++		return false
++	}
++	suffix := strings.ToLower(strings.TrimPrefix(patternHost, "*"))
++	originHost = strings.ToLower(originHost)
++	if !strings.HasSuffix(originHost, suffix) {
++		return false
++	}
++	label := strings.TrimSuffix(originHost, suffix)
++	return label != "" && !strings.Contains(label, ".")
++}
++
+ func newNonce() string {
+ 	b := make([]byte, 16)
+ 	_, _ = rand.Read(b)
+diff --git a/templates/review-done.gohtml b/templates/review-done.gohtml
+index 15731a619..7c5d6a535 100644
+--- a/templates/review-done.gohtml
++++ b/templates/review-done.gohtml
+@@ -18,12 +18,13 @@
+         @media (max-width:600px) { body { padding:12px 8px; } .card { padding:32px 18px; } }
+     </style>
+ </head>
+-<body>
++<body data-parent="{{.Parent}}">
+ <div class="card">
+     <div class="mark">{{if .Gone}}!{{else if .Ask}}?{{else}}✓{{end}}</div>
+     <h1>{{.Title}}</h1>
+     <p>{{.Body}}</p>
+     {{if .Action}}<form method="post" action="{{.Action}}"><button type="submit"{{if .Secondary}} class="secondary"{{end}}>{{.Button}}</button></form>{{end}}
+ </div>
++<script nonce="{{.Nonce}}" src="/r/review.js"></script>
+ </body>
+ </html>
+diff --git a/templates/review-form.gohtml b/templates/review-form.gohtml
+index 6ac3fa94e..aff003a19 100644
+--- a/templates/review-form.gohtml
++++ b/templates/review-form.gohtml
+@@ -73,7 +73,7 @@
+         @media (max-width:600px) { body { padding:12px 8px; } .card { padding:22px 16px; border-radius:10px; } h1 { font-size:21px; } .subs { grid-template-columns:1fr; gap:14px; } .stars label, .stars a { width:44px; height:44px; } .stars.small label, .stars.small a { width:38px; height:38px; } }
+     </style>
+ </head>
+-<body data-token="{{.Token}}" data-csrf="{{.CSRF}}">
++<body data-token="{{.Token}}" data-csrf="{{.CSRF}}" data-parent="{{.Parent}}">
+ <div class="card">
+ {{if eq .Step "rate"}}
+     <h1>{{.T.title_rate}}</h1>
+@@ -92,7 +92,8 @@
+     </div>
+     {{if not .Edit}}<div class="note{{if not .Saved}} hidden{{end}}" id="auto-rate" data-token="{{.Token}}" data-csrf="{{.CSRF}}" data-sku="{{.Item.SKU}}"{{if not .Saved}} data-rating="{{.Rating}}"{{end}}>{{.T.optional_note}}</div>{{end}}
+ 
+-    <form method="post" action="/r/{{.Token}}" id="review-form" enctype="multipart/form-data" novalidate>
++    {{/* The parent origin rides on the action so the POST and the redirect after it keep it; without it the thank-you step cannot report its height and the frame stays at the form's size. */}}
++    <form method="post" action="/r/{{.Token}}{{if .Parent}}?parent={{.Parent}}{{end}}" id="review-form" enctype="multipart/form-data" novalidate>
+         <input type="hidden" name="_csrf" value="{{.CSRF}}">
+         <input type="hidden" name="sku" value="{{.Item.SKU}}">
+         <div class="hp" aria-hidden="true"><input type="text" name="contact_ref" tabindex="-1" autocomplete="off"></div>
+diff --git a/internal/reviews/public/security_frame_test.go b/internal/reviews/public/security_frame_test.go
+new file mode 100644
+index 000000000..2e455078c
+--- /dev/null
++++ b/internal/reviews/public/security_frame_test.go
+@@ -0,0 +1,114 @@
++package public
++
++import (
++	"net/http/httptest"
++	"strings"
++	"testing"
++
++	"github.com/gin-gonic/gin"
++	"github.com/indexon/ixpf-ng/internal/config"
++)
++
++// The form is only embeddable because of these headers, and the failure mode is silent: a
++// storefront that is not on the list shows the customer a blank box, not an error. So the list
++// and the parent echo are worth pinning down.
++
++func TestIsFrameAncestor(t *testing.T) {
++	valid := []string{
++		"https://www.carpetavenue.de",
++		"http://de-m246.carpetavenue.devs",
++		"https://*.carpetavenue.net",
++		"https://localhost:8443",
++	}
++	for _, origin := range valid {
++		if !isFrameAncestor(origin) {
++			t.Errorf("expected %q to be a valid frame ancestor", origin)
++		}
++	}
++
++	invalid := []string{
++		"",
++		"carpetavenue.de",       // no scheme
++		"ftp://carpetavenue.de", // wrong scheme
++		"https://a.de; script-src 'unsafe-inline'", // header injection
++		"https://a.de/path",                        // path is not part of an origin
++		"https://a.de:notaport",
++		"https://*.*.carpetavenue.de",
++	}
++	for _, origin := range invalid {
++		if isFrameAncestor(origin) {
++			t.Errorf("expected %q to be rejected", origin)
++		}
++	}
++}
++
++func TestFrameAncestorsFallsBackToNone(t *testing.T) {
++	defer restoreConfig(config.SysConfig.ReviewFrameAncestors)
++
++	config.SysConfig.ReviewFrameAncestors = nil
++	if got := frameAncestors(); got != none {
++		t.Errorf("empty config: got %q, want %q", got, none)
++	}
++
++	// One bad entry must not weaken the policy for the rest, and an all-bad list must close.
++	config.SysConfig.ReviewFrameAncestors = []string{"https://a.de; frame-ancestors *", "https://b.de"}
++	if got := frameAncestors(); got != "https://b.de" {
++		t.Errorf("mixed config: got %q, want %q", got, "https://b.de")
++	}
++}
++
++func TestSecurityHeadersDropsXFrameOptionsWhenFramingAllowed(t *testing.T) {
++	defer restoreConfig(config.SysConfig.ReviewFrameAncestors)
++	gin.SetMode(gin.TestMode)
++
++	config.SysConfig.ReviewFrameAncestors = []string{"https://www.carpetavenue.de"}
++	rec := httptest.NewRecorder()
++	c, _ := gin.CreateTestContext(rec)
++	c.Request = httptest.NewRequest("GET", "/r/token", nil)
++	securityHeadersMW(c)
++
++	if xfo := rec.Header().Get("X-Frame-Options"); xfo != "" {
++		t.Errorf("X-Frame-Options must be absent when an allowlist exists, got %q", xfo)
++	}
++	if csp := rec.Header().Get("Content-Security-Policy"); !strings.Contains(csp, "frame-ancestors https://www.carpetavenue.de;") {
++		t.Errorf("allowlist missing from CSP: %s", csp)
++	}
++
++	config.SysConfig.ReviewFrameAncestors = nil
++	rec = httptest.NewRecorder()
++	c, _ = gin.CreateTestContext(rec)
++	c.Request = httptest.NewRequest("GET", "/r/token", nil)
++	securityHeadersMW(c)
++
++	if rec.Header().Get("X-Frame-Options") != "DENY" {
++		t.Error("X-Frame-Options must stay when nobody may embed")
++	}
++}
++
++func TestAllowedParent(t *testing.T) {
++	defer restoreConfig(config.SysConfig.ReviewFrameAncestors)
++	gin.SetMode(gin.TestMode)
++
++	config.SysConfig.ReviewFrameAncestors = []string{"https://www.carpetavenue.de", "http://*.carpetavenue.devs"}
++
++	cases := map[string]string{
++		"https://www.carpetavenue.de":          "https://www.carpetavenue.de",
++		"https://www.carpetavenue.de/":         "https://www.carpetavenue.de", // trailing slash tolerated
++		"http://de-m246.carpetavenue.devs":     "http://de-m246.carpetavenue.devs",
++		"https://evil.example":                 "", // not on the list
++		"http://a.b.carpetavenue.devs":         "", // wildcard is one label only
++		"https://www.carpetavenue.de.evil.tld": "", // suffix trick
++		"":                                     "",
++	}
++	for parent, want := range cases {
++		c, _ := gin.CreateTestContext(httptest.NewRecorder())
++		c.Request = httptest.NewRequest("GET", "/r/token?parent="+parent, nil)
++		if got := allowedParent(c); got != want {
++			t.Errorf("parent %q: got %q, want %q", parent, got, want)
++		}
++	}
++}
++
++func restoreConfig(previous []string) {
++	config.SysConfig.ReviewFrameAncestors = previous
++}

@@ -480,6 +480,7 @@ Same full shape as Create/Update, with `mode` = `coupon_removed` and
 {
   "shipping_method": "flatrate_flatrate",
   "payment_method": "checkmo",
+  "order_email": "buyer@example.com",
   "send_email": true,
   "comment": "Order placed via IXPF phone order",
   "comment_visible_storefront": false,

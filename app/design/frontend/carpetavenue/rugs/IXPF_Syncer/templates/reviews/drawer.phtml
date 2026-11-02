@@ -1,0 +1,148 @@
+<?php
+/**
+ * The drawer shell.
+ *
+ * Ships empty. Summary and first page arrive from ixpfsyncer/reviews/load when the drawer is first
+ * opened, so a product page nobody opens the drawer on costs nothing and the page stays in the
+ * full page cache.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \IXPF\Syncer\ViewModel\Reviews\Reviews $viewModel
+ */
+$viewModel = $block->getData('view_model');
+
+if (!$viewModel->showTrigger()) {
+    return;
+}
+
+$config = [
+    'IXPF_Syncer/js/reviews-drawer' => [
+        'loadUrl'   => $viewModel->getLoadUrl(),
+        'productId' => $viewModel->getProductId(),
+        'title'     => (string)__('Reviews'),
+        'closeText' => (string)__('Close'),
+    ],
+];
+?>
+<div id="ixpf-reviews-drawer"
+     class="ixpf-reviews-drawer"
+     data-mage-init='<?= $escaper->escapeHtmlAttr(json_encode($config)) ?>'>
+
+    <?php
+    /*
+     * Both containers ship a skeleton rather than empty. The first load replaces the whole
+     * container with .html(), so this needs no JS and no extra request - and because it is static
+     * markup it stays inside the full page cache. Filter and sort reloads keep the existing
+     * dim-in-place instead: the list is already populated by then, so swapping a skeleton back in
+     * would make the panel jump.
+     */
+    ?>
+    <div class="ixpf-reviews-drawer__summary" data-ixpf-reviews-summary>
+        <div class="ixpf-reviews-skeleton" aria-hidden="true">
+            <span class="ixpf-reviews-skeleton__box ixpf-reviews-skeleton__box--score"></span>
+            <?php for ($bar = 0; $bar < 5; $bar++): ?>
+                <span class="ixpf-reviews-skeleton__box ixpf-reviews-skeleton__box--bar"></span>
+            <?php endfor; ?>
+        </div>
+    </div>
+
+    <div class="ixpf-reviews-drawer__controls">
+        <?php
+        /*
+         * Short label on purpose. "Show only with images" needs ~146px next to two selects, which
+         * does not fit a 390px panel without ellipsising - and a truncated control label reads as
+         * broken. The full intent is carried by the checkbox's title for anyone who wants it.
+         */
+        ?>
+        <?php
+        /*
+         * One group, so the two checkboxes stay side by side when the selects wrap below. Each box
+         * is rendered only when switched on in admin, and ships hidden: this shell is full-page
+         * cached, so whether the pool has a photo or a written review arrives with the first load
+         * (`filters`) and the script reveals what can return something. Both switched off: no group.
+         */
+        ?>
+        <?php if ($viewModel->showPhotoFilter() || $viewModel->showTextFilter()): ?>
+            <div class="ixpf-reviews-drawer__filters" data-ixpf-reviews-filters hidden>
+                <?php if ($viewModel->showPhotoFilter()): ?>
+                    <label class="ixpf-reviews-drawer__photos" data-ixpf-reviews-filter="photos" hidden
+                           title="<?= $escaper->escapeHtmlAttr(__('Show only reviews with images')) ?>">
+                        <input type="checkbox" data-ixpf-reviews-photos value="1">
+                        <span><?= $escaper->escapeHtml(__('Images only')) ?></span>
+                    </label>
+                <?php endif; ?>
+
+                <?php /* Same short-label reasoning as above. */ ?>
+                <?php if ($viewModel->showTextFilter()): ?>
+                    <label class="ixpf-reviews-drawer__photos" data-ixpf-reviews-filter="text" hidden
+                           title="<?= $escaper->escapeHtmlAttr(__('Show only reviews with written text')) ?>">
+                        <input type="checkbox" data-ixpf-reviews-withtext value="1">
+                        <span><?= $escaper->escapeHtml(__('Text only')) ?></span>
+                    </label>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php
+        /*
+         * No visible labels: every option already names its own dimension ("All ratings",
+         * "Latest"), so a label above each select only costs vertical space and forces the row to
+         * wrap on a phone. The accessible name comes from aria-label instead, so screen readers
+         * still get "Filter by rating" / "Sort reviews".
+         */
+        ?>
+        <div class="ixpf-reviews-drawer__selects">
+            <select class="ixpf-reviews-drawer__select"
+                    data-ixpf-reviews-rating
+                    aria-label="<?= $escaper->escapeHtmlAttr(__('Filter by rating')) ?>">
+                <?php foreach ($viewModel->getRatingOptions() as $value => $label): ?>
+                    <option value="<?= $escaper->escapeHtmlAttr((string)$value) ?>">
+                        <?= $escaper->escapeHtml($label) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <select class="ixpf-reviews-drawer__select"
+                    data-ixpf-reviews-sort
+                    aria-label="<?= $escaper->escapeHtmlAttr(__('Sort reviews')) ?>">
+                <?php foreach ($viewModel->getSortOptions() as $value => $label): ?>
+                    <option value="<?= $escaper->escapeHtmlAttr((string)$value) ?>">
+                        <?= $escaper->escapeHtml($label) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+
+    <div class="ixpf-reviews-drawer__list" data-ixpf-reviews-list aria-live="polite">
+        <div class="ixpf-reviews-skeleton" aria-hidden="true">
+            <?php /* Three cards: about one phone screen, so nothing below the fold animates. */ ?>
+            <?php for ($card = 0; $card < 3; $card++): ?>
+                <div class="ixpf-reviews-skeleton__card">
+                    <span class="ixpf-reviews-skeleton__box ixpf-reviews-skeleton__box--name"></span>
+                    <span class="ixpf-reviews-skeleton__box ixpf-reviews-skeleton__box--stars"></span>
+                    <span class="ixpf-reviews-skeleton__box ixpf-reviews-skeleton__box--text"></span>
+                    <span class="ixpf-reviews-skeleton__box ixpf-reviews-skeleton__box--text ixpf-reviews-skeleton__box--short"></span>
+                </div>
+            <?php endfor; ?>
+        </div>
+    </div>
+
+    <?php
+    /*
+     * Appends the next page under the reviews already shown. Ships hidden: whether there is a
+     * next page arrives with every load (page / page_count), and the script shows the button.
+     */
+    ?>
+    <div class="ixpf-reviews-more" data-ixpf-reviews-more hidden>
+        <button type="button" class="ixpf-reviews-more__button" data-ixpf-reviews-more-button>
+            <?php /* The span anchors the loading spinner beside the label without moving it. */ ?>
+            <span class="ixpf-reviews-more__label"><?= $escaper->escapeHtml(__('Load more')) ?></span>
+        </button>
+    </div>
+
+    <p class="ixpf-reviews-drawer__error" data-ixpf-reviews-error hidden>
+        <?= $escaper->escapeHtml(__('Could not load reviews. Please try again.')) ?>
+    </p>
+</div>

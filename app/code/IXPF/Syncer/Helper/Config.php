@@ -5,6 +5,8 @@ declare(strict_types=1);
 
 namespace IXPF\Syncer\Helper;
 
+use IXPF\Syncer\Model\Config\Source\ReviewCountDisplay;
+use IXPF\Syncer\Model\Config\Source\ReviewCriteria;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 class Config extends AbstractHelper
@@ -42,9 +44,16 @@ class Config extends AbstractHelper
 
     const XML_PATH_REVIEWS_ENABLED          = 'ixpf_reviews/general/enabled';
     const XML_PATH_REVIEWS_SHOW_ON_FRONTEND = 'ixpf_reviews/general/show_on_frontend';
+    const XML_PATH_REVIEWS_SHOW_TEXT_FILTER = 'ixpf_reviews/general/show_text_filter';
+    const XML_PATH_REVIEWS_SHOW_PHOTO_FILTER = 'ixpf_reviews/general/show_photo_filter';
+    const XML_PATH_REVIEWS_COUNT_DISPLAY    = 'ixpf_reviews/general/count_display';
+    const XML_PATH_REVIEWS_REVIEW_CRITERIA  = 'ixpf_reviews/general/review_criteria';
     const XML_PATH_REVIEWS_PER_PAGE         = 'ixpf_reviews/general/per_page';
     const XML_PATH_REVIEWS_WARN_THRESHOLD   = 'ixpf_reviews/general/warn_threshold';
+    const XML_PATH_REVIEWS_REPLY_NAME       = 'ixpf_reviews/general/reply_name';
     const XML_PATH_REVIEWS_MEDIA_ENABLED    = 'ixpf_reviews/media/enabled';
+    const XML_PATH_REVIEWS_FORM_ENABLED     = 'ixpf_reviews/form/enabled';
+    const XML_PATH_REVIEWS_FORM_BASE_URL    = 'ixpf_reviews/form/base_url';
 
     const DEFAULT_WEBHOOK_DISPATCH_LIMIT    = 50;
     const DEFAULT_WEBHOOK_PARALLEL_WORKERS  = 4;
@@ -54,6 +63,7 @@ class Config extends AbstractHelper
 
     const DEFAULT_REVIEWS_PER_PAGE          = 10;
     const DEFAULT_REVIEWS_WARN_THRESHOLD    = 2000;
+    const DEFAULT_REVIEWS_REPLY_NAME        = 'Carpet Avenue Customer Service';
 
     /**
      * Root catalog category id (parent of every store root, e.g. "Default Category").
@@ -263,6 +273,62 @@ class Config extends AbstractHelper
             );
     }
 
+    /**
+     * Whether the drawer offers the "Text only" filter. Off by default.
+     */
+    public function isReviewsTextFilterEnabled(?int $storeId = null): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_REVIEWS_SHOW_TEXT_FILTER,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Whether the drawer offers the "Images only" filter. On by default. The drawer still hides it
+     * for a pool without a downloaded photo.
+     */
+    public function isReviewsPhotoFilterEnabled(?int $storeId = null): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_REVIEWS_SHOW_PHOTO_FILTER,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * How the drawer headline counts a pool: one of the ReviewCountDisplay constants.
+     */
+    public function getReviewCountDisplay(?int $storeId = null): string
+    {
+        $value = (string)$this->scopeConfig->getValue(
+            self::XML_PATH_REVIEWS_COUNT_DISPLAY,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+
+        return in_array($value, ReviewCountDisplay::VALUES, true) ? $value : ReviewCountDisplay::SPLIT;
+    }
+
+    /**
+     * What makes an entry a review rather than a bare rating: ReviewCriteria constants. Empty when
+     * every box is cleared in admin, which makes every entry a rating.
+     *
+     * @return string[]
+     */
+    public function getReviewCriteria(?int $storeId = null): array
+    {
+        $value = (string)$this->scopeConfig->getValue(
+            self::XML_PATH_REVIEWS_REVIEW_CRITERIA,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+
+        return array_values(array_intersect(ReviewCriteria::VALUES, explode(',', $value)));
+    }
+
     public function getReviewsPerPage(?int $storeId = null): int
     {
         $value = (int)$this->scopeConfig->getValue(
@@ -271,6 +337,20 @@ class Config extends AbstractHelper
             $storeId
         );
         return $value > 0 ? $value : self::DEFAULT_REVIEWS_PER_PAGE;
+    }
+
+    /**
+     * Name a store reply is attributed to. IXPF sends no author, so this is the only one shown.
+     */
+    public function getReviewReplyName(?int $storeId = null): string
+    {
+        $value = trim((string)$this->scopeConfig->getValue(
+            self::XML_PATH_REVIEWS_REPLY_NAME,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        ));
+
+        return $value !== '' ? $value : self::DEFAULT_REVIEWS_REPLY_NAME;
     }
 
     /**
@@ -286,5 +366,23 @@ class Config extends AbstractHelper
     public function isReviewMediaEnabled(): bool
     {
         return $this->scopeConfig->isSetFlag(self::XML_PATH_REVIEWS_MEDIA_ENABLED);
+    }
+
+    /**
+     * Whether /reviews serves the hosted invite form. Independent of the read-side switches
+     * above: the form is a separate application, so it can go live before or after the
+     * storefront starts showing reviews.
+     */
+    public function isReviewFormEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_REVIEWS_FORM_ENABLED);
+    }
+
+    /**
+     * Origin of the hosted form. The only source for the framed host — never the request.
+     */
+    public function getReviewFormBaseUrl(): string
+    {
+        return (string)$this->scopeConfig->getValue(self::XML_PATH_REVIEWS_FORM_BASE_URL);
     }
 }

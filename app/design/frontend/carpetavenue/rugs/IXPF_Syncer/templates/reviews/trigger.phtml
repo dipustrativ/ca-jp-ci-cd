@@ -1,0 +1,36 @@
+<?php
+/**
+ * "Title Anchor" from the spec: aggregate rating and count near the main title, acting as the
+ * button that opens the drawer.
+ *
+ * Reads only the review_count / review_average product attributes, so it renders inside
+ * full-page-cached HTML without a single query. Those attributes hold the pool aggregate, which
+ * IXPF already calculated across every variant and every market - nothing is aggregated at read
+ * time.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \IXPF\Syncer\ViewModel\Reviews\Reviews $viewModel
+ */
+$viewModel = $block->getData('view_model');
+
+if (!$viewModel->showTrigger()) {
+    return;
+}
+
+$average = $viewModel->getAttributeAverage();
+$count   = $viewModel->getAttributeCount();
+?>
+<div class="ixpf-reviews-trigger">
+    <button type="button"
+            class="ixpf-reviews-trigger__button"
+            data-ixpf-reviews-open
+            aria-haspopup="dialog"
+            aria-label="<?= $escaper->escapeHtmlAttr($viewModel->getTriggerLabel($average, $count)) ?>">
+        <?= /* @noEscape */ $viewModel->getStarsHtml($average) ?>
+        <span class="ixpf-reviews-trigger__average"><?= $escaper->escapeHtml($viewModel->formatAverage($average)) ?></span>
+        <span class="ixpf-reviews-trigger__count">
+            <?= $escaper->escapeHtml($viewModel->getCountLabel($count)) ?>
+        </span>
+    </button>
+</div>
