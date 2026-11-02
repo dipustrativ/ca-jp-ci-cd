@@ -289,3 +289,46 @@ Items %1 of %2,全%2件中%1件を表示
 "Allow remote shopping assistance","リモートショッピングサポートを許可する"
 "This allows merchants to ""see what you see"" and take actions on your behalf in order to provide better assistance.","これにより、販売者はお客様と同じ画面を確認し、より良いサポートを提供するためにお客様に代わって操作を行うことができます。"
 "Diameter","直径"
+(%1 review),(%1件のレビュー)
+(%1 reviews),(%1件のレビュー)
+%1 rating,%1件の評価
+%1 ratings,%1件の評価
+%1 review,%1件のレビュー
+%1 reviews,%1件のレビュー
+%1 star,星%1つ
+%1 stars,星%1つ
+%1: %2 out of 5,%1: 5点中%2点
+All ratings,すべての評価
+Art. No: %1,品番: %1
+Average rating %1 out of 5,平均評価 5点中%1点
+Based on %1,%1に基づく
+Based on %1 and %2,%1と%2に基づく
+BUYER,購入者
+Close,閉じる
+Could not load reviews.,レビューを読み込めませんでした。
+Could not load reviews. Please try again.,レビューを読み込めませんでした。もう一度お試しください。
+Customer service,カスタマーサービス
+Delivery,配送
+Filter by rating,評価で絞り込む
+Highest rating,評価の高い順
+Images only,画像ありのみ
+Latest,新着順
+Load more,さらに読み込む
+Lowest rating,評価の低い順
+No reviews match your selection.,選択条件に一致するレビューはありません。
+of 5,／5
+Photo by %1,%1さんの写真
+Quality,品質
+Rated %1 out of 5,5点中%1点
+Rated %1 out of 5. Read %2 review,5点中%1点。%2件のレビューを読む
+Rated %1 out of 5. Read %2 reviews,5点中%1点。%2件のレビューを読む
+Reply from %1,%1からの返信
+Reviews,レビュー
+Show only reviews with images,画像付きレビューのみ表示
+Show only reviews with written text,テキストがあるレビューのみ表示
+show original,原文を表示
+show translation,翻訳を表示
+Sort reviews,レビューを並べ替える
+Text only,テキストありのみ
+Write a review,レビューを書く
+Automatically translated from %1,%1から自動翻訳

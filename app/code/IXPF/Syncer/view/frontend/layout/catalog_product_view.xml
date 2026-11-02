@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+    Review drawer on the product page.
+
+    Both blocks stay cacheable. The trigger renders from the review_count / review_average product
+    attributes and the shell is empty markup, so neither costs a query and the page stays in the
+    full page cache. The drawer's contents arrive from ixpfsyncer/reviews/load on first open.
+
+    Templates live in the active theme, not in this module - see
+    app/design/frontend/Evalent/carpet/IXPF_Syncer/templates/reviews/.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="product.info.main">
+            <!--
+                "Title Anchor" from the spec: the aggregate sits near the main title, which here
+                means immediately above the price box.
+
+                Anchored on product.info.price, which Magento_Catalog declares as a native child of
+                product.info.main. Do not anchor on page.main.title or container.size.attribute:
+                the theme <move>s both into this container, and moves run after blocks are
+                scheduled, so the sibling does not exist yet at that point and the block silently
+                lands at the end of the container - below Add to Cart, with no warning logged.
+            -->
+            <block class="Magento\Framework\View\Element\Template"
+                   name="ixpf.reviews.trigger"
+                   before="product.info.price"
+                   template="IXPF_Syncer::reviews/trigger.phtml"
+                   ifconfig="ixpf_reviews/general/show_on_frontend">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">IXPF\Syncer\ViewModel\Reviews\Reviews</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="ixpf.reviews.drawer"
+                   template="IXPF_Syncer::reviews/drawer.phtml"
+                   ifconfig="ixpf_reviews/general/show_on_frontend">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">IXPF\Syncer\ViewModel\Reviews\Reviews</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

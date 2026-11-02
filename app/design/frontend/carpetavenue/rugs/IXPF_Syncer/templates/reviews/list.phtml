@@ -1,0 +1,34 @@
+<?php
+/**
+ * One page of reviews.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \IXPF\Syncer\ViewModel\Reviews\Reviews $viewModel
+ */
+$viewModel = $block->getData('view_model');
+$items     = $viewModel->getItems();
+
+if ($items === []) {
+    // "Load more" appends this response under the reviews already shown. A page past the end
+    // (the pool shrank between two clicks) must add nothing there, not an empty-state message.
+    if ($viewModel->getList()->getPage() > 1) {
+        return;
+    }
+    ?>
+    <p class="ixpf-reviews-empty"><?= $escaper->escapeHtml(__('No reviews match your selection.')) ?></p>
+    <?php
+    return;
+}
+
+// One block instance reused for every row rather than one per review - Template has no cache
+// lifetime, so toHtml() re-renders cleanly each time the data changes.
+$itemBlock = $block->getLayout()
+    ->createBlock(\Magento\Framework\View\Element\Template::class)
+    ->setTemplate('IXPF_Syncer::reviews/item.phtml')
+    ->setData('view_model', $viewModel);
+
+// item.phtml escapes every value it prints, hence @noEscape on the rendered card.
+foreach ($items as $item): ?>
+    <?= /* @noEscape */ $itemBlock->setData('review_item', $item)->toHtml() ?>
+<?php endforeach;

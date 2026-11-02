@@ -23,7 +23,7 @@ class PhotoStudioPipeline
 {
     private const DOWNLOAD_LIMIT = 600;
     private const DOWNLOAD_CONCURRENCY = 10;
-    private const QUEUE_LIMIT = 50;
+    private const QUEUE_LIMIT = 80;
 
     public function __construct(
         protected readonly State $state,

@@ -10,7 +10,6 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\QuoteManagement;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order\Email\Sender\OrderCommentSender;
-use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Store\Model\App\Emulation;
 
 /**
@@ -24,7 +23,6 @@ class QuoteSubmit
     public function __construct(
         protected readonly CartRepositoryInterface $cartRepository,
         protected readonly QuoteManagement          $quoteManagement,
-        protected readonly OrderSender              $orderSender,
         protected readonly OrderCommentSender       $orderCommentSender,
         protected readonly OrderRepositoryInterface $orderRepository,
         protected readonly Emulation                $emulation,
@@ -116,22 +114,24 @@ class QuoteSubmit
         // Mark order as placed via IXPF — internal note, not shown to customer.
         $ixpfHistory = $order->addCommentToStatusHistory('Order placed using IXPF', false, false);
         $ixpfHistory->setIsCustomerNotified(false);
-        $this->orderRepository->save($order);
 
         if ($comment !== '') {
             $history = $order->addCommentToStatusHistory($comment, false, $commentVisible);
             $history->setIsCustomerNotified($notifyComment);
-            $this->orderRepository->save($order);
+        }
 
-            if ($notifyComment) {
-                try {
-                    $this->orderCommentSender->send($order, true, $comment);
-                } catch (Exception $e) {
-                    $this->logger->writeDaily(
-                        "[quote_submit] Order #{$order->getIncrementId()} comment email failed: " . $e->getMessage(),
-                        'error'
-                    );
-                }
+        // One save for both notes: each extra save re-locks the order row and
+        // widens the window for a deadlock with a concurrent IXPF call.
+        $this->orderRepository->save($order);
+
+        if ($comment !== '' && $notifyComment) {
+            try {
+                $this->orderCommentSender->send($order, true, $comment);
+            } catch (Exception $e) {
+                $this->logger->writeDaily(
+                    "[quote_submit] Order #{$order->getIncrementId()} comment email failed: " . $e->getMessage(),
+                    'error'
+                );
             }
         }
 

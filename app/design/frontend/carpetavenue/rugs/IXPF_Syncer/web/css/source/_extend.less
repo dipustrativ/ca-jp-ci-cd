@@ -1,0 +1,959 @@
+//
+//  IXPF product reviews - drawer and trigger
+//  _____________________________________________
+//
+//  Collected automatically by the `//@magento_import 'source/_extend.less'` directive in
+//  theme-frontend-blank's styles-m.less - there is no file to register this in.
+//
+//  Ported from the Evalent/carpet reference theme. Brand colours come from this theme's
+//  _theme.less (@ca-green, @ca-black) instead of the reference's hard-coded hexes; the
+//  /reviews invite-page iframe (Magento_Theme::review-embed.phtml) is styled at the bottom of
+//  the common block rather than in a separate Magento_Theme/_extend.less.
+//
+//  Typography is inherited, never declared: no font-family anywhere in this file, and every size
+//  goes through .lib-font-size() so it lands on the theme's rem scale. That keeps the drawer
+//  consistent with the rest of the storefront across every locale, including the ja/nb overrides
+//  the theme applies at the html[lang] level.
+//
+
+//
+//  Variables
+//  ---------------------------------------------
+
+@reviews-drawer__width: 500px;
+//  Phone values. The desktop block at the bottom widens both - see the mobile-first note there.
+@reviews-drawer__padding: 16px;
+@reviews-drawer__padding--desktop: 28px;
+@reviews__gap: 16px;
+
+@reviews__star-color: #e39300;
+@reviews__star-empty-color: #d8d8d8;
+@reviews__verified-color: @ca-green;
+
+//  Every star on the page is this one colour. Sub-ratings used to warm up on poor scores, which
+//  put two star colours in a single card and read as an inconsistency rather than a signal.
+//  The star count already carries the value.
+@reviews__rule-color: #e8e8e8;
+@reviews__bar-track-color: #eeeeee;
+@reviews__bar-fill-color: #1a1a1a;
+@reviews__text-color: @ca-black;
+@reviews__muted-color: #6b6b6b;
+@reviews__subtle-color: #949494;
+@reviews__reply-background: #f6f6f6;
+
+//  Review photos, longest side: preview and expanded.
+@reviews__photo-size: 120px;
+@reviews__photo-size--expanded: 450px;
+
+//  Distribution bar widths, one rule per whole percent (0-100). summary.phtml prints the value
+//  as data-percent rather than an inline style="width", so the markup carries no inline CSS.
+.ixpf-reviews-dist-fill-widths(@i) when (@i >= 0) {
+    &[data-percent="@{i}"] {
+        width: (@i * 1%);
+    }
+    .ixpf-reviews-dist-fill-widths(@i - 1);
+}
+
+& when (@media-common = true) {
+
+    //
+    //  Stars
+    //  ---------------------------------------------
+    //  Plain glyphs, generously spaced. Filled boxes were tried and rejected: at these sizes five
+    //  coloured blocks side by side read as one solid bar and crowd everything next to them.
+
+    //  Accessible text for the star rows, which are aria-hidden decoration.
+    .ixpf-stars__sr-only {
+        .lib-visually-hidden();
+    }
+
+    .ixpf-stars {
+        display: inline-flex;
+        gap: 1px;
+        line-height: 1;
+        vertical-align: middle;
+        white-space: nowrap;
+
+        &__star {
+            color: @reviews__star-empty-color;
+            .lib-font-size(20);
+            line-height: 1;
+
+            &.is-filled {
+                color: @reviews__star-color;
+            }
+
+            //  Half star: the same filled glyph, painted with a hard-stop gradient clipped to the
+            //  text. No second glyph and no overlay element, so it cannot drift out of alignment
+            //  with its neighbours. Only an average can produce one - per-review and sub-rating
+            //  values are whole integers.
+            &.is-half {
+                background: linear-gradient(
+                    90deg,
+                    @reviews__star-color 50%,
+                    @reviews__star-empty-color 50%
+                );
+                //  Safari still needs the prefixed property, and background painting on a purely
+                //  inline box is unreliable - hence inline-block.
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+                display: inline-block;
+            }
+        }
+
+        &--small &__star {
+            .lib-font-size(12);
+        }
+
+        &--large &__star {
+            .lib-font-size(25);
+        }
+    }
+
+    //
+    //  Product page trigger - the spec's "Title Anchor"
+    //  ---------------------------------------------
+
+    .ixpf-reviews-trigger {
+        //  The SKU row above already carries its own bottom margin, so no top margin here - the
+        //  two stack up otherwise and leave a visible gap above the stars.
+        margin: 0 0 16px;
+
+        &__button {
+            .lib-button-reset();
+            align-items: center;
+            cursor: pointer;
+            display: inline-flex;
+            gap: 10px;
+            //  Pulls the row back up under the SKU line: 20px stars are taller than the text
+            //  they sit below, and the extra leading reads as a gap rather than as spacing.
+            margin-top: -15px;
+
+            &:hover .ixpf-reviews-trigger__count {
+                text-decoration: none;
+            }
+        }
+
+        &__average {
+            color: @reviews__text-color;
+            .lib-font-size(15);
+            font-weight: @font-weight__bold;
+        }
+
+        &__count {
+            color: @reviews__muted-color;
+            .lib-font-size(14);
+            text-decoration: underline;
+        }
+    }
+
+    //
+    //  Drawer shell
+    //  ---------------------------------------------
+    //  .modal-slide already animates from translateX(100%) to 0 via .lib-modal-slide() in
+    //  lib/web/css/source/components/_modals.less, which is exactly a right-hand entry. Only the
+    //  position and width need overriding - the base sets a left indent for its own left-side use.
+    //
+    //  Mobile-first on purpose. `_extend.less` is imported last in styles-m.less, so anything in
+    //  this @media-common block is emitted *after* the `.media-width('max')` blocks that LESS
+    //  collects from every module - a max-width override of the same specificity would lose.
+    //  Declaring the phone value here and the desktop value in a 'min' block puts the desktop
+    //  rule in styles-l.css, which loads later still, so the cascade works by construction.
+
+    .ixpf-reviews-modal.modal-slide {
+        left: auto;
+        right: 0;
+        //  90% on a phone leaves a sliver of the page visible, so it reads as a panel over the
+        //  product rather than a whole new screen. Desktop pins it to a fixed 500px below.
+        width: 90%;
+
+        .modal-inner-wrap {
+            box-shadow: -4px 0 24px rgba(0, 0, 0, .12);
+            height: 100%;
+            margin: 0;
+            max-width: none;
+            width: 100%;
+        }
+
+        //  Tight on a phone: the panel is the whole screen there, so a tall header just pushes
+        //  the first review below the fold.
+        .modal-header {
+            align-items: center;
+            border-bottom: 1px solid @reviews__rule-color;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px @reviews-drawer__padding;
+        }
+
+        .modal-title {
+            border: 0;
+            color: @reviews__text-color;
+            .lib-font-size(18);
+            font-weight: @font-weight__bold;
+            line-height: 1.2;
+            margin: 0;
+            padding: 0;
+        }
+
+        //  The base slide modal pins its close button to the left; this drawer opens from the
+        //  right, so the button belongs on the right.
+        .action-close {
+            left: auto;
+            margin: 0;
+            padding: 8px;
+            position: static;
+            right: auto;
+            top: auto;
+        }
+
+        //  The header rule already separates the two, so the content only needs a small top
+        //  offset - header padding plus a full content padding read as a large empty band.
+        .modal-content {
+            padding: 14px @reviews-drawer__padding @reviews-drawer__padding;
+        }
+
+        //  Magento's inner-scroll modal adds its own top offset; the header already provides the
+        //  separation, so it only reads as a gap.
+        &._inner-scroll .modal-inner-wrap {
+            margin-top: 0;
+        }
+    }
+
+    .ixpf-reviews-drawer {
+        color: @reviews__text-color;
+
+        &.is-loading {
+            opacity: .55;
+            pointer-events: none;
+        }
+    }
+
+    //
+    //  First-open skeleton
+    //  ---------------------------------------------
+    //
+    //  Shipped in the drawer markup and replaced by the first response, so it costs no JS. Only
+    //  the first open sees it - paging and filtering dim the populated list instead.
+
+    .ixpf-reviews-skeleton {
+        &__card {
+            border-bottom: 1px solid @reviews__rule-color;
+            padding: 20px 0;
+
+            &:last-child {
+                border-bottom: 0;
+            }
+        }
+
+        &__box {
+            animation: ixpf-reviews-skeleton-pulse 1.4s ease-in-out infinite;
+            background: @reviews__bar-track-color;
+            display: block;
+            height: 9px;
+            margin-bottom: 10px;
+
+            //  Heights and widths mirror the real rows so the swap does not shift the layout.
+            &--score {
+                height: 26px;
+                margin-bottom: 18px;
+                width: 120px;
+            }
+
+            &--name {
+                height: 15px;
+                width: 40%;
+            }
+
+            &--stars {
+                height: 13px;
+                width: 88px;
+            }
+
+            &--text {
+                height: 13px;
+                width: 100%;
+            }
+
+            &--short {
+                width: 60%;
+            }
+        }
+    }
+
+    @keyframes ixpf-reviews-skeleton-pulse {
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: .45;
+        }
+    }
+
+    //  A pulsing block is exactly the kind of motion this setting asks to stop. The grey boxes
+    //  still communicate "loading" without it.
+    @media (prefers-reduced-motion: reduce) {
+        .ixpf-reviews-skeleton__box {
+            animation: none;
+        }
+    }
+
+    //
+    //  Summary and distribution chart
+    //  ---------------------------------------------
+
+    .ixpf-reviews-summary {
+        margin-top: 0;
+
+        &__headline {
+            align-items: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        &__score {
+            .lib-font-size(26);
+            font-weight: @font-weight__bold;
+            line-height: 1;
+        }
+
+        &__outof,
+        &__count {
+            color: @reviews__muted-color;
+            .lib-font-size(14);
+        }
+
+        &__count {
+            margin-left: 4px;
+        }
+    }
+
+    .ixpf-reviews-dist {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        &__row {
+            align-items: center;
+            display: flex;
+            .lib-font-size(13);
+            margin: 0 0 8px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        //  min-width, not width: "5 Sterne" fits 66px but a longer locale would be clipped by a
+        //  fixed one, and the track next to it can give up the space.
+        &__label {
+            color: @reviews__muted-color;
+            flex-shrink: 0;
+            min-width: 66px;
+        }
+
+        &__track {
+            background: @reviews__bar-track-color;
+            flex-grow: 1;
+            height: 9px;
+            margin: 0 14px;
+            overflow: hidden;
+        }
+
+        &__fill {
+            background: @reviews__bar-fill-color;
+            display: block;
+            height: 100%;
+            width: 0;
+            .ixpf-reviews-dist-fill-widths(100);
+        }
+
+        &__percent {
+            color: @reviews__muted-color;
+            flex-shrink: 0;
+            text-align: right;
+            width: 38px;
+        }
+    }
+
+    //
+    //  Filter + sort controls
+    //  ---------------------------------------------
+
+    //  Two items: the checkbox pair and the selects. One line when both fit, otherwise the
+    //  selects drop below. Wrap, not nowrap: nowrap ellipsised the German labels to "Nur...",
+    //  and a clipped label reads as broken where a second line does not.
+    .ixpf-reviews-drawer__controls {
+        align-items: center;
+        border-bottom: 1px solid @reviews__rule-color;
+        border-top: 1px solid @reviews__rule-color;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: space-between;
+        margin: 18px 0 0;
+        padding: 12px 0;
+    }
+
+    //  Never split: spread apart by space-between, the pair read as unrelated controls.
+    .ixpf-reviews-drawer__filters {
+        align-items: center;
+        display: flex;
+        flex-shrink: 0;
+        gap: 16px;
+
+        //  Hidden until the load says the pool has a photo or a written review; display:flex
+        //  above would otherwise beat the attribute.
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    .ixpf-reviews-drawer__photos {
+        align-items: center;
+        cursor: pointer;
+        display: flex;
+        .lib-font-size(13);
+        gap: 8px;
+        margin: 0;
+
+        &[hidden] {
+            display: none;
+        }
+
+        //  Explicit box and zero margin: the theme's checkbox carries its own metrics, which
+        //  left it 2px below the centre line shared by the label and the two selects.
+        //  The theme nudges every checkbox with position:relative; top:2px, which knocked this
+        //  one 2px below the centre line shared by the label and the two selects. Flex centring
+        //  cannot undo a relative offset, so it has to be zeroed explicitly.
+        input[type='checkbox'] {
+            flex-shrink: 0;
+            height: 16px;
+            margin: 0;
+            top: 0;
+            vertical-align: middle;
+            width: 16px;
+        }
+
+        > span {
+            line-height: 1;
+        }
+    }
+
+    //  Same rule for the selects: side by side when they fit, stacked when not. Unshrinkable,
+    //  they overflowed a phone by up to 17px in es, pt and hu.
+    .ixpf-reviews-drawer__selects {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        max-width: 100%;
+    }
+
+    //  No checkbox group (none shown for this pool, or both switched off in admin): the selects
+    //  keep the right-hand place they have beside the checkboxes.
+    .ixpf-reviews-drawer__filters[hidden] + .ixpf-reviews-drawer__selects,
+    .ixpf-reviews-drawer__selects:first-child {
+        margin-left: auto;
+    }
+
+    select.ixpf-reviews-drawer__select {
+        .lib-font-size(13);
+        height: auto;
+        padding: 7px 26px 7px 10px;
+        width: auto;
+    }
+
+    //
+    //  Review card
+    //  ---------------------------------------------
+
+    .ixpf-review {
+        border-bottom: 1px solid @reviews__rule-color;
+        padding: 20px 0;
+
+        &:last-child {
+            border-bottom: 0;
+        }
+
+        //  Centre, not baseline. The meta column mixes an icon badge with 12px text, so its
+        //  baseline sits a few pixels off the 15px name and the rows looked misaligned.
+        &__head {
+            align-items: center;
+            display: flex;
+            gap: @reviews__gap;
+            justify-content: space-between;
+            min-height: 20px;
+        }
+
+        &__author {
+            .lib-font-size(15);
+            font-weight: @font-weight__bold;
+            line-height: 1.3;
+            margin: 0;
+        }
+
+        &__flag {
+            margin-left: 6px;
+            vertical-align: middle;
+            line-height: 1;
+            display: inline-block;
+        }
+
+        &__meta {
+            align-items: center;
+            display: flex;
+            flex-shrink: 0;
+            gap: 12px;
+            line-height: 1.25;
+        }
+
+        &__verified {
+            align-items: center;
+            color: @reviews__verified-color;
+            display: flex;
+            gap: 5px;
+        }
+
+        &__verified-icon {
+            height: 14px;
+            width: 14px;
+        }
+
+        &__verified-text {
+            .lib-font-size(11);
+            font-weight: @font-weight__bold;
+            letter-spacing: .08em;
+            line-height: 1;
+        }
+
+        &__purchase-date {
+            color: @reviews__muted-color;
+            .lib-font-size(12);
+            line-height: 1;
+        }
+
+        //  When the review came in, under the name.
+        &__date {
+            color: @reviews__muted-color;
+            display: block;
+            .lib-font-size(12);
+            line-height: 1;
+            margin-top: 4px;
+        }
+
+        &__rating {
+            margin-top: 8px;
+        }
+
+        //
+        //  Variant context - which exact item was reviewed. The pool is shared across every
+        //  size, colour and market, so this row is what makes a card meaningful.
+        //
+        &__bought {
+            align-items: center;
+            color: @reviews__muted-color;
+            display: flex;
+            flex-wrap: wrap;
+            .lib-font-size(12);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        &__bought-thumb {
+            border: 1px solid @reviews__rule-color;
+            display: block;
+            flex-shrink: 0;
+            height: 38px;
+            overflow: hidden;
+            width: 38px;
+
+            img {
+                height: 100%;
+                object-fit: cover;
+                width: 100%;
+            }
+        }
+
+        &__bought-sku {
+            font-weight: @font-weight__bold;
+        }
+
+        //  Own row on phones: wrapped inline, IXPF's longer line started with the separator.
+        &__bought-variant {
+            flex-basis: 100%;
+        }
+
+        &__body-row {
+            display: flex;
+            flex-direction: column;
+            gap: @reviews__gap;
+            margin-top: 14px;
+        }
+
+        &__text {
+            flex-grow: 1;
+            .lib-font-size(14);
+            line-height: 1.65;
+            margin: 0;
+        }
+
+        //  One row that scrolls sideways; a click grows every photo in it (Rugvista).
+        //  Positioned so a photo's offsetLeft is relative to the row - see reviews-drawer.js.
+        //  A size container so an expanded photo can be capped at the row's width (cqw).
+        &__photos {
+            align-items: flex-start;
+            container-type: inline-size;
+            display: flex;
+            gap: 8px;
+            max-width: 100%;
+            overflow-x: auto;
+            position: relative;
+
+            &.is-expanded .ixpf-review__photo {
+                cursor: zoom-out;
+
+                img {
+                    max-height: @reviews__photo-size--expanded;
+                    max-width: ~"min(@{reviews__photo-size--expanded}, 100cqw)";
+                }
+            }
+        }
+
+        //  Border lives on the img: .lib-button-reset() clears the button's on hover/focus.
+        &__photo {
+            .lib-button-reset();
+            cursor: zoom-in;
+            display: block;
+            flex-shrink: 0;
+
+            img {
+                border: 1px solid @reviews__rule-color;
+                box-sizing: border-box;
+                display: block;
+                //  Longest side capped, shape kept: portrait 90x120, landscape 120x80.
+                height: auto;
+                max-height: @reviews__photo-size;
+                max-width: @reviews__photo-size;
+                width: auto;
+            }
+
+            //  Inset: the row clips anything drawn outside it.
+            &:focus-visible {
+                outline: 2px solid @reviews__text-color;
+                outline-offset: -2px;
+            }
+        }
+
+        &__subratings {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px 28px;
+            margin-top: 18px;
+        }
+
+        &__subrating {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        &__subrating-label {
+            color: @reviews__muted-color;
+            .lib-font-size(12);
+        }
+
+        &__translated {
+            color: @reviews__subtle-color;
+            .lib-font-size(12);
+            line-height: 1.5;
+            margin-top: 12px;
+        }
+
+        //  .lib-button-reset() does not normalise font metrics, so the button was rendering at
+        //  the browser's default button size - visibly larger than the note beside it. Both are
+        //  pinned to the same size and weight here.
+        &__translated-toggle {
+            .lib-button-reset();
+            color: inherit;
+            cursor: pointer;
+            .lib-font-size(12);
+            font-weight: inherit;
+            line-height: inherit;
+            margin-left: 4px;
+            text-decoration: underline;
+            vertical-align: baseline;
+
+            &:hover {
+                color: @reviews__muted-color;
+            }
+        }
+
+        &__reply {
+            background: @reviews__reply-background;
+            //  Small indent on a phone: every pixel here comes off the reply header's one line.
+            margin: 14px 0 0 10px;
+            padding: 12px 14px;
+            position: relative;
+
+            //  Speech pointer: a rotated square masking the top-left corner.
+            &:before {
+                background: @reviews__reply-background;
+                content: '';
+                height: 12px;
+                left: 20px;
+                position: absolute;
+                top: -6px;
+                transform: rotate(45deg);
+                width: 12px;
+            }
+        }
+
+        //  Date keeps its column; a long heading wraps instead of truncating.
+        &__reply-head {
+            align-items: flex-start;
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 10px;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        &__reply-author {
+            align-items: flex-start;
+            display: flex;
+            .lib-font-size(13);
+            font-weight: @font-weight__bold;
+            gap: 6px;
+            line-height: 1.4;
+            margin: 0;
+            min-width: 0;
+        }
+
+        &__reply-date {
+            color: @reviews__muted-color;
+            flex-shrink: 0;
+            .lib-font-size(12);
+            line-height: 1.5;
+        }
+
+        &__reply-icon {
+            flex-shrink: 0;
+            height: 14px;
+            margin-top: 2px;
+            width: 14px;
+        }
+
+        &__reply-text {
+            color: @reviews__muted-color;
+            .lib-font-size(13);
+            line-height: 1.65;
+            margin: 0;
+        }
+    }
+
+    .ixpf-reviews-empty {
+        color: @reviews__muted-color;
+        .lib-font-size(14);
+        padding: 30px 0;
+        text-align: center;
+    }
+
+    //
+    //  Card entrance
+    //  ---------------------------------------------
+    //  Cards added by "Load more" or a filter / sort change fade and rise into place one after
+    //  another rather than appearing all at once. The script sets the class and a per-card
+    //  animation-delay, and removes both when the card's animation ends.
+
+    .ixpf-review.is-entering {
+        animation: ixpf-review-enter .32s cubic-bezier(.2, .7, .3, 1) both;
+    }
+
+    //  No `to`: the card's resting style is the end state.
+    @keyframes ixpf-review-enter {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+    }
+
+    //
+    //  Load more
+    //  ---------------------------------------------
+
+    .ixpf-reviews-more {
+        border-top: 1px solid @reviews__rule-color;
+        margin-top: 4px;
+        padding-top: 24px;
+        //  The last page fades the button out before the script hides it (MORE_LEAVE_MS in
+        //  reviews-drawer.js is this duration).
+        transition: opacity .2s ease;
+
+        //  The hidden attribute is only a user-agent display:none, so any author display rule
+        //  outranks it. Restated here so the last page really hides the button.
+        &[hidden] {
+            display: none;
+        }
+
+        &.is-leaving {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        //  The spinner is absolute, beside the label: in the flow it would push the centred label
+        //  sideways for as long as the page loads.
+        &__label {
+            position: relative;
+
+            .ixpf-reviews-drawer.is-appending &::before {
+                animation: ixpf-reviews-spin .7s linear infinite;
+                border: 2px solid currentColor;
+                border-radius: 50%;
+                border-right-color: transparent;
+                box-sizing: border-box;
+                content: '';
+                height: 14px;
+                margin: -7px 10px 0 0;
+                position: absolute;
+                right: 100%;
+                top: 50%;
+                width: 14px;
+            }
+        }
+
+        &__button {
+            .lib-button-reset();
+            border: 1px solid @reviews__text-color;
+            cursor: pointer;
+            display: block;
+            .lib-font-size(14);
+            font-weight: @font-weight__bold;
+            padding: 14px 16px;
+            text-align: center;
+            width: 100%;
+
+            &:hover {
+                background: @reviews__reply-background;
+            }
+        }
+    }
+
+    @keyframes ixpf-reviews-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    //  Reduced motion: cards simply appear, the button hides at once, and while a page loads the
+    //  button dims instead of spinning, which still reads as busy. After the rules it overrides.
+    @media (prefers-reduced-motion: reduce) {
+        .ixpf-review.is-entering {
+            animation: none;
+        }
+
+        .ixpf-reviews-more {
+            transition: none;
+        }
+
+        .ixpf-reviews-drawer.is-appending {
+            .ixpf-reviews-more__label::before {
+                display: none;
+            }
+
+            .ixpf-reviews-more__button {
+                opacity: .55;
+            }
+        }
+    }
+
+    .ixpf-reviews-drawer__error {
+        color: @message-error__color;
+        .lib-font-size(13);
+        margin: 16px 0 0;
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    //
+    //  Review invite page - /reviews?token=... (Magento_Theme::review-embed.phtml)
+    //  ---------------------------------------------
+
+    .review-embed {
+        margin: 0 auto;
+        max-width: 760px;
+        width: 100%;
+
+        &__frame {
+            border: 0;
+            display: block;
+            width: 100%;
+
+            //  Starting height, used until the form reports its own and permanently if it never
+            //  does. Deliberately `height` and not `min-height`: a minimum would stop the script
+            //  ever shrinking the frame, so a short confirmation step would keep the tall form's
+            //  whitespace below it.
+            height: 900px;
+        }
+    }
+}
+
+//
+//  Desktop - fixed-width panel instead of full bleed
+//  _____________________________________________
+//
+//  These land in styles-l.css, which the page loads after styles-m.css, so they win over the
+//  phone defaults above without needing extra specificity or !important.
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .ixpf-reviews-modal.modal-slide {
+        //  Fixed panel on desktop; the phone default above is 90%.
+        width: @reviews-drawer__width;
+
+        .modal-header {
+            padding: 16px @reviews-drawer__padding--desktop;
+        }
+
+        .modal-title {
+            .lib-font-size(22);
+        }
+
+        .modal-content {
+            padding: 20px @reviews-drawer__padding--desktop @reviews-drawer__padding--desktop;
+        }
+    }
+
+    .ixpf-reviews-drawer__controls {
+        gap: 16px;
+        padding: 14px 0;
+    }
+
+    .ixpf-review {
+        padding: 26px 0;
+    }
+
+    //  Inline on desktop, as in the spec: Art. No | bought line.
+    .ixpf-review__bought-variant {
+        flex-basis: auto;
+    }
+
+    .ixpf-review__bought-sku + .ixpf-review__bought-variant:before {
+        color: @reviews__star-empty-color;
+        content: '|';
+        margin-right: 10px;
+    }
+
+    .ixpf-review__subratings {
+        gap: 18px 28px;
+    }
+
+    .ixpf-review__reply {
+        margin: 18px 0 0 18px;
+        padding: 16px 18px;
+    }
+}

@@ -5,5 +5,21 @@
         <route id="ixpfsyncer" frontName="ixpfsyncer">
             <module name="IXPF_Syncer" />
         </route>
+        <!--
+            Customer-facing front name for the review invite page, free of the provider's name
+            because it appears in the address bar: /reviews?token=...&sku=...&rating=...
+
+            The token is a query parameter, not a path segment. Magento derives a PHP class name
+            from the path - ActionList::get() lowercases it and turns "_" into a namespace
+            separator - so /reviews/r/<token> can only resolve through a custom router, and a
+            base64url token would arrive case-folded and split. Not worth a router.
+
+            A second front name on the same module means every controller here also answers under
+            /reviews/*. Harmless - the ingest endpoints validate their own bearer token - but do
+            not add anything here that relies on its URL prefix for access control.
+        -->
+        <route id="reviews" frontName="reviews">
+            <module name="IXPF_Syncer" />
+        </route>
     </router>
 </config>

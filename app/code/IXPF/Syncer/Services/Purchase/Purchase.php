@@ -18,7 +18,6 @@ use Magento\InventoryApi\Api\Data\SourceItemInterfaceFactory;
 use Magento\InventoryApi\Api\SourceItemRepositoryInterface;
 use Magento\InventoryApi\Api\SourceItemsDeleteInterface;
 use Magento\InventoryApi\Api\SourceItemsSaveInterface;
-use function Symfony\Component\HttpFoundation\initializeFormats;
 
 class Purchase
 {

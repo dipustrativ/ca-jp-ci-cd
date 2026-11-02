@@ -465,7 +465,7 @@
                  showInStore="1">
             <label>Product Reviews</label>
             <tab>ixpfng</tab>
-            <resource>Magento_Backend::admin</resource>
+            <resource>IXPF_Syncer::product_reviews</resource>
 
             <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
                    showInStore="1">
@@ -491,6 +491,51 @@
                     <comment>Default page size for the review list.</comment>
                     <validate>validate-digits validate-greater-than-zero</validate>
                 </field>
+                <field id="review_criteria" translate="label comment" type="multiselect" sortOrder="22"
+                       showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>What Makes an Entry a Review</label>
+                    <comment>An entry with at least one of the selected parts counts as a review; one with none is a bare rating. Clear every option to count every entry as a rating. Drives the review count in the drawer headline.</comment>
+                    <source_model>IXPF\Syncer\Model\Config\Source\ReviewCriteria</source_model>
+                    <can_be_empty>1</can_be_empty>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="count_display" translate="label comment" type="select" sortOrder="24" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Headline Count</label>
+                    <comment>How the drawer headline counts reviews and ratings. Examples assume 10 entries, 8 of them reviews.</comment>
+                    <source_model>IXPF\Syncer\Model\Config\Source\ReviewCountDisplay</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="show_photo_filter" translate="label comment" type="select" sortOrder="26"
+                       showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Show "Images only" Filter</label>
+                    <comment>Offers the "Images only" checkbox in the drawer. Still hidden for a product whose reviews have no downloaded photo. When off, a has_photos request parameter is ignored.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="show_text_filter" translate="label comment" type="select" sortOrder="27"
+                       showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Show "Text only" Filter</label>
+                    <comment>Offers the "Text only" checkbox in the drawer. Still hidden for a product without a written review. When off, a with_text request parameter is ignored. Off by default so the control row fits one line in long locales.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="reply_name" translate="label comment" type="text" sortOrder="28" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Store Reply Name</label>
+                    <comment>Who a store reply is attributed to ("Reply from ..."). IXPF sends no author, so this is the only name shown. Empty falls back to "Carpet Avenue Customer Service".</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
                 <field id="warn_threshold" translate="label comment" type="text" sortOrder="30" showInDefault="1"
                        showInWebsite="0" showInStore="0">
                     <label>Payload Warn Threshold</label>
@@ -507,6 +552,37 @@
                     <label>Enable Media Download</label>
                     <comment>Download review photos and bought-item thumbnails from the GCS bucket.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+
+            <group id="form" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Review Form</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Enable Review Form Page</label>
+                    <comment>Serves the hosted review invite form, framed, at /reviews. Independent of Enable Reviews: the form is a separate application and can go live before or after the storefront shows reviews.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="base_url" translate="label comment" type="text" sortOrder="20" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Review Form Base URL</label>
+                    <comment>Origin of the hosted form, e.g. https://review-stage.carpetavenue.com. Must be https; anything else (or empty) disables the page and logs an error.</comment>
+                    <validate>validate-url</validate>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+
+            <group id="cache" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Cache</label>
+                <field id="clean_cache" translate="label comment" type="button" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Review Cache</label>
+                    <comment>Clears only the ixpf_reviews cache type (same as bin/magento cache:clean ixpf_reviews). Every write path already invalidates itself; use this after editing the IXPF review tables by hand.</comment>
+                    <frontend_model>IXPF\Syncer\Block\Adminhtml\System\Config\CleanReviewCache</frontend_model>
                 </field>
             </group>
         </section>

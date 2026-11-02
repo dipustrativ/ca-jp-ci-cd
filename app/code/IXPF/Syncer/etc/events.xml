@@ -12,20 +12,25 @@
         <observer name="ixpf_syncer_reservation_cancel" instance="IXPF\Syncer\Observer\ReservationCancel" />
     </event>
     <event name="sales_order_save_after">
-        <observer name="ixpf_syncer_order_save_webhook" instance="IXPF\Syncer\Observer\OrderSaveWebhook" />
         <observer name="ixpf_syncer_reservation_complete" instance="IXPF\Syncer\Observer\ReservationComplete" />
     </event>
-    <event name="sales_order_invoice_save_after">
+    <!-- Webhooks fire only after the DB transaction commits. On *_save_after the row locks
+         are still held, so IXPF calling back for the same order hit lock waits / deadlocks
+         (SQLSTATE 40001) and could read uncommitted data. -->
+    <event name="sales_order_save_commit_after">
+        <observer name="ixpf_syncer_order_save_webhook" instance="IXPF\Syncer\Observer\OrderSaveWebhook" />
+    </event>
+    <event name="sales_order_invoice_save_commit_after">
         <observer name="ixpf_syncer_invoice_save_webhook" instance="IXPF\Syncer\Observer\InvoiceSaveWebhook" />
     </event>
-    <event name="sales_order_shipment_save_after">
+    <event name="sales_order_shipment_save_commit_after">
         <observer name="ixpf_syncer_shipment_save_webhook" instance="IXPF\Syncer\Observer\ShipmentSaveWebhook" />
     </event>
-    <event name="sales_order_creditmemo_save_after">
+    <event name="sales_order_creditmemo_save_commit_after">
         <observer name="ixpf_syncer_creditmemo_save_webhook" instance="IXPF\Syncer\Observer\CreditmemoSaveWebhook" />
         <observer name="ixpf_syncer_reservation_refund" instance="IXPF\Syncer\Observer\ReservationRefund" />
     </event>
-    <event name="customer_save_after">
+    <event name="customer_save_commit_after">
         <observer name="ixpf_syncer_customer_save_webhook" instance="IXPF\Syncer\Observer\CustomerSaveWebhook" />
     </event>
 </config>

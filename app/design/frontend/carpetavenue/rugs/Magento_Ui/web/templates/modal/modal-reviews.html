@@ -1,0 +1,40 @@
+<!--
+    Drawer shell for the product review panel.
+
+    Sibling of modal-filter.html and loaded the same way: the drawer passes type: 'reviews' plus
+    reviewsTpl to Magento_Ui/js/modal/modal, which resolves options[type + 'Tpl'].
+
+    It has to be a separate type, not 'filter': the layered-navigation slide-out
+    (CarpetAvenue_Productify) owns modal-filter, so a reviews drawer sharing those classes would
+    pick up its styling and lifecycle.
+
+    Title and close text use the escaping interpolation, unlike core modal-slide.html: both are
+    plain translated strings, so nothing here needs to pass through as markup. (No template
+    delimiters in this comment - the underscore compiler would evaluate them.)
+
+    modal-slide is hardcoded so the base slide transitions in lib/web/css/source/components/_modals.less
+    apply; the right-hand offset and width come from IXPF_Syncer/web/css/source/_extend.less.
+-->
+
+<aside role="dialog"
+       class="modal-<%- data.type %> <%- data.modalClass %>
+               <% if(data.innerScroll){ %><%- data.innerScrollClass %><% } %> modal-slide"
+<% if(data.title){ %> aria-labelledby="modal-title-<%- data.id %>"<% } %>
+aria-describedby="modal-content-<%- data.id %>"
+data-role="modal"
+data-type="<%- data.type %>"
+tabindex="0">
+<div data-role="focusable-start" tabindex="0"></div>
+<div class="modal-inner-wrap" data-role="focusable-scope">
+    <header class="modal-header">
+        <% if(data.title){ %>
+        <h2 id="modal-title-<%- data.id %>" class="modal-title" data-role="title"><%- data.title %></h2>
+        <% } %>
+        <button class="action-close" data-role="closeBtn" type="button">
+            <span><%- data.closeText %></span>
+        </button>
+    </header>
+    <div id="modal-content-<%- data.id %>" class="modal-content" data-role="content"></div>
+</div>
+<div data-role="focusable-end" tabindex="0"></div>
+</aside>

@@ -2,6 +2,7 @@
 
 namespace IXPF\Syncer\Helper;
 
+use Magento\Integration\Model\Oauth\Token;
 use Magento\Integration\Model\Oauth\TokenFactory;
 
 class TokenValidator
@@ -18,7 +19,12 @@ class TokenValidator
     public function checkTokenValidation($token)
     {
         $tokenModel = $this->tokenFactory->create()->loadByToken($token);
-        if (!$tokenModel->getId()) {
+        // oauth_token also holds request and verifier tokens, and a revoked integration keeps its
+        // row - existence alone would let either of those authenticate.
+        if (!$tokenModel->getId()
+            || $tokenModel->getRevoked()
+            || $tokenModel->getType() !== Token::TYPE_ACCESS
+        ) {
             throw new \Exception("Unauthorized token");
         }
 

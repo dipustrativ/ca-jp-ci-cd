@@ -25,27 +25,18 @@ use Magento\Sales\Model\Order;
  */
 class QuoteSubmitBefore implements ObserverInterface
 {
-    /**
-     * Quote data key holding the API's send_email flag.
-     */
-    public const QUOTE_FLAG = 'ixpf_send_order_email';
+    public const QUOTE_FLAG = 'ixpf_can_send_email';
 
     public function execute(Observer $observer): void
     {
-        /** @var Quote|null $quote */
-        $quote = $observer->getEvent()->getData('quote');
-        /** @var Order|null $order */
-        $order = $observer->getEvent()->getData('order');
-
-        if (!$quote || !$order) {
-            return;
+        $quote = $observer->getEvent()->getQuote();
+        if ($quote === null || !$quote->hasData(self::QUOTE_FLAG)) {
+            return; // not an IXPF submit — leave normal checkout emails alone
         }
 
-        $sendEmail = $quote->getData(self::QUOTE_FLAG);
-        if ($sendEmail === null) {
-            return;
+        $order = $observer->getEvent()->getOrder();
+        if ($order !== null) {
+            $order->setCanSendNewEmailFlag((bool)$quote->getData(self::QUOTE_FLAG));
         }
-
-        $order->setCanSendNewEmailFlag((bool)$sendEmail);
     }
 }

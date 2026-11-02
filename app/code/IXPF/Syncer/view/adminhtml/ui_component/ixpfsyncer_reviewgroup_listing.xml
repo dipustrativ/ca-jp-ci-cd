@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">ixpfsyncer_reviewgroup_listing.ixpfsyncer_reviewgroup_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <deps>
+            <dep>ixpfsyncer_reviewgroup_listing.ixpfsyncer_reviewgroup_listing_data_source</dep>
+        </deps>
+        <spinner>ixpfsyncer_reviewgroup_columns</spinner>
+    </settings>
+
+    <!-- review_group is the primary key itself, a varchar join key - this table has no
+         surrogate id, so the grid is keyed on it directly. -->
+    <dataSource name="ixpfsyncer_reviewgroup_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">review_group</param>
+            </storageConfig>
+        </settings>
+        <aclResource>IXPF_Syncer::review_pools</aclResource>
+        <dataProvider name="ixpfsyncer_reviewgroup_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>review_group</requestFieldName>
+                <primaryFieldName>review_group</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="ixpfsyncer_reviewgroup_columns">
+        <column name="review_group" sortOrder="10">
+            <settings>
+                <label translate="true">Review Group</label>
+                <filter>text</filter>
+                <dataScope>review_group</dataScope>
+            </settings>
+        </column>
+        <!-- Filters against the raw locale-keyed JSON, so a search matches the label in any
+             language IXPF sent. Not sortable: ordering by a JSON blob is meaningless. -->
+        <column name="group_label" class="IXPF\Syncer\Ui\Component\Listing\Column\ReviewGroupLabel" sortOrder="20">
+            <settings>
+                <label translate="true">Label</label>
+                <filter>text</filter>
+                <dataScope>group_label</dataScope>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="review_count" sortOrder="30">
+            <settings>
+                <label translate="true">Reviews</label>
+                <filter>textRange</filter>
+                <dataScope>review_count</dataScope>
+            </settings>
+        </column>
+        <column name="review_average" sortOrder="40">
+            <settings>
+                <label translate="true">Average</label>
+                <filter>textRange</filter>
+                <dataScope>review_average</dataScope>
+            </settings>
+        </column>
+        <column name="dist_1" sortOrder="50">
+            <settings>
+                <label translate="true">1 Star</label>
+                <dataScope>dist_1</dataScope>
+            </settings>
+        </column>
+        <column name="dist_2" sortOrder="60">
+            <settings>
+                <label translate="true">2 Star</label>
+                <dataScope>dist_2</dataScope>
+            </settings>
+        </column>
+        <column name="dist_3" sortOrder="70">
+            <settings>
+                <label translate="true">3 Star</label>
+                <dataScope>dist_3</dataScope>
+            </settings>
+        </column>
+        <column name="dist_4" sortOrder="80">
+            <settings>
+                <label translate="true">4 Star</label>
+                <dataScope>dist_4</dataScope>
+            </settings>
+        </column>
+        <column name="dist_5" sortOrder="90">
+            <settings>
+                <label translate="true">5 Star</label>
+                <dataScope>dist_5</dataScope>
+            </settings>
+        </column>
+        <column name="avg_quality" sortOrder="100">
+            <settings>
+                <label translate="true">Avg Quality</label>
+                <dataScope>avg_quality</dataScope>
+                <visible>false</visible>
+            </settings>
+        </column>
+        <column name="avg_delivery" sortOrder="110">
+            <settings>
+                <label translate="true">Avg Delivery</label>
+                <dataScope>avg_delivery</dataScope>
+                <visible>false</visible>
+            </settings>
+        </column>
+        <column name="avg_customer_service" sortOrder="120">
+            <settings>
+                <label translate="true">Avg Customer Service</label>
+                <dataScope>avg_customer_service</dataScope>
+                <visible>false</visible>
+            </settings>
+        </column>
+        <!-- generated_at is IXPF's clock and drives the staleness check; updated_at is ours and
+             says when the push actually landed. Both matter when a pool looks out of date. -->
+        <column name="generated_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date" sortOrder="130">
+            <settings>
+                <label translate="true">Generated At (IXPF)</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>generated_at</dataScope>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date" sortOrder="140">
+            <settings>
+                <label translate="true">Stored At</label>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dataScope>updated_at</dataScope>
+            </settings>
+        </column>
+    </columns>
+</listing>

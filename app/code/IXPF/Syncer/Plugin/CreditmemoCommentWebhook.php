@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace IXPF\Syncer\Plugin;
 
+use IXPF\Syncer\Helper\Logger\WebhookLogger;
+use IXPF\Syncer\Helper\Webhook;
+
 /**
- * Credit memo comment save fires the creditmemo webhook.
+ * Creditmemo comment-save webhook binding. See {@see CommentWebhook}.
  */
-class CreditmemoCommentWebhook extends AbstractCommentWebhook
+class CreditmemoCommentWebhook extends CommentWebhook
 {
-    /**
-     * @inheritDoc
-     */
-    protected function getType(): string
+    public function __construct(Webhook $webhook, WebhookLogger $logger)
     {
-        return 'creditmemo';
+        parent::__construct($webhook, $logger, 'creditmemo');
     }
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+    Review invite landing page - /reviews?token=...
+
+    1column keeps the standard header, navigation, search and footer; only the body is the form.
+
+    cacheable="false" is not a performance compromise: every URL carries a single-use token, so
+    no two customers share one. Caching them would fill the page cache with entries that can
+    never be hit, holding live invite tokens.
+
+    Template and JS live in the theme under Magento_Theme rather than IXPF_Syncer because the
+    RequireJS path is rendered into data-mage-init in the page source, and customers see this
+    page.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- The form carries its own heading, so the page title would just repeat it. -->
+        <referenceBlock name="page.main.title" remove="true"/>
+
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="review.form.embed"
+                   template="Magento_Theme::review-embed.phtml"
+                   cacheable="false">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">IXPF\Syncer\ViewModel\Reviews\FormEmbed</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>
