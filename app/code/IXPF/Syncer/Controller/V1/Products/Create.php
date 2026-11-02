@@ -71,32 +71,11 @@ class Create extends AbstractController implements HttpPostActionInterface, Csrf
                 throw new Exception('Purchase file_name is required');
             }
 
-            $requiredAttributes = $this->productPurchase->getRequiredAttributes();
+            // name and the configured required attributes are only needed to create a product,
+            // so they are checked per SKU in the purchase service once it knows create vs update.
             foreach ($payload['products'] as $product) {
-                $errorMessages = [];
-
-                if (!isset($product['sku'])) {
-                    $errorMessages[] = "Product sku is required";
-                }
-
-                if (!isset($product['name'])) {
-                    $errorMessages[] = "Product name is required";
-                }
-                if (count($requiredAttributes)) {
-                    $productAttributes = array_keys($product);
-                    $diff = array_diff($requiredAttributes, $productAttributes);
-                    $diff = array_values(array_filter($diff, function($v) {
-                        return trim($v) !== '';
-                    }));
-
-                    if (!empty($diff)) {
-                        $sku = $product['sku'] ?? '(unknown)';
-                        $errorMessages[] = "Product {$sku} is missing required attributes: " . implode(', ', $diff);
-                    }
-                }
-
-                if (is_array($errorMessages) && count($errorMessages)) {
-                    throw new \Exception(implode(", ", $errorMessages), 422);
+                if (!is_array($product) || !isset($product['sku'])) {
+                    throw new \Exception('Product sku is required', 422);
                 }
             }
 

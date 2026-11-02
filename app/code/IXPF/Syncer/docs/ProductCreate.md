@@ -60,8 +60,9 @@ Key behaviours:
 | Enable Cron | `ixpfng_purchase/cronjob/enabled` |
 
 If **Enable Purchase** is `No`, the endpoint returns `Purchase product is disabled.`
-**Required Attributes** is a comma list; every product in the payload must include
-each listed attribute or it is rejected (`422`).
+**Required Attributes** is a comma list of attributes a **new** product must include;
+a new SKU missing one fails on its own (the rest of the batch still runs). Updates of an
+existing SKU don't need them.
 
 ---
 
@@ -125,15 +126,18 @@ Invalid/missing token → error response.
 | `purchase.file_name` | Source file name |
 | `products` | Non-empty array |
 
-**Per product required:** `sku`, `name`, plus every attribute listed in the
-**Required Attributes** config.
+**Per product required:** `sku` on every product (missing → whole request `422`).
+For a **new** SKU also `name` plus every attribute in the **Required Attributes**
+config — if missing or empty (`null`, `""`, `[]`; `0` counts as a value), that SKU
+fails with `New product is missing required fields: …`.
+An **update** needs only `sku`; send just the fields to change.
 
 ### Product Fields
 
 | Field | Type | Notes |
 |---|---|---|
 | `sku` | string | Required. Immutable on update. |
-| `name` | string | Required. |
+| `name` | string | Required to create. Optional on update; blank is ignored. |
 | `status` | int | `1` enabled / `2` disabled. Default `2`. |
 | `visibility` | int | Default `4`. |
 | `attribute_set` | int | Maps to `attribute_set_id`. Default `4`. |

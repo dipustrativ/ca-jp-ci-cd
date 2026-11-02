@@ -42,6 +42,13 @@ class Purchase
      */
     private array $sourceItemCache = [];
 
+    /**
+     * Configured required attribute codes (create only), loaded once per request
+     *
+     * @var string[]|null
+     */
+    private ?array $requiredAttributes = null;
+
     public function __construct(
         protected ProductAttribute              $productAttribute,
         protected CategoryResolver              $categoryResolver,
@@ -328,6 +335,8 @@ class Purchase
                         [
                             'process_status' => $ongoing ? 'ready_for_ongoing' : 'completed',
                             'behavior' => $behavior,
+                            // an update may omit name — log the product's actual name
+                            'name' => (string)$productData->getName(),
                         ],
                         $product['sku'],
                         $purchaseOrderId
@@ -393,6 +402,7 @@ class Purchase
             $productInstance = $hasProduct;
             $behavior = 'update';
         } else {
+            $this->assertCreatable($rawProduct);
             $productInstance = $this->productFactory->create();
             $behavior = 'create';
             // Defaults for new products only — on update an omitted field keeps its current
@@ -402,6 +412,13 @@ class Purchase
                 'visibility' => 4,
                 'status' => 2,
             ];
+        }
+
+        // name is optional on update; an empty one is ignored rather than blanking the product.
+        if ($behavior === 'update' && array_key_exists('name', $productData)
+            && trim((string)$productData['name']) === ''
+        ) {
+            unset($productData['name']);
         }
 
         // attribute_set_id is a smallint: an unknown id would be saved truncated (999999 →
@@ -647,6 +664,42 @@ class Purchase
         }
 
         return $this->productCache[$sku];
+    }
+
+    /**
+     * A new product needs a name and every configured required attribute; an update needs
+     * neither (only the fields sent are changed).
+     *
+     * @param array $rawProduct
+     * @return void
+     * @throws Exception
+     */
+    private function assertCreatable(array $rawProduct): void
+    {
+        if ($this->requiredAttributes === null) {
+            $this->requiredAttributes = array_values(array_filter(array_map(
+                'trim',
+                $this->productPurchaseHelper->getRequiredAttributes()
+            )));
+        }
+
+        $missing = [];
+        if (trim((string)($rawProduct['name'] ?? '')) === '') {
+            $missing[] = 'name';
+        }
+        // A required attribute needs a value: absent, null, "" or [] count as missing (0 is a value).
+        foreach ($this->requiredAttributes as $attributeCode) {
+            $value = $rawProduct[$attributeCode] ?? null;
+            if ($value === null || $value === [] || (is_scalar($value) && trim((string)$value) === '')) {
+                $missing[] = $attributeCode;
+            }
+        }
+
+        if ($missing) {
+            throw new Exception(
+                'New product is missing required fields: ' . implode(', ', array_unique($missing))
+            );
+        }
     }
 
     /**
