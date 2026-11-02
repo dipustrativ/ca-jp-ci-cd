@@ -1,4 +1,477 @@
 increment_id,order_increment_id,store_code,created_at,updated_at,shipment_status,email_sent,send_email,customer_note,customer_note_notify,total_qty,total_weight,packages,document_comments,document_tracks,track_numbers,track_carrier_codes,track_titles,item_sku,item_name,item_description,item_additional_data,item_qty,item_price,item_row_total,item_weight
+S-20200101876,CA-20200148066,jp,"2026-11-01 12:15:58","2026-11-01 12:16:00",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8541",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8541"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-11-01 12:15:59""}]","[{""track_number"":""1410-2745-8541"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-11-01 12:15:59""}]",1410-2745-8541,custom,Sagawa,CDR11983,ハマダン,,,1.0000,27181.8200,,3.0000
+S-20200101798,CA-20200147578,jp,"2026-10-30 04:10:38","2026-10-30 04:10:41",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8552",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8552"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-30 04:10:39""}]","[{""track_number"":""1410-2745-8552"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-30 04:10:39""}]",1410-2745-8552,custom,Sagawa,CDR6485,シールジャン,,,1.0000,76363.6400,,10.0000
+S-20200101486,CA-20200147268,jp,"2026-10-27 08:03:02","2026-10-27 08:03:05",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8563",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8563"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 08:03:04""}]","[{""track_number"":""1410-2745-8563"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 08:03:04""}]",1410-2745-8563,custom,Sagawa,C141,バルーチ,,,1.0000,43636.3600,,1.5000
+S-20200101485,CA-20200147088,jp,"2026-10-27 08:02:07","2026-10-27 08:02:09",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8574",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8574"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 08:02:08""}]","[{""track_number"":""1410-2745-8574"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 08:02:08""}]",1410-2745-8574,custom,Sagawa,CDR9281,ハマダン,,,1.0000,24818.1800,,3.0000
+S-20200101484,CA-20200146855,jp,"2026-10-27 07:59:49","2026-10-27 08:00:06",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8585",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8585"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 08:00:05""}]","[{""track_number"":""1410-2745-8585"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 08:00:05""}]",1410-2745-8585,custom,Sagawa,HL1058,"Handloom Solo - ブラック / グレー",,,1.0000,94545.4500,,10.0000
+S-20200101483,CA-20200146841,jp,"2026-10-27 07:56:52","2026-10-27 07:56:54",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8611",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8611"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 07:56:53""}]","[{""track_number"":""1410-2745-8611"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:56:53""}]",1410-2745-8611,custom,Sagawa,VAN549742,"Nain Kashmar",,,1.0000,178181.8200,,8.7000
+S-20200101479,CA-20200146733,jp,"2026-10-27 07:49:00","2026-10-27 07:49:02",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8600",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8600"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 07:49:01""}]","[{""track_number"":""1410-2745-8600"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:49:01""}]",1410-2745-8600,custom,Sagawa,SBW557572,"キリム アフガン オールドスタイル",,,1.0000,62727.2700,,7.0000
+S-20200101475,CA-20200146722,jp,"2026-10-27 07:35:52","2026-10-27 07:35:54",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8596",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8596"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 07:35:53""}]","[{""track_number"":""1410-2745-8596"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:35:53""}]",1410-2745-8596,custom,Sagawa,VAN246160,"タブリーズ Tabatabai パティナ",,,1.0000,95454.5500,,6.8000
+S-20200101474,CA-20200146671,jp,"2026-10-27 07:33:38","2026-10-27 07:33:39",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8622",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8622"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 07:33:39""}]","[{""track_number"":""1410-2745-8622"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:33:39""}]",1410-2745-8622,custom,Sagawa,GAB1007,"ギャッベ ルーム  - オフホワイト",,,1.0000,78181.8200,,15.0000
+S-20200101473,CA-20200146547,jp,"2026-10-27 07:31:52","2026-10-27 07:31:54",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8633",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8633"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 07:31:53""}]","[{""track_number"":""1410-2745-8633"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:31:53""}]",1410-2745-8633,custom,Sagawa,SBW511886,カザック,,,1.0000,72727.2700,,5.0000
+S-20200101472,CA-20200146475,jp,"2026-10-27 07:29:55","2026-10-27 07:29:57",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8644",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8644"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 07:29:56""}]","[{""track_number"":""1410-2745-8644"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:29:56""}]",1410-2745-8644,custom,Sagawa,ACA546382,"ギャッベ ルーム  Mara",,,1.0000,279090.9100,,30.0000
+S-20200101471,CA-20200146448,jp,"2026-10-27 07:28:04","2026-10-27 07:28:04",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8666",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8666"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 07:28:04""}]","[{""track_number"":""1410-2745-8666"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:28:04""}]",1410-2745-8666,custom,Sagawa,AWZ1081,"Claremont - Ziegler",,,1.0000,100000.0000,,10.0000
+S-20200101470,CA-20200146382,jp,"2026-10-27 07:20:20","2026-10-27 07:20:22",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8655",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8655"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 07:20:22""}]","[{""track_number"":""1410-2745-8655"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:20:22""}]",1410-2745-8655,custom,Sagawa,RJS59290,カシャーン,,,1.0000,1503636.3600,,37.0000
+S-20200101469,CA-20200146348,jp,"2026-10-27 07:15:44","2026-10-27 07:15:46",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8670",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8670"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 07:15:45""}]","[{""track_number"":""1410-2745-8670"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:15:45""}]",1410-2745-8670,custom,Sagawa,AGF535367,キリム・パッチワーク,,,1.0000,116363.6400,,19.0000
+S-20200101468,CA-20200146317,jp,"2026-10-27 07:13:32","2026-10-27 07:13:34",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8681",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8681"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 07:13:33""}]","[{""track_number"":""1410-2745-8681"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:13:33""}]",1410-2745-8681,custom,Sagawa,VAN233614,ジョザン,,,1.0000,94545.4500,,5.9000
+S-20200101467,CA-20200146219,jp,"2026-10-27 07:12:17","2026-10-27 07:12:17",,,,,,2.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:12:32""}]",11111111,custom,Sagawa,VAN554975,"Persian Gabbeh-LORIBAFT",,,1.0000,154545.4500,,18.2000
+S-20200101467,CA-20200146219,jp,"2026-10-27 07:12:17","2026-10-27 07:12:17",,,,,,2.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:12:32""}]",11111111,custom,Sagawa,OSG16159,ペルシャギャッベ,,,1.0000,109090.9100,,11.8000
+S-20200101466,CA-20200146118,jp,"2026-10-27 07:11:19","2026-10-27 07:11:21",,1,1,"
+佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7150
+",1,1.0000,,[],"[{""comment"":""\r\n\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7150\r\n"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-27 07:11:20""}]","[{""track_number"":""1406-9791-7150"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-27 07:11:20""}]",1406-9791-7150,custom,Sagawa,DRW1483,ナイン9ラ,,,1.0000,87272.7300,,4.0000
+S-20200101220,CA-20200146838,jp,"2026-10-23 09:46:13","2026-10-23 09:46:15",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2743",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2743"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-23 09:46:14""}]","[{""track_number"":""1403-1911-2743"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-23 09:46:14""}]",1403-1911-2743,custom,Sagawa,CMD3932,ムード,,,1.0000,87272.7300,,4.9000
+S-20200101183,CA-20200147026,jp,"2026-10-23 06:24:57","2026-10-23 06:24:59",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8714",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8714"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-23 06:24:59""}]","[{""track_number"":""1410-2745-8714"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-23 06:24:59""}]",1410-2745-8714,custom,Sagawa,CDR11114,ナジャファバード,,,1.0000,10181.8200,,2.0000
+S-20200101182,CA-20200146938,jp,"2026-10-23 06:21:52","2026-10-23 06:21:54",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8692",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8692"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-23 06:21:53""}]","[{""track_number"":""1410-2745-8692"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-23 06:21:53""}]",1410-2745-8692,custom,Sagawa,CDR11836,カシャーン,,,1.0000,17727.2700,,3.0000
+S-20200101181,CA-20200146814,jp,"2026-10-23 06:18:47","2026-10-23 06:18:49",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1410-2745-8703",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1410-2745-8703"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-23 06:18:48""}]","[{""track_number"":""1410-2745-8703"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-23 06:18:48""}]",1410-2745-8703,custom,Sagawa,CDR6354,シラーズ,,,1.0000,7500.0000,,1.0000
+S-20200101180,CA-20200145924,jp,"2026-10-23 01:34:53","2026-10-23 01:34:53",,,,,,1.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-23 01:34:54""}]",11111111,custom,Sagawa,OSG14485,トルクメンパティナ,,,1.0000,188181.8200,,8.0000
+S-20200101083,CA-20200145616,jp,"2026-10-22 01:37:53","2026-10-22 01:37:53",,,,,,1.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-22 01:37:54""}]",11111111,custom,Sagawa,KSW547784,サルーク,,,1.0000,224545.4500,,24.0000
+S-20200100892,CA-20200145941,jp,"2026-10-20 07:24:02","2026-10-20 07:24:03",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7172",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7172"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-20 07:24:02""}]","[{""track_number"":""1406-9791-7172"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-20 07:24:02""}]",1406-9791-7172,custom,Sagawa,AWZ1007,"Charlotte - Ziegler",,,1.0000,68181.8200,,12.0000
+S-20200100891,CA-20200145923,jp,"2026-10-20 07:23:02","2026-10-20 07:23:02",,,,,,2.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-20 07:23:03""}]",11111111,custom,Sagawa,OSK16750,ペルシャギャッベ,,,1.0000,59090.9100,,5.5000
+S-20200100891,CA-20200145923,jp,"2026-10-20 07:23:02","2026-10-20 07:23:02",,,,,,2.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-20 07:23:03""}]",11111111,custom,Sagawa,OSK13871,ペルシャギャッベ,,,1.0000,59090.9100,,6.0000
+S-20200100890,CA-20200145417,jp,"2026-10-20 07:22:33","2026-10-20 07:22:33",,,,,,1.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-20 07:22:33""}]",11111111,custom,Sagawa,VAN235911,Kashkooli,,,1.0000,290909.0900,,11.4000
+S-20200100888,CA-20200145753,jp,"2026-10-20 07:20:42","2026-10-20 07:20:44",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7194",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7194"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-20 07:20:43""}]","[{""track_number"":""1406-9791-7194"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-20 07:20:43""}]",1406-9791-7194,custom,Sagawa,OSK15237,ペルシャギャッベ,,,1.0000,89090.9100,,5.9000
+S-20200100887,CA-20200145740,jp,"2026-10-20 07:17:58","2026-10-20 07:18:00",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7205",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7205"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-20 07:17:59""}]","[{""track_number"":""1406-9791-7205"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-20 07:17:59""}]",1406-9791-7205,custom,Sagawa,OSG16324,ペルシャギャッベ,,,1.0000,180000.0000,,20.1000
+S-20200100886,CA-20200145737,jp,"2026-10-20 07:16:48","2026-10-20 07:16:50",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7216",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7216"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-20 07:16:49""}]","[{""track_number"":""1406-9791-7216"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-20 07:16:49""}]",1406-9791-7216,custom,Sagawa,ICA20689,ハマダン,,,1.0000,79090.9100,,7.0000
+S-20200100882,CA-20200145628,jp,"2026-10-20 07:12:14","2026-10-20 07:12:17",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7220",1,2.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7220"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-20 07:12:16""}]","[{""track_number"":""1406-9791-7220"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-20 07:12:16""}]",1406-9791-7220,custom,Sagawa,SBW534439,カザックガズニ,,,1.0000,62727.2700,,5.0000
+S-20200100882,CA-20200145628,jp,"2026-10-20 07:12:14","2026-10-20 07:12:17",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7220",1,2.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7220"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-20 07:12:16""}]","[{""track_number"":""1406-9791-7220"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-20 07:12:16""}]",1406-9791-7220,custom,Sagawa,DRW564387,"ハマダン ",,,1.0000,65454.5500,,6.0000
+S-20200100881,CA-20200145436,jp,"2026-10-20 07:08:08","2026-10-20 07:08:10",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7253",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7253"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-20 07:08:09""}]","[{""track_number"":""1406-9791-7253"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-20 07:08:09""}]",1406-9791-7253,custom,Sagawa,OSG14741,トルクメン,,,1.0000,51818.1800,,2.7000
+S-20200100641,CA-20200144668,jp,"2026-10-16 01:09:32","2026-10-16 01:09:32",,,,,,1.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-16 01:09:32""}]",11111111,custom,Sagawa,VAN554878,"Persian Gabbeh",,,1.0000,127272.7200,,13.2000
+S-20200100578,CA-20200144885,jp,"2026-10-15 02:12:24","2026-10-15 02:12:26",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2780",1,2.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2780"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-15 02:12:25""}]","[{""track_number"":""1403-1911-2780"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-15 02:12:25""}]",1403-1911-2780,custom,Sagawa,CDR8568,シールジャン,,,1.0000,11818.1800,,2.0000
+S-20200100578,CA-20200144885,jp,"2026-10-15 02:12:24","2026-10-15 02:12:26",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2780",1,2.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2780"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-15 02:12:25""}]","[{""track_number"":""1403-1911-2780"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-15 02:12:25""}]",1403-1911-2780,custom,Sagawa,FRC545352,カシュガイ,,,1.0000,69090.9100,,4.0000
+S-20200100577,CA-20200144884,jp,"2026-10-15 02:10:19","2026-10-15 02:10:20",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2802",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2802"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-15 02:10:19""}]","[{""track_number"":""1403-1911-2802"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-15 02:10:19""}]",1403-1911-2802,custom,Sagawa,FRC545372,カシュガイ,,,1.0000,69090.9100,,4.0000
+S-20200100576,CA-20200144770,jp,"2026-10-15 02:08:18","2026-10-15 02:08:19",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2813",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2813"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-15 02:08:19""}]","[{""track_number"":""1403-1911-2813"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-15 02:08:19""}]",1403-1911-2813,custom,Sagawa,AW1311,"Aurelius - Gabbeh",,,1.0000,75454.5500,,10.0000
+S-20200100575,CA-20200144766,jp,"2026-10-15 02:06:27","2026-10-15 02:06:28",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2835",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2835"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-15 02:06:27""}]","[{""track_number"":""1403-1911-2835"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-15 02:06:27""}]",1403-1911-2835,custom,Sagawa,CWS555170,"Afghan Baghlan",,,1.0000,46363.6400,,5.0000
+S-20200100574,CA-20200144668,jp,"2026-10-15 01:58:11","2026-10-15 01:58:11",,,,,,6.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-15 01:58:27""}]",11111111,custom,Sagawa,OSG16114,ペルシャギャッベ,,,1.0000,136363.6400,,12.6000
+S-20200100574,CA-20200144668,jp,"2026-10-15 01:58:11","2026-10-15 01:58:11",,,,,,6.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-15 01:58:27""}]",11111111,custom,Sagawa,OSG16250,ペルシャギャッベ,,,1.0000,118181.8100,,13.9000
+S-20200100574,CA-20200144668,jp,"2026-10-15 01:58:11","2026-10-15 01:58:11",,,,,,6.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-15 01:58:27""}]",11111111,custom,Sagawa,VAN554977,"Persian Gabbeh-LORIBAFT",,,1.0000,163636.3700,,8.9000
+S-20200100574,CA-20200144668,jp,"2026-10-15 01:58:11","2026-10-15 01:58:11",,,,,,6.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-15 01:58:27""}]",11111111,custom,Sagawa,VAN554971,"Persian Gabbeh-LORIBAFT",,,1.0000,336363.6300,,15.7000
+S-20200100574,CA-20200144668,jp,"2026-10-15 01:58:11","2026-10-15 01:58:11",,,,,,6.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-15 01:58:27""}]",11111111,custom,Sagawa,VAN554744,"Persian Gabbeh",,,1.0000,127272.7300,,9.3000
+S-20200100574,CA-20200144668,jp,"2026-10-15 01:58:11","2026-10-15 01:58:11",,,,,,6.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-15 01:58:27""}]",11111111,custom,Sagawa,VAN554734,"Persian Gabbeh",,,1.0000,63636.3700,,6.2000
+S-20200100289,CA-20200145824,jp,"2026-10-13 05:40:30","2026-10-13 05:40:32",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7146",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7146"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-13 05:40:31""}]","[{""track_number"":""1406-9791-7146"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-13 05:40:31""}]",1406-9791-7146,custom,Sagawa,CDR6487,タブリーズ,,,1.0000,36363.6400,,5.0000
+S-20200100052,CA-20200145124,jp,"2026-10-09 06:50:16","2026-10-09 06:50:18",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7290",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7290"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-09 06:50:17""}]","[{""track_number"":""1406-9791-7290"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-09 06:50:17""}]",1406-9791-7290,custom,Sagawa,CDR8020,ヴィンテージ,,,1.0000,23636.3600,,3.0000
+S-20200100051,CA-20200145238,jp,"2026-10-09 06:49:18","2026-10-09 06:49:20",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7275",1,2.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7275"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-09 06:49:19""}]","[{""track_number"":""1406-9791-7275"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-09 06:49:19""}]",1406-9791-7275,custom,Sagawa,CDR6887,ハマダン,,,1.0000,2709.0900,,1.0000
+S-20200100051,CA-20200145238,jp,"2026-10-09 06:49:18","2026-10-09 06:49:20",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7275",1,2.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7275"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-09 06:49:19""}]","[{""track_number"":""1406-9791-7275"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-09 06:49:19""}]",1406-9791-7275,custom,Sagawa,CDR8441,バクティアリ,,,1.0000,2709.0900,,2.0000
+S-20200100050,CA-20200145158,jp,"2026-10-09 06:48:16","2026-10-09 06:48:19",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7286",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7286"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-09 06:48:18""}]","[{""track_number"":""1406-9791-7286"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-09 06:48:18""}]",1406-9791-7286,custom,Sagawa,CDR5998,"ギャッベ キャシュクリ",,,1.0000,168181.8200,,18.0000
+S-20200100049,CA-20200144580,jp,"2026-10-09 06:45:37","2026-10-09 06:45:37",,,,,,1.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-09 06:45:38""}]",11111111,custom,Sagawa,OSK13876,ペルシャギャッベ,,,1.0000,181818.1800,,17.0000
+S-20200100048,CA-20200144577,jp,"2026-10-09 06:45:05","2026-10-09 06:45:06",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7301",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7301"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-09 06:45:05""}]","[{""track_number"":""1406-9791-7301"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-09 06:45:05""}]",1406-9791-7301,custom,Sagawa,AU1062,"Aurora - Gold",,,1.0000,78181.8200,,15.0000
+S-20200100047,CA-20200144538,jp,"2026-10-09 06:43:18","2026-10-09 06:43:20",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7312",1,2.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7312"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-09 06:43:19""}]","[{""track_number"":""1406-9791-7312"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-09 06:43:19""}]",1406-9791-7312,custom,Sagawa,OSG16072,ペルシャギャッベ,,,1.0000,372727.2700,,22.5000
+S-20200100047,CA-20200144538,jp,"2026-10-09 06:43:18","2026-10-09 06:43:20",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7312",1,2.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7312"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-09 06:43:19""}]","[{""track_number"":""1406-9791-7312"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-09 06:43:19""}]",1406-9791-7312,custom,Sagawa,CDR3634,ギャッベロリバフ,,,1.0000,18090.9100,,2.2000
+S-20200100046,CA-20200144479,jp,"2026-10-09 06:41:28","2026-10-09 06:41:29",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7323",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7323"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-09 06:41:28""}]","[{""track_number"":""1406-9791-7323"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-09 06:41:28""}]",1406-9791-7323,custom,Sagawa,AW1162,"Aphrodite - Gabbeh",,,1.0000,50000.0000,,8.0000
+S-20200100045,CA-20200144387,jp,"2026-10-09 06:39:34","2026-10-09 06:39:37",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7334",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7334"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-09 06:39:35""}]","[{""track_number"":""1406-9791-7334"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-09 06:39:35""}]",1406-9791-7334,custom,Sagawa,RJS537731,ペルシャギャッベ,,,1.0000,71818.1800,,6.0000
+S-2020099751,CA-20200144118,jp,"2026-10-06 05:03:38","2026-10-06 05:03:56",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2872",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2872"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-06 05:03:54""}]","[{""track_number"":""1403-1911-2872"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-06 05:03:54""}]",1403-1911-2872,custom,Sagawa,HL1175,"Handloom Solo - ライトグリーン / グレー",,,1.0000,139090.9100,,16.0000
+S-2020099750,CA-20200143857,jp,"2026-10-06 05:01:57","2026-10-06 05:01:59",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2894",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2894"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-06 05:01:57""}]","[{""track_number"":""1403-1911-2894"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-06 05:01:57""}]",1403-1911-2894,custom,Sagawa,VAN215479,シラーズ,,,1.0000,300909.0900,,30.0000
+S-2020099749,CA-20200143854,jp,"2026-10-06 04:59:57","2026-10-06 04:59:59",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2905",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2905"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-06 04:59:58""}]","[{""track_number"":""1403-1911-2905"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-06 04:59:58""}]",1403-1911-2905,custom,Sagawa,EPR1069,ナイン,,,1.0000,82727.2700,,13.0000
+S-2020099748,CA-20200144171,jp,"2026-10-06 04:50:45","2026-10-06 04:50:48",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2861",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2861"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-06 04:50:46""}]","[{""track_number"":""1403-1911-2861"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-06 04:50:46""}]",1403-1911-2861,custom,Sagawa,OSK14787,ナジャファバードパティナ,,,1.0000,60909.0900,,8.1000
+S-2020099747,CA-20200144054,jp,"2026-10-06 04:48:06","2026-10-06 04:48:09",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-1911-2883",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-1911-2883"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-06 04:48:08""}]","[{""track_number"":""1406-1911-2883"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-06 04:48:08""}]",1406-1911-2883,custom,Sagawa,DRW1310,ヘリーズ,,,1.0000,75454.5500,,4.0000
+S-2020099495,CA-20200144501,jp,"2026-10-02 04:54:28","2026-10-02 04:54:30",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7360",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7360"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-02 04:54:29""}]","[{""track_number"":""1406-9791-7360"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-02 04:54:29""}]",1406-9791-7360,custom,Sagawa,C4648,"クルド クーチャーン",,,1.0000,82727.2700,,1.5000
+S-2020099494,CA-20200144397,jp,"2026-10-02 04:53:38","2026-10-02 04:53:41",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7371",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7371"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-02 04:53:40""}]","[{""track_number"":""1406-9791-7371"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-02 04:53:40""}]",1406-9791-7371,custom,Sagawa,CDR10683,ハマダン,,,1.0000,10181.8200,,2.0000
+S-2020099493,CA-20200144383,jp,"2026-10-02 04:52:47","2026-10-02 04:52:49",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7382",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7382"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-02 04:52:48""}]","[{""track_number"":""1406-9791-7382"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-02 04:52:48""}]",1406-9791-7382,custom,Sagawa,CDR10280,カシャーン,,,1.0000,37272.7300,,3.0000
+S-2020099492,CA-20200144353,jp,"2026-10-02 04:50:22","2026-10-02 04:50:25",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7393",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7393"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-10-02 04:50:23""}]","[{""track_number"":""1406-9791-7393"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-10-02 04:50:23""}]",1406-9791-7393,custom,Sagawa,CDR15363,ペルシャギャッベ,,,1.0000,14818.1800,,1.0000
+S-2020099228,CA-20200144280,jp,"2026-09-29 07:32:21","2026-09-29 07:32:24",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2920",1,2.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2920"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:32:23""}]","[{""track_number"":""1403-1911-2920"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:32:23""}]",1403-1911-2920,custom,Sagawa,CDR10598,ロリ,,,1.0000,2709.0900,,1.0000
+S-2020099228,CA-20200144280,jp,"2026-09-29 07:32:21","2026-09-29 07:32:24",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2920",1,2.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2920"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:32:23""}]","[{""track_number"":""1403-1911-2920"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:32:23""}]",1403-1911-2920,custom,Sagawa,CDR11210,ハマダン,,,1.0000,2709.0900,,1.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR8976,ハマダン,,,1.0000,2709.0900,,1.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR8465,バクティアリ,,,1.0000,2709.0900,,1.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR8348,バクティアリ,,,1.0000,2709.0900,,2.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR8458,バルーチ,,,1.0000,2709.0900,,2.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR8418,ハマダン,,,1.0000,2709.0900,,1.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR9566,アラク,,,1.0000,2709.1000,,1.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR9506,アラク,,,1.0000,2709.0900,,1.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR9467,バルーチ,,,1.0000,2709.0900,,1.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR10013,バルーチ,,,1.0000,2709.0900,,1.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR10210,マシュハド,,,1.0000,2709.0900,,2.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR11187,ハマダン,,,1.0000,2709.0900,,1.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR11587,ハマダン,,,1.0000,2709.0900,,1.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR11605,ハマダン,,,1.0000,2709.0900,,1.0000
+S-2020099227,CA-20200143911,jp,"2026-09-29 07:31:07","2026-09-29 07:31:12",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2916",1,14.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2916"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:31:09""}]","[{""track_number"":""1403-1911-2916"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:31:09""}]",1403-1911-2916,custom,Sagawa,CDR11253,ハマダン,,,1.0000,2709.0900,,1.0000
+S-2020099226,CA-20200144053,jp,"2026-09-29 07:29:59","2026-09-29 07:30:02",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2931",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2931"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:30:00""}]","[{""track_number"":""1403-1911-2931"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:30:00""}]",1403-1911-2931,custom,Sagawa,CDR6277,シラーズ,,,1.0000,48181.8200,,7.0000
+S-2020099225,CA-20200143681,jp,"2026-09-29 07:29:00","2026-09-29 07:29:04",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2942",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2942"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:29:02""}]","[{""track_number"":""1403-1911-2942"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:29:02""}]",1403-1911-2942,custom,Sagawa,OSK8412,ナイン9ラ,,,1.0000,265454.5500,,7.0000
+S-2020099224,CA-20200143670,jp,"2026-09-29 07:25:53","2026-09-29 07:25:56",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2953",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2953"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:25:53""}]","[{""track_number"":""1403-1911-2953"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:25:53""}]",1403-1911-2953,custom,Sagawa,AWZ1037,"Memphis - Ziegler",,,1.0000,53636.3600,,8.0000
+S-2020099221,CA-20200143577,jp,"2026-09-29 07:23:18","2026-09-29 07:23:35",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2975",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2975"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:23:30""}]","[{""track_number"":""1403-1911-2975"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:23:30""}]",1403-1911-2975,custom,Sagawa,ACA565349,"Bamboo Gabbeh",,,1.0000,292727.2700,,38.0000
+S-2020099214,CA-20200143515,jp,"2026-09-29 07:21:22","2026-09-29 07:21:26",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2986",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2986"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:21:24""}]","[{""track_number"":""1403-1911-2986"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:21:24""}]",1403-1911-2986,custom,Sagawa,SBW556845,"キリム アフガン オールドスタイル",,,1.0000,76363.6400,,5.0000
+S-2020099213,CA-20200143510,jp,"2026-09-29 07:18:53","2026-09-29 07:18:57",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2990",1,3.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2990"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:18:55""}]","[{""track_number"":""1403-1911-2990"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:18:55""}]",1403-1911-2990,custom,Sagawa,OSK15210,ペルシャギャッベ,,,1.0000,55454.5500,,3.8000
+S-2020099213,CA-20200143510,jp,"2026-09-29 07:18:53","2026-09-29 07:18:57",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2990",1,3.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2990"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:18:55""}]","[{""track_number"":""1403-1911-2990"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:18:55""}]",1403-1911-2990,custom,Sagawa,CDR8190,ペルシャギャッベ,,,1.0000,47272.7200,,4.0000
+S-2020099213,CA-20200143510,jp,"2026-09-29 07:18:53","2026-09-29 07:18:57",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-2990",1,3.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-2990"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:18:55""}]","[{""track_number"":""1403-1911-2990"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:18:55""}]",1403-1911-2990,custom,Sagawa,ASJ1002,絨毯の滑り止め,,,1.0000,2032.7300,,1.0000
+S-2020099212,CA-20200143423,jp,"2026-09-29 07:15:30","2026-09-29 07:15:34",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-3001",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-3001"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:15:32""}]","[{""track_number"":""1403-1911-3001"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:15:32""}]",1403-1911-3001,custom,Sagawa,SBW534424,"ジーグラー Shabargan",,,1.0000,263636.3600,,10.0000
+S-2020099211,CA-20200143287,jp,"2026-09-29 07:13:37","2026-09-29 07:13:57",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-3012",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-3012"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:13:56""}]","[{""track_number"":""1403-1911-3012"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:13:56""}]",1403-1911-3012,custom,Sagawa,ABK1001,"Studio Line",,,1.0000,57272.7300,,10.0000
+S-2020099210,CA-20200143286,jp,"2026-09-29 07:11:44","2026-09-29 07:11:44",,,,,,1.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:11:45""}]",11111111,custom,Sagawa,VAN231683,"カシュマール パティナ",,,1.0000,454545.4500,,34.0000
+S-2020099209,CA-20200143231,jp,"2026-09-29 07:10:58","2026-09-29 07:11:00",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-3023",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-3023"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:10:59""}]","[{""track_number"":""1403-1911-3023"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:10:59""}]",1403-1911-3023,custom,Sagawa,EST547089,モダンキリム,,,1.0000,42727.2700,,9.0000
+S-2020099208,CA-20200143100,jp,"2026-09-29 07:09:15","2026-09-29 07:09:17",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-3034",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-3034"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:09:16""}]","[{""track_number"":""1403-1911-3034"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:09:16""}]",1403-1911-3034,custom,Sagawa,OSK7019,ビジャー,,,1.0000,350909.0900,,9.0000
+S-2020099207,CA-20200142854,jp,"2026-09-29 07:07:19","2026-09-29 07:07:21",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1403-1911-3045",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1403-1911-3045"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-29 07:07:19""}]","[{""track_number"":""1403-1911-3045"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-29 07:07:19""}]",1403-1911-3045,custom,Sagawa,VAN228423,ペルシャギャッベ,,,1.0000,62727.2700,,6.9000
+S-2020098978,CA-20200143576,jp,"2026-09-25 07:59:09","2026-09-25 07:59:14",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7415",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7415"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-25 07:59:11""}]","[{""track_number"":""1406-9791-7415"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-25 07:59:11""}]",1406-9791-7415,custom,Sagawa,CDR8866,ハマダン,,,1.0000,2709.0900,,1.0000
+S-2020098977,CA-20200143573,jp,"2026-09-25 07:57:40","2026-09-25 07:57:45",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7426",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7426"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-25 07:57:41""}]","[{""track_number"":""1406-9791-7426"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-25 07:57:41""}]",1406-9791-7426,custom,Sagawa,CDR7556,シラーズ,,,1.0000,81818.1800,,17.0000
+S-2020098976,CA-20200143299,jp,"2026-09-25 07:56:44","2026-09-25 07:56:46",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7430",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7430"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-25 07:56:45""}]","[{""track_number"":""1406-9791-7430"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-25 07:56:45""}]",1406-9791-7430,custom,Sagawa,CDR8637,カシャーン,,,1.0000,2709.0900,,1.0000
+S-2020098975,CA-20200143245,jp,"2026-09-25 07:55:36","2026-09-25 07:55:39",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7441",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7441"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-25 07:55:37""}]","[{""track_number"":""1406-9791-7441"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-25 07:55:37""}]",1406-9791-7441,custom,Sagawa,CDR8022,ヴィンテージ,,,1.0000,18636.3600,,2.0000
+S-2020098974,CA-20200143023,jp,"2026-09-25 07:54:28","2026-09-25 07:54:30",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7452",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7452"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-25 07:54:29""}]","[{""track_number"":""1406-9791-7452"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-25 07:54:29""}]",1406-9791-7452,custom,Sagawa,CWS567621,Ziegler,,,1.0000,309090.9100,,11.0000
+S-2020098973,CA-20200142886,jp,"2026-09-25 07:53:27","2026-09-25 07:53:30",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7463",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7463"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-25 07:53:28""}]","[{""track_number"":""1406-9791-7463"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-25 07:53:28""}]",1406-9791-7463,custom,Sagawa,EST547207,Raffi,,,1.0000,44545.4500,,11.0000
+S-2020098972,CA-20200142783,jp,"2026-09-25 07:52:04","2026-09-25 07:52:05",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7474",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7474"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-25 07:52:04""}]","[{""track_number"":""1406-9791-7474"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-25 07:52:04""}]",1406-9791-7474,custom,Sagawa,GAB1018,"ギャッベ ルーム - ライトブルー",,,1.0000,55454.5500,,11.0000
+S-2020098971,CA-20200142632,jp,"2026-09-25 07:49:38","2026-09-25 07:49:40",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7485",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7485"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-25 07:49:38""}]","[{""track_number"":""1406-9791-7485"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-25 07:49:38""}]",1406-9791-7485,custom,Sagawa,TSW60073,"ナイン カシュマール",,,1.0000,616363.6400,,23.0000
+S-2020098970,CA-20200142620,jp,"2026-09-25 07:48:25","2026-09-25 07:48:29",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7496",1,1.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7496"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-25 07:48:25""}]","[{""track_number"":""1406-9791-7496"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-25 07:48:25""}]",1406-9791-7496,custom,Sagawa,CWS555164,アフガン・アクチェ,,,1.0000,46363.6400,,5.0000
+S-2020098969,CA-20200142588,jp,"2026-09-25 07:47:01","2026-09-25 07:47:05",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7500",1,2.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7500"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-25 07:47:01""}]","[{""track_number"":""1406-9791-7500"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-25 07:47:01""}]",1406-9791-7500,custom,Sagawa,ZDK118513,"パキスタン ブハラ",,,1.0000,75454.5500,,4.0000
+S-2020098969,CA-20200142588,jp,"2026-09-25 07:47:01","2026-09-25 07:47:05",,1,1,"佐川急便お荷物お問合せサイト
+https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
+
+追跡番号：
+1406-9791-7500",1,2.0000,,[],"[{""comment"":""\u4f50\u5ddd\u6025\u4fbf\u304a\u8377\u7269\u304a\u554f\u5408\u305b\u30b5\u30a4\u30c8\r\nhttps:\/\/k2k.sagawa-exp.co.jp\/p\/sagawa\/web\/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284\r\n\r\n\u8ffd\u8de1\u756a\u53f7\uff1a\r\n1406-9791-7500"",""is_customer_notified"":""1"",""is_visible_on_front"":""0"",""created_at"":""2026-09-25 07:47:01""}]","[{""track_number"":""1406-9791-7500"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-25 07:47:01""}]",1406-9791-7500,custom,Sagawa,ASJ1003,絨毯の滑り止め,,,1.0000,3048.1800,,1.0000
 S-2020098968,CA-20200142476,jp,"2026-09-25 07:46:01","2026-09-25 07:46:01",,,,,,1.0000,,[],,"[{""track_number"":""11111111"",""title"":""Sagawa"",""carrier_code"":""custom"",""created_at"":""2026-09-25 07:46:02""}]",11111111,custom,Sagawa,KRV517108,インドギャッベ,,,1.0000,54545.4500,,20.0000
 S-2020098967,CA-20200142586,jp,"2026-09-25 07:45:20","2026-09-25 07:45:22",,1,1,"佐川急便お荷物お問合せサイト
 https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp?_ga=2.134790580.491628120.1772522897-167992335.1739409284
