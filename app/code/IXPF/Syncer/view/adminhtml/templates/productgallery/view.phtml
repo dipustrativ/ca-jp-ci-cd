@@ -1,0 +1,279 @@
+<?php
+/**
+ * Photo Studio queue job details: each section has a readable view and a JSON tree view.
+ *
+ * @var \IXPF\Syncer\Block\Adminhtml\ProductGalleryJsonViewer $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+$queue = $block->getQueue();
+$jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+    | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR;
+
+/** Section header with Readable/JSON switch and copy button; JSON is embedded for the tree. */
+$sectionStart = function (string $title, mixed $json, ?int $count = null) use ($escaper, $jsonFlags): string {
+    $countHtml = $count !== null ? '<span class="ps-count">' . (int)$count . '</span>' : '';
+    return '<section class="ps-section" data-ps-section>'
+        . '<header class="ps-section__head">'
+        . '<h2 class="ps-section__title">' . $escaper->escapeHtml($title) . $countHtml . '</h2>'
+        . '<div class="ps-section__tools">'
+        . '<div class="ps-switch" role="group">'
+        . '<button type="button" class="ps-switch__btn is-active" data-ps-mode="readable">'
+        . $escaper->escapeHtml(__('Readable')) . '</button>'
+        . '<button type="button" class="ps-switch__btn" data-ps-mode="json">'
+        . $escaper->escapeHtml(__('JSON')) . '</button>'
+        . '</div>'
+        . '<button type="button" class="ps-btn" data-ps-copy>' . $escaper->escapeHtml(__('Copy JSON')) . '</button>'
+        . '</div></header>'
+        . '<script type="application/json" data-ps-data>' . json_encode($json, $jsonFlags) . '</script>'
+        . '<div class="ps-pane" data-ps-pane="readable">';
+};
+$sectionEnd = '</div><div class="ps-pane" data-ps-pane="json" hidden></div></section>';
+
+$roleChips = function ($roles) use ($escaper): string {
+    $roles = array_filter((array)$roles);
+    if (!$roles) {
+        return '<span class="ps-muted">—</span>';
+    }
+    $html = '';
+    foreach ($roles as $role) {
+        $html .= '<span class="ps-chip">' . $escaper->escapeHtml((string)$role) . '</span>';
+    }
+    return $html;
+};
+$disabledFlag = fn($value) => (int)$value
+    ? '<span class="ps-pill ps-pill--off">' . $escaper->escapeHtml(__('Hidden')) . '</span>'
+    : '<span class="ps-pill ps-pill--on">' . $escaper->escapeHtml(__('Visible')) . '</span>';
+?>
+<div class="ps-view">
+<?php if (!$queue): ?>
+    <div class="message message-error error">
+        <div><?= $escaper->escapeHtml(__('Photo Studio job not found.')) ?></div>
+    </div>
+    <a class="ps-btn" href="<?= $escaper->escapeUrl($block->getBackUrl()) ?>">← <?= $escaper->escapeHtml(__('Back')) ?></a>
+<?php else: ?>
+    <?php
+    $payload = $block->getPayload();
+    $result = $block->getResult();
+    $details = $result['details'] ?? [];
+    $gallery = $details['gallery_images'] ?? [];
+    $uploadErrors = $details['upload_errors'] ?? [];
+    $otherErrors = $details['others_errors'] ?? [];
+    $bucketImages = $block->getBucketImages();
+    $ixpfResponse = $block->getIxpfResponse();
+    $product = $block->getProductInfo();
+    $status = (string)$queue['status'];
+    $supersededBy = (int)($result['superseded_by'] ?? 0);
+    $payloadItems = is_array($payload) ? $payload : [];
+    $newCount = count(array_filter($payloadItems, fn($i) => ($i['id'] ?? '') === 'new_image'));
+    ?>
+
+    <div class="ps-toolbar">
+        <a class="ps-btn" href="<?= $escaper->escapeUrl($block->getBackUrl()) ?>">← <?= $escaper->escapeHtml(__('Back to list')) ?></a>
+        <div class="ps-toolbar__right">
+            <span class="ps-muted"><?= $escaper->escapeHtml(__('Show all sections as')) ?></span>
+            <div class="ps-switch" role="group" data-ps-global>
+                <button type="button" class="ps-switch__btn is-active" data-ps-mode="readable"><?= $escaper->escapeHtml(__('Readable')) ?></button>
+                <button type="button" class="ps-switch__btn" data-ps-mode="json"><?= $escaper->escapeHtml(__('JSON')) ?></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="ps-hero">
+        <div class="ps-hero__main">
+            <div class="ps-hero__title">
+                <?= $escaper->escapeHtml(__('Job #%1', $queue['entity_id'])) ?>
+                <span class="ps-badge ps-badge--<?= $escaper->escapeHtmlAttr($status) ?>"><?= $escaper->escapeHtml($block->getStatusLabel($status)) ?></span>
+                <?php if ($result !== null && isset($result['success'])): ?>
+                    <span class="ps-badge ps-badge--<?= $result['success'] ? 'ok' : 'error' ?>">
+                        <?= $escaper->escapeHtml($result['success'] ? __('Result: success') : __('Result: failed')) ?>
+                        <?php if (isset($result['status_code'])): ?>· <?= (int)$result['status_code'] ?><?php endif; ?>
+                    </span>
+                <?php endif; ?>
+            </div>
+            <div class="ps-hero__sub">
+                <?= $escaper->escapeHtml(__('Product')) ?>
+                <a href="<?= $escaper->escapeUrl($product['url']) ?>" target="_blank" rel="noopener">
+                    <?= $escaper->escapeHtml($product['sku'] ?? __('(deleted)')) ?> · #<?= (int)$product['id'] ?>
+                </a>
+                <?php if ($supersededBy): ?>
+                    · <?= $escaper->escapeHtml(__('Superseded by')) ?>
+                    <a href="<?= $escaper->escapeUrl($block->getViewUrl($supersededBy)) ?>">#<?= (int)$supersededBy ?></a>
+                <?php endif; ?>
+            </div>
+        </div>
+        <dl class="ps-facts">
+            <div><dt><?= $escaper->escapeHtml(__('Type')) ?></dt><dd><?= $escaper->escapeHtml($queue['type']) ?></dd></div>
+            <div><dt><?= $escaper->escapeHtml(__('Retries')) ?></dt><dd><?= (int)$queue['retry_count'] ?></dd></div>
+            <div><dt><?= $escaper->escapeHtml(__('Created')) ?></dt><dd><?= $escaper->escapeHtml($queue['created_at']) ?></dd></div>
+            <div><dt><?= $escaper->escapeHtml(__('Updated')) ?></dt><dd><?= $escaper->escapeHtml($queue['updated_at']) ?></dd></div>
+        </dl>
+        <div class="ps-stats">
+            <div class="ps-stat"><span class="ps-stat__num"><?= count($payloadItems) ?></span><span class="ps-stat__label"><?= $escaper->escapeHtml(__('Requested')) ?></span></div>
+            <div class="ps-stat"><span class="ps-stat__num"><?= (int)$newCount ?></span><span class="ps-stat__label"><?= $escaper->escapeHtml(__('New images')) ?></span></div>
+            <div class="ps-stat"><span class="ps-stat__num"><?= count($gallery) ?></span><span class="ps-stat__label"><?= $escaper->escapeHtml(__('In gallery after')) ?></span></div>
+            <div class="ps-stat <?= ($uploadErrors || $otherErrors) ? 'ps-stat--error' : '' ?>"><span class="ps-stat__num"><?= count($otherErrors) ?></span><span class="ps-stat__label"><?= $escaper->escapeHtml(__('Errors')) ?></span></div>
+        </div>
+    </div>
+
+    <?php if ($uploadErrors || $otherErrors): ?>
+        <?= /* @noEscape */ $sectionStart((string)__('Errors'), ['upload_errors' => $uploadErrors, 'others_errors' => $otherErrors], count($otherErrors)) ?>
+            <div class="ps-errors">
+                <?php if ($uploadErrors): ?>
+                    <h3 class="ps-subtitle"><?= $escaper->escapeHtml(__('Upload errors')) ?></h3>
+                    <table class="ps-table">
+                        <thead><tr><th><?= $escaper->escapeHtml(__('File')) ?></th><th><?= $escaper->escapeHtml(__('Label')) ?></th><th><?= $escaper->escapeHtml(__('Error')) ?></th></tr></thead>
+                        <tbody>
+                        <?php foreach ($uploadErrors as $err): ?>
+                            <?php $err = is_array($err) ? $err : ['error' => (string)$err]; ?>
+                            <tr>
+                                <td class="ps-mono"><?= $escaper->escapeHtml(basename((string)($err['bucket_url'] ?? $err['path'] ?? ''))) ?></td>
+                                <td><?= $escaper->escapeHtml((string)($err['label'] ?? '')) ?></td>
+                                <td class="ps-error-text"><?= $escaper->escapeHtml((string)($err['error'] ?? '')) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+                <?php if ($otherErrors): ?>
+                    <h3 class="ps-subtitle"><?= $escaper->escapeHtml(__('Messages')) ?></h3>
+                    <ul class="ps-error-list">
+                        <?php foreach ($otherErrors as $msg): ?>
+                            <li><?= $escaper->escapeHtml(is_scalar($msg) ? (string)$msg : json_encode($msg)) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
+        <?= /* @noEscape */ $sectionEnd ?>
+    <?php endif; ?>
+
+    <?= /* @noEscape */ $sectionStart((string)__('Requested gallery (IXPF payload)'), $payload ?? $queue['payload'], count($payloadItems)) ?>
+        <?php if (!$payloadItems): ?>
+            <p class="ps-empty"><?= $escaper->escapeHtml($payload === null && $queue['payload'] ? __('Payload is not valid JSON — switch to JSON view.') : __('Empty payload — all images are removed from the product.')) ?></p>
+        <?php else: ?>
+            <table class="ps-table">
+                <thead><tr>
+                    <th>#</th><th><?= $escaper->escapeHtml(__('Image')) ?></th><th><?= $escaper->escapeHtml(__('ID')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Label / file')) ?></th><th><?= $escaper->escapeHtml(__('Roles')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Visibility')) ?></th>
+                </tr></thead>
+                <tbody>
+                <?php foreach ($payloadItems as $item): ?>
+                    <?php
+                    $id = (string)($item['id'] ?? '');
+                    $path = (string)($item['path'] ?? '');
+                    $source = $path !== '' ? $path : (string)($item['bucket_url'] ?? '');
+                    ?>
+                    <tr>
+                        <td class="ps-num"><?= (int)($item['position'] ?? 0) ?></td>
+                        <td class="ps-thumb-cell">
+                            <?php if ($path !== ''): ?>
+                                <a href="<?= $escaper->escapeUrl($block->getMediaUrl($path)) ?>" target="_blank" rel="noopener">
+                                    <img class="ps-thumb" loading="lazy" alt="" src="<?= $escaper->escapeUrl($block->getMediaUrl($path)) ?>">
+                                </a>
+                            <?php else: ?>
+                                <span class="ps-thumb ps-thumb--none"><?= $escaper->escapeHtml(__('bucket')) ?></span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if ($id === 'new_image'): ?>
+                                <span class="ps-pill ps-pill--new"><?= $escaper->escapeHtml(__('new')) ?></span>
+                            <?php else: ?>
+                                <span class="ps-mono" data-ps-copy-text="<?= $escaper->escapeHtmlAttr($id) ?>"><?= $escaper->escapeHtml($id) ?></span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <div><?= $escaper->escapeHtml((string)($item['label'] ?? '')) ?></div>
+                            <div class="ps-mono ps-muted ps-small"><?= $escaper->escapeHtml($source) ?></div>
+                        </td>
+                        <td><?= /* @noEscape */ $roleChips($item['role'] ?? []) ?></td>
+                        <td><?= /* @noEscape */ $disabledFlag($item['disabled'] ?? 0) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+    <?= /* @noEscape */ $sectionEnd ?>
+
+    <?= /* @noEscape */ $sectionStart((string)__('Resulting gallery (sent in webhook)'), $result ?? $queue['response_result'], $result !== null && !$supersededBy ? count($gallery) : null) ?>
+        <?php if ($result === null): ?>
+            <p class="ps-empty"><?= $escaper->escapeHtml($queue['response_result'] ? __('Result is not valid JSON — switch to JSON view.') : __('Not processed yet.')) ?></p>
+        <?php elseif ($supersededBy && !$gallery): ?>
+            <p class="ps-empty"><?= $escaper->escapeHtml(__('Not processed: a newer job for the same product replaced it. Its webhook reports the final gallery.')) ?></p>
+        <?php elseif (!$gallery): ?>
+            <p class="ps-empty"><?= $escaper->escapeHtml(__('Product has no gallery images.')) ?></p>
+        <?php else: ?>
+            <table class="ps-table">
+                <thead><tr>
+                    <th>#</th><th><?= $escaper->escapeHtml(__('Image')) ?></th><th><?= $escaper->escapeHtml(__('value_id')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Label / path')) ?></th><th><?= $escaper->escapeHtml(__('Roles')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Visibility')) ?></th>
+                </tr></thead>
+                <tbody>
+                <?php foreach ($gallery as $image): ?>
+                    <?php $url = (string)($image['url'] ?? ''); ?>
+                    <tr>
+                        <td class="ps-num"><?= (int)($image['position'] ?? 0) ?></td>
+                        <td class="ps-thumb-cell">
+                            <?php if ($url !== ''): ?>
+                                <a href="<?= $escaper->escapeUrl($url) ?>" target="_blank" rel="noopener">
+                                    <img class="ps-thumb" loading="lazy" alt="" src="<?= $escaper->escapeUrl($url) ?>">
+                                </a>
+                            <?php endif; ?>
+                        </td>
+                        <td><span class="ps-mono" data-ps-copy-text="<?= (int)($image['id'] ?? 0) ?>"><?= (int)($image['id'] ?? 0) ?></span></td>
+                        <td>
+                            <div><?= $escaper->escapeHtml((string)($image['label'] ?? '')) ?></div>
+                            <div class="ps-mono ps-muted ps-small"><?= $escaper->escapeHtml((string)($image['path'] ?? '')) ?></div>
+                        </td>
+                        <td><?= /* @noEscape */ $roleChips($image['roles'] ?? []) ?></td>
+                        <td><?= /* @noEscape */ $disabledFlag($image['disabled'] ?? 0) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+    <?= /* @noEscape */ $sectionEnd ?>
+
+    <?php if ($bucketImages): ?>
+        <?= /* @noEscape */ $sectionStart((string)__('Bucket downloads'), $bucketImages, count($bucketImages)) ?>
+            <table class="ps-table">
+                <thead><tr>
+                    <th><?= $escaper->escapeHtml(__('File')) ?></th><th><?= $escaper->escapeHtml(__('Status')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Error')) ?></th><th><?= $escaper->escapeHtml(__('Updated')) ?></th>
+                </tr></thead>
+                <tbody>
+                <?php foreach ($bucketImages as $row): ?>
+                    <tr>
+                        <td class="ps-mono"><?= $escaper->escapeHtml((string)$row['bucket_image_path']) ?></td>
+                        <td><span class="ps-badge ps-badge--<?= $escaper->escapeHtmlAttr((string)$row['status']) ?>"><?= $escaper->escapeHtml((string)$row['status']) ?></span></td>
+                        <td class="ps-error-text"><?= $escaper->escapeHtml((string)$row['error_message']) ?></td>
+                        <td class="ps-nowrap"><?= $escaper->escapeHtml((string)$row['updated_at']) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?= /* @noEscape */ $sectionEnd ?>
+    <?php endif; ?>
+
+    <?php if ($ixpfResponse !== null && $ixpfResponse !== ''): ?>
+        <?= /* @noEscape */ $sectionStart((string)__('IXPF webhook response'), $ixpfResponse) ?>
+            <?php if (is_array($ixpfResponse)): ?>
+                <dl class="ps-kv" data-ps-kv></dl>
+            <?php else: ?>
+                <pre class="ps-pre"><?= $escaper->escapeHtml((string)$ixpfResponse) ?></pre>
+            <?php endif; ?>
+        <?= /* @noEscape */ $sectionEnd ?>
+    <?php endif; ?>
+
+    <?= /* @noEscape */ $sectionStart((string)__('Full record'), $block->getJsonData()) ?>
+        <dl class="ps-kv" data-ps-kv></dl>
+    <?= /* @noEscape */ $sectionEnd ?>
+
+    <div class="ps-toast" data-ps-toast hidden></div>
+
+    <script type="text/x-magento-init">
+        {"*": {"IXPF_Syncer/js/photo-studio-view": {}}}
+    </script>
+<?php endif; ?>
+</div>
