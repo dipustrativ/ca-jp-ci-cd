@@ -180,7 +180,8 @@ class DirectGallerySync
      *   1. Decode & validate payload JSON.
      *   2. Resolve the product's entity_id / row_id / sku from the DB.
      *   3. Empty payload → delete all images and mark ready_for_webhook.
-     *   4. Classify payload items into new / existing / keep-ids.
+     *   4. Classify payload items into new / existing / keep-ids. Any existing id not in the
+     *      product's gallery (stale payload) rejects the job with the gallery left unchanged.
      *   5. Delete gallery entries no longer referenced by the payload.
      *   6. Copy new image files into pub/media and insert gallery rows.
      *   7. Update metadata (label, position, disabled, roles) for existing entries.
@@ -223,6 +224,32 @@ class DirectGallerySync
         }
 
         [$newImages, $existingImages, $keepValueIds] = $this->classifyPayloadItems($payload);
+
+        // The payload is built from value_ids IXPF got in an earlier webhook. If one is no longer
+        // in this product's gallery the payload is stale: deleteRemovedImages() would drop every
+        // real image (none are in $keepValueIds), so reject the job before touching anything and
+        // report the current gallery for IXPF to resync from.
+        $unknownIds = array_values(array_diff(
+            array_filter($keepValueIds),
+            $this->getProductValueIds($productRow)
+        ));
+        if (!empty($unknownIds)) {
+            $this->logWarning(sprintf(
+                'DirectGallerySync: Queue ID=%d — value_id(s) %s not in product ID=%d gallery; payload rejected, gallery unchanged.',
+                $queueId, implode(', ', $unknownIds), $productId
+            ));
+            return $this->completeQueue(
+                $queueId,
+                $this->photoStudioHelper->getGalleryImages($productId),
+                [],
+                array_map(
+                    fn($id) => 'value_id ' . $id . ' not found in this product\'s gallery'
+                        . ' (stale or wrong id) — payload rejected, gallery unchanged.',
+                    $unknownIds
+                )
+            );
+        }
+
         $failedDownloads = $this->getFailedDownloads($batch['images']);
 
         // Must run before deleteRemovedImages(): a resent image keeps its value_id instead of
@@ -407,6 +434,23 @@ class DirectGallerySync
     }
 
     /**
+     * Every gallery value_id currently linked to the product.
+     *
+     * @param array{entity_id: int, row_id: int, sku: string} $productRow
+     * @return int[]
+     */
+    private function getProductValueIds(array $productRow): array
+    {
+        $conn = $this->resourceConnection->getConnection();
+        $valueToET = $this->resourceConnection->getTableName('catalog_product_entity_media_gallery_value_to_entity');
+
+        return array_map('intval', $conn->fetchCol(
+            "SELECT value_id FROM {$valueToET} WHERE entity_id = ?",
+            [(int)$productRow['entity_id']]
+        ));
+    }
+
+    /**
      * Fetch the minimal product data needed for raw SQL gallery writes.
      *
      * Returns an associative array with keys entity_id, row_id, and sku,
@@ -485,13 +529,7 @@ class DirectGallerySync
      */
     private function deleteAllImages(array $productRow): array
     {
-        $conn = $this->resourceConnection->getConnection();
-        $valueToET = $this->resourceConnection->getTableName('catalog_product_entity_media_gallery_value_to_entity');
-
-        $valueIds = $conn->fetchCol(
-            "SELECT value_id FROM {$valueToET} WHERE entity_id = ?",
-            [(int)$productRow['entity_id']]
-        );
+        $valueIds = $this->getProductValueIds($productRow);
 
         return empty($valueIds) ? [] : $this->deleteValueIds($productRow, $valueIds);
     }
@@ -848,6 +886,7 @@ class DirectGallerySync
         $conn = $this->resourceConnection->getConnection();
         $galleryT = $this->resourceConnection->getTableName('catalog_product_entity_media_gallery');
         $galleryVT = $this->resourceConnection->getTableName('catalog_product_entity_media_gallery_value');
+        $valueToET = $this->resourceConnection->getTableName('catalog_product_entity_media_gallery_value_to_entity');
         $varcharT = $this->resourceConnection->getTableName('catalog_product_entity_varchar');
 
         $entityId = (int)$productRow['entity_id'];
@@ -861,13 +900,16 @@ class DirectGallerySync
             }
 
             try {
+                // Scoped to this product: a value_id of another product's image must not be updated.
                 $filePath = $conn->fetchOne(
-                    "SELECT value FROM {$galleryT} WHERE value_id = ?",
-                    [$valueId]
+                    "SELECT g.value FROM {$galleryT} g"
+                    . " JOIN {$valueToET} vte ON vte.value_id = g.value_id"
+                    . " WHERE g.value_id = ? AND vte.entity_id = ?",
+                    [$valueId, $entityId]
                 );
 
                 if (!$filePath) {
-                    $errors[] = 'value_id ' . $valueId . ' not found in media_gallery table.';
+                    $errors[] = 'value_id ' . $valueId . ' not found in this product\'s gallery.';
                     continue;
                 }
 
