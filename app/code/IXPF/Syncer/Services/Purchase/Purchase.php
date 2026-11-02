@@ -13,15 +13,20 @@ use IXPF\Syncer\Helper\Logger\PurchaseLogger;
 use IXPF\Syncer\Helper\ProductPurchase;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Lock\LockManagerInterface;
 use Magento\InventoryApi\Api\Data\SourceItemInterface;
 use Magento\InventoryApi\Api\Data\SourceItemInterfaceFactory;
 use Magento\InventoryApi\Api\SourceItemRepositoryInterface;
 use Magento\InventoryApi\Api\SourceItemsDeleteInterface;
 use Magento\InventoryApi\Api\SourceItemsSaveInterface;
-use function Symfony\Component\HttpFoundation\initializeFormats;
 
 class Purchase
 {
+    /**
+     * Seconds to wait for another request holding the same SKU before giving up
+     */
+    private const SKU_LOCK_TIMEOUT = 30;
+
     /**
      * In-memory cache for loaded products (keyed by SKU)
      * Prevents duplicate DB loads within the same request
@@ -52,7 +57,8 @@ class Purchase
         protected SearchCriteriaBuilder         $searchCriteriaBuilder,
         protected SourceItemRepositoryInterface $sourceItemRepository,
         protected SourceItemsDeleteInterface    $sourceItemsDelete,
-        protected StoreValueWriter              $storeValueWriter
+        protected StoreValueWriter              $storeValueWriter,
+        protected LockManagerInterface          $lockManager
     )
     {
     }
@@ -117,14 +123,20 @@ class Purchase
             return;
         }
 
-        // Guard: do not insert a duplicate item
+        // One item row per (ixpf_purchase_id, sku): a resent SKU refreshes the existing row and
+        // re-points it at the current purchase order, so the status updates above (keyed on
+        // purchase_order_id + sku) land on it instead of matching nothing.
         $select = $connection->select()
-            ->from(['ipo' => $tableName])
+            ->from(['ipo' => $tableName], ['entity_id'])
             ->where('ipo.ixpf_purchase_id = ?', $purchaseItemData['ixpf_purchase_id'])
             ->where('ipo.sku = ?', $purchaseItemData['sku'])
+            ->order('ipo.entity_id ASC')
             ->limit(1);
 
-        if ($connection->fetchRow($select)) {
+        $existingItemId = $connection->fetchOne($select);
+        if ($existingItemId) {
+            $purchaseItemData['error_message'] = null;
+            $connection->update($tableName, $purchaseItemData, ['entity_id = ?' => (int)$existingItemId]);
             return;
         }
 
@@ -166,7 +178,16 @@ class Purchase
         $purchaseOrder = $this->getPurchaseOrderById($purchaseOrderId);
 
         foreach ($products as $product) {
+            // Normalise the SKU once and use it everywhere. Magento trims the SKU on save but
+            // looks it up untrimmed, so " RUG-1" would miss the existing "RUG-1" and save a
+            // second product with the same SKU.
+            $product['sku'] = $this->normalizeSku($product['sku'] ?? '');
+
             try {
+                if ($product['sku'] === '') {
+                    throw new Exception('Product sku is empty');
+                }
+
                 $createOrUpdateProductData = [];
                 $purchaseQty = 0;
                 $ongoing = false; //-- optional for others magento2 versions
@@ -191,17 +212,6 @@ class Purchase
                     }
                 }
 
-                // Defaults
-                if (!isset($createOrUpdateProductData['attribute_set_id'])) {
-                    $createOrUpdateProductData['attribute_set_id'] = 4;
-                }
-                if (!isset($createOrUpdateProductData['visibility'])) {
-                    $createOrUpdateProductData['visibility'] = 4;
-                }
-                if (!isset($createOrUpdateProductData['status'])) {
-                    $createOrUpdateProductData['status'] = 2;
-                }
-
                 // "categories" = list of "A/B/C" path strings from the API.
                 // Resolve to ids (creating missing levels), merge into category_ids.
                 if (!empty($createOrUpdateProductData['categories'])) {
@@ -216,6 +226,19 @@ class Purchase
                     }
                 }
                 unset($createOrUpdateProductData['categories']);
+
+                // The category list replaces the product's categories on update, so drop blanks /
+                // non-ids; an empty result leaves categories untouched rather than unassigning all.
+                if (isset($createOrUpdateProductData['category_ids'])) {
+                    $categoryIds = array_values(array_unique(array_filter(
+                        array_map('intval', (array)$createOrUpdateProductData['category_ids'])
+                    )));
+                    if ($categoryIds) {
+                        $createOrUpdateProductData['category_ids'] = $categoryIds;
+                    } else {
+                        unset($createOrUpdateProductData['category_ids']);
+                    }
+                }
 
                 $stockSource = $product['stock_source'] ?? '';
                 $purchaseQty = intval($product['qty'] ?? ($product['qty_ordered'] ?? 0));
@@ -280,14 +303,25 @@ class Purchase
                     $behavior = 'create';
                     $this->purchaseOrderItemCreateOrUpdate($purchaseOrderItem);
 
-                    $productData = $this->updateOrCreateProduct(
-                        $product['sku'],
-                        $createOrUpdateProductData,
-                        $sourceInfo,
-                        $behavior,
-                        $storeValues,
-                        $product
-                    );
+                    // Serialise create-or-update per SKU across requests: an IXPF retry that
+                    // overlaps the original call would otherwise see "not found" in both and
+                    // create the product twice.
+                    $lockName = 'ixpf_purchase_sku_' . hash('sha256', mb_strtolower($product['sku']));
+                    if (!$this->lockManager->lock($lockName, self::SKU_LOCK_TIMEOUT)) {
+                        throw new Exception('SKU is being processed by another request, retry later');
+                    }
+                    try {
+                        $productData = $this->updateOrCreateProduct(
+                            $product['sku'],
+                            $createOrUpdateProductData,
+                            $sourceInfo,
+                            $behavior,
+                            $storeValues,
+                            $product
+                        );
+                    } finally {
+                        $this->lockManager->unlock($lockName);
+                    }
 
                     // Mark item as completed / ready for ongoing
                     $this->purchaseOrderItemCreateOrUpdate(
@@ -361,6 +395,21 @@ class Purchase
         } else {
             $productInstance = $this->productFactory->create();
             $behavior = 'create';
+            // Defaults for new products only — on update an omitted field keeps its current
+            // value (a partial update must not disable the product or reset its visibility).
+            $productData += [
+                'attribute_set_id' => 4,
+                'visibility' => 4,
+                'status' => 2,
+            ];
+        }
+
+        // attribute_set_id is a smallint: an unknown id would be saved truncated (999999 →
+        // 65535) and leave a product that can no longer be loaded.
+        if (isset($productData['attribute_set_id'])
+            && !$this->isProductAttributeSet((int)$productData['attribute_set_id'])
+        ) {
+            throw new Exception("Unknown product attribute_set {$productData['attribute_set_id']}");
         }
 
 
@@ -393,7 +442,25 @@ class Purchase
             $productInstance->setData($key, $value);
         }
 
+        // Purchase API only: the payload's categories are the full list (replace). Magento merges
+        // category_ids into the loaded category_links otherwise, so a moved product would stay in
+        // its old categories too. Without links, SaveHandler syncs to category_ids (keeping
+        // positions of categories that stay) and deletes the rest.
+        if ($behavior === 'update' && isset($productData['category_ids'])) {
+            $productInstance->getExtensionAttributes()->setCategoryLinks(null);
+        }
+
         $product = $productInstance->save();
+
+        // Magento renames a colliding new SKU to "<sku>-1" instead of failing. Reaching this
+        // means a duplicate slipped past the lookup above — record it loudly.
+        if ($behavior === 'create' && $product->getSku() !== $sku) {
+            $this->purchaseLogger->writeDaily(
+                "[ERROR] Product SKU {$sku} already existed; Magento saved the new product as "
+                . "SKU {$product->getSku()} (id {$product->getId()}). Duplicate needs cleanup.",
+                'error'
+            );
+        }
 
         // Bust our local cache so the next getProduct() call for this SKU
         // returns the freshly-saved instance.
@@ -560,7 +627,9 @@ class Purchase
             return false;
         }
 
-        if (array_key_exists($sku, $this->productCache)) {
+        // Only hits are cached: a miss is re-checked, since another request may have created
+        // the SKU since (callers hold the SKU lock while re-checking).
+        if (!empty($this->productCache[$sku])) {
             return $this->productCache[$sku];
         }
 
@@ -569,10 +638,48 @@ class Purchase
             $product = $this->productRepository->get($sku, false, 0);
             $this->productCache[$sku] = $product->getId() ? $product : false;
         } catch (NoSuchEntityException $e) {
+            // A product that exists but fails to load (broken attribute set, etc.) must not
+            // be treated as missing — the create path would save a duplicate "<sku>-1".
+            if ($this->product->getIdBySku($sku)) {
+                throw new Exception("Product SKU {$sku} exists but could not be loaded: " . $e->getMessage());
+            }
             $this->productCache[$sku] = false;
         }
 
         return $this->productCache[$sku];
+    }
+
+    /**
+     * @param int $attributeSetId
+     * @return bool
+     */
+    private function isProductAttributeSet(int $attributeSetId): bool
+    {
+        $connection = $this->resourceConnection->getConnection();
+        $select = $connection->select()
+            ->from(['eas' => $this->resourceConnection->getTableName('eav_attribute_set')], ['attribute_set_id'])
+            ->join(
+                ['eet' => $this->resourceConnection->getTableName('eav_entity_type')],
+                'eet.entity_type_id = eas.entity_type_id',
+                []
+            )
+            ->where('eet.entity_type_code = ?', Product::ENTITY)
+            ->where('eas.attribute_set_id = ?', $attributeSetId);
+
+        return (bool)$connection->fetchOne($select);
+    }
+
+    /**
+     * Trim ASCII whitespace plus NBSP and the full-width (ideographic) space.
+     *
+     * @param mixed $sku
+     * @return string
+     */
+    private function normalizeSku(mixed $sku): string
+    {
+        $sku = (string)$sku;
+        // preg_replace() returns null on invalid UTF-8; fall back to a plain trim.
+        return preg_replace('/^[\s\x{00A0}\x{3000}]+|[\s\x{00A0}\x{3000}]+$/u', '', $sku) ?? trim($sku);
     }
 
     /**
@@ -673,19 +780,20 @@ class Purchase
     {
         $seoCategoryName = isset($productInfo['seo_category_id'])
             ? $this->getSeoCategoryName($productInfo['seo_category_id'])
-            : $this->getGoogleFeedCategoryName($productInfo['google_feed_category']);
+            : $this->getGoogleFeedCategoryName($productInfo['google_feed_category'] ?? null);
 
-        return preg_replace(
+        // Optional parts may be missing from the payload; trim the dashes they leave behind.
+        return trim(preg_replace(
             '/[^a-z0-9-]+/',
             '-',
             strtolower(
                 $seoCategoryName . '-' .
-                $productInfo['name'] . '-' .
-                number_format($productInfo['width'], 0, '', '') . 'x' .
-                number_format($productInfo['length'], 0, '', '') . '-' .
+                ($productInfo['name'] ?? '') . '-' .
+                number_format((float)($productInfo['width'] ?? 0), 0, '', '') . 'x' .
+                number_format((float)($productInfo['length'] ?? 0), 0, '', '') . '-' .
                 $productInfo['sku']
             )
-        );
+        ), '-');
     }
 
     /**
@@ -740,9 +848,10 @@ class Purchase
                         SELECT entity_type_id FROM `eav_entity_type`
                          WHERE entity_type_code = 'catalog_category'
                     )
-                AND ccev.entity_id = {$categoryId}
+                AND ccev.entity_id = :category_id
                 AND ccev.store_id  = 0
-              LIMIT 1"
+              LIMIT 1",
+            ['category_id' => (int)$categoryId]
         );
     }
 }

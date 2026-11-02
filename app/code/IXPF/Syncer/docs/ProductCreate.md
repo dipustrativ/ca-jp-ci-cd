@@ -150,7 +150,7 @@ Invalid/missing token → error response.
 
 ### Special Rules
 
-- **`categories`** → resolved to ids and merged into `category_ids`. Category
+- **`categories`** → resolved to ids and merged into `category_ids` (same payload). Category
   assignment is **global** (no store scope).
 - **`special_price = 0`** → set to `null` (removes special price), logged.
 - **Select / multiselect by label** → the label is resolved to an option id; if the
@@ -160,6 +160,32 @@ Invalid/missing token → error response.
   from seo/google-feed category name + name + dimensions + sku.
 - **Update immutables** — on an existing SKU, `sku`, `ean_barcode`, `tepp_barcode`
   are not overwritten.
+- **SKU match (no duplicates)** — the SKU is trimmed (ASCII whitespace, NBSP,
+  full-width space) before lookup, so `" RUG-123"` updates `RUG-123` instead of
+  creating a second product. Create-or-update holds a per-SKU DB lock (30 s wait),
+  so an overlapping retry of the same SKU becomes an update; if the lock can't be
+  taken the SKU fails with `SKU is being processed by another request, retry later`.
+  The same SKU twice in one payload is created once, then updated.
+- **Defaults are create-only** — `status=2`, `visibility=4`, `attribute_set=4` apply only
+  when the SKU is new. On update an omitted field keeps its current value; a value sent
+  in the payload always wins (create and update).
+- **`attribute_set`** must be an existing product attribute set, otherwise that SKU fails
+  (`Unknown product attribute_set <id>`).
+- **Attributes outside the product's attribute set** are silently dropped by Magento
+  (e.g. `brand`, `manufacturer`, `area` are not in set 4) — the SKU still reports success.
+- **Categories replace on update** — when `category_ids` and/or `categories` are sent, they
+  are the product's full category list: categories not in the payload are unassigned,
+  categories that stay keep their position, new ones get position 1000. Omitted, empty
+  (`""`) or all-invalid category values leave the categories untouched. This applies to
+  this endpoint only — other APIs and the admin keep Magento's merge behaviour.
+- **Select labels** match the admin label or, for source-model attributes
+  (`gift_message_available`, `options_container`, …), the untranslated label; the
+  raw option id/value is accepted too.
+- **Empty value** (`""`) on update clears text, select, multiselect, price and boolean
+  attributes.
+- **Purchase item log** — one `ixpf_purchase_order_items` row per
+  (`purchase.id`, `sku`). Resending a SKU under the same purchase id refreshes that
+  row and re-points it at the newest purchase order record.
 
 ### MSI Stock Assignment
 

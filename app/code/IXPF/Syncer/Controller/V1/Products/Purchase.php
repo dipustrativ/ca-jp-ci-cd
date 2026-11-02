@@ -95,7 +95,13 @@ class Purchase extends AbstractController implements HttpPostActionInterface, Cs
             $connection = $this->resourceConnection->getConnection();
             //-- save the batch
             try {
-                $checkAlreadyExits = $connection->fetchOne("SELECT entity_id FROM `ixpf_purchases_batch` WHERE `batch_id` = '{$payload['batch']}' AND `purchase_id` = '{$payload['purchase_id']}'");
+                $checkAlreadyExits = $connection->fetchOne(
+                    $connection->select()
+                        ->from($this->resourceConnection->getTableName('ixpf_purchases_batch'), ['entity_id'])
+                        ->where('batch_id = ?', (string)$payload['batch'])
+                        ->where('purchase_id = ?', (string)$payload['purchase_id'])
+                        ->limit(1)
+                );
                 if ($checkAlreadyExits) {
                     $purchaseBatch = $this->batchFactory->create()->load($checkAlreadyExits, 'entity_id');
                 } else {

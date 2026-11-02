@@ -221,7 +221,12 @@ class ProductAttribute
         $attributeOptionIds = [];
         foreach ($options as $option) {
             if (!empty($option['value']) && !empty($option['label'])) {
-                $attributeOptionValues[strtolower(trim($option['label']))] = $option['value'];
+                //-- source-model labels are Phrases translated to the request locale (ja_JP on
+                //-- the storefront: "Yes" → "はい"); accept the untranslated label too
+                if ($option['label'] instanceof \Magento\Framework\Phrase) {
+                    $attributeOptionValues[strtolower(trim($option['label']->getText()))] = $option['value'];
+                }
+                $attributeOptionValues[strtolower(trim((string)$option['label']))] = $option['value'];
                 $attributeOptionIds[(string)(int)$option['value']] = $option['value'];
             }
         }
