@@ -12,10 +12,11 @@ name: build-deploy
 #   <tag>       the git tag name, frozen, never moves -> rollback target
 # Setup: docker/INFRA-CI.md, Part 2 (CI/CD).
 #
-# ⚠️ A `carpetavenue-jp-build` self-hosted runner must be registered for
-# indexon/carpetavenue-jp first — without one, a pushed tag queues a job that
-# waits forever. Deploy docker/github-runner.compose.yml on Server A and add the
-# repo secrets (docker/INFRA-CI.md) before pushing the first tag.
+# Runs on a GitHub-hosted runner (bills Actions minutes, no server needed).
+# To build on Server A instead, register a self-hosted runner labelled
+# `carpetavenue-jp-build` (docker/INFRA-CI.md, Step 1) and switch `runs-on` to
+# [self-hosted, carpetavenue-jp-build] — without that runner, a pushed tag
+# queues a job that waits forever.
 on:
   push:
     tags: ['v*', '*_stage_*']
@@ -27,7 +28,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: [self-hosted, carpetavenue-jp-build]
+    runs-on: ubuntu-latest
     env:
       IMAGE: registry.carpetavenue.net/carpetavenue-jp
       VERSION: ${{ github.ref_name }}

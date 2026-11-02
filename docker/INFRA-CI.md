@@ -179,8 +179,9 @@ sudo ./svc.sh install "$USER" && sudo ./svc.sh start && sudo ./svc.sh status
 docker login registry.carpetavenue.net    # prove creds before a 20-min build needs them
 ```
 
-The label **`carpetavenue-jp-build`** must match exactly — the workflow targets
-it with `runs-on: [self-hosted, carpetavenue-jp-build]`.
+The label **`carpetavenue-jp-build`** must match exactly. The workflow currently
+ships with `runs-on: ubuntu-latest` (GitHub-hosted) — switch it to
+`runs-on: [self-hosted, carpetavenue-jp-build]` once this runner shows Idle.
 
 ✅ GitHub → Settings → Actions → Runners shows **carpetavenue-jp-build-1** as
 **● Idle** (green) with that label. Not idle → `sudo ./svc.sh status` and
@@ -295,7 +296,7 @@ tagged, so they are never collected. That is what makes rollback safe.
 |---|---|
 | `on: push: tags: ['v*', '*_stage_*']` | tag = deploy (`v164` prod, `1.0.1_stage_1` stage). Nothing else triggers it — no branch push, merge, PR or manual button |
 | `concurrency: cancel-in-progress: false` | two tags in a row → queued one after the other; a release is never cancelled half-built |
-| `runs-on: [self-hosted, carpetavenue-jp-build]` | pins to your runner. Zero GitHub minutes |
+| `runs-on: ubuntu-latest` | GitHub-hosted, bills Actions minutes, needs `registry.carpetavenue.net` reachable from the internet. Switch to `[self-hosted, carpetavenue-jp-build]` to build on Server A for zero minutes (Step 1) |
 | `VERSION: ${{ github.ref_name }}` | the git tag name (`v164`) = the immutable image tag |
 | `context: .` | repo root **is** the Magento root (`src/`), filtered by `.dockerignore` |
 | `secrets:` on the Magento build | `auth.json` as a BuildKit secret, never in a layer |
